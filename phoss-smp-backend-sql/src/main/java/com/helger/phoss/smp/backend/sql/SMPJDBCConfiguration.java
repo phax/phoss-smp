@@ -23,7 +23,7 @@ import javax.annotation.concurrent.Immutable;
 import com.helger.commons.annotation.PresentForCodeCoverage;
 import com.helger.commons.annotation.Since;
 import com.helger.config.IConfig;
-import com.helger.db.jdbc.executor.DBExecutor;
+import com.helger.db.api.config.JdbcConfiguration;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 
 /**
@@ -132,7 +132,7 @@ public final class SMPJDBCConfiguration
   public static long getJdbcExecutionTimeWarningMilliseconds ()
   {
     return _getConfig ().getAsLong (CONFIG_JDBC_EXECUTION_TIME_WARNING_MS,
-                                    DBExecutor.DEFAULT_EXECUTION_DURATION_WARN_MS);
+                                    JdbcConfiguration.DEFAULT_EXECUTION_DURATION_WARN_MS);
   }
 
   public static boolean isJdbcServiceGroupCacheEnabled ()

@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.exception.InitializationException;
-import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
@@ -67,7 +66,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
                                                                            SMPServerConfiguration.getTrustStorePassword ());
     if (aTrustStoreLoading.isFailure ())
     {
-      _loadError (aTrustStoreLoading.getError (), PeppolKeyStoreHelper.getLoadError (aTrustStoreLoading));
+      _loadError (aTrustStoreLoading.getError (), LoadedKeyStore.getLoadError (aTrustStoreLoading));
       throw new InitializationException (s_sInitError);
     }
     m_aTrustStore = aTrustStoreLoading.getKeyStore ();
@@ -95,8 +94,8 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return The global trust store to be used. This trust store is never
-   *         reloaded and must be present.
+   * @return The global trust store to be used. This trust store is never reloaded and must be
+   *         present.
    */
   @Nullable
   public KeyStore getTrustStore ()
@@ -105,9 +104,8 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return A shortcut method to determine if the trust store configuration is
-   *         valid or not. This method can be used, even if
-   *         {@link #getInstance()} throws an exception.
+   * @return A shortcut method to determine if the trust store configuration is valid or not. This
+   *         method can be used, even if {@link #getInstance()} throws an exception.
    */
   public static boolean isTrustStoreValid ()
   {
@@ -115,8 +113,8 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   }
 
   /**
-   * If the certificate is not valid according to {@link #isTrustStoreValid()}
-   * this method can be used to determine the error detail code.
+   * If the certificate is not valid according to {@link #isTrustStoreValid()} this method can be
+   * used to determine the error detail code.
    *
    * @return <code>null</code> if initialization was successful.
    */
@@ -127,8 +125,8 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   }
 
   /**
-   * If the certificate is not valid according to {@link #isTrustStoreValid()}
-   * this method can be used to determine the error detail message.
+   * If the certificate is not valid according to {@link #isTrustStoreValid()} this method can be
+   * used to determine the error detail message.
    *
    * @return <code>null</code> if initialization was successful.
    */

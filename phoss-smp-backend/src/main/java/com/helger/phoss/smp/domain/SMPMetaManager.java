@@ -50,7 +50,7 @@ import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolURLProvider;
+import com.helger.smpclient.url.PeppolConfigurableURLProvider;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
@@ -78,12 +78,11 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private Consumer <ETriState> m_aBackendConnectionStateChangeCallback;
 
   /**
-   * Set the manager provider to be used. This must be called exactly once
-   * before {@link #getInstance()} is called.
+   * Set the manager provider to be used. This must be called exactly once before
+   * {@link #getInstance()} is called.
    *
    * @param aManagerProvider
-   *        The manager factory to be used. May be <code>null</code> for testing
-   *        purposes.
+   *        The manager factory to be used. May be <code>null</code> for testing purposes.
    * @throws IllegalStateException
    *         If another manager provider is already present.
    */
@@ -207,7 +206,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
         throw new IllegalStateException ("Failed to get default backend connection state!");
 
       // TODO This might become configurable in the future
-      m_aSMPURLProvider = SMPServerConfiguration.getRESTType ().isPeppol () ? PeppolURLProvider.INSTANCE
+      m_aSMPURLProvider = SMPServerConfiguration.getRESTType ().isPeppol () ? PeppolConfigurableURLProvider.INSTANCE
                                                                             : BDXLURLProvider.INSTANCE;
       if (m_aSMPURLProvider == null)
         throw new IllegalStateException ("Failed to create SMP URL Provider!");
@@ -332,8 +331,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if an {@link ISMPBusinessCardManager} is present,
-   *         <code>false</code> if not.
+   * @return <code>true</code> if an {@link ISMPBusinessCardManager} is present, <code>false</code>
+   *         if not.
    */
   public static boolean hasBusinessCardMgr ()
   {
@@ -361,9 +360,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   /**
-   * Set the SMP callback that should be invoked if the backend connection
-   * established state changed. This needs to be a custom callback for
-   * dependency reasons and is only used by the SQL backend.
+   * Set the SMP callback that should be invoked if the backend connection established state
+   * changed. This needs to be a custom callback for dependency reasons and is only used by the SQL
+   * backend.
    *
    * @param aCB
    *        The callback to invoke. May be <code>null</code>.
@@ -374,10 +373,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   /**
-   * This is the initialization routine that must be called upon application
-   * startup. It performs the SPI initialization of all registered manager
-   * provider ({@link ISMPManagerProvider}) and selects the one specified in the
-   * SMP server configuration file.
+   * This is the initialization routine that must be called upon application startup. It performs
+   * the SPI initialization of all registered manager provider ({@link ISMPManagerProvider}) and
+   * selects the one specified in the SMP server configuration file.
    *
    * @throws InitializationException
    *         If an unsupported backend is provided in the configuration.

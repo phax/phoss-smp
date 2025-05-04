@@ -26,7 +26,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolURLProvider;
+import com.helger.smpclient.url.PeppolConfigurableURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 
 abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
@@ -47,17 +47,19 @@ abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
     @Nonnull
     private static ISMPURLProvider _getURLProvider (@Nonnull final ESMPAPIType eAPIType)
     {
-      return eAPIType == ESMPAPIType.PEPPOL ? PeppolURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
+      return eAPIType == ESMPAPIType.PEPPOL ? PeppolConfigurableURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
     }
 
     @Nullable
-    public static SMPQueryParams create (@Nonnull final ESMPAPIType eAPIType, @Nullable final IParticipantIdentifier aParticipantID)
+    public static SMPQueryParams create (@Nonnull final ESMPAPIType eAPIType,
+                                         @Nullable final IParticipantIdentifier aParticipantID)
     {
       final SMPQueryParams ret = new SMPQueryParams ();
       try
       {
         ret.m_aSMPHostURI = _getURLProvider (eAPIType).getSMPURIOfParticipant (aParticipantID,
-                                                                               SMPMetaManager.getSettings ().getSMLDNSZone ());
+                                                                               SMPMetaManager.getSettings ()
+                                                                                             .getSMLDNSZone ());
       }
       catch (final SMPDNSResolutionException ex)
       {

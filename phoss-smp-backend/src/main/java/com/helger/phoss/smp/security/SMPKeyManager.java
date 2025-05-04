@@ -52,7 +52,6 @@ import com.helger.commons.annotation.UsedViaReflection;
 import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.exception.InitializationException;
 import com.helger.commons.ws.TrustManagerTrustAll;
-import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
@@ -62,8 +61,7 @@ import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
 
 /**
- * This class holds the private key for signing and the certificate for
- * checking.
+ * This class holds the private key for signing and the certificate for checking.
  *
  * @author Philip Helger
  */
@@ -103,7 +101,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                         SMPServerConfiguration.getKeyStorePassword ());
     if (aLoadedKeyStore.isFailure ())
     {
-      _loadError (aLoadedKeyStore.getError (), PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore));
+      _loadError (aLoadedKeyStore.getError (), LoadedKeyStore.getLoadError (aLoadedKeyStore));
       throw new InitializationException (s_sInitError);
     }
     m_aKeyStore = aLoadedKeyStore.getKeyStore ();
@@ -114,7 +112,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
                                                                                            SMPServerConfiguration.getKeyStoreKeyPassword ());
     if (aLoadedKey.isFailure ())
     {
-      _loadError (aLoadedKey.getError (), PeppolKeyStoreHelper.getLoadError (aLoadedKey));
+      _loadError (aLoadedKey.getError (), LoadedKey.getLoadError (aLoadedKey));
       throw new InitializationException (s_sInitError);
     }
 
@@ -144,9 +142,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return The configured keystore. May be <code>null</code> if loading
-   *         failed. In that case check the result of
-   *         {@link #getInitializationError()}.
+   * @return The configured keystore. May be <code>null</code> if loading failed. In that case check
+   *         the result of {@link #getInitializationError()}.
    */
   @Nullable
   public KeyStore getKeyStore ()
@@ -155,9 +152,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return The configured private key. May be <code>null</code> if loading
-   *         failed. In that case check the result of
-   *         {@link #getInitializationError()}.
+   * @return The configured private key. May be <code>null</code> if loading failed. In that case
+   *         check the result of {@link #getInitializationError()}.
    */
   @Nullable
   public KeyStore.PrivateKeyEntry getPrivateKeyEntry ()
@@ -178,9 +174,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * Create an SSLContext based on the configured key store and trust store.
-   * This is required for communication with the SMI/SML as well as other
-   * network dependent components like the Peppol Directory.
+   * Create an SSLContext based on the configured key store and trust store. This is required for
+   * communication with the SMI/SML as well as other network dependent components like the Peppol
+   * Directory.
    *
    * @return A new {@link SSLContext} and never <code>null</code>.
    * @throws GeneralSecurityException
@@ -221,8 +217,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @param aElementToSign
    *        The XML element to sign. May not be <code>null</code>.
    * @param eRESTType
-   *        The REST type current configured. This differences are the hash
-   *        algorithm as well as the canonicalization algorithms.
+   *        The REST type current configured. This differences are the hash algorithm as well as the
+   *        canonicalization algorithms.
    * @throws NoSuchAlgorithmException
    *         An algorithm is not supported by the underlying platform.
    * @throws InvalidAlgorithmParameterException
@@ -309,9 +305,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * @return A shortcut method to determine if the certification configuration
-   *         is valid or not. This method can be used, even if
-   *         {@link #getInstance()} throws an exception.
+   * @return A shortcut method to determine if the certification configuration is valid or not. This
+   *         method can be used, even if {@link #getInstance()} throws an exception.
    */
   public static boolean isKeyStoreValid ()
   {
@@ -319,8 +314,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * If the certificate is not valid according to {@link #isKeyStoreValid()}
-   * this method can be used to determine the error detail code.
+   * If the certificate is not valid according to {@link #isKeyStoreValid()} this method can be used
+   * to determine the error detail code.
    *
    * @return <code>null</code> if initialization was successful.
    */
@@ -331,8 +326,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
-   * If the certificate is not valid according to {@link #isKeyStoreValid()}
-   * this method can be used to determine the error detail message.
+   * If the certificate is not valid according to {@link #isKeyStoreValid()} this method can be used
+   * to determine the error detail message.
    *
    * @return <code>null</code> if initialization was successful.
    */

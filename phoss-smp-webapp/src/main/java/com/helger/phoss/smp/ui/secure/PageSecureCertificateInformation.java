@@ -42,7 +42,6 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.pd.client.PDClientConfiguration;
-import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -61,8 +60,8 @@ import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
 
 /**
- * This page displays information about the certificate configured in the SMP
- * Server configuration file.
+ * This page displays information about the certificate configured in the SMP Server configuration
+ * file.
  *
  * @author Philip Helger
  */
@@ -432,7 +431,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         final LoadedKeyStore aKeyStoreLR = PDClientConfiguration.loadKeyStore ();
         if (aKeyStoreLR.isFailure ())
         {
-          aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aKeyStoreLR)));
+          aTab.addChild (error (LoadedKeyStore.getLoadError (aKeyStoreLR)));
           aTabLabel = addErrorHint.apply (aTabLabel);
         }
         else
@@ -444,7 +443,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             aTab.addChild (success (div ("Keystore is located at '" +
                                          sKeyStorePath +
                                          "' and was successfully loaded.")));
-            aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aKeyLoading)));
+            aTab.addChild (error (LoadedKey.getLoadError (aKeyLoading)));
             aTabLabel = addErrorHint.apply (aTabLabel);
           }
           else
@@ -524,7 +523,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         final LoadedKeyStore aTrustStoreLR = PDClientConfiguration.loadTrustStore ();
         if (aTrustStoreLR.isFailure ())
         {
-          aTab.addChild (error (PeppolKeyStoreHelper.getLoadError (aTrustStoreLR)));
+          aTab.addChild (error (LoadedKeyStore.getLoadError (aTrustStoreLR)));
           aTabLabel = addErrorHint.apply (aTabLabel);
         }
         else

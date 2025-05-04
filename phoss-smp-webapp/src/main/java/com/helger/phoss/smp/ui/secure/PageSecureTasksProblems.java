@@ -56,7 +56,6 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.utils.PeppolKeyStoreHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.ESMPRESTType;
@@ -428,7 +427,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       if (aLoadedKeyStore.isFailure ())
       {
         aOL.addItem (_createError ("The " + sDirectoryName + " client key store configuration is invalid."),
-                     div (PeppolKeyStoreHelper.getLoadError (aLoadedKeyStore)));
+                     div (LoadedKeyStore.getLoadError (aLoadedKeyStore)));
       }
       else
       {
@@ -439,7 +438,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
           aOL.addItem (_createError ("The " +
                                      sDirectoryName +
                                      " client key store could be read, but the private key configuration is invalid."),
-                       div (PeppolKeyStoreHelper.getLoadError (aLoadedKey)));
+                       div (LoadedKey.getLoadError (aLoadedKey)));
         }
         else
         {
@@ -452,7 +451,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       if (aLoadedTrustStore.isFailure ())
       {
         aOL.addItem (_createError ("The " + sDirectoryName + " client trust store configuration is invalid."),
-                     div (PeppolKeyStoreHelper.getLoadError (aLoadedTrustStore)));
+                     div (LoadedKeyStore.getLoadError (aLoadedTrustStore)));
       }
       else
       {
