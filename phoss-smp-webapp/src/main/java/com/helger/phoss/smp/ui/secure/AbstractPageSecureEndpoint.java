@@ -801,21 +801,25 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_ENDPOINT_REFERENCE)));
     }
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires Business Level Signature")
-                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
-                                                                                                    aSelectedEndpoint !=
-                                                                                                                                             null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
-                                                                                                                                                  : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
-                                                 .setHelpText ("Check the box if the recipient requires business-level signatures for " +
-                                                               "the message, meaning a signature applied to the business message " +
-                                                               "before the message is put on the transport. This is independent of " +
-                                                               "the transport-level signatures that a specific transport profile, such " +
-                                                               "as the START profile, might mandate. This flag does not indicate " +
-                                                               "which type of business-level signature might be required. Setting or " +
-                                                               "consuming business-level signatures would typically be the " +
-                                                               "responsibility of the final senders and receivers of messages, rather " +
-                                                               "than a set of APs.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE)));
+    if (!bIsPeppolMode)
+    {
+      // This field is not used in Peppol
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Requires Business Level Signature")
+                                                   .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
+                                                                                                      aSelectedEndpoint !=
+                                                                                                                                               null ? aSelectedEndpoint.isRequireBusinessLevelSignature ()
+                                                                                                                                                    : SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE)))
+                                                   .setHelpText ("Check the box if the recipient requires business-level signatures for " +
+                                                                 "the message, meaning a signature applied to the business message " +
+                                                                 "before the message is put on the transport. This is independent of " +
+                                                                 "the transport-level signatures that a specific transport profile, such " +
+                                                                 "as the START profile, might mandate. This flag does not indicate " +
+                                                                 "which type of business-level signature might be required. Setting or " +
+                                                                 "consuming business-level signatures would typically be the " +
+                                                                 "responsibility of the final senders and receivers of messages, rather " +
+                                                                 "than a set of APs.")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE)));
+    }
 
     if (!bIsPeppolMode)
     {
