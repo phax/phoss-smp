@@ -573,30 +573,38 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       if (StringHelper.hasNoText (sDocTypeIDValue))
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
-      {
-        aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (sDocTypeIDScheme, sDocTypeIDValue);
-        if (aDocTypeID == null)
-          aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "The provided document type ID has an invalid syntax!");
+        if (sDocTypeIDScheme != null && sDocTypeIDValue.startsWith (sDocTypeIDScheme))
+          aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE,
+                                     "Document type ID value must not contain the Document type ID scheme!");
         else
         {
-          if (aServiceGroup != null)
-            if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) != null)
-              aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE,
-                                         "At least one redirect is registered for this document type. Delete the redirect before you can create an endpoint.");
+          aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (sDocTypeIDScheme, sDocTypeIDValue);
+          if (aDocTypeID == null)
+            aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "The provided document type ID has an invalid syntax!");
+          else
+          {
+            if (aServiceGroup != null)
+              if (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) != null)
+                aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE,
+                                           "At least one redirect is registered for this document type. Delete the redirect before you can create an endpoint.");
+          }
         }
-      }
 
     if (aIdentifierFactory.isProcessIdentifierSchemeMandatory () && StringHelper.hasNoText (sProcessIDScheme))
       aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID scheme must not be empty!");
     else
       if (StringHelper.hasNoText (sProcessIDValue))
-        aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID value must not be empty!");
+        aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "Process ID value must not be empty!");
       else
-      {
-        aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme, sProcessIDValue);
-        if (aProcessID == null)
-          aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
-      }
+        if (sProcessIDScheme != null && sProcessIDValue.startsWith (sProcessIDScheme))
+          aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE,
+                                     "Process ID value must not contain the Process ID scheme!");
+        else
+        {
+          aProcessID = aIdentifierFactory.createProcessIdentifier (sProcessIDScheme, sProcessIDValue);
+          if (aProcessID == null)
+            aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
+        }
 
     if (StringHelper.hasNoText (sTransportProfileID))
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile must not be empty!");

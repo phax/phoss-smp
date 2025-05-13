@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '17', '21' ]
+        java: [ 11, 17, 21, 24 ]
     name: Java ${{ matrix.java }} build
 
     steps:
@@ -63,7 +63,7 @@ jobs:
         mysql password: 'smp'
               
     - name: Build and deploy with Maven
-      run: mvn --batch-mode --update-snapshots deploy
+      run: mvn --batch-mode --update-snapshots -P release-snapshot deploy
       if: matrix.java == 11
       env:
         MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
