@@ -776,15 +776,18 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PROCESS_ID_SCHEME,
                                                                                                FIELD_PROCESS_ID_VALUE)));
     }
-    final ESMPTransportProfile eDefault = bIsPeppolMode ? ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2
-                                                        : ESMPTransportProfile.TRANSPORT_PROFILE_BDXR_AS4;
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Transport Profile")
-                                                 .setCtrl (new HCSMPTransportProfileSelect (new RequestField (FIELD_TRANSPORT_PROFILE,
-                                                                                                              aSelectedEndpoint !=
-                                                                                                                                       null ? aSelectedEndpoint.getTransportProfile ()
-                                                                                                                                            : eDefault.getID ()),
-                                                                                            aDisplayLocale).setReadOnly (bEdit))
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_TRANSPORT_PROFILE)));
+    {
+      final ESMPTransportProfile eDefault = bIsPeppolMode ? ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2
+                                                          : ESMPTransportProfile.TRANSPORT_PROFILE_BDXR_AS4;
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Transport Profile")
+                                                   .setCtrl (new HCSMPTransportProfileSelect (new RequestField (FIELD_TRANSPORT_PROFILE,
+                                                                                                                aSelectedEndpoint !=
+                                                                                                                                         null ? aSelectedEndpoint.getTransportProfile ()
+                                                                                                                                              : eDefault.getID ()),
+                                                                                              aDisplayLocale).setReadOnly (bEdit))
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_TRANSPORT_PROFILE)));
+
+    }
 
     {
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel (new HCFormLabel ("EndpointReference",
@@ -814,17 +817,21 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                "than a set of APs.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE)));
 
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum Authentication Level")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_MINIMUM_AUTHENTICATION_LEVEL,
-                                                                                         aSelectedEndpoint != null
-                                                                                                                   ? aSelectedEndpoint.getMinimumAuthenticationLevel ()
-                                                                                                                   : null)))
-                                                 .setHelpText ("Indicates the minimum authentication level that recipient requires. " +
-                                                               "The specific semantics of this field is defined in a specific instance " +
-                                                               "of the BUSDOX infrastructure. It could for example reflect the " +
-                                                               "value of the \"urn:eu:busdox:attribute:assurance-level\" SAML " +
-                                                               "attribute defined in the START specification.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_MINIMUM_AUTHENTICATION_LEVEL)));
+    if (!bIsPeppolMode)
+    {
+      // This field is not used in Peppol
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Minimum Authentication Level")
+                                                   .setCtrl (new HCEdit (new RequestField (FIELD_MINIMUM_AUTHENTICATION_LEVEL,
+                                                                                           aSelectedEndpoint != null
+                                                                                                                     ? aSelectedEndpoint.getMinimumAuthenticationLevel ()
+                                                                                                                     : null)))
+                                                   .setHelpText ("Indicates the minimum authentication level that recipient requires. " +
+                                                                 "The specific semantics of this field is defined in a specific instance " +
+                                                                 "of the BUSDOX infrastructure. It could for example reflect the " +
+                                                                 "value of the \"urn:eu:busdox:attribute:assurance-level\" SAML " +
+                                                                 "attribute defined in the START specification.")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_MINIMUM_AUTHENTICATION_LEVEL)));
+    }
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Not before")
                                                  .setCtrl (BootstrapDateTimePicker.create (FIELD_NOT_BEFORE,
@@ -852,7 +859,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                                                        ? aSelectedEndpoint.getCertificate ()
                                                                                                                        : null)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
                                                  .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
-                                                               "PEM base 64 encoded X509 DER formatted value.")
+                                                               "PEM encoded X509 DER formatted value.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CERTIFICATE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Description")
