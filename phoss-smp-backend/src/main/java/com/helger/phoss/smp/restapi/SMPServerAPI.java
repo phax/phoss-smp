@@ -62,8 +62,7 @@ import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 import com.helger.xsds.peppol.smp1.SignedServiceMetadataType;
 
 /**
- * This class implements all the service methods, that must be provided by the
- * Peppol REST service.
+ * This class implements all the service methods, that must be provided by the Peppol REST service.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
@@ -104,6 +103,7 @@ public final class SMPServerAPI
       }
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
@@ -112,6 +112,7 @@ public final class SMPServerAPI
         throw new SMPNotFoundException ("Unknown Service Group ID '" + sPathServiceGroupID + "'",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
+
       // Then add the service metadata references
       final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
@@ -127,6 +128,16 @@ public final class SMPServerAPI
           aRefCollection.addServiceMetadataReference (aMetadataReference);
         }
       }
+
+      // Now add all redirects
+      for (final ISMPRedirect aRedirect : aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aPathServiceGroupID))
+      {
+        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+        aMetadataReference.setHref (m_aAPIDataProvider.getServiceMetadataReferenceHref (aPathServiceGroupID,
+                                                                                        aRedirect.getDocumentTypeIdentifier ()));
+        aRefCollection.addServiceMetadataReference (aMetadataReference);
+      }
+
       final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectPeppol ();
       aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
@@ -215,6 +226,7 @@ public final class SMPServerAPI
       }
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       // Retrieve the service group
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
@@ -224,9 +236,11 @@ public final class SMPServerAPI
         throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
-      // Then add the service metadata references
+
       final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectPeppol ();
-      final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
+      final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
+
+      // Then add the service metadata references
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
@@ -237,10 +251,20 @@ public final class SMPServerAPI
           final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
           aMetadataReference.setHref (m_aAPIDataProvider.getServiceMetadataReferenceHref (aPathServiceGroupID,
                                                                                           aDocTypeID));
-          aCollectionType.addServiceMetadataReference (aMetadataReference);
+          aRefCollection.addServiceMetadataReference (aMetadataReference);
         }
       }
-      aSG.setServiceMetadataReferenceCollection (aCollectionType);
+
+      // Now add all redirects
+      for (final ISMPRedirect aRedirect : aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aPathServiceGroupID))
+      {
+        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+        aMetadataReference.setHref (m_aAPIDataProvider.getServiceMetadataReferenceHref (aPathServiceGroupID,
+                                                                                        aRedirect.getDocumentTypeIdentifier ()));
+        aRefCollection.addServiceMetadataReference (aMetadataReference);
+      }
+
+      aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);

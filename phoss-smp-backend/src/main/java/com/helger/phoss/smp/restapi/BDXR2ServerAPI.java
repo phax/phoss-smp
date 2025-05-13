@@ -61,8 +61,8 @@ import com.helger.xsds.bdxr.smp2.ac.ServiceReferenceType;
 import com.helger.xsds.bdxr.smp2.bc.IDType;
 
 /**
- * This class implements all the service methods, that must be provided by the
- * OASIS BDXR SMP v2 REST service.
+ * This class implements all the service methods, that must be provided by the OASIS BDXR SMP v2
+ * REST service.
  *
  * @author Philip Helger
  * @since 5.7.0
@@ -111,6 +111,7 @@ public final class BDXR2ServerAPI
       }
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       // Retrieve the service group
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
@@ -120,6 +121,7 @@ public final class BDXR2ServerAPI
         throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
                                         m_aAPIDataProvider.getCurrentURI ());
       }
+
       // Then add the service metadata references
       final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectBDXR2 ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
@@ -139,6 +141,21 @@ public final class BDXR2ServerAPI
           aSG.addServiceReference (aMetadataReference);
         }
       }
+
+      // Now add all redirects
+      for (final ISMPRedirect aRedirect : aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aPathServiceGroupID))
+      {
+        final IDocumentTypeIdentifier aDocTypeID = aRedirect.getDocumentTypeIdentifier ();
+        final ServiceReferenceType aMetadataReference = new ServiceReferenceType ();
+        {
+          final IDType aID = new IDType ();
+          aID.setSchemeID (aDocTypeID.getScheme ());
+          aID.setValue (aDocTypeID.getValue ());
+          aMetadataReference.setID (aID);
+        }
+        aSG.addServiceReference (aMetadataReference);
+      }
+
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aSG;

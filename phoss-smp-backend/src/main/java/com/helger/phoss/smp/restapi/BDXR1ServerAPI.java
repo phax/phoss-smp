@@ -65,8 +65,8 @@ import com.helger.xsds.bdxr.smp1.ServiceMetadataType;
 import com.helger.xsds.bdxr.smp1.SignedServiceMetadataType;
 
 /**
- * This class implements all the service methods, that must be provided by the
- * OASIS BDXR SMP v1 REST service.
+ * This class implements all the service methods, that must be provided by the OASIS BDXR SMP v1
+ * REST service.
  *
  * @author Philip Helger
  */
@@ -116,6 +116,7 @@ public final class BDXR1ServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aServiceGroup == null)
@@ -139,6 +140,15 @@ public final class BDXR1ServerAPI
                                                                                           aDocTypeID));
           aRefCollection.addServiceMetadataReference (aMetadataReference);
         }
+      }
+
+      // Now add all redirects
+      for (final ISMPRedirect aRedirect : aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aPathServiceGroupID))
+      {
+        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+        aMetadataReference.setHref (m_aAPIDataProvider.getServiceMetadataReferenceHref (aPathServiceGroupID,
+                                                                                        aRedirect.getDocumentTypeIdentifier ()));
+        aRefCollection.addServiceMetadataReference (aMetadataReference);
       }
 
       final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
@@ -237,6 +247,7 @@ public final class BDXR1ServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       // Retrieve the service group
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
@@ -249,7 +260,7 @@ public final class BDXR1ServerAPI
 
       // Then add the service metadata references
       final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
-      final ServiceMetadataReferenceCollectionType aCollectionType = new ServiceMetadataReferenceCollectionType ();
+      final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
@@ -260,10 +271,20 @@ public final class BDXR1ServerAPI
           final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
           aMetadataReference.setHref (m_aAPIDataProvider.getServiceMetadataReferenceHref (aPathServiceGroupID,
                                                                                           aDocTypeID));
-          aCollectionType.addServiceMetadataReference (aMetadataReference);
+          aRefCollection.addServiceMetadataReference (aMetadataReference);
         }
       }
-      aSG.setServiceMetadataReferenceCollection (aCollectionType);
+
+      // Now add all redirects
+      for (final ISMPRedirect aRedirect : aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aPathServiceGroupID))
+      {
+        final ServiceMetadataReferenceType aMetadataReference = new ServiceMetadataReferenceType ();
+        aMetadataReference.setHref (m_aAPIDataProvider.getServiceMetadataReferenceHref (aPathServiceGroupID,
+                                                                                        aRedirect.getDocumentTypeIdentifier ()));
+        aRefCollection.addServiceMetadataReference (aMetadataReference);
+      }
+
+      aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
