@@ -73,4 +73,21 @@ public final class SMPRedirectTest
     assertFalse (aRedirect.hasCertificate ());
     assertEquals ("[{\"Any\":\"<extredirect />\"}]", aRedirect.getExtensions ().getExtensionsAsJsonString ());
   }
+
+  @Test
+  public void testGetPercentEncodedURL ()
+  {
+    assertNull (SMPRedirect.getPercentEncodedURL (null));
+    assertEquals ("", SMPRedirect.getPercentEncodedURL (""));
+    assertEquals ("crapInCrapOut", SMPRedirect.getPercentEncodedURL ("crapInCrapOut"));
+    assertEquals ("http://smp.io/a%3Ab", SMPRedirect.getPercentEncodedURL ("http://smp.io/a%3ab"));
+    assertEquals ("http://smp.io/a%3Ab", SMPRedirect.getPercentEncodedURL ("http://smp.io/a:b"));
+    assertEquals ("http://smp.io/a%3Ab/", SMPRedirect.getPercentEncodedURL ("http://smp.io/a%3ab/"));
+    assertEquals ("http://smp.io/a%3Ab/", SMPRedirect.getPercentEncodedURL ("http://smp.io/a:b/"));
+    assertEquals ("http://smp.io/a%3Ab/fix/%3A%3A", SMPRedirect.getPercentEncodedURL ("http://smp.io/a:b/fix/::"));
+    assertEquals ("http://smp.io/a%3Ab/fix/c%23d?x=y",
+                  SMPRedirect.getPercentEncodedURL ("http://smp.io/a:b/fix/c#d?x=y"));
+    assertEquals ("http://smp.io/a%3Ab/fix/c%23d?x=y",
+                  SMPRedirect.getPercentEncodedURL ("http://smp.io/a%3Ab/fix/c%23d?x=y"));
+  }
 }

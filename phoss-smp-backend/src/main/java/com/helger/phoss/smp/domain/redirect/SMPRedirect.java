@@ -18,10 +18,15 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.annotation.VisibleForTesting;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.hashcode.HashCodeGenerator;
+import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.ToStringGenerator;
 import com.helger.commons.type.ObjectType;
+import com.helger.commons.url.IURLProtocol;
+import com.helger.commons.url.URLHelper;
+import com.helger.commons.url.URLProtocolRegistry;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp2.doctype.BDXR2DocumentTypeIdentifier;
@@ -136,11 +141,64 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     m_aCertificate = aCertificate;
   }
 
+  @VisibleForTesting
+  static String getPercentEncodedURL (@Nullable final String sURL)
+  {
+    if (sURL == null)
+      return null;
+
+    final IURLProtocol eProtocol = URLProtocolRegistry.getInstance ().getProtocol (sURL);
+    if (eProtocol != null)
+    {
+      // The base URL may contain "#" which is not an anchor
+      // That's why this weird parsing is needed
+      String sPathRest = sURL.substring (eProtocol.getProtocol ().length ());
+      final int nParamIdx = sPathRest.indexOf ('?');
+      String sParams;
+      if (nParamIdx >= 0)
+      {
+        sParams = sPathRest.substring (nParamIdx);
+        sPathRest = sPathRest.substring (0, nParamIdx);
+      }
+      else
+        sParams = "";
+
+      // Take the path and URL encode each path part separately
+      final StringBuilder aSB = new StringBuilder (sPathRest.length () * 2);
+      final boolean bEndsWithSlash = StringHelper.endsWith (sPathRest, '/');
+
+      boolean bFirst = true;
+      for (final String sPathPart : StringHelper.getExplodedArray ('/', sPathRest))
+        if (bFirst)
+        {
+          // Host (with or without part) - never URL escape
+          aSB.append (sPathPart).append ('/');
+          bFirst = false;
+        }
+        else
+          if (sPathPart.length () > 0)
+          {
+            // First decode, to ensure it is not double encoded
+            aSB.append (URLHelper.urlEncode (URLHelper.urlDecode (sPathPart))).append ('/');
+          }
+      if (!bEndsWithSlash)
+      {
+        // Remove trailing slash to remain consistent with original URL
+        aSB.setLength (aSB.length () - 1);
+      }
+
+      return eProtocol.getProtocol () + aSB.toString () + sParams;
+    }
+
+    // Fallback: use original URL
+    return sURL;
+  }
+
   @Nonnull
   public com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ()
   {
     final com.helger.xsds.peppol.smp1.RedirectType aRedirect = new com.helger.xsds.peppol.smp1.RedirectType ();
-    aRedirect.setHref (m_sTargetHref);
+    aRedirect.setHref (getPercentEncodedURL (m_sTargetHref));
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (getExtensions ().getAsPeppolExtension ());
     // Certificate is not used here
@@ -154,7 +212,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.RedirectType aRedirect = new com.helger.xsds.bdxr.smp1.RedirectType ();
-    aRedirect.setHref (m_sTargetHref);
+    aRedirect.setHref (getPercentEncodedURL (m_sTargetHref));
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
     aRedirect.setExtension (getExtensions ().getAsBDXRExtensions ());
     // Certificate is not used here
