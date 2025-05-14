@@ -9,7 +9,7 @@ It was the first SMP to be [CEF eDelivery conformant](https://ec.europa.eu/digit
 
 This project is part of my Peppol solution stack. See https://github.com/phax/peppol for other components and libraries in that area.
 
-Latest version: **[7.2.4](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-7.2.4)** (2025-05-14).
+Latest version: **[7.2.5](https://github.com/phax/phoss-smp/releases/tag/phoss-smp-parent-pom-7.2.5)** (2025-05-14).
 See the special [Migrations guide](https://github.com/phax/phoss-smp/wiki/Migrations) for actions necessary on updates/version changes.
 
 Docker containers can be found, depending on the backend you want to use:
