@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.debug.GlobalDebug;
 import com.helger.commons.io.stream.NonBlockingByteArrayOutputStream;
 import com.helger.commons.mime.CMimeType;
 import com.helger.commons.string.StringHelper;
@@ -119,6 +120,42 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     catch (final Exception ex)
     {
       throw new SMPInternalErrorException ("Error in signing the response XML", ex);
+    }
+
+    if (GlobalDebug.isDebugMode ())
+    {
+      LOGGER.info ("Running post-signing XML Schema validation in debug mode");
+
+      // Run the XML Schema validation after the signing
+      switch (SMPServerConfiguration.getRESTType ())
+      {
+        case PEPPOL:
+        {
+          // Verify DOM document
+          final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
+          if (aMarshaller.read (aDoc) == null)
+            LOGGER.error ("Signed response document is not XML Schema compliant");
+          break;
+        }
+        case OASIS_BDXR_V1:
+        {
+          // Verify DOM document
+          final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
+          if (aMarshaller.read (aDoc) == null)
+            LOGGER.error ("Signed response document is not XML Schema compliant");
+          break;
+        }
+        case OASIS_BDXR_V2:
+        {
+          // Verify DOM document
+          final BDXR2MarshallerServiceMetadata aMarshaller = new BDXR2MarshallerServiceMetadata ();
+          if (aMarshaller.read (aDoc) == null)
+            LOGGER.error ("Signed response document is not XML Schema compliant");
+          break;
+        }
+        default:
+          throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      }
     }
 
     // Serialize the signed document
