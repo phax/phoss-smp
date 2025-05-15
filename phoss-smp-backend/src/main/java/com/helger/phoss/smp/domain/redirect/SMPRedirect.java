@@ -168,18 +168,21 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
       final boolean bEndsWithSlash = StringHelper.endsWith (sPathRest, '/');
 
       boolean bFirst = true;
-      for (final String sPathPart : StringHelper.getExplodedArray ('/', sPathRest))
+      for (final String sOriginalPathPart : StringHelper.getExplodedArray ('/', sPathRest))
         if (bFirst)
         {
           // Host (with or without part) - never URL escape
-          aSB.append (sPathPart).append ('/');
+          aSB.append (sOriginalPathPart).append ('/');
           bFirst = false;
         }
         else
-          if (sPathPart.length () > 0)
+          if (sOriginalPathPart.length () > 0)
           {
             // First decode, to ensure it is not double encoded
-            aSB.append (URLHelper.urlEncode (URLHelper.urlDecode (sPathPart))).append ('/');
+            final String sDecoded = URLHelper.urlDecodeOrNull (sOriginalPathPart);
+            // If decoding failed, assume it to be not encoded
+            final String sEncoded = URLHelper.urlEncode (sDecoded != null ? sDecoded : sOriginalPathPart);
+            aSB.append (sEncoded).append ('/');
           }
       if (!bEndsWithSlash)
       {

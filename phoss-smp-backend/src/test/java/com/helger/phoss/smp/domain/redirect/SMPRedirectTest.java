@@ -89,5 +89,12 @@ public final class SMPRedirectTest
                   SMPRedirect.getPercentEncodedURL ("http://smp.io/a:b/fix/c#d?x=y"));
     assertEquals ("http://smp.io/a%3Ab/fix/c%23d?x=y",
                   SMPRedirect.getPercentEncodedURL ("http://smp.io/a%3Ab/fix/c%23d?x=y"));
+
+    assertEquals ("http://eu1-smp-test.babelway.net/iso6523-actorid-upis%3A%3A9925%3Abe0758688864/services/busdox-docid-qns%3A%3Aurn%3Aoasis%3Anames%3Aspecification%3Aubl%3Aschema%3Axsd%3ACreditNote-2%3A%3ACreditNote%23%23urn%3Acen.eu%3Aen16931%3A2017%23compliant%23urn%3Afdc%3Apeppol.eu%3A2017%3Apoacc%3Abilling%3A3.0%3A%3A2.1",
+                  SMPRedirect.getPercentEncodedURL ("http://eu1-smp-test.babelway.net/iso6523-actorid-upis%3A%3A9925%3Abe0758688864/services/busdox-docid-qns%3A%3Aurn%3Aoasis%3Anames%3Aspecification%3Aubl%3Aschema%3Axsd%3ACreditNote-2%3A%3ACreditNote%23%23urn%3Acen.eu%3Aen16931%3A2017%23compliant%23urn%3Afdc%3Apeppol.eu%3A2017%3Apoacc%3Abilling%3A3.0%3A%3A2.1"));
+
+    // bogus encoding
+    assertEquals ("http://any.url/%25zz", SMPRedirect.getPercentEncodedURL ("http://any.url/%zz"));
+    assertEquals ("http://any.url/%25zz/and%3Ahere", SMPRedirect.getPercentEncodedURL ("http://any.url/%zz/and:here"));
   }
 }
