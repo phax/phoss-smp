@@ -141,13 +141,13 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   protected ISMPRedirect getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                          .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup != null)
     {
-      final String sDocTypeID = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID);
+      final String sDocTypeID = aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID);
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocTypeID);
       if (aDocTypeID != null)
       {
@@ -169,13 +169,13 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
         eFormAction == EWebPageFormAction.DELETE)
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final String sServiceGroupID = aWPEC.params ().getAsString (FIELD_SERVICE_GROUP_ID);
+      final String sServiceGroupID = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
       final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
       final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                            .getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup != null)
       {
-        final String sDocTypeID = aWPEC.params ().getAsString (FIELD_DOCTYPE_ID);
+        final String sDocTypeID = aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID);
         final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocTypeID);
         if (aDocTypeID != null)
         {
@@ -260,17 +260,17 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ()
-                                                                                       .getAsString (FIELD_SERVICE_GROUP_ID);
+                                                                                       .getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
     IParticipantIdentifier aParticipantID = null;
     ISMPServiceGroup aServiceGroup = null;
     final String sDocTypeID = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded () : aWPEC.params ()
-                                                                                                           .getAsString (FIELD_DOCTYPE_ID);
+                                                                                                           .getAsStringTrimmed (FIELD_DOCTYPE_ID);
     IDocumentTypeIdentifier aDocTypeID = null;
-    final String sRedirectTo = aWPEC.params ().getAsString (FIELD_REDIRECT_TO);
-    final String sSubjectUniqueIdentifier = aWPEC.params ().getAsString (FIELD_SUBJECT_UNIQUE_IDENTIFIER);
+    final String sRedirectTo = aWPEC.params ().getAsStringTrimmed (FIELD_REDIRECT_TO);
+    final String sSubjectUniqueIdentifier = aWPEC.params ().getAsStringTrimmed (FIELD_SUBJECT_UNIQUE_IDENTIFIER);
     // TODO add certificate redirect support
     final X509Certificate aCertificate = null;
-    final String sExtension = aWPEC.params ().getAsString (FIELD_EXTENSION);
+    final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
     if (StringHelper.hasNoText (sServiceGroupID))

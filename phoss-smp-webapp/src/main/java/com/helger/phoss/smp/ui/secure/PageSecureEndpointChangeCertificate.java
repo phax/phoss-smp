@@ -328,11 +328,11 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       bShowList = false;
       final FormErrorList aFormErrors = new FormErrorList ();
 
-      final String sOldUnifiedCert = _getUnifiedCert (aWPEC.params ().getAsString (FIELD_OLD_CERTIFICATE));
+      final String sOldUnifiedCert = _getUnifiedCert (aWPEC.params ().getAsStringTrimmed (FIELD_OLD_CERTIFICATE));
 
       if (aWPEC.hasSubAction (CPageParam.ACTION_SAVE))
       {
-        final String sNewCert = aWPEC.params ().getAsString (FIELD_NEW_CERTIFICATE);
+        final String sNewCert = aWPEC.params ().getAsStringTrimmed (FIELD_NEW_CERTIFICATE);
         final String sNewUnifiedCert = _getUnifiedCert (sNewCert);
 
         if (StringHelper.hasNoText (sOldUnifiedCert))

@@ -94,7 +94,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final LocalDate aNow = PDTFactory.getCurrentLocalDate ();
-    final String sMigrationDate = aWPEC.params ().getAsString (FIELD_PM_MIGRATION_DATE);
+    final String sMigrationDate = aWPEC.params ().getAsStringTrimmed (FIELD_PM_MIGRATION_DATE);
     final LocalDate aMigrationDate = PDTFromString.getLocalDateFromString (sMigrationDate, aDisplayLocale);
     final String sMigrationPublicCert = aWPEC.params ().getAsStringTrimmed (FIELD_PM_PUBLIC_CERT);
     X509Certificate aMigrationPublicCert = null;

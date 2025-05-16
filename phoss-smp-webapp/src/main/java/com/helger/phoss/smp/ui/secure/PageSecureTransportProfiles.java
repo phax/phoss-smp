@@ -261,9 +261,9 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
 
     // Never edit ID
-    final String sID = bEdit ? aSelectedObject.getID () : aWPEC.params ().getAsString (FIELD_ID);
-    final String sName = aWPEC.params ().getAsString (FIELD_NAME);
-    final boolean bIsDeprecated = aWPEC.params ().getAsBoolean (FIELD_DEPRECATED, DEFAULT_DEPRECATED);
+    final String sID = bEdit ? aSelectedObject.getID () : aWPEC.params ().getAsStringTrimmed (FIELD_ID);
+    final String sName = aWPEC.params ().getAsStringTrimmed (FIELD_NAME);
+    final boolean bIsDeprecated = aWPEC.params ().isCheckBoxChecked (FIELD_DEPRECATED, DEFAULT_DEPRECATED);
 
     // validations
     if (StringHelper.hasNoText (sID))

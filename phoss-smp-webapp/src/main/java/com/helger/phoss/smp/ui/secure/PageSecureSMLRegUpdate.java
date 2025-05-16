@@ -71,9 +71,9 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     final boolean bUseHttpConstraints = eRESTType.isHttpConstraint ();
     final boolean bUsePort80Constraints = eRESTType.isPort80Constraint ();
     final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
-    final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
+    final String sSMLID = aWPEC.params ().getAsStringTrimmed (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
-    final String sLogicalAddress = aWPEC.params ().getAsString (FIELD_LOGICAL_ADDRESS);
+    final String sLogicalAddress = aWPEC.params ().getAsStringTrimmed (FIELD_LOGICAL_ADDRESS);
 
     if (StringHelper.hasNoText (sLogicalAddress))
       aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
@@ -227,7 +227,8 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         aForm.addChild (info ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                  aDefaultSML == null ? null
+                                                                                                  aDefaultSML == null
+                                                                                                                      ? null
                                                                                                                       : aDefaultSML.getID ()),
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))

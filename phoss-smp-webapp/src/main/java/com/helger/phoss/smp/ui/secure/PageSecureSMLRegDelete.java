@@ -61,7 +61,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
                                   @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final String sSMLID = aWPEC.params ().getAsString (FIELD_SML_ID);
+    final String sSMLID = aWPEC.params ().getAsStringTrimmed (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
 
     if (aSMLInfo == null)
@@ -152,7 +152,8 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       aForm.addChild (error ("This will remove ALL participants / Service Groups from the network! Your local Service Groups will become unreachable."));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                aDefaultSML == null ? null
+                                                                                                aDefaultSML == null
+                                                                                                                    ? null
                                                                                                                     : aDefaultSML.getID ()),
                                                                               aDisplayLocale,
                                                                               aSMLFilter))

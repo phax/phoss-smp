@@ -148,7 +148,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final boolean bSMLActive = aWPEC.params ().isCheckBoxChecked (FIELD_SML_ACTIVE, SMPSettings.DEFAULT_SML_ENABLED);
     final boolean bSMLRequired = aWPEC.params ()
                                       .isCheckBoxChecked (FIELD_SML_REQUIRED, SMPSettings.DEFAULT_SML_REQUIRED);
-    final String sSMLInfoID = aWPEC.params ().getAsString (FIELD_SML_INFO);
+    final String sSMLInfoID = aWPEC.params ().getAsStringTrimmed (FIELD_SML_INFO);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLInfoID);
 
     final boolean bDirectoryIntegrationEnabled = aWPEC.params ()

@@ -101,8 +101,9 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
     {
       // Start import
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
-      final boolean bOverwriteExisting = aWPEC.params ().isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
-      final String sDefaultOwnerID = aWPEC.params ().getAsString (FIELD_DEFAULT_OWNER);
+      final boolean bOverwriteExisting = aWPEC.params ()
+                                              .isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
+      final String sDefaultOwnerID = aWPEC.params ().getAsStringTrimmed (FIELD_DEFAULT_OWNER);
       final IUser aDefaultOwner = aUserMgr.getActiveUserOfID (sDefaultOwnerID);
 
       if (aImportFile == null || aImportFile.getSize () == 0)
@@ -165,9 +166,11 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
           {
             // Unsupported or no version present
             if (sVersion == null)
-              aFormErrors.addFieldError (FIELD_IMPORT_FILE, "The provided file cannot be imported because it has the wrong layout.");
+              aFormErrors.addFieldError (FIELD_IMPORT_FILE,
+                                         "The provided file cannot be imported because it has the wrong layout.");
             else
-              aFormErrors.addFieldError (FIELD_IMPORT_FILE, "The provided file contains the unsupported version '" + sVersion + "'.");
+              aFormErrors.addFieldError (FIELD_IMPORT_FILE,
+                                         "The provided file contains the unsupported version '" + sVersion + "'.");
           }
         }
       }
@@ -200,7 +203,8 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                                                                " integration is enabled, existing business cards contained in the import are also overwritten!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_OVERWRITE_EXISTING)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owner of the new service groups")
-                                                 .setCtrl (new HCUserSelect (new RequestField (FIELD_DEFAULT_OWNER), aDisplayLocale))
+                                                 .setCtrl (new HCUserSelect (new RequestField (FIELD_DEFAULT_OWNER),
+                                                                             aDisplayLocale))
                                                  .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
 
