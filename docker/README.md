@@ -34,6 +34,10 @@ Alternative console without any configuration - for quick startup testing only:
 ```
 docker run --name phoss-smp -p 8888:8080 -v.:/a -e WEBAPP_DATAPATH=/a -e SML_SMPID=TEST1 -e SMP_BACKEND=xml phelger/phoss-smp-xml:latest
 ```
+and for ARM64 architecture:
+```
+docker run --name phoss-smp -p 8888:8080 -v.:/a -e WEBAPP_DATAPATH=/a -e SML_SMPID=TEST1 -e SMP_BACKEND=xml phelger/phoss-smp-xml-arm64:latest
+```
 
 The command line exposes port 8888 locally if Tomcat is running successfully.
 Open `http://localhost:8888` in your browser to check.

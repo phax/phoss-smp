@@ -15,6 +15,7 @@ target/
 
 .factorypath
 .classpath
+.DS_Store
 .pmd
 .project
 pom.xml.releaseBackup
