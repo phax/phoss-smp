@@ -1,5 +1,6 @@
 db-*-smp.sql
 demo*.png
+hs_err_*.log
 private-*
 prod.*
 _*.cmd
