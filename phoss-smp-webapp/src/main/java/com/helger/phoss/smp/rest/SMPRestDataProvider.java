@@ -21,6 +21,9 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
@@ -36,12 +39,14 @@ import com.helger.servlet.StaticServerInfo;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
+import com.helger.smpclient.url.PeppolConfigurableURLProvider;
+import com.helger.smpclient.url.PeppolURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
- * {@link ISMPServerAPIDataProvider} implementation based on
- * {@link IRequestWebScopeWithoutResponse} data.
+ * {@link ISMPServerAPIDataProvider} implementation based on {@link IRequestWebScopeWithoutResponse}
+ * data.
  *
  * @author Philip Helger
  */
@@ -51,7 +56,8 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   {
     STATIC_SERVER_INFO ("default"),
     REQUEST_SCOPE ("request"),
-    DYNAMIC_PARTICIPANT_URL ("dynamic-participant");
+    @Deprecated (forRemoval = true, since = "7.2.7")
+    DYNAMIC_PARTICIPANT_URL("dynamic-participant");
 
     public static final EServerNameMode DEFAULT = STATIC_SERVER_INFO;
     public static final EServerNameMode FALLBACK = REQUEST_SCOPE;
@@ -77,6 +83,8 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     }
   }
 
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestDataProvider.class);
+
   private final EServerNameMode m_eServerNameMode;
   private final IRequestWebScopeWithoutResponse m_aRequestScope;
   private final IParticipantIdentifier m_aParticipantID;
@@ -88,14 +96,22 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
     m_eServerNameMode = EServerNameMode.getFromIDOrDefault (SMPServerConfiguration.getPublicServerURLMode ());
+    if (m_eServerNameMode == EServerNameMode.DYNAMIC_PARTICIPANT_URL)
+    {
+      LOGGER.warn ("The public URL mode '" +
+                   m_eServerNameMode.getID () +
+                   "' is deprecated and will be removed soon, because it does not work with NAPTR based lookup");
+    }
+
     m_aRequestScope = aRequestScope;
     m_aParticipantID = SMPMetaManager.getIdentifierFactory ().parseParticipantIdentifier (sServiceGroupID);
     m_sSMLZoneName = SMPMetaManager.getSettings ().getSMLDNSZone ();
     m_sQueryPathPrefix = SMPServerConfiguration.getRESTType ().getQueryPathPrefix ();
   }
 
+  @SuppressWarnings ("removal")
   @Nonnull
-  private EServerNameMode _getServerNameMode ()
+  private EServerNameMode _getEffectiveServerNameMode ()
   {
     if (m_eServerNameMode == EServerNameMode.STATIC_SERVER_INFO)
     {
@@ -108,6 +124,16 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
       {
         // Check if feasible
         if (m_aParticipantID == null || StringHelper.hasNoText (m_sSMLZoneName))
+          return EServerNameMode.FALLBACK;
+
+        // This only works with Peppol CNAME URL provider
+        final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
+        if (aURLProvider instanceof PeppolURLProvider ||
+            (aURLProvider instanceof PeppolConfigurableURLProvider && !PeppolConfigurableURLProvider.USE_NATPR.get ()))
+        {
+          // continue
+        }
+        else
           return EServerNameMode.FALLBACK;
       }
 
@@ -149,7 +175,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   public URI getCurrentURI ()
   {
     final String ret;
-    switch (_getServerNameMode ())
+    switch (_getEffectiveServerNameMode ())
     {
       case STATIC_SERVER_INFO:
         // Do not decode params - '#' lets URI parser fail!
@@ -172,8 +198,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   }
 
   /**
-   * @return An UriBuilder that contains the full server name, port and context
-   *         path!
+   * @return An UriBuilder that contains the full server name, port and context path!
    */
   @Nonnull
   protected String getBaseUriBuilder ()
@@ -181,7 +206,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
 
     final String ret;
-    switch (_getServerNameMode ())
+    switch (_getEffectiveServerNameMode ())
     {
       case STATIC_SERVER_INFO:
         if (bIsForceRoot)
