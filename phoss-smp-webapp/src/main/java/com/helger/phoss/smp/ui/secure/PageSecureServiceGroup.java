@@ -780,7 +780,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             new HCTextNode (" "),
                             createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
                             new HCTextNode (" "),
-                            new HCA (LinkHelper.getURLWithServerAndContext (aCurObject.getParticipantIdentifier ()
+                            new HCA (LinkHelper.getURLWithServerAndContext (eRESTType.getQueryPathPrefix () +
+                                                                            aCurObject.getParticipantIdentifier ()
                                                                                       .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
                                                                                                                            sDisplayName)
                                                                                                                 .setTargetBlank ()
@@ -789,7 +790,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         // This is implementation specific, but not contained for BDXR2
         aActions.addChildren (new HCTextNode (" "),
-                              new HCA (LinkHelper.getURLWithServerAndContext ("complete/" +
+                              new HCA (LinkHelper.getURLWithServerAndContext (eRESTType.getQueryPathPrefix () +
+                                                                              "complete/" +
                                                                               aCurObject.getParticipantIdentifier ()
                                                                                         .getURIPercentEncoded ())).setTitle ("Perform complete SMP query on " +
                                                                                                                              sDisplayName)
