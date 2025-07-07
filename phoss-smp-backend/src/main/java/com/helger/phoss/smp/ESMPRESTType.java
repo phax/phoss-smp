@@ -21,9 +21,8 @@ import com.helger.commons.name.IHasDisplayName;
 import com.helger.peppol.sml.ESMPAPIType;
 
 /**
- * Defines the type of REST responses to be returned. Either Peppol (using
- * objects in namespace http://busdox.org/serviceMetadata/publishing/1.0/) or
- * BDXR (using objects in namespace
+ * Defines the type of REST responses to be returned. Either Peppol (using objects in namespace
+ * http://busdox.org/serviceMetadata/publishing/1.0/) or BDXR (using objects in namespace
  * http://docs.oasis-open.org/bdxr/ns/SMP/2016/05)
  *
  * @author Philip Helger
@@ -79,8 +78,7 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
   }
 
   /**
-   * @return <code>true</code> if this REST type supports retrieving the
-   *         complete service group
+   * @return <code>true</code> if this REST type supports retrieving the complete service group
    */
   public boolean isCompleteServiceGroupSupported ()
   {
@@ -88,35 +86,19 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
   }
 
   /**
-   * @return <code>true</code> if this REST API enforces the usage of HTTP and
-   *         does not allow HTTPS.
+   * @return <code>true</code> if this REST API allows the usage of HTTP and HTTPS in parallel. This
+   *         is only true for {@link #PEPPOL} until 2026-02-01. Afterwards Peppol must also use
+   *         HTTPS only.
    */
-  public boolean isHttpConstraint ()
+  public boolean isHttpAlsoAllowed ()
   {
     return this == PEPPOL;
   }
 
   /**
-   * @return <code>true</code> if this REST API enforces the usage of port 80.
-   */
-  public boolean isPort80Constraint ()
-  {
-    return this == PEPPOL;
-  }
-
-  /**
-   * @return <code>true</code> if this REST API enforces the usage of the "/"
-   *         path.
-   */
-  public boolean isPathConstraint ()
-  {
-    return this == PEPPOL;
-  }
-
-  /**
-   * @return The query path prefix for the particular REST type. This was
-   *         introduced for OASIS BDXR SMP v2 support. Never <code>null</code>
-   *         but maybe empty. If a path is returned, it must end with a slash.
+   * @return The query path prefix for the particular REST type. This was introduced for OASIS BDXR
+   *         SMP v2 support. Never <code>null</code> but maybe empty. If a path is returned, it must
+   *         end with a slash.
    * @since 5.7.0
    */
   @Nonnull

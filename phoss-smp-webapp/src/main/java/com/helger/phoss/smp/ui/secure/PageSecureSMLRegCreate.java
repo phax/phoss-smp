@@ -36,7 +36,6 @@ import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
-import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -68,10 +67,6 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
                                   @Nonnull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
-    final boolean bUseHttpConstraints = eRESTType.isHttpConstraint ();
-    final boolean bUsePort80Constraints = eRESTType.isPort80Constraint ();
-    final boolean bUsePathConstraints = eRESTType.isPathConstraint ();
     final String sSMLID = aWPEC.params ().getAsStringTrimmed (FIELD_SML_ID);
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
     final String sLogicalAddress = aWPEC.params ().getAsStringTrimmed (FIELD_LOGICAL_ADDRESS);
@@ -90,36 +85,12 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
                                    "The provided logical address seems not be a URL! Please use the form 'http://smp.example.org'");
       else
       {
-        if (!"http".equals (aURL.getProtocol ()))
+        if (!"http".equals (aURL.getProtocol ()) && !"https".equals (aURL.getProtocol ()))
         {
-          if (bUseHttpConstraints || !"https".equals (aURL.getProtocol ()))
-            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                       "The provided logical address must use the 'http'" +
-                                                              (bUseHttpConstraints ? "" : " or the 'https'") +
-                                                              " protocol and may not use the '" +
-                                                              aURL.getProtocol () +
-                                                              "' protocol." +
-                                                              (bUseHttpConstraints ? " According to the underlying SMP specification, no other protocols than 'http' are allowed!"
-                                                                                   : ""));
-        }
-
-        if (bUsePort80Constraints)
-        {
-          // -1 means default port
-          if (aURL.getPort () != 80 && aURL.getPort () != -1)
-            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                       "The provided logical address must use the default http port 80 and not port " +
-                                                              aURL.getPort () +
-                                                              ". According to the underlying SMP specification, no other ports are allowed!");
-        }
-
-        if (bUsePathConstraints)
-        {
-          if (StringHelper.hasText (aURL.getPath ()) && !"/".equals (aURL.getPath ()))
-            aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
-                                       "The provided logical address may not contain a path (" +
-                                                              aURL.getPath () +
-                                                              ") because according to the SMP specifications it must run in the root (/) path!");
+          aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
+                                     "The provided logical address must use the 'http' or the 'https' protocol and may not use the '" +
+                                                            aURL.getProtocol () +
+                                                            "' protocol.");
         }
       }
     }
