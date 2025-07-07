@@ -42,7 +42,6 @@ import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.IHCElementWithChildren;
 import com.helger.html.hc.html.embedded.HCImg;
-import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCP;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -53,16 +52,13 @@ import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.servlet.SMPLogoutServlet;
-import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumb;
 import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.dropdown.BootstrapDropdownMenu;
 import com.helger.photon.bootstrap4.layout.BootstrapContainer;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
-import com.helger.photon.bootstrap4.navbar.BootstrapNavbarNav;
 import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRenderer;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRendererHorz;
@@ -110,9 +106,6 @@ public final class SMPRendererPublic
   private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
                                              @Nonnull final BootstrapNavbar aNavbar)
   {
-    if (!SMPWebAppConfiguration.isPublicLoginEnabled ())
-      return;
-
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = aLEC.getLoggedInUser ();
 
@@ -134,18 +127,6 @@ public final class SMPRendererPublic
                                                   .setOnClick (LinkHelper.getURLWithContext (aRequestScope,
                                                                                              SMPLogoutServlet.SERVLET_DEFAULT_PATH))
                                                   .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
-    }
-    else
-    {
-      final BootstrapNavbarNav aNav = aToggleable.addAndReturnNav ();
-      final BootstrapDropdownMenu aDropDown = new BootstrapDropdownMenu ();
-      {
-        final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.P_2)
-                                       .addStyle (CCSSProperties.MIN_WIDTH.newValue ("400px"));
-        aDiv.addChild (SMPCommonUI.createViewLoginForm (aLEC, null));
-        aDropDown.addChild (aDiv);
-      }
-      aNav.addItem ().addNavDropDown ("Login", aDropDown);
     }
   }
 
@@ -266,15 +247,13 @@ public final class SMPRendererPublic
 
   /**
    * @param bShowApplicationName
-   *        <code>true</code> to show the application name and version,
-   *        <code>false</code> to hide it.
+   *        <code>true</code> to show the application name and version, <code>false</code> to hide
+   *        it.
    * @param bShowSource
-   *        <code>true</code> to show the link to the source, <code>false</code>
-   *        to hide it.
+   *        <code>true</code> to show the link to the source, <code>false</code> to hide it.
    * @param bShowAuthor
    *        <code>true</code> to show the author, <code>false</code> to hide it.
-   * @return The footer to be used for /public and /secure. Never
-   *         <code>null</code> but maybe empty.
+   * @return The footer to be used for /public and /secure. Never <code>null</code> but maybe empty.
    */
   @Nonnull
   public static BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,

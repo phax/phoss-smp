@@ -50,8 +50,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   {}
 
   /**
-   * @return The web application (UI) configuration for the SMP server. Never
-   *         <code>null</code>.
+   * @return The web application (UI) configuration for the SMP server. Never <code>null</code>.
    */
   @Nonnull
   private static IConfig _getConfig ()
@@ -60,8 +59,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if global debug is enabled. Should be turned off
-   *         in production systems!
+   * @return <code>true</code> if global debug is enabled. Should be turned off in production
+   *         systems!
    */
   @Nullable
   public static String getGlobalDebug ()
@@ -70,8 +69,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if global production mode is enabled. Should only
-   *         be turned on in production systems!
+   * @return <code>true</code> if global production mode is enabled. Should only be turned on in
+   *         production systems!
    */
   @Nullable
   public static String getGlobalProduction ()
@@ -80,8 +79,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if global JAX WS debugging should be enabled,
-   *         <code>false</code> if not. Default is <code>false</code>.
+   * @return <code>true</code> if global JAX WS debugging should be enabled, <code>false</code> if
+   *         not. Default is <code>false</code>.
    * @since 5.0.7
    */
   public static boolean isGlobalDebugJaxWS ()
@@ -90,8 +89,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return The path where the application stores its data. Should be an
-   *         absolute path.
+   * @return The path where the application stores its data. Should be an absolute path.
    */
   @Nullable
   public static String getDataPath ()
@@ -105,8 +103,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if this is a public testable version,
-   *         <code>false</code> if not.
+   * @return <code>true</code> if this is a public testable version, <code>false</code> if not.
    */
   public static boolean isTestVersion ()
   {
@@ -114,8 +111,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to persist statistics on end, <code>false</code>
-   *         to not do it. Default is <code>true</code>.
+   * @return <code>true</code> to persist statistics on end, <code>false</code> to not do it.
+   *         Default is <code>true</code>.
    * @since 5.2.4
    */
   public static boolean isPersistStatisticsOnEnd ()
@@ -135,8 +132,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to show no participants on the start page.
-   *         Default is <code>false</code>.
+   * @return <code>true</code> to show no participants on the start page. Default is
+   *         <code>false</code>.
    * @since 5.0.4
    */
   public static boolean isStartPageParticipantsNone ()
@@ -145,9 +142,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to show extension details on the public start
-   *         page, <code>false</code> to just show a yes or no indicator.
-   *         Default is <code>false</code>.
+   * @return <code>true</code> to show extension details on the public start page,
+   *         <code>false</code> to just show a yes or no indicator. Default is <code>false</code>.
    * @since 5.1.0
    */
   public static boolean isStartPageExtensionsShow ()
@@ -156,8 +152,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return Name of the Directory. Usually "Peppol Directory" but maybe "TOOP
-   *         Directory" as well.
+   * @return Name of the Directory. Usually "Peppol Directory" but maybe "TOOP Directory" as well.
    * @since 5.0.7
    */
   @Nonnull
@@ -167,9 +162,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to show extension details in the secure service
-   *         group list, <code>false</code> to just show a yes or no indicator.
-   *         Default is <code>false</code>.
+   * @return <code>true</code> to show extension details in the secure service group list,
+   *         <code>false</code> to just show a yes or no indicator. Default is <code>false</code>.
    * @since 5.1.0
    */
   public static boolean isServiceGroupsExtensionsShow ()
@@ -178,8 +172,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if the details of login failures (like "User not
-   *         existing" or "Invalid password") should be shown or not.
+   * @return <code>true</code> if the details of login failures (like "User not existing" or
+   *         "Invalid password") should be shown or not.
    * @since 6.0.0
    */
   public static boolean isSecurityLoginShowErrorDetails ()
@@ -188,21 +182,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * Settings for issue #102
-   *
-   * @return <code>true</code> if the Login UI elements should be shown,
-   *         <code>false</code> to to not show them. Default is
-   *         <code>true</code>.
-   * @since 5.1.2
-   */
-  public static boolean isPublicLoginEnabled ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.public.login.enabled", true);
-  }
-
-  /**
-   * @return <code>true</code> to show the author in the public area,
-   *         <code>false</code> to not show it.
+   * @return <code>true</code> to show the author in the public area, <code>false</code> to not show
+   *         it.
    * @since 5.5.0
    */
   public static boolean isPublicShowApplicationName ()
@@ -211,8 +192,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to show the author in the public area,
-   *         <code>false</code> to not show it.
+   * @return <code>true</code> to show the author in the public area, <code>false</code> to not show
+   *         it.
    * @since 5.5.0
    */
   public static boolean isPublicShowSource ()
@@ -221,8 +202,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to show the author in the public area,
-   *         <code>false</code> to not show it.
+   * @return <code>true</code> to show the author in the public area, <code>false</code> to not show
+   *         it.
    * @since 5.2.6
    */
   public static boolean isPublicShowAuthor ()
@@ -231,11 +212,10 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * The inline version has precedence over the external URL and the internal
-   * URL version.
+   * The inline version has precedence over the external URL and the internal URL version.
    *
-   * @return An inline data URL that represents an image and will be used as the
-   *         logo on the public page part. Must start with "data:".
+   * @return An inline data URL that represents an image and will be used as the logo on the public
+   *         page part. Must start with "data:".
    * @see #getPublicLogoExternalUrl()
    * @see #getPublicLogoInternalUrl()
    * @since 6.0.0
@@ -249,9 +229,9 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   /**
    * The external URL version has precedence over the internal URL version.
    *
-   * @return An absolute URL pointing to an image and will be used as the logo
-   *         on the public page part. Should start with "http:" or "https:".
-   *         Please consider CORS settings on the other side.
+   * @return An absolute URL pointing to an image and will be used as the logo on the public page
+   *         part. Should start with "http:" or "https:". Please consider CORS settings on the other
+   *         side.
    * @see #getPublicLogoInline()
    * @see #getPublicLogoInternalUrl()
    * @since 6.0.0
@@ -263,9 +243,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return A relative URL pointing to an image inside the same web server that
-   *         will be used as the logo on the public page part. Should start with
-   *         "/".
+   * @return A relative URL pointing to an image inside the same web server that will be used as the
+   *         logo on the public page part. Should start with "/".
    * @see #getPublicLogoInline()
    * @see #getPublicLogoExternalUrl()
    * @since 6.0.0
@@ -291,8 +270,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   /**
    * Setting for issue #132
    *
-   * @return <code>true</code> if a custom imprint should be shown in the
-   *         footer, <code>false</code> if not.
+   * @return <code>true</code> if a custom imprint should be shown in the footer, <code>false</code>
+   *         if not.
    * @since 5.2.4
    */
   public static boolean isImprintEnabled ()
@@ -301,8 +280,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * This method is only called if {@link #isImprintEnabled()} returns
-   * <code>true</code>.
+   * This method is only called if {@link #isImprintEnabled()} returns <code>true</code>.
    *
    * @return The text used to reference the Imprint. May be <code>null</code>.
    * @since 5.2.4
@@ -314,11 +292,10 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * This method is only called if {@link #isImprintEnabled()} returns
-   * <code>true</code>.
+   * This method is only called if {@link #isImprintEnabled()} returns <code>true</code>.
    *
-   * @return The HRef the Imprint should link to. May be <code>null</code> in
-   *         which case only the text is rendered.
+   * @return The HRef the Imprint should link to. May be <code>null</code> in which case only the
+   *         text is rendered.
    * @since 5.2.4
    */
   @Nullable
@@ -330,13 +307,11 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * This method is only called if {@link #isImprintEnabled()} returns
-   * <code>true</code> and if a imprint link is returned by
-   * {@link #getImprintHref()}.
+   * This method is only called if {@link #isImprintEnabled()} returns <code>true</code> and if a
+   * imprint link is returned by {@link #getImprintHref()}.
    *
-   * @return The HTML link target to be used for the Imprint link. May be
-   *         <code>null</code> in which case the link opens in the current
-   *         window.
+   * @return The HTML link target to be used for the Imprint link. May be <code>null</code> in which
+   *         case the link opens in the current window.
    * @since 5.2.4
    */
   @Nullable
@@ -346,13 +321,11 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * This method is only called if {@link #isImprintEnabled()} returns
-   * <code>true</code>.
+   * This method is only called if {@link #isImprintEnabled()} returns <code>true</code>.
    *
-   * @return A String of whitespace separated CSS classes that should be applied
-   *         on the Imprint HTML node (text or link). The supported classes
-   *         depend on the user interface framework that is in use (currently
-   *         Bootstrap 4).
+   * @return A String of whitespace separated CSS classes that should be applied on the Imprint HTML
+   *         node (text or link). The supported classes depend on the user interface framework that
+   *         is in use (currently Bootstrap 4).
    * @since 5.2.4
    */
   @Nullable
@@ -362,9 +335,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if the "Administration / Monitoring / Sessions"
-   *         page should be disabled (for security reasons), <code>false</code>
-   *         to show it (also the default).
+   * @return <code>true</code> if the "Administration / Monitoring / Sessions" page should be
+   *         disabled (for security reasons), <code>false</code> to show it (also the default).
    * @since 6.0.0
    */
   public static boolean isWebAppPageSessionManagmentDisabled ()
@@ -374,9 +346,9 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if the "Administration / System Information /
-   *         Environment Variables" page should be disabled (for security
-   *         reasons), <code>false</code> to show it (also the default).
+   * @return <code>true</code> if the "Administration / System Information / Environment Variables"
+   *         page should be disabled (for security reasons), <code>false</code> to show it (also the
+   *         default).
    * @since 6.0.8
    */
   public static boolean isWebAppPageEnvVarsDisabled ()
@@ -386,8 +358,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if the system message allows Markdown,
-   *         <code>false</code> if not
+   * @return <code>true</code> if the system message allows Markdown, <code>false</code> if not
    * @since 6.0.1
    */
   public static boolean isWebAppSystemMessageUseMarkdown ()
@@ -396,8 +367,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not
-   *         be provided.
+   * @return <code>true</code> if support for the HTTP "OPTIONS" verb should not be provided.
    * @since 5.2.6
    */
   public static boolean isHttpOptionsDisabled ()
@@ -407,8 +377,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> to enable CSP in general, <code>false</code> to
-   *         disable it.
+   * @return <code>true</code> to enable CSP in general, <code>false</code> to disable it.
    * @since 5.2.6
    */
   public static boolean isCSPEnabled ()
@@ -417,9 +386,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if CSP is enabled, errors should only be reported
-   *         but the content should not be blocked, <code>false</code> to also
-   *         block payload.
+   * @return <code>true</code> if CSP is enabled, errors should only be reported but the content
+   *         should not be blocked, <code>false</code> to also block payload.
    * @since 5.2.6
    */
   public static boolean isCSPReportingOnly ()
@@ -428,9 +396,8 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * @return <code>true</code> if CSP is enabled and it's not "reporting only"
-   *         mode, errors should be reported , <code>false</code> to silently
-   *         ignore them.
+   * @return <code>true</code> if CSP is enabled and it's not "reporting only" mode, errors should
+   *         be reported , <code>false</code> to silently ignore them.
    * @since 5.2.6
    */
   public static boolean isCSPReportingEnabled ()

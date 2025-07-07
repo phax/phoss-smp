@@ -34,48 +34,30 @@ import com.helger.commons.collection.impl.CommonsArrayList;
 import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.datetime.PDTFactory;
 import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.http.EHttpMethod;
-import com.helger.commons.id.factory.GlobalIDFactory;
 import com.helger.commons.math.MathHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.css.property.CCSSProperties;
 import com.helger.datetime.util.PDTDisplayHelper;
 import com.helger.html.hc.IHCNode;
-import com.helger.html.hc.html.forms.HCEdit;
-import com.helger.html.hc.html.forms.HCEditPassword;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCHR;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.html.jquery.JQuery;
 import com.helger.html.jquery.JQueryAjaxBuilder;
-import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
-import com.helger.html.jscode.JSPackage;
-import com.helger.html.jscode.JSParam;
-import com.helger.html.jscode.html.JSHtml;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
-import com.helger.phoss.smp.ui.ajax.AjaxExecutorPublicLogin;
 import com.helger.phoss.smp.ui.ajax.CAjax;
-import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.ext.BootstrapSystemMessage;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap4.uictrls.ext.BootstrapTechnicalUI;
-import com.helger.photon.core.EPhotonCoreText;
-import com.helger.photon.core.execcontext.ILayoutExecutionContext;
-import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.login.CLogin;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.uictrls.datatables.DataTablesLengthMenu;
@@ -172,58 +154,6 @@ public final class SMPCommonUI
       aSB.append (aParts.get (i));
     }
     return aSB.append (" and ").append (aParts.getLastOrNull ()).toString ();
-  }
-
-  @Nonnull
-  public static BootstrapForm createViewLoginForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                   @Nullable final String sPreselectedUserName)
-  {
-    final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
-
-    // Use new IDs for both fields, in case the login stuff is displayed more
-    // than once!
-    final String sIDUserName = GlobalIDFactory.getNewStringID ();
-    final String sIDPassword = GlobalIDFactory.getNewStringID ();
-    final String sIDErrorField = GlobalIDFactory.getNewStringID ();
-
-    final BootstrapForm aForm = new BootstrapForm (aLEC).setAction (aLEC.getSelfHref ());
-    aForm.setLeft (4);
-
-    // User name field
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel (EPhotonCoreText.EMAIL_ADDRESS.getDisplayText (aDisplayLocale))
-                                                 .setCtrl (new HCEdit (new RequestField (CLogin.REQUEST_ATTR_USERID,
-                                                                                         sPreselectedUserName)).setID (sIDUserName)));
-
-    // Password field
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel (EPhotonCoreText.LOGIN_FIELD_PASSWORD.getDisplayText (aDisplayLocale))
-                                                 .setCtrl (new HCEditPassword (CLogin.REQUEST_ATTR_PASSWORD).setID (sIDPassword)));
-
-    // Placeholder for error message
-    aForm.addChild (new HCDiv ().setID (sIDErrorField).addClass (CBootstrapCSS.MX_2));
-
-    // Login button
-    final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aLEC));
-    {
-      final JSPackage aOnClick = new JSPackage ();
-      final JSAnonymousFunction aJSSuccess = new JSAnonymousFunction ();
-      final JSParam aJSData = aJSSuccess.param ("data");
-      aJSSuccess.body ()
-                ._if (aJSData.ref (AjaxExecutorPublicLogin.JSON_LOGGEDIN),
-                      JSHtml.windowLocationReload (),
-                      JQuery.idRef (sIDErrorField).empty ().append (aJSData.ref (AjaxExecutorPublicLogin.JSON_HTML)));
-      aOnClick.add (new JQueryAjaxBuilder ().url (CAjax.LOGIN.getInvocationURI (aRequestScope))
-                                            .method (EHttpMethod.POST)
-                                            .data (new JSAssocArray ().add (CLogin.REQUEST_ATTR_USERID,
-                                                                            JQuery.idRef (sIDUserName).val ())
-                                                                      .add (CLogin.REQUEST_ATTR_PASSWORD,
-                                                                            JQuery.idRef (sIDPassword).val ()))
-                                            .success (aJSSuccess)
-                                            .build ());
-      aOnClick._return (false);
-      aToolbar.addSubmitButton (EPhotonCoreText.LOGIN_BUTTON_SUBMIT.getDisplayText (aDisplayLocale), aOnClick);
-    }
-    return aForm;
   }
 
   @Nonnull
