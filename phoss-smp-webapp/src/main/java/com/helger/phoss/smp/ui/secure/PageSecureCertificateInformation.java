@@ -69,22 +69,31 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 {
   private enum EPredefinedCA
   {
-    // PEPPOL PKI v2
-    PEPPOL_PILOT_V2 ("Peppol Pilot CA v2",
+    // PEPPOL PKI G1 2010
+    PEPPOL_PILOT_G1 ("Peppol Pilot CA G1 (2010)",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
                      3,
                      true),
-    PEPPOL_PRODUCTION_V2 ("Peppol Production CA v2",
+    PEPPOL_PRODUCTION_G1 ("Peppol Production CA G1 (2010)",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
                           3,
                           true),
-    // PEPPOL PKI v3
-    PEPPOL_PILOT_V3 ("Peppol Pilot CA v3",
+    // PEPPOL PKI G2 2018
+    PEPPOL_PILOT_G2 ("Peppol Pilot CA G2 (2018)",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
                      3,
                      false),
-    PEPPOL_PRODUCTION_V3 ("Peppol Production CA v3",
+    PEPPOL_PRODUCTION_G2 ("Peppol Production CA G2 (2018)",
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
+                          3,
+                          false),
+    // PEPPOL PKI G3 2025
+    PEPPOL_PILOT_G3 ("Peppol Pilot CA G3 (2025)",
+                     "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G3,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
+                     3,
+                     false),
+    PEPPOL_PRODUCTION_G3 ("Peppol Production CA G3 (2025)",
+                          "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G3,O=OpenPEPPOL AISBL,C=BE",
                           3,
                           false),
     // TOOP Pilot PKI
