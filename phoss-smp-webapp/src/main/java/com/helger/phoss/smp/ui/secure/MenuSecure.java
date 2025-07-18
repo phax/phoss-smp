@@ -17,22 +17,29 @@
 package com.helger.phoss.smp.ui.secure;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.commons.collection.impl.CommonsHashMap;
+import com.helger.commons.collection.impl.ICommonsMap;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.bootstrap4.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap4.pages.security.BasePageSecurityChangePassword;
 import com.helger.photon.core.menu.IMenuItemPage;
+import com.helger.photon.core.menu.IMenuObject;
 import com.helger.photon.core.menu.IMenuObjectFilter;
 import com.helger.photon.core.menu.IMenuTree;
 import com.helger.photon.core.menu.filter.MenuObjectFilterUserAssignedToUserGroup;
+import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.system.BasePageShowChildren;
+import com.helger.web.scope.singleton.AbstractRequestWebSingleton;
 
 @Immutable
 public final class MenuSecure
@@ -42,15 +49,53 @@ public final class MenuSecure
   private MenuSecure ()
   {}
 
+  /**
+   * Cache the check if the current user is in a user group or not, to avoid that too many queries
+   * are performed. If necessary, this class can be made more public if required on other places.
+   * 
+   * @author Philip Helger
+   * @since v7.2.7
+   */
+  public static final class CurrentUserToUserGroupAssignmentCache extends AbstractRequestWebSingleton
+  {
+    private final ICommonsMap <String, Boolean> m_aMap = new CommonsHashMap <> ();
+
+    @Deprecated
+    public CurrentUserToUserGroupAssignmentCache ()
+    {}
+
+    public static final CurrentUserToUserGroupAssignmentCache getInstance ()
+    {
+      return getRequestSingleton (CurrentUserToUserGroupAssignmentCache.class);
+    }
+
+    boolean isCurrentUserAssignedToUserGroup (final String sUserGroupID)
+    {
+      return m_aMap.computeIfAbsent (sUserGroupID,
+                                     k -> Boolean.valueOf (SecurityHelper.isCurrentUserAssignedToUserGroup (sUserGroupID)))
+                   .booleanValue ();
+    }
+  }
+
   public static void init (@Nonnull final IMenuTree aMenuTree)
   {
-    final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID);
+    final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID)
+    {
+      @Override
+      public boolean test (@Nullable final IMenuObject aValue)
+      {
+        return CurrentUserToUserGroupAssignmentCache.getInstance ()
+                                                    .isCurrentUserAssignedToUserGroup (getUserGroupID ());
+      }
+    };
     final IMenuObjectFilter aFilterPeppolDirectory = x -> SMPMetaManager.getSettings ()
                                                                         .isDirectoryIntegrationEnabled () &&
                                                           SMPMetaManager.hasBusinessCardMgr ();
     final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLEnabled ();
-    final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> SMPMetaManager.getSettings ().isSMLEnabled () ||
-                                                                      SMPMetaManager.getSettings ().isSMLRequired ();
+    final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> {
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      return aSettings.isSMLEnabled () || aSettings.isSMLRequired ();
+    };
 
     aMenuTree.createRootItem (new PageSecureHome (CMenuSecure.MENU_HOME, aMenuTree));
 
