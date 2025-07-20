@@ -42,6 +42,7 @@
   <item id="cenbii-procid-ubl::urn:fdc:hr-xml:2007:humanresource:1.0" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:hr-xml:2007:staffingorder:1.0" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:hr-xml:2007:timesheet:1.0" name="Peppol predefined" state="act" />
+  <item id="cenbii-procid-ubl::urn:fdc:imda.gov.sg:bis:order_balance:1" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:billing:01:1.0" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:poacc:selfbilling:01:1.0" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p001:01:1.0" name="Peppol predefined" state="dep" />
@@ -104,6 +105,7 @@
   <item id="cenbii-procid-ubl::urn:peppol:eb2b:order_desadv_billing" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:peppol:eb2b:ordering" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:peppol:eb2b:ordering_desadv_billing" name="Peppol predefined" state="act" />
+  <item id="cenbii-procid-ubl::urn:peppol:edec:mls" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:peppol:france:billing:non-regulated" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:peppol:france:billing:regulated" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii01:ver1.0" name="Peppol predefined" state="dep" />
