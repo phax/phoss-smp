@@ -180,6 +180,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     _initTimeZone ();
   }
 
+  @SuppressWarnings ("removal")
   @Override
   protected void initGlobalSettings ()
   {
