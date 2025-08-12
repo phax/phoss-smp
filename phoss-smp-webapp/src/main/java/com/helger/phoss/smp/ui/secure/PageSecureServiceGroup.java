@@ -165,14 +165,11 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         aNodeList.addChild (info ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
       }
 
-      if (false)
-        aNodeList.addChild (warn ("Please note that this page can only be used with Peppol and standard CEF BDMSL entries. Other entries, like BPC ones, may not be resolved correctly!"));
-
       final String sSMLZoneName = aSettings.getSMLDNSZone ();
       final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
 
       final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
-                                          new DTCol ("DNS name").setWidth ("50%"),
+                                          new DTCol ("DNS name (not clickable)").setWidth ("50%"),
                                           new DTCol ("SMP URI").setDataSort (2, 0),
                                           new DTCol ("Action")).setID (getID () + "_checkdns");
 
@@ -226,12 +223,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
         if (sDNSName != null)
-          aRow.addCell (new HCA (new SimpleURL ("http://" + sDNSName)).setTargetBlank ().addChild (sDNSName));
+        {
+          // This host name cannot be opened in the browser, so no link
+          aRow.addCell (sDNSName);
+        }
         else
           aRow.addCell (new HCEM ().addChild ("DNS resolve failed"));
         if (sURI != null)
         {
-          aRow.addCell (sURI);
+          aRow.addCell (new HCA (new SimpleURL (sURI)).setTargetBlank ().addChild (sURI));
           aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER, EBootstrapButtonSize.SMALL).addChild (
                                                                                                                 "Unregister from SML")
                                                                                                      .setOnClick (aWPEC.getSelfHref ()
@@ -288,6 +288,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
   private static final String ACTION_UNREGISTER_FROM_SML = "unregister-from-sml";
 
+  private static final String PARAM_CREATE_IN_SML = "create-in-sml";
   private static final String PARAM_DELETE_IN_SML = "delete-in-sml";
 
   public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
@@ -302,6 +303,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
+        aForm.setLeft (0);
+
         final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete SMP Service Group '" +
                                                         aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
                                                         "'?")).addChild (div ("This means that all Endpoints and all Redirects are deleted as well."));
@@ -314,7 +317,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Delete in SML?")
                                                      .setCtrl (new HCCheckBox (new RequestFieldBoolean (PARAM_DELETE_IN_SML,
-                                                                                                        aSettings.isSMLEnabled ()))));
+                                                                                                        aSettings.isSMLEnabled ())))
+                                                     .setHelpText ("Handle with care. If this checkbox is not checked but the Service Group was created in the SML, you create a dead record!"));
       }
 
       @Override
@@ -503,6 +507,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
     aForm.setLeft (2);
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
@@ -545,6 +550,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                  .setHelpText ("The user who owns this entry. Only this user can make changes via the REST API.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_OWNING_USER_ID)));
 
+    if (!bEdit)
+    {
+      // Show only on creation
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Create in SML?")
+                                                   .setCtrl (new HCCheckBox (new RequestFieldBoolean (PARAM_CREATE_IN_SML,
+                                                                                                      aSettings.isSMLEnabled ())))
+                                                   .setHelpText ("Handle with care. If this checkbox is not checked, the participant is only created locally and cannot be reached from the outside."));
+    }
+
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
                                                                                              aSelectedObject != null
@@ -564,12 +578,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
     final String sParticipantIDScheme = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_SCHEME);
     final String sParticipantIDValue = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_VALUE);
     IParticipantIdentifier aParticipantID = null;
     final String sOwningUserID = aWPEC.params ().getAsStringTrimmed (FIELD_OWNING_USER_ID);
     final IUser aOwningUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwningUserID);
+    final boolean bCreateInSML = aWPEC.params ().isCheckBoxChecked (PARAM_CREATE_IN_SML, aSettings.isSMLEnabled ());
     final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
@@ -629,7 +645,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         Exception aCaughtEx = null;
         try
         {
-          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, true);
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, bCreateInSML);
         }
         catch (final Exception ex)
         {
