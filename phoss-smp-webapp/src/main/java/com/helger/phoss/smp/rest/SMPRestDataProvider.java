@@ -26,11 +26,14 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.commons.ValueEnforcer;
 import com.helger.commons.annotation.Nonempty;
+import com.helger.commons.collection.impl.ICommonsList;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.lang.EnumHelper;
 import com.helger.commons.string.StringHelper;
 import com.helger.commons.string.StringParser;
 import com.helger.commons.url.URLHelper;
+import com.helger.http.HttpForwardedHeaderHop;
+import com.helger.http.HttpForwardedHeaderParser;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -73,7 +76,14 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
      * 
      * @since 7.2.8
      */
-    X_FORWARDED_REQUEST ("x-forwarded-request"),
+    X_FORWARDED_HEADER ("x-forwarded-header"),
+    /**
+     * Use the information from the "Forwarded" HTTP header including fallback to
+     * {@link IRequestWebScopeWithoutResponse} data
+     * 
+     * @since 7.2.8
+     */
+    FORWARDED_HEADER ("forwarded-header"),
     /**
      * Use the Peppol CNAME record. Does not work with NAPTR records
      */
@@ -196,7 +206,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   }
 
   @Nonnull
-  private StringBuilder _getXForwardedBasedHostName ()
+  private StringBuilder _getXForwardedHeaderBasedHostName ()
   {
     // Try to use as many "X-Forwarded-*" header values as possible. The parts not present will
     // be replaced with
@@ -229,6 +239,59 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   }
 
   @Nonnull
+  private StringBuilder _getForwardedHeaderBasedHostName ()
+  {
+    // Get the hops in reverse order, so that the last hop is in front and we can iterate forward
+    // based
+    final ICommonsList <HttpForwardedHeaderHop> aMultiHops = HttpForwardedHeaderParser.parseMultipleHops (m_aRequestScope.headers ()
+                                                                                                                         .getFirstHeaderValue (HttpForwardedHeaderParser.HTTP_HEADER_FORWARDED))
+                                                                                      .reverse ();
+
+    final HttpServletRequest aHttpRequest = m_aRequestScope.getRequest ();
+
+    // Scheme
+    String sScheme = null;
+    for (final HttpForwardedHeaderHop aHop : aMultiHops)
+      if (aHop.containsProto ())
+      {
+        sScheme = aHop.getProto ();
+        if (StringHelper.hasText (sScheme))
+          break;
+      }
+    if (!StringHelper.hasText (sScheme))
+      sScheme = ServletHelper.getRequestScheme (aHttpRequest);
+
+    // Host and port
+    String sHost = null;
+    int nPort = -1;
+    for (final HttpForwardedHeaderHop aHop : aMultiHops)
+      if (aHop.containsHost ())
+      {
+        // Host may contain port number as well
+        final String sFullHost = aHop.getHost ();
+
+        final int nPortSep = sFullHost.indexOf (':');
+        if (nPortSep > 0)
+        {
+          sHost = sFullHost.substring (0, nPortSep);
+          nPort = StringParser.parseInt (sFullHost.substring (1), -1);
+        }
+        else
+          sHost = sFullHost;
+        if (StringHelper.hasText (sHost))
+          break;
+      }
+    if (!StringHelper.hasText (sHost))
+    {
+      sHost = ServletHelper.getRequestServerName (aHttpRequest);
+      nPort = ServletHelper.getRequestServerPort (aHttpRequest);
+    }
+
+    // Build result string
+    return RequestHelper.getFullServerName (sScheme, sHost, nPort);
+  }
+
+  @Nonnull
   public URI getCurrentURI ()
   {
     final String ret;
@@ -242,8 +305,11 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
       case REQUEST_SCOPE:
         ret = m_aRequestScope.getRequestURLEncoded ().toString ();
         break;
-      case X_FORWARDED_REQUEST:
-        ret = _getXForwardedBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ()).toString ();
+      case X_FORWARDED_HEADER:
+        ret = _getXForwardedHeaderBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ()).toString ();
+        break;
+      case FORWARDED_HEADER:
+        ret = _getForwardedHeaderBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ()).toString ();
         break;
       case DYNAMIC_PARTICIPANT_URL:
         ret = m_aRequestScope.getScheme () +
@@ -275,8 +341,13 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
       case REQUEST_SCOPE:
         ret = m_aRequestScope.getFullServerPath () + (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
         break;
-      case X_FORWARDED_REQUEST:
-        ret = _getXForwardedBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope.getContextPath ()).toString ();
+      case X_FORWARDED_HEADER:
+        ret = _getXForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope.getContextPath ())
+                                                  .toString ();
+        break;
+      case FORWARDED_HEADER:
+        ret = _getForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope.getContextPath ())
+                                                 .toString ();
         break;
       case DYNAMIC_PARTICIPANT_URL:
         ret = m_aRequestScope.getScheme () +
