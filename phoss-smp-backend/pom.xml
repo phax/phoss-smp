@@ -16,7 +16,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>7.2.8-SNAPSHOT</version>
+    <version>7.2.8</version>
   </parent>
   <artifactId>phoss-smp-backend</artifactId>
   <packaging>bundle</packaging>
