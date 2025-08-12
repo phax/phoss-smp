@@ -29,13 +29,16 @@ import com.helger.commons.annotation.Nonempty;
 import com.helger.commons.id.IHasID;
 import com.helger.commons.lang.EnumHelper;
 import com.helger.commons.string.StringHelper;
+import com.helger.commons.string.StringParser;
 import com.helger.commons.url.URLHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.servlet.ServletHelper;
 import com.helger.servlet.StaticServerInfo;
+import com.helger.servlet.request.RequestHelper;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
@@ -43,6 +46,8 @@ import com.helger.smpclient.url.PeppolConfigurableURLProvider;
 import com.helger.smpclient.url.PeppolURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * {@link ISMPServerAPIDataProvider} implementation based on {@link IRequestWebScopeWithoutResponse}
@@ -54,8 +59,24 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
 {
   enum EServerNameMode implements IHasID <String>
   {
+    /**
+     * Use the information from the {@link StaticServerInfo}
+     */
     STATIC_SERVER_INFO ("default"),
+    /**
+     * Use the information from the {@link IRequestWebScopeWithoutResponse}
+     */
     REQUEST_SCOPE ("request"),
+    /**
+     * Use the information from the "X-Forwarded-*" HTTP headers including fallback to
+     * {@link IRequestWebScopeWithoutResponse} data
+     * 
+     * @since 7.2.8
+     */
+    X_FORWARDED_REQUEST ("x-forwarded-request"),
+    /**
+     * Use the Peppol CNAME record. Does not work with NAPTR records
+     */
     @Deprecated (forRemoval = true, since = "7.2.7")
     DYNAMIC_PARTICIPANT_URL("dynamic-participant");
 
@@ -84,6 +105,9 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestDataProvider.class);
+  private static final String HTTP_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+  private static final String HTTP_X_FORWARDED_HOST = "X-Forwarded-Host";
+  private static final String HTTP_X_FORWARDED_PORT = "X-Forwarded-Port";
 
   private final EServerNameMode m_eServerNameMode;
   private final IRequestWebScopeWithoutResponse m_aRequestScope;
@@ -172,6 +196,39 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   }
 
   @Nonnull
+  private StringBuilder _getXForwardedBasedHostName ()
+  {
+    // Try to use as many "X-Forwarded-*" header values as possible. The parts not present will
+    // be replaced with
+    final HttpServletRequest aHttpRequest = m_aRequestScope.getRequest ();
+    boolean bFallbackToLocalPort = false;
+
+    // Scheme
+    String sScheme = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_PROTO);
+    if (StringHelper.hasText (sScheme))
+      bFallbackToLocalPort = false;
+    else
+      sScheme = ServletHelper.getRequestScheme (aHttpRequest);
+
+    // Host
+    String sHost = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_HOST);
+    if (StringHelper.hasText (sHost))
+      bFallbackToLocalPort = false;
+    else
+      sHost = ServletHelper.getRequestServerName (aHttpRequest);
+
+    // Port
+    int nPort = StringParser.parseInt (m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_PORT), -1);
+    // If no fallback to local port should be performed, the default port of the selected scheme
+    // is used
+    if (nPort < 0 && bFallbackToLocalPort)
+      nPort = ServletHelper.getRequestServerPort (aHttpRequest);
+
+    // Build result string
+    return RequestHelper.getFullServerName (sScheme, sHost, nPort);
+  }
+
+  @Nonnull
   public URI getCurrentURI ()
   {
     final String ret;
@@ -184,6 +241,9 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
         break;
       case REQUEST_SCOPE:
         ret = m_aRequestScope.getRequestURLEncoded ().toString ();
+        break;
+      case X_FORWARDED_REQUEST:
+        ret = _getXForwardedBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ()).toString ();
         break;
       case DYNAMIC_PARTICIPANT_URL:
         ret = m_aRequestScope.getScheme () +
@@ -209,16 +269,14 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     switch (_getEffectiveServerNameMode ())
     {
       case STATIC_SERVER_INFO:
-        if (bIsForceRoot)
-          ret = StaticServerInfo.getInstance ().getFullServerPath ();
-        else
-          ret = StaticServerInfo.getInstance ().getFullContextPath ();
+        ret = StaticServerInfo.getInstance ().getFullServerPath () +
+              (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
         break;
       case REQUEST_SCOPE:
-        if (bIsForceRoot)
-          ret = m_aRequestScope.getFullServerPath ();
-        else
-          ret = m_aRequestScope.getFullContextPath ();
+        ret = m_aRequestScope.getFullServerPath () + (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
+        break;
+      case X_FORWARDED_REQUEST:
+        ret = _getXForwardedBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope.getContextPath ()).toString ();
         break;
       case DYNAMIC_PARTICIPANT_URL:
         ret = m_aRequestScope.getScheme () +
