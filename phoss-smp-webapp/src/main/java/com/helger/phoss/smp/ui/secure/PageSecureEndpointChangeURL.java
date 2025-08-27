@@ -279,7 +279,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         // Find selected service group (if any)
         final String sServiceGroupID = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP);
         ISMPServiceGroup aSelectedServiceGroup = null;
-        if (StringHelper.hasText (sServiceGroupID))
+        if (StringHelper.isNotEmpty (sServiceGroupID))
         {
           final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
           if (aParticipantID != null)
@@ -288,13 +288,13 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
         final String sNewURL = aWPEC.params ().getAsStringTrimmed (FIELD_NEW_URL);
 
-        if (StringHelper.hasNoText (sOldURL))
+        if (StringHelper.isEmpty (sOldURL))
           aFormErrors.addFieldInfo (FIELD_OLD_URL, "An old URL must be provided");
         else
           if (!URLValidator.isValid (sOldURL))
             aFormErrors.addFieldInfo (FIELD_OLD_URL, "The old URL is invalid");
 
-        if (StringHelper.hasNoText (sNewURL))
+        if (StringHelper.isEmpty (sNewURL))
           aFormErrors.addFieldInfo (FIELD_NEW_URL, "A new URL must be provided");
         else
           if (!URLValidator.isValid (sNewURL))

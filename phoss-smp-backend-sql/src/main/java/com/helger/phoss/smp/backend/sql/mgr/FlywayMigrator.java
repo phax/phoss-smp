@@ -155,7 +155,7 @@ final class FlywayMigrator
 
     // Flyway to handle the DB schema?
     final String sSchema = SMPJDBCConfiguration.getJdbcSchema ();
-    if (StringHelper.hasText (sSchema))
+    if (StringHelper.isNotEmpty (sSchema))
     {
       // Use the schema only, if it is explicitly configured
       // The default schema name is ["$user", public] and as such unusable

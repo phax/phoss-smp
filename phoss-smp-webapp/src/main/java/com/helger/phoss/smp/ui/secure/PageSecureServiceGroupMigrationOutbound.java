@@ -364,7 +364,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     final String sParticipantID = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID);
     final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sParticipantID);
 
-    if (StringHelper.hasNoText (sParticipantID))
+    if (StringHelper.isEmpty (sParticipantID))
       aFormErrors.addFieldError (FIELD_PARTICIPANT_ID, "A Service Group must be selected.");
     else
       if (aParticipantID == null)

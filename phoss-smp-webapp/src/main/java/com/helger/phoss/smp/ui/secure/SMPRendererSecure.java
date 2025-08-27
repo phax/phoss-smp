@@ -153,7 +153,7 @@ public final class SMPRendererSecure
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
                                    .addChild (" Directory support is configured."));
-        if (StringHelper.hasNoText (aSettings.getDirectoryHostName ()))
+        if (StringHelper.isEmpty (aSettings.getDirectoryHostName ()))
         {
           aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
                                      .addChild (" No Directory host is provided. ")

@@ -99,7 +99,7 @@ public final class NiceNameUI
           ret.addChild (" ")
              .addChild (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Identifier is deprecated"));
         }
-      if (StringHelper.hasText (sSpecialLabel))
+      if (StringHelper.isNotEmpty (sSpecialLabel))
       {
         ret.addChild (" ").addChild (new BootstrapBadge (eSpecialLabelBadgeType).addChild (sSpecialLabel));
       }

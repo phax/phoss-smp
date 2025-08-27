@@ -24,7 +24,6 @@
   <description>SMP backend library with all common parts used for a full SMP server web application</description>
   <url>https://github.com/phax/phoss-smp/phoss-smp-backend</url>
   <inceptionYear>2015</inceptionYear>
-  
   <licenses>
     <license>
       <name>MPL 2.0</name>
@@ -32,12 +31,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
   <organization>
     <name>Philip Helger</name>
     <url>https://www.helger.com</url>
   </organization>
-  
   <developers>
     <developer>
       <id>philip</id>
@@ -46,7 +43,6 @@
       <url>https://www.helger.com</url>
     </developer>
   </developers>
-  
   <dependencies>
     <dependency>
       <groupId>com.helger.commons</groupId>
@@ -88,13 +84,11 @@
       <groupId>com.helger</groupId>
       <artifactId>ph-xmldsig</artifactId>
     </dependency>
-    
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -105,7 +99,6 @@
       <artifactId>ph-oton-security</artifactId>
       <optional>true</optional>
     </dependency>
-    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -117,11 +110,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
   <build>
     <resources>
-      <!-- Hack to filter only properties files -->
-      <resource>
+      <!-- Hack to filter only properties files -->      <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
         <includes>
@@ -146,12 +137,9 @@
             <Automatic-Module-Name>com.helger.phoss.smp</Automatic-Module-Name>
             <Export-Package>com.helger.phoss.smp.*</Export-Package>
             <Import-Package>!javax.annotation.*,*</Import-Package>
-            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)",
-osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
-osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple; resolution:=optional</Require-Capability>
+            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.commons.typeconvert.ITypeConverterRegistrarSPI,
 osgi.serviceloader; osgi.serviceloader=com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI</Provide-Capability>
-            <!-- The latter one has precedence -->
             <Include-Resource>{maven-resources},smp-server-version.properties=target/classes/smp-server-version.properties</Include-Resource>
           </instructions>
         </configuration>

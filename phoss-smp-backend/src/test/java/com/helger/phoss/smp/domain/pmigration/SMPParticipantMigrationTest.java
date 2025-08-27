@@ -44,11 +44,11 @@ public final class SMPParticipantMigrationTest
     final SMPParticipantMigration pm = SMPParticipantMigration.createOutbound (aPI,
                                                                                ManageParticipantIdentifierServiceCaller.createRandomMigrationKey ());
     assertNotNull (pm);
-    assertTrue (StringHelper.hasText (pm.getID ()));
+    assertTrue (StringHelper.isNotEmpty (pm.getID ()));
     assertEquals (EParticipantMigrationDirection.OUTBOUND, pm.getDirection ());
     assertSame (aPI, pm.getParticipantIdentifier ());
     assertTrue (PDTFactory.getCurrentLocalDateTime ().compareTo (pm.getInitiationDateTime ()) >= 0);
-    assertTrue (StringHelper.hasText (pm.getMigrationKey ()));
+    assertTrue (StringHelper.isNotEmpty (pm.getMigrationKey ()));
     XMLTestHelper.testMicroTypeConversion (pm);
   }
 
@@ -58,7 +58,7 @@ public final class SMPParticipantMigrationTest
     final IParticipantIdentifier aPI = SimpleIdentifierFactory.INSTANCE.createParticipantIdentifier ("foo", "bar");
     final SMPParticipantMigration pm = SMPParticipantMigration.createInbound (aPI, "11AAbb$$");
     assertNotNull (pm);
-    assertTrue (StringHelper.hasText (pm.getID ()));
+    assertTrue (StringHelper.isNotEmpty (pm.getID ()));
     assertEquals (EParticipantMigrationDirection.INBOUND, pm.getDirection ());
     assertSame (aPI, pm.getParticipantIdentifier ());
     assertTrue (PDTFactory.getCurrentLocalDateTime ().compareTo (pm.getInitiationDateTime ()) >= 0);

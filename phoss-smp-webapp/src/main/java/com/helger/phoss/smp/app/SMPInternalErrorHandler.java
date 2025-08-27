@@ -78,7 +78,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
     final long nSMTPConnectionTimeoutMS = aConfig.getAsLong ("smp.smtp.connectiontimeoutms", 10_000);
     final long nSMTPSocketTimeoutMS = aConfig.getAsLong ("smp.smtp.sockettimeoutms", 10_000);
     final boolean bSMTPDebug = aConfig.getAsBoolean ("smp.smtp.debug", false);
-    final SMTPSettings aSMTPSettings = StringHelper.hasText (sSMTPHostName) ? new SMTPSettings (sSMTPHostName,
+    final SMTPSettings aSMTPSettings = StringHelper.isNotEmpty (sSMTPHostName) ? new SMTPSettings (sSMTPHostName,
                                                                                                 nSMTPPort,
                                                                                                 sSMTPUserName,
                                                                                                 sSMTPPassword,
@@ -88,8 +88,8 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
                                                                                                 nSMTPConnectionTimeoutMS,
                                                                                                 nSMTPSocketTimeoutMS,
                                                                                                 bSMTPDebug) : null;
-    if (StringHelper.hasText (sSenderAddress) &&
-        StringHelper.hasText (sReceiverAddress) &&
+    if (StringHelper.isNotEmpty (sSenderAddress) &&
+        StringHelper.isNotEmpty (sReceiverAddress) &&
         aSMTPSettings != null &&
         aSMTPSettings.areRequiredFieldsSet ())
     {

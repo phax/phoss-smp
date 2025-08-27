@@ -138,7 +138,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
   @Nonnull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
-    if (StringHelper.hasNoText (sSMPTransportProfileID))
+    if (StringHelper.isEmpty (sSMPTransportProfileID))
       return EChange.UNCHANGED;
 
     final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_tprofile WHERE id=?",
@@ -173,7 +173,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
   @Nullable
   public ISMPTransportProfile getSMPTransportProfileOfID (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
@@ -192,7 +192,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
 
   public boolean containsSMPTransportProfileWithID (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return false;
 
     return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_tprofile WHERE id=?",

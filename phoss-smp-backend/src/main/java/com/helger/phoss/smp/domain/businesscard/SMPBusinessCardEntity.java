@@ -152,7 +152,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
    */
   public boolean hasGeographicalInformation ()
   {
-    return StringHelper.hasText (m_sGeographicalInformation);
+    return StringHelper.isNotEmpty (m_sGeographicalInformation);
   }
 
   /**
@@ -200,7 +200,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
 
   public boolean hasAdditionalInformation ()
   {
-    return StringHelper.hasText (m_sAdditionalInformation);
+    return StringHelper.isNotEmpty (m_sAdditionalInformation);
   }
 
   /**

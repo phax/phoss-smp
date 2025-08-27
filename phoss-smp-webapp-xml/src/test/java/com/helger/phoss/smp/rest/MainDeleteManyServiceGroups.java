@@ -51,7 +51,7 @@ public final class MainDeleteManyServiceGroups extends AbstractCreateMany
                                                  @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);
-    if (StringHelper.hasText (sResponse))
+    if (StringHelper.isNotEmpty (sResponse))
       LOGGER.error ("HTTP Response: " + sResponse);
     if (!ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()))
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));

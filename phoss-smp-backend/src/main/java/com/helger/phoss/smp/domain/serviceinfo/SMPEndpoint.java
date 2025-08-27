@@ -204,7 +204,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate, false, "\n"));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
-    if (StringHelper.hasText (m_sTechnicalInformationUrl))
+    if (StringHelper.isNotEmpty (m_sTechnicalInformationUrl))
       ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
     ret.setExtension (getExtensions ().getAsPeppolExtension ());
     ret.setTransportProfile (m_sTransportProfile);
@@ -236,11 +236,11 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     final com.helger.xsds.bdxr.smp2.ac.EndpointType ret = new com.helger.xsds.bdxr.smp2.ac.EndpointType ();
     ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
     ret.setTransportProfileID (m_sTransportProfile);
-    if (StringHelper.hasText (m_sServiceDescription))
+    if (StringHelper.isNotEmpty (m_sServiceDescription))
       ret.setDescription (m_sServiceDescription);
-    if (StringHelper.hasText (m_sTechnicalContactUrl))
+    if (StringHelper.isNotEmpty (m_sTechnicalContactUrl))
       ret.setContact (m_sTechnicalContactUrl);
-    if (StringHelper.hasText (m_sEndpointReference))
+    if (StringHelper.isNotEmpty (m_sEndpointReference))
       ret.setAddressURI (m_sEndpointReference);
     if (m_aServiceActivationDT != null)
       ret.setActivationDate (m_aServiceActivationDT.toLocalDate ());

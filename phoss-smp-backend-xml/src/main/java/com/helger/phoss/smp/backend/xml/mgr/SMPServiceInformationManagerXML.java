@@ -368,7 +368,7 @@ public final class SMPServiceInformationManagerXML extends
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
-    if (StringHelper.hasNoText (sTransportProfileID))
+    if (StringHelper.isEmpty (sTransportProfileID))
       return false;
 
     return containsAny (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));

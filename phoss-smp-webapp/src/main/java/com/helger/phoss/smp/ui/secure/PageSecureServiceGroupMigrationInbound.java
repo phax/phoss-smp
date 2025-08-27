@@ -258,16 +258,16 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.hasNoText (sMigrationKey))
+    if (StringHelper.isEmpty (sMigrationKey))
       aFormErrors.addFieldError (FIELD_MIGRATION_KEY, "The migration key must not be empty!");
     else
       if (!SMPParticipantMigration.isValidMigrationKey (sMigrationKey))
         aFormErrors.addFieldError (FIELD_MIGRATION_KEY, "The migration key is not valid. Please verify the received code is correct.");
 
-    if (aIdentifierFactory.isParticipantIdentifierSchemeMandatory () && StringHelper.hasNoText (sParticipantIDScheme))
+    if (aIdentifierFactory.isParticipantIdentifierSchemeMandatory () && StringHelper.isEmpty (sParticipantIDScheme))
       aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_SCHEME, "Participant ID scheme must not be empty!");
     else
-      if (StringHelper.hasNoText (sParticipantIDValue))
+      if (StringHelper.isEmpty (sParticipantIDValue))
         aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "Participant ID value must not be empty!");
       else
       {
@@ -280,13 +280,13 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                        "Another service group for the same participant ID is already present (may be case insensitive)!");
       }
 
-    if (StringHelper.hasNoText (sOwningUserID))
+    if (StringHelper.isEmpty (sOwningUserID))
       aFormErrors.addFieldError (FIELD_OWNING_USER_ID, "Owning User must not be empty!");
     else
       if (aOwningUser == null)
         aFormErrors.addFieldError (FIELD_OWNING_USER_ID, "Provided owning user does not exist!");
 
-    if (StringHelper.hasText (sExtension))
+    if (StringHelper.isNotEmpty (sExtension))
     {
       final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
       if (aDoc == null)

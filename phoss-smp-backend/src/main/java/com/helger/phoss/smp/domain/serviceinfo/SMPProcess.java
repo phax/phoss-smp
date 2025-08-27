@@ -80,7 +80,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   @Nullable
   public SMPEndpoint getEndpointOfTransportProfile (@Nullable final String sTransportProfile)
   {
-    if (StringHelper.hasNoText (sTransportProfile))
+    if (StringHelper.isEmpty (sTransportProfile))
       return null;
     return m_aEndpoints.get (sTransportProfile);
   }
@@ -94,7 +94,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
-    return StringHelper.hasText (sTransportProfileID) && m_aEndpoints.containsKey (sTransportProfileID);
+    return StringHelper.isNotEmpty (sTransportProfileID) && m_aEndpoints.containsKey (sTransportProfileID);
   }
 
   public final void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)
@@ -125,7 +125,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   @Nonnull
   public EChange deleteEndpoint (@Nullable final String sTransportProfile)
   {
-    if (StringHelper.hasNoText (sTransportProfile))
+    if (StringHelper.isEmpty (sTransportProfile))
       return EChange.UNCHANGED;
     return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
   }

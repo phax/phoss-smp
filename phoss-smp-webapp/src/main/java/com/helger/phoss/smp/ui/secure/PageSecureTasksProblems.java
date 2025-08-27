@@ -165,7 +165,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     // Check that public URL is set
 
     final String sPublicUrl = SMPServerConfiguration.getPublicServerURL ();
-    if (StringHelper.hasNoText (sPublicUrl))
+    if (StringHelper.isEmpty (sPublicUrl))
     {
       aOL.addItem (_createWarning ("The public server URL is not configured"),
                    div ("The configuration file property ").addChild (code (SMPServerConfiguration.KEY_SMP_PUBLIC_URL))
@@ -418,7 +418,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
     if (aSMPSettings.isDirectoryIntegrationEnabled ())
     {
-      if (StringHelper.hasNoText (aSMPSettings.getDirectoryHostName ()))
+      if (StringHelper.isEmpty (aSMPSettings.getDirectoryHostName ()))
         aOL.addItem (_createError ("An empty " + sDirectoryName + " hostname is provided"),
                      div ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 

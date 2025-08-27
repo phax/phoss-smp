@@ -62,7 +62,7 @@ public class SMPRootServlet extends AbstractXServlet
       }
 
       final String sQueryString = aRequestScope.getQueryString ();
-      if (StringHelper.hasText (sQueryString))
+      if (StringHelper.isNotEmpty (sQueryString))
         sRedirectURL += "?" + sQueryString;
 
       if (LOGGER.isDebugEnabled ())

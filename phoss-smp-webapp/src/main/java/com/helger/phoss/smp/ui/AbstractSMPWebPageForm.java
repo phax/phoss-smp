@@ -61,7 +61,7 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
 
     // Show all global errors that don't have a specific error field
     for (final IError aError : aFormErrors)
-      if (StringHelper.hasNoText (aError.getErrorFieldName ()))
+      if (StringHelper.isEmpty (aError.getErrorFieldName ()))
       {
         final EBootstrapAlertType eType = aError.isError () ? EBootstrapAlertType.DANGER : EBootstrapAlertType.WARNING;
         aNodeList.addChild (new BootstrapBox (eType).addChild (aError.getAsString (aDisplayLocale)));

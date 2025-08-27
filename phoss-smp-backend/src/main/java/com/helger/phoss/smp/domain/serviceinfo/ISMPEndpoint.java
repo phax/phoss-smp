@@ -55,7 +55,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
    */
   default boolean hasEndpointReference ()
   {
-    return StringHelper.hasText (getEndpointReference ());
+    return StringHelper.isNotEmpty (getEndpointReference ());
   }
 
   /**
@@ -88,7 +88,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
    */
   default boolean hasMinimumAuthenticationLevel ()
   {
-    return StringHelper.hasText (getMinimumAuthenticationLevel ());
+    return StringHelper.isNotEmpty (getMinimumAuthenticationLevel ());
   }
 
   /**
@@ -156,7 +156,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
 
   default boolean hasCertificate ()
   {
-    return StringHelper.hasText (getCertificate ());
+    return StringHelper.isNotEmpty (getCertificate ());
   }
 
   /**
@@ -167,7 +167,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
 
   default boolean hasServiceDescription ()
   {
-    return StringHelper.hasText (getServiceDescription ());
+    return StringHelper.isNotEmpty (getServiceDescription ());
   }
 
   /**
@@ -179,7 +179,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
 
   default boolean hasTechnicalContactUrl ()
   {
-    return StringHelper.hasText (getTechnicalContactUrl ());
+    return StringHelper.isNotEmpty (getTechnicalContactUrl ());
   }
 
   /**
@@ -192,7 +192,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
 
   default boolean hasTechnicalInformationUrl ()
   {
-    return StringHelper.hasText (getTechnicalInformationUrl ());
+    return StringHelper.isNotEmpty (getTechnicalInformationUrl ());
   }
 
   /**

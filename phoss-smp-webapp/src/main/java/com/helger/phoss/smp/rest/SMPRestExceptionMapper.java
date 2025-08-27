@@ -82,7 +82,7 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     {
       // With payload
       setSimpleTextResponse (aUnifiedResponse, nStatusCode, sContent);
-      if (StringHelper.hasText (sContent))
+      if (StringHelper.isNotEmpty (sContent))
         aUnifiedResponse.disableCaching ();
     }
     else

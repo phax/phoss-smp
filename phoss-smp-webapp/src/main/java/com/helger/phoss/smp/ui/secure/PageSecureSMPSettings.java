@@ -172,7 +172,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
         aFormErrors.addFieldError (FIELD_SML_INFO, "An SML configuration must be selected if SML is active.");
     }
 
-    if (StringHelper.hasNoText (sDirectoryHostName))
+    if (StringHelper.isEmpty (sDirectoryHostName))
     {
       if (bDirectoryIntegrationEnabled)
         aFormErrors.addFieldError (FIELD_SMP_DIRECTORY_HOSTNAME,

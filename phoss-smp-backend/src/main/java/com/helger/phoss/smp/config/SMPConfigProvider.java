@@ -44,34 +44,34 @@ public final class SMPConfigProvider
   {
     // TODO remove block in v7
     // smp-server.properties stuff
-    if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("peppol.smp.server.properties.path")))
+    if (StringHelper.isNotEmpty (SystemProperties.getPropertyValueOrNull ("peppol.smp.server.properties.path")))
       throw new InitializationException ("The system property 'peppol.smp.server.properties.path' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
                                          " See https://github.com/phax/ph-commons#ph-config for alternatives." +
                                          " Consider using the system property 'config.file' instead.");
-    if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("smp.server.properties.path")))
+    if (StringHelper.isNotEmpty (SystemProperties.getPropertyValueOrNull ("smp.server.properties.path")))
       throw new InitializationException ("The system property 'smp.server.properties.path' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
                                          " See https://github.com/phax/ph-commons#ph-config for alternatives." +
                                          " Consider using the system property 'config.file' instead.");
-    if (StringHelper.hasText (System.getenv ().get ("SMP_SERVER_CONFIG")))
+    if (StringHelper.isNotEmpty (System.getenv ().get ("SMP_SERVER_CONFIG")))
       throw new InitializationException ("The environment variable 'SMP_SERVER_CONFIG' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
                                          " See https://github.com/phax/ph-commons#ph-config for alternatives." +
                                          " Consider using the environment variable 'CONFIG_FILE' instead.");
 
     // webapp.properties stuff
-    if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("peppol.smp.webapp.properties.path")))
+    if (StringHelper.isNotEmpty (SystemProperties.getPropertyValueOrNull ("peppol.smp.webapp.properties.path")))
       throw new InitializationException ("The system property 'peppol.smp.webapp.properties.path' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
                                          " See https://github.com/phax/ph-commons#ph-config for alternatives." +
                                          " Consider using the system property 'config.file' instead.");
-    if (StringHelper.hasText (SystemProperties.getPropertyValueOrNull ("smp.webapp.properties.path")))
+    if (StringHelper.isNotEmpty (SystemProperties.getPropertyValueOrNull ("smp.webapp.properties.path")))
       throw new InitializationException ("The system property 'smp.webapp.properties.path' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
                                          " See https://github.com/phax/ph-commons#ph-config for alternatives." +
                                          " Consider using the system property 'config.file' instead.");
-    if (StringHelper.hasText (System.getenv ().get ("SMP_WEBAPP_CONFIG")))
+    if (StringHelper.isNotEmpty (System.getenv ().get ("SMP_WEBAPP_CONFIG")))
       throw new InitializationException ("The environment variable 'SMP_WEBAPP_CONFIG' is no longer supported." +
                                          " All configuration properties are in 'application.properties' since v6.0.0." +
                                          " See https://github.com/phax/ph-commons#ph-config for alternatives." +

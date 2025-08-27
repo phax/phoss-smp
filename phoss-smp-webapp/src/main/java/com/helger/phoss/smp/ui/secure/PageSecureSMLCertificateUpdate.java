@@ -100,7 +100,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     X509Certificate aMigrationPublicCert = null;
     final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
 
-    if (StringHelper.hasText (sMigrationDate))
+    if (StringHelper.isNotEmpty (sMigrationDate))
     {
       if (aMigrationDate == null)
         aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE,
@@ -110,7 +110,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
           aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE, "The certificate migration date must be in the future!");
     }
 
-    if (StringHelper.hasNoText (sMigrationPublicCert))
+    if (StringHelper.isEmpty (sMigrationPublicCert))
     {
       aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT, "A new public certificate must be provided.");
     }

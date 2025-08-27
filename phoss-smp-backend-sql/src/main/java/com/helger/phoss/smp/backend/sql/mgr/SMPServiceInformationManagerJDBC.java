@@ -628,7 +628,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
-    if (StringHelper.hasNoText (sTransportProfileID))
+    if (StringHelper.isEmpty (sTransportProfileID))
       return false;
 
     final long nCount = newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_endpoint WHERE transportProfile=?",

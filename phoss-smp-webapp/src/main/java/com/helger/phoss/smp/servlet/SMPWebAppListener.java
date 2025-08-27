@@ -138,7 +138,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   {
     // This is internally set in "StaticServerInfo" class
     final String sPublicURL = SMPServerConfiguration.getPublicServerURL ();
-    if (StringHelper.hasText (sPublicURL))
+    if (StringHelper.isNotEmpty (sPublicURL))
     {
       // Check validity (see #237)
       if (URLHelper.getAsURL (sPublicURL, false) != null)
@@ -236,7 +236,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-    if (StringHelper.hasNoText (sSMPID))
+    if (StringHelper.isEmpty (sSMPID))
       throw new IllegalArgumentException ("The SMP ID is missing. It must match the regular expression '" +
                                           CSMPServer.PATTERN_SMP_ID +
                                           "'!");
@@ -250,7 +250,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
 
     // Check other consistency stuff
-    if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.hasNoText (SMPWebAppConfiguration.getImprintText ()))
+    if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.isEmpty (SMPWebAppConfiguration.getImprintText ()))
       LOGGER.warn ("The custom Imprint is enabled in the configuration, but no imprint text is configured. Therefore no imprint will be shown.");
   }
 

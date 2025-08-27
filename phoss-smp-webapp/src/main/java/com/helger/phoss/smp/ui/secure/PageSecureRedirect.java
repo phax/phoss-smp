@@ -273,7 +273,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (StringHelper.isEmpty (sServiceGroupID))
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A Service Group must be selected!");
     else
     {
@@ -283,7 +283,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided Service Group does not exist!");
     }
 
-    if (StringHelper.hasNoText (sDocTypeID))
+    if (StringHelper.isEmpty (sDocTypeID))
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID, "Document Type ID must not be empty!");
     else
     {
@@ -306,16 +306,16 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       }
     }
 
-    if (StringHelper.hasNoText (sRedirectTo))
+    if (StringHelper.isEmpty (sRedirectTo))
       aFormErrors.addFieldError (FIELD_REDIRECT_TO, "The Redirect URL must not be empty!");
     else
       if (URLHelper.getAsURL (sRedirectTo) == null)
         aFormErrors.addFieldError (FIELD_REDIRECT_TO, "The Redirect URL is not a valid URL!");
 
-    if (StringHelper.hasNoText (sSubjectUniqueIdentifier))
+    if (StringHelper.isEmpty (sSubjectUniqueIdentifier))
       aFormErrors.addFieldError (FIELD_SUBJECT_UNIQUE_IDENTIFIER, "Subject Unique Identifier must not be empty!");
 
-    if (StringHelper.hasText (sExtension))
+    if (StringHelper.isNotEmpty (sExtension))
     {
       final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
       if (aDoc == null)

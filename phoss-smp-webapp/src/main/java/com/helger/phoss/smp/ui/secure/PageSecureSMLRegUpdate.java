@@ -70,7 +70,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     final ISMLInfo aSMLInfo = SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sSMLID);
     final String sLogicalAddress = aWPEC.params ().getAsStringTrimmed (FIELD_LOGICAL_ADDRESS);
 
-    if (StringHelper.hasNoText (sLogicalAddress))
+    if (StringHelper.isEmpty (sLogicalAddress))
       aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
                                  "A logical address must be provided in the form 'http://smp.example.org'!");
     else

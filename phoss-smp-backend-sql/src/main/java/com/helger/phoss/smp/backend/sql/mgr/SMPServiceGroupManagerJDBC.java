@@ -128,7 +128,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                     ", " +
                     aParticipantID.getURIEncoded () +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ", " +
                     bCreateInSML +
                     ")");
@@ -230,7 +230,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                     ", " +
                     sNewOwnerID +
                     ", " +
-                    (StringHelper.hasText (sNewExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sNewExtension) ? "with extension" : "without extension") +
                     ")");
 
     final Wrapper <EChange> aWrappedChange = new Wrapper <> (EChange.UNCHANGED);

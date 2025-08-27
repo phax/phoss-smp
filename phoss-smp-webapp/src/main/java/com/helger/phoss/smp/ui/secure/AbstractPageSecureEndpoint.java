@@ -447,7 +447,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                                                                                                         true))));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
-                                                 .setCtrl (StringHelper.hasText (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
+                                                 .setCtrl (StringHelper.isNotEmpty (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
                                                                                                                                                        HC_Target.BLANK)
                                                                                                                             : em ("none")));
 
@@ -558,7 +558,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
 
     // validations
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (StringHelper.isEmpty (sServiceGroupID))
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A service group must be selected!");
     else
     {
@@ -567,10 +567,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       if (aServiceGroup == null)
         aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "The provided service group does not exist!");
     }
-    if (aIdentifierFactory.isDocumentTypeIdentifierSchemeMandatory () && StringHelper.hasNoText (sDocTypeIDScheme))
+    if (aIdentifierFactory.isDocumentTypeIdentifierSchemeMandatory () && StringHelper.isEmpty (sDocTypeIDScheme))
       aFormErrors.addFieldError (FIELD_DOCTYPE_ID_SCHEME, "Document type ID scheme must not be empty!");
     else
-      if (StringHelper.hasNoText (sDocTypeIDValue))
+      if (StringHelper.isEmpty (sDocTypeIDValue))
         aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, "Document type ID value must not be empty!");
       else
         if (sDocTypeIDScheme != null && sDocTypeIDValue.startsWith (sDocTypeIDScheme))
@@ -590,10 +590,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
           }
         }
 
-    if (aIdentifierFactory.isProcessIdentifierSchemeMandatory () && StringHelper.hasNoText (sProcessIDScheme))
+    if (aIdentifierFactory.isProcessIdentifierSchemeMandatory () && StringHelper.isEmpty (sProcessIDScheme))
       aFormErrors.addFieldError (FIELD_PROCESS_ID_SCHEME, "Process ID scheme must not be empty!");
     else
-      if (StringHelper.hasNoText (sProcessIDValue))
+      if (StringHelper.isEmpty (sProcessIDValue))
         aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "Process ID value must not be empty!");
       else
         if (sProcessIDScheme != null && sProcessIDValue.startsWith (sProcessIDScheme))
@@ -606,7 +606,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
             aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, "The provided process ID has an invalid syntax!");
         }
 
-    if (StringHelper.hasNoText (sTransportProfileID))
+    if (StringHelper.isEmpty (sTransportProfileID))
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, "Transport Profile must not be empty!");
     else
       if (aTransportProfile == null)
@@ -624,7 +624,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
       aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, sMsg);
     }
-    if (StringHelper.hasNoText (sEndpointReference))
+    if (StringHelper.isEmpty (sEndpointReference))
     {
       if (false)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
@@ -635,7 +635,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     if (aNotBeforeDate != null && aNotAfterDate != null)
       if (aNotBeforeDate.isAfter (aNotAfterDate))
         aFormErrors.addFieldError (FIELD_NOT_BEFORE, "Not Before Date must not be after Not After Date!");
-    if (StringHelper.hasNoText (sCertificate))
+    if (StringHelper.isEmpty (sCertificate))
       aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
     else
     {
@@ -652,12 +652,12 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aFormErrors.addFieldError (FIELD_CERTIFICATE,
                                    "The provided certificate string is not a valid X509 certificate!");
     }
-    if (StringHelper.hasNoText (sServiceDescription))
+    if (StringHelper.isEmpty (sServiceDescription))
       aFormErrors.addFieldError (FIELD_SERVICE_DESCRIPTION, "Service Description must not be empty!");
 
-    if (StringHelper.hasNoText (sTechnicalContact))
+    if (StringHelper.isEmpty (sTechnicalContact))
       aFormErrors.addFieldError (FIELD_TECHNICAL_CONTACT, "Technical Contact must not be empty!");
-    if (StringHelper.hasText (sExtension))
+    if (StringHelper.isNotEmpty (sExtension))
     {
       final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
       if (aDoc == null)

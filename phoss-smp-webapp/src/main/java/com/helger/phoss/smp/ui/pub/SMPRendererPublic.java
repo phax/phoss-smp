@@ -135,7 +135,7 @@ public final class SMPRendererPublic
   static
   {
     final String sInlineURL = SMPWebAppConfiguration.getPublicLogoInline ();
-    if (StringHelper.hasText (sInlineURL) && CSSDataURLHelper.isDataURL (sInlineURL))
+    if (StringHelper.isNotEmpty (sInlineURL) && CSSDataURLHelper.isDataURL (sInlineURL))
     {
       // Use custom inline data URL
       CUSTOM_LOGO_URL_CACHE = new SimpleURL (sInlineURL);
@@ -144,7 +144,7 @@ public final class SMPRendererPublic
     else
     {
       final String sExternalURL = SMPWebAppConfiguration.getPublicLogoExternalUrl ();
-      if (StringHelper.hasText (sExternalURL) && URLHelper.getAsURL (sExternalURL) != null)
+      if (StringHelper.isNotEmpty (sExternalURL) && URLHelper.getAsURL (sExternalURL) != null)
       {
         // Use custom external URL
         CUSTOM_LOGO_URL_CACHE = new SimpleURL (sExternalURL);
@@ -153,7 +153,7 @@ public final class SMPRendererPublic
       else
       {
         final String sInternalURL = SMPWebAppConfiguration.getPublicLogoInternalUrl ();
-        if (StringHelper.hasText (sInternalURL))
+        if (StringHelper.isNotEmpty (sInternalURL))
         {
           // Use custom internal URL
           CUSTOM_LOGO_URL_CACHE = new SimpleURL (sInternalURL);
@@ -293,7 +293,7 @@ public final class SMPRendererPublic
     if (SMPWebAppConfiguration.isImprintEnabled ())
     {
       final String sImprintText = SMPWebAppConfiguration.getImprintText ();
-      if (StringHelper.hasText (sImprintText))
+      if (StringHelper.isNotEmpty (sImprintText))
       {
         final ISimpleURL aImprintHref = SMPWebAppConfiguration.getImprintHref ();
         final IHCElementWithChildren <?> aNode;
@@ -301,7 +301,7 @@ public final class SMPRendererPublic
         {
           // Link and text
           final String sImprintTarget = SMPWebAppConfiguration.getImprintTarget ();
-          final HC_Target aTarget = StringHelper.hasText (sImprintTarget) ? new HC_Target (sImprintTarget) : null;
+          final HC_Target aTarget = StringHelper.isNotEmpty (sImprintTarget) ? new HC_Target (sImprintTarget) : null;
           aNode = new HCA (aImprintHref).addChild (sImprintText).setTarget (aTarget);
         }
         else
@@ -311,7 +311,7 @@ public final class SMPRendererPublic
         }
         // Already trimmed
         final String sImprintCSSClasses = SMPWebAppConfiguration.getImprintCSSClasses ();
-        if (StringHelper.hasText (sImprintCSSClasses))
+        if (StringHelper.isNotEmpty (sImprintCSSClasses))
         {
           final ICommonsSet <String> aUniqueNames = new CommonsHashSet <> (RegExHelper.getSplitToList (sImprintCSSClasses,
                                                                                                        "\\s+"));

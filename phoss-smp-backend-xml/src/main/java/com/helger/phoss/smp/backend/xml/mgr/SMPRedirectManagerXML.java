@@ -126,7 +126,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
                     ", " +
                     aCertificate +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ")");
 
     final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID,
@@ -237,7 +237,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
-    if (StringHelper.hasText (sServiceGroupID))
+    if (StringHelper.isNotEmpty (sServiceGroupID))
       findAll (x -> x.getServiceGroupID ().equals (sServiceGroupID), ret::add);
     return ret;
   }

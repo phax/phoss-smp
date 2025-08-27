@@ -99,7 +99,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   @Nullable
   public ISMPManagerProvider getManagerProvider (@Nullable final String sBackendID)
   {
-    if (StringHelper.hasNoText (sBackendID))
+    if (StringHelper.isEmpty (sBackendID))
       return null;
 
     final Supplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLockedGet ( () -> m_aMap.get (sBackendID));

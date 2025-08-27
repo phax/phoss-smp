@@ -49,13 +49,13 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   {
     // Standard configuration file
     final String sConnectionString = SMPMongoConfiguration.getMongoConnectionString ();
-    if (StringHelper.hasNoText (sConnectionString))
+    if (StringHelper.isEmpty (sConnectionString))
       throw new IllegalStateException ("The MongoDB connection string is missing in the configuration. See property '" +
                                        SMPMongoConfiguration.CONFIG_MONGODB_CONNECTION_STRING +
                                        "'");
 
     final String sDBName = SMPMongoConfiguration.getMongoDBName ();
-    if (StringHelper.hasNoText (sDBName))
+    if (StringHelper.isEmpty (sDBName))
       throw new IllegalStateException ("The MongoDB database name is missing in the configuration. See property '" +
                                        SMPMongoConfiguration.CONFIG_MONGODB_DB_NAME +
                                        "'");

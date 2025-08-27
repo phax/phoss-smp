@@ -130,7 +130,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   @Nullable
   public EChange deleteSMLInfo (@Nullable final String sSMLInfoID)
   {
-    if (StringHelper.hasNoText (sSMLInfoID))
+    if (StringHelper.isEmpty (sSMLInfoID))
       return EChange.UNCHANGED;
 
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMLInfoID));
@@ -166,7 +166,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   @Nullable
   public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable final String sAddress)
   {
-    if (StringHelper.hasNoText (sAddress))
+    if (StringHelper.isEmpty (sAddress))
       return null;
 
     // The stored field does not contain the suffix

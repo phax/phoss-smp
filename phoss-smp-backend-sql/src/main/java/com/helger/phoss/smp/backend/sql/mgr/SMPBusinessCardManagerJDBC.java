@@ -315,7 +315,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
                                       @Nullable final String sName,
                                       @Nullable final String sNames)
   {
-    if (StringHelper.hasText (sNames))
+    if (StringHelper.isNotEmpty (sNames))
     {
       // Eventually more then one name - parse JSON
       final IJsonArray aJsonArray = JsonReader.builder ().source (sNames).readAsArray ();

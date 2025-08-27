@@ -185,7 +185,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
-    if (StringHelper.hasNoText (sTransportProfileID))
+    if (StringHelper.isEmpty (sTransportProfileID))
       return false;
 
     return m_aProcesses.containsAnyValue (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));

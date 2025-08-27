@@ -109,7 +109,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
       if (aImportFile == null || aImportFile.getSize () == 0)
         aFormErrors.addFieldError (FIELD_IMPORT_FILE, "A file to import must be selected!");
 
-      if (StringHelper.hasNoText (sDefaultOwnerID))
+      if (StringHelper.isEmpty (sDefaultOwnerID))
         aFormErrors.addFieldError (FIELD_DEFAULT_OWNER, "A default owner must be selected!");
       else
         if (aDefaultOwner == null)

@@ -373,7 +373,7 @@ public final class SMPServerConfiguration
     String ret = _getConfig ().getAsString (KEY_SML_SMP_HOSTNAME);
 
     // Ensure prefix
-    if (StringHelper.hasText (ret) && !ret.startsWith ("http://"))
+    if (StringHelper.isNotEmpty (ret) && !ret.startsWith ("http://"))
       ret = "http://" + ret;
     return ret;
   }

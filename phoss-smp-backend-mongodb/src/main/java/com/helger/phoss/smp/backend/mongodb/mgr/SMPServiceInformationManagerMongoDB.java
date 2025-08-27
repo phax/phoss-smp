@@ -496,7 +496,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
-    if (StringHelper.hasNoText (sTransportProfileID))
+    if (StringHelper.isEmpty (sTransportProfileID))
       return false;
 
     // As simple as it can be

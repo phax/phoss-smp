@@ -169,7 +169,7 @@ public final class SMPStatusProvider
     // Proxy configuration (since 5.2.0)
     aStatusData.add ("proxy.http.configured", SMPHttpConfiguration.getAsHttpProxySettings () != null);
     aStatusData.add ("proxy.https.configured", SMPHttpConfiguration.getAsHttpsProxySettings () != null);
-    aStatusData.add ("proxy.username.configured", StringHelper.hasText (SMPHttpConfiguration.getProxyUsername ()));
+    aStatusData.add ("proxy.username.configured", StringHelper.isNotEmpty (SMPHttpConfiguration.getProxyUsername ()));
 
     // CSP configuration (since 5.2.6)
     aStatusData.add ("csp.enabled", SMPWebAppConfiguration.isCSPEnabled ());

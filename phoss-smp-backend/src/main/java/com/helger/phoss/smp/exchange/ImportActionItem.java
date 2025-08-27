@@ -74,7 +74,7 @@ public final class ImportActionItem implements IHasErrorLevel
 
   public boolean hasParticipantID ()
   {
-    return StringHelper.hasText (m_sPI);
+    return StringHelper.isNotEmpty (m_sPI);
   }
 
   @Nonnull

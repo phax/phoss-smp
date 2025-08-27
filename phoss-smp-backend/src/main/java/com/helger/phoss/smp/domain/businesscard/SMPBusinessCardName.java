@@ -73,12 +73,12 @@ public class SMPBusinessCardName implements Serializable
 
   public boolean hasLanguageCode ()
   {
-    return StringHelper.hasText (m_sLanguageCode);
+    return StringHelper.isNotEmpty (m_sLanguageCode);
   }
 
   public boolean hasNoLanguageCode ()
   {
-    return StringHelper.hasNoText (m_sLanguageCode);
+    return StringHelper.isEmpty (m_sLanguageCode);
   }
 
   @Nonnull
@@ -91,7 +91,7 @@ public class SMPBusinessCardName implements Serializable
   public IJsonObject getAsJson ()
   {
     final IJsonObject ret = new JsonObject ().add (JSON_TAG_NAME, m_sName);
-    if (StringHelper.hasText (m_sLanguageCode))
+    if (StringHelper.isNotEmpty (m_sLanguageCode))
       ret.add (JSON_TAG_LANGUAGE, m_sLanguageCode);
     return ret;
   }

@@ -108,7 +108,7 @@ public final class ServiceMetadataInterfaceTest
     assertNotNull (aResponseMsg);
     // Read response
     final String sResponse = aResponseMsg.readEntity (String.class);
-    if (StringHelper.hasText (sResponse))
+    if (StringHelper.isNotEmpty (sResponse))
       LOGGER.info ("HTTP Response: " + sResponse);
     assertTrue (Arrays.toString (aStatusCodes) + " does not contain " + aResponseMsg.getStatus (),
                 ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));

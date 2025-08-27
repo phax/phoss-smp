@@ -106,7 +106,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   @Nullable
   public EChange deleteSMLInfo (@Nullable final String sSMLInfoID)
   {
-    if (StringHelper.hasNoText (sSMLInfoID))
+    if (StringHelper.isEmpty (sSMLInfoID))
       return EChange.UNCHANGED;
 
     m_aRWLock.writeLock ().lock ();
@@ -148,7 +148,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   @Nullable
   public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable final String sAddress)
   {
-    if (StringHelper.hasNoText (sAddress))
+    if (StringHelper.isEmpty (sAddress))
       return null;
     return findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ().toExternalForm ().equals (sAddress));
   }

@@ -49,7 +49,7 @@ public final class SMPServiceGroupTest
                                                      .createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                                    "0088:dummy");
     final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, "<foobar />");
-    assertTrue (StringHelper.hasText (aSG.getID ()));
+    assertTrue (StringHelper.isNotEmpty (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticipantIdentifier ());
     assertEquals ("[{\"Any\":\"<foobar />\"}]", aSG.getExtensions ().getExtensionsAsJsonString ());
@@ -81,7 +81,7 @@ public final class SMPServiceGroupTest
                                                      aPI,
                                                      BDXR1ServerAPI.convertToJsonString (new CommonsArrayList <> (aExt,
                                                                                                                   aExt2)));
-    assertTrue (StringHelper.hasText (aSG.getID ()));
+    assertTrue (StringHelper.isNotEmpty (aSG.getID ()));
     assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aSG.getOwnerID ());
     assertEquals (aPI, aSG.getParticipantIdentifier ());
     assertNotNull (aSG.getExtensions ().getExtensionsAsJsonString ());

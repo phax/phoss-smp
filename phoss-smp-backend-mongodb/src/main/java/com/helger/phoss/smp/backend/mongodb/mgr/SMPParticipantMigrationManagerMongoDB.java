@@ -128,7 +128,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   @Nonnull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
-    if (StringHelper.hasNoText (sParticipantMigrationID))
+    if (StringHelper.isEmpty (sParticipantMigrationID))
       return EChange.UNCHANGED;
 
     final DeleteResult aDR = getCollection ().deleteMany (new Document (BSON_ID, sParticipantMigrationID));
@@ -194,7 +194,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   @Nullable
   public SMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return null;
 
     final Document aMatch = getCollection ().find (new Document (BSON_ID, sID)).first ();

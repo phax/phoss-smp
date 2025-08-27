@@ -119,7 +119,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                     ", " +
                     aParticipantID.getURIEncoded () +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ", " +
                     bCreateInSML +
                     ")");
@@ -188,7 +188,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                     ", " +
                     sNewOwnerID +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ")");
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);

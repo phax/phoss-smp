@@ -238,7 +238,7 @@ public final class SMPCommonUI
     final BootstrapTable aCertDetails = new BootstrapTable (new HCCol ().addStyle (CCSSProperties.WIDTH.newValue ("12rem")),
                                                             HCCol.star ());
     aCertDetails.setResponsive (true);
-    if (StringHelper.hasText (sAlias))
+    if (StringHelper.isNotEmpty (sAlias))
       aCertDetails.addBodyRow ().addCell ("Alias:").addCell (sAlias);
     aCertDetails.addBodyRow ().addCell ("Version:").addCell (Integer.toString (aX509Cert.getVersion ()));
     aCertDetails.addBodyRow ().addCell ("Issuer:").addCell (getCertIssuer (aX509Cert));

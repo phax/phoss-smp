@@ -69,7 +69,7 @@ public final class APIExecutorMigrationInboundFromXMLPut extends AbstractSMPAPIE
 
     final String sServiceGroupID = MicroHelper.getChildTextContent (aMigrateDoc.getDocumentElement (),
                                                                     APIExecutorMigrationOutboundStartPut.XML_ELEMENT_PARTICIPANT_ID);
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (StringHelper.isEmpty (sServiceGroupID))
       throw new SMPBadRequestException ("The XML payload is missing the '" +
                                         APIExecutorMigrationOutboundStartPut.XML_ELEMENT_PARTICIPANT_ID +
                                         "' element content.",
@@ -77,7 +77,7 @@ public final class APIExecutorMigrationInboundFromXMLPut extends AbstractSMPAPIE
 
     final String sMigrationKey = MicroHelper.getChildTextContent (aMigrateDoc.getDocumentElement (),
                                                                   APIExecutorMigrationOutboundStartPut.XML_ELEMENT_MIGRATION_KEY);
-    if (StringHelper.hasNoText (sMigrationKey))
+    if (StringHelper.isEmpty (sMigrationKey))
       throw new SMPBadRequestException ("The XML payload is missing the '" +
                                         APIExecutorMigrationOutboundStartPut.XML_ELEMENT_MIGRATION_KEY +
                                         "' element content.",

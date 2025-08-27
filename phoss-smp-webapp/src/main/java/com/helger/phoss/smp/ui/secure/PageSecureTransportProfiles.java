@@ -266,7 +266,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     final boolean bIsDeprecated = aWPEC.params ().isCheckBoxChecked (FIELD_DEPRECATED, DEFAULT_DEPRECATED);
 
     // validations
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       aFormErrors.addFieldError (FIELD_ID, "Transport profile ID must not be empty!");
     else
       if (!bEdit)
@@ -276,7 +276,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
           aFormErrors.addFieldError (FIELD_ID, "Another transport profile with the same name already exists!");
       }
 
-    if (StringHelper.hasNoText (sName))
+    if (StringHelper.isEmpty (sName))
       aFormErrors.addFieldError (FIELD_NAME, "The transport profile name must not be empty!");
 
     if (aFormErrors.isEmpty ())

@@ -498,7 +498,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ICommonsList <SMPBusinessCardEntity> aSMPEntities = new CommonsArrayList <> ();
 
     // validations
-    if (StringHelper.hasNoText (sServiceGroupID))
+    if (StringHelper.isEmpty (sServiceGroupID))
       aFormErrors.addFieldError (FIELD_SERVICE_GROUP_ID, "A Service Group must be selected!");
     else
     {
@@ -525,7 +525,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         // Entity name
         final String sFieldName = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_NAME);
         final String sEntityName = aEntityRow.get (SUFFIX_NAME);
-        if (StringHelper.hasNoText (sEntityName))
+        if (StringHelper.isEmpty (sEntityName))
           aFormErrors.addFieldError (sFieldName, "The Name of the Entity must be provided!");
 
         // Entity country code
@@ -533,7 +533,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                        sEntityRowID,
                                                                        SUFFIX_COUNTRY_CODE);
         final String sCountryCode = aEntityRow.get (SUFFIX_COUNTRY_CODE);
-        if (StringHelper.hasNoText (sCountryCode))
+        if (StringHelper.isEmpty (sCountryCode))
           aFormErrors.addFieldError (sFieldCountryCode, "The Country Code of the Entity must be provided!");
 
         // Entity Geographical Information
@@ -555,7 +555,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                       sIdentifierRowID,
                                                                       SUFFIX_SCHEME);
             final String sScheme = aIdentifierRow.get (SUFFIX_SCHEME);
-            if (StringHelper.hasNoText (sScheme))
+            if (StringHelper.isEmpty (sScheme))
               aFormErrors.addFieldError (sFieldScheme, "The Scheme of the Identifier must be provided!");
 
             // Value
@@ -565,7 +565,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                      sIdentifierRowID,
                                                                      SUFFIX_VALUE);
             final String sValue = aIdentifierRow.get (SUFFIX_VALUE);
-            if (StringHelper.hasNoText (sValue))
+            if (StringHelper.isEmpty (sValue))
               aFormErrors.addFieldError (sFieldValue, "The Value of the Identifier must be provided!");
 
             if (aFormErrors.size () == nErrors2)
@@ -620,14 +620,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                      sContactRowID,
                                                                      SUFFIX_EMAIL);
             final String sEmail = aContactRow.get (SUFFIX_EMAIL);
-            if (StringHelper.hasText (sEmail))
+            if (StringHelper.isNotEmpty (sEmail))
               if (!EmailAddressValidator.isValid (sEmail))
                 aFormErrors.addFieldError (sFieldEmail, "The provided email address is invalid!");
 
-            final boolean bIsAnySet = StringHelper.hasText (sType) ||
-                                      StringHelper.hasText (sName) ||
-                                      StringHelper.hasText (sPhoneNumber) ||
-                                      StringHelper.hasText (sEmail);
+            final boolean bIsAnySet = StringHelper.isNotEmpty (sType) ||
+                                      StringHelper.isNotEmpty (sName) ||
+                                      StringHelper.isNotEmpty (sPhoneNumber) ||
+                                      StringHelper.isNotEmpty (sEmail);
 
             if (aFormErrors.size () == nErrors2 && bIsAnySet)
             {
@@ -663,7 +663,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         final String sFieldRegDate = RequestParamMap.getFieldName (PREFIX_ENTITY, sEntityRowID, SUFFIX_REG_DATE);
         final String sRegDate = aEntityRow.get (SUFFIX_REG_DATE);
         final LocalDate aRegDate = PDTFromString.getLocalDateFromString (sRegDate, aDisplayLocale);
-        if (aRegDate == null && StringHelper.hasText (sRegDate))
+        if (aRegDate == null && StringHelper.isNotEmpty (sRegDate))
           aFormErrors.addFieldError (sFieldRegDate, "The entered registration date is invalid!");
 
         if (aFormErrors.size () == nErrors)
@@ -723,7 +723,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                    @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final String sIdentifierID = StringHelper.hasText (sExistingID) ? sExistingID : TMP_ID_PREFIX +
+    final String sIdentifierID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
                                                                                     Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
@@ -774,7 +774,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                 @Nonnull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final String sContactID = StringHelper.hasText (sExistingID) ? sExistingID : TMP_ID_PREFIX +
+    final String sContactID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
                                                                                  Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
@@ -858,7 +858,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
-    final String sEntityID = StringHelper.hasText (sExistingID) ? sExistingID : TMP_ID_PREFIX +
+    final String sEntityID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
                                                                                 Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final BootstrapCard aPanel = new BootstrapCard ().setID (sEntityID);

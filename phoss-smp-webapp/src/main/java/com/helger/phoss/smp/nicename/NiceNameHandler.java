@@ -146,7 +146,7 @@ public final class NiceNameHandler
     {
       IReadableResource aDocTypeIDRes = null;
       final String sPath = SMPWebAppConfiguration.getNiceNameDocTypesPath ();
-      if (StringHelper.hasText (sPath))
+      if (StringHelper.isNotEmpty (sPath))
       {
         aDocTypeIDRes = new FileSystemResource (sPath);
         if (!aDocTypeIDRes.exists ())
@@ -168,7 +168,7 @@ public final class NiceNameHandler
     {
       IReadableResource aProcessIDRes = null;
       final String sPath = SMPWebAppConfiguration.getNiceNameProcessesPath ();
-      if (StringHelper.hasText (sPath))
+      if (StringHelper.isNotEmpty (sPath))
       {
         aProcessIDRes = new FileSystemResource (sPath);
         if (!aProcessIDRes.exists ())
@@ -197,7 +197,7 @@ public final class NiceNameHandler
   @Nullable
   public static NiceNameEntry getDocTypeNiceName (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return null;
 
     RW_LOCK.readLock ().lock ();
@@ -220,7 +220,7 @@ public final class NiceNameHandler
   @Nullable
   public static NiceNameEntry getProcessNiceName (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return null;
 
     RW_LOCK.readLock ().lock ();

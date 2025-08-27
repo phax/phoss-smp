@@ -170,7 +170,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     @Nullable
     public static EPredefinedCA getFromIssuerOrNull (@Nullable final String sIssuer)
     {
-      if (StringHelper.hasText (sIssuer))
+      if (StringHelper.isNotEmpty (sIssuer))
         for (final EPredefinedCA e : values ())
           if (e.m_sIssuer.equals (sIssuer))
             return e;

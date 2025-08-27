@@ -112,7 +112,7 @@ public class SMPParticipantMigrationManagerXML extends
   @Nonnull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
-    if (StringHelper.hasNoText (sParticipantMigrationID))
+    if (StringHelper.isEmpty (sParticipantMigrationID))
       return EChange.UNCHANGED;
 
     final SMPParticipantMigration aParticipantMigration;

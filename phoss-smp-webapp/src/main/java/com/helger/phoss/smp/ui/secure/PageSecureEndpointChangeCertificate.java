@@ -277,7 +277,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   @Nonnull
   private static String _getUnifiedCert (@Nullable final String s)
   {
-    if (StringHelper.hasNoText (s))
+    if (StringHelper.isEmpty (s))
       return "";
 
     // Trims, removes PEM header, removes spaces
@@ -335,7 +335,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         final String sNewCert = aWPEC.params ().getAsStringTrimmed (FIELD_NEW_CERTIFICATE);
         final String sNewUnifiedCert = _getUnifiedCert (sNewCert);
 
-        if (StringHelper.hasNoText (sOldUnifiedCert))
+        if (StringHelper.isEmpty (sOldUnifiedCert))
           aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "An old certificate must be provided");
         else
         {
@@ -344,7 +344,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
             aFormErrors.addFieldInfo (FIELD_OLD_CERTIFICATE, "The old certificate is invalid: " + sErrorDetails);
         }
 
-        if (StringHelper.hasNoText (sNewUnifiedCert))
+        if (StringHelper.isEmpty (sNewUnifiedCert))
           aFormErrors.addFieldError (FIELD_NEW_CERTIFICATE, "A new certificate must be provided");
         else
         {

@@ -128,7 +128,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   @Nonnull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
-    if (StringHelper.hasNoText (sSMPTransportProfileID))
+    if (StringHelper.isEmpty (sSMPTransportProfileID))
       return EChange.UNCHANGED;
 
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMPTransportProfileID));

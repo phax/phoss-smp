@@ -91,7 +91,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
                                                                 aTarget.isDirectoryIntegrationAutoUpdate ()));
 
     String sDirectoryHostName = aDoc.getString (BSON_DIRECTORY_HOSTNAME);
-    if (StringHelper.hasNoText (sDirectoryHostName))
+    if (StringHelper.isEmpty (sDirectoryHostName))
       sDirectoryHostName = aTarget.getDirectoryHostName ();
     aTarget.setDirectoryHostName (sDirectoryHostName);
 

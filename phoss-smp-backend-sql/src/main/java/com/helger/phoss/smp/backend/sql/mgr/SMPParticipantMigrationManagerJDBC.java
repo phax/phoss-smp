@@ -127,7 +127,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   @Nonnull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
-    if (StringHelper.hasNoText (sParticipantMigrationID))
+    if (StringHelper.isEmpty (sParticipantMigrationID))
       return EChange.UNCHANGED;
 
     final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_pmigration" + " WHERE id=?",
@@ -208,7 +208,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   @Nullable
   public SMPParticipantMigration getParticipantMigrationOfID (@Nullable final String sID)
   {
-    if (StringHelper.hasNoText (sID))
+    if (StringHelper.isEmpty (sID))
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();

@@ -157,7 +157,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
       if (m_eServerNameMode == EServerNameMode.DYNAMIC_PARTICIPANT_URL)
       {
         // Check if feasible
-        if (m_aParticipantID == null || StringHelper.hasNoText (m_sSMLZoneName))
+        if (m_aParticipantID == null || StringHelper.isEmpty (m_sSMLZoneName))
           return EServerNameMode.FALLBACK;
 
         // This only works with Peppol CNAME URL provider
@@ -215,14 +215,14 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
 
     // Scheme
     String sScheme = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_PROTO);
-    if (StringHelper.hasText (sScheme))
+    if (StringHelper.isNotEmpty (sScheme))
       bFallbackToLocalPort = false;
     else
       sScheme = ServletHelper.getRequestScheme (aHttpRequest);
 
     // Host
     String sHost = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_HOST);
-    if (StringHelper.hasText (sHost))
+    if (StringHelper.isNotEmpty (sHost))
       bFallbackToLocalPort = false;
     else
       sHost = ServletHelper.getRequestServerName (aHttpRequest);
@@ -255,10 +255,10 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
       if (aHop.containsProto ())
       {
         sScheme = aHop.getProto ();
-        if (StringHelper.hasText (sScheme))
+        if (StringHelper.isNotEmpty (sScheme))
           break;
       }
-    if (!StringHelper.hasText (sScheme))
+    if (!StringHelper.isNotEmpty (sScheme))
       sScheme = ServletHelper.getRequestScheme (aHttpRequest);
 
     // Host and port
@@ -278,10 +278,10 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
         }
         else
           sHost = sFullHost;
-        if (StringHelper.hasText (sHost))
+        if (StringHelper.isNotEmpty (sHost))
           break;
       }
-    if (!StringHelper.hasText (sHost))
+    if (!StringHelper.isNotEmpty (sHost))
     {
       sHost = ServletHelper.getRequestServerName (aHttpRequest);
       nPort = ServletHelper.getRequestServerPort (aHttpRequest);

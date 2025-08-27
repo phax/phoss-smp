@@ -107,7 +107,7 @@ public final class SMPTransportProfileManagerXML extends
   @Nonnull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
-    if (StringHelper.hasNoText (sSMPTransportProfileID))
+    if (StringHelper.isEmpty (sSMPTransportProfileID))
       return EChange.UNCHANGED;
 
     m_aRWLock.writeLock ().lock ();

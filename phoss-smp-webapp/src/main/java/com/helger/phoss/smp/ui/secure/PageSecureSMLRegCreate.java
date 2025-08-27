@@ -74,7 +74,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
     if (aSMLInfo == null)
       aFormErrors.addFieldError (FIELD_SML_ID, "A valid SML must be selected!");
 
-    if (StringHelper.hasNoText (sLogicalAddress))
+    if (StringHelper.isEmpty (sLogicalAddress))
       aFormErrors.addFieldError (FIELD_LOGICAL_ADDRESS,
                                  "A logical address must be provided in the form 'http://smp.example.org'!");
     else

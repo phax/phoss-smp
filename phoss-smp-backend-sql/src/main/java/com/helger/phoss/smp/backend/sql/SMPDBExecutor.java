@@ -36,7 +36,7 @@ public final class SMPDBExecutor extends DBExecutor
   static
   {
     final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
-    if (StringHelper.hasText (sSchemaName))
+    if (StringHelper.isNotEmpty (sSchemaName))
     {
       final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
       final EDatabaseType eDBType = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);

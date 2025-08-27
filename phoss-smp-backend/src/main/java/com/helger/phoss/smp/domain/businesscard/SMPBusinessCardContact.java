@@ -83,7 +83,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
 
   public boolean hasType ()
   {
-    return StringHelper.hasText (m_sType);
+    return StringHelper.isNotEmpty (m_sType);
   }
 
   /**
@@ -97,7 +97,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
 
   public boolean hasName ()
   {
-    return StringHelper.hasText (m_sName);
+    return StringHelper.isNotEmpty (m_sName);
   }
 
   /**
@@ -111,7 +111,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
 
   public boolean hasPhoneNumber ()
   {
-    return StringHelper.hasText (m_sPhoneNumber);
+    return StringHelper.isNotEmpty (m_sPhoneNumber);
   }
 
   /**
@@ -125,7 +125,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
 
   public boolean hasEmail ()
   {
-    return StringHelper.hasText (m_sEmail);
+    return StringHelper.isNotEmpty (m_sEmail);
   }
 
   public boolean isAnyFieldSet ()

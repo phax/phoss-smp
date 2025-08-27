@@ -184,7 +184,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
                     ", " +
                     aCertificate +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ")");
 
     final ISMPRedirect aOldRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID,
@@ -282,7 +282,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
-    if (StringHelper.hasText (sServiceGroupID))
+    if (StringHelper.isNotEmpty (sServiceGroupID))
       getCollection ().find (new Document (BSON_SERVICE_GROUP_ID, sServiceGroupID))
                       .forEach (x -> ret.add (toDomain (x)));
     return ret;

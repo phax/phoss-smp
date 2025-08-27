@@ -225,13 +225,13 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                                                         DEFAULT_CLIENT_CERTIFICATE_REQUIRED);
 
     // validations
-    if (StringHelper.hasNoText (sDisplayName))
+    if (StringHelper.isEmpty (sDisplayName))
       aFormErrors.addFieldError (FIELD_DISPLAY_NAME, "The SML configuration name must not be empty!");
 
-    if (StringHelper.hasNoText (sDNSZone))
+    if (StringHelper.isEmpty (sDNSZone))
       aFormErrors.addFieldError (FIELD_DNS_ZONE, "The DNS Zone must not be empty!");
 
-    if (StringHelper.hasNoText (sManagementAddressURL))
+    if (StringHelper.isEmpty (sManagementAddressURL))
       aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL, "The Management Address URL must not be empty!");
     else
     {

@@ -92,7 +92,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                     ", " +
                     aParticipantID.getURIEncoded () +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ", " +
                     bCreateInSML +
                     ")");
@@ -166,7 +166,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                     ", " +
                     sNewOwnerID +
                     ", " +
-                    (StringHelper.hasText (sExtension) ? "with extension" : "without extension") +
+                    (StringHelper.isNotEmpty (sExtension) ? "with extension" : "without extension") +
                     ")");
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);

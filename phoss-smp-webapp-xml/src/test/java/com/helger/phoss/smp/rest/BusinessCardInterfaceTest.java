@@ -101,7 +101,7 @@ public final class BusinessCardInterfaceTest
     assertNotNull (aResponseMsg);
     // Read response
     final String sResponse = aResponseMsg.readEntity (String.class);
-    if (StringHelper.hasText (sResponse))
+    if (StringHelper.isNotEmpty (sResponse))
       LOGGER.info ("HTTP Response: " + sResponse);
     assertTrue (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes),
                 ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));

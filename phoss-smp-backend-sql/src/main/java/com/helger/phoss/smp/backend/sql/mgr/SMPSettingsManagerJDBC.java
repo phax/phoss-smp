@@ -142,7 +142,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   @Nullable
   public static String getSettingsValueFromDB (@Nonnull final DBExecutor aExecutor, @Nullable final String sKey)
   {
-    if (StringHelper.hasNoText (sKey))
+    if (StringHelper.isEmpty (sKey))
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
@@ -158,7 +158,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   @Nullable
   public String getSettingsValue (@Nullable final String sKey)
   {
-    if (StringHelper.hasNoText (sKey))
+    if (StringHelper.isEmpty (sKey))
       return null;
 
     return getSettingsValueFromDB (newExecutor (), sKey);
@@ -196,7 +196,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
       ret.setDirectoryIntegrationAutoUpdate (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_AUTO_UPDATE),
                                                                      ret.isDirectoryIntegrationAutoUpdate ()));
       String sDirectoryHostName = aValues.get (DIRECTORY_HOSTNAME);
-      if (StringHelper.hasNoText (sDirectoryHostName))
+      if (StringHelper.isEmpty (sDirectoryHostName))
         sDirectoryHostName = ret.getDirectoryHostName ();
       ret.setDirectoryHostName (sDirectoryHostName);
       ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), ret.isSMLEnabled ()));

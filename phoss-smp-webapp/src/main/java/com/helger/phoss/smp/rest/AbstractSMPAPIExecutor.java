@@ -46,7 +46,7 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
   private static String _getBearerToken (@Nullable final String sAuthHeader)
   {
     final String sRealHeader = StringHelper.trim (sAuthHeader);
-    if (StringHelper.hasNoText (sRealHeader))
+    if (StringHelper.isEmpty (sRealHeader))
       return null;
 
     final String [] aElements = RegExHelper.getSplitToArray (sRealHeader, "\\s+", 2);
@@ -81,7 +81,7 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
 
     // Check bearer token first (does not log in case of error)
     final String sBearerToken = _getBearerToken (sAuthHeader);
-    if (StringHelper.hasText (sBearerToken))
+    if (StringHelper.isNotEmpty (sBearerToken))
       return SMPAPICredentials.createForBearerToken (sBearerToken);
 
     // Now try BasicAuth
