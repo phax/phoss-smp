@@ -18,7 +18,7 @@ package com.helger.phoss.smp.servlet;
 
 import java.io.IOException;
 
-import com.helger.commons.http.CHttpHeader;
+import com.helger.http.CHttpHeader;
 import com.helger.http.csp.CSPDirective;
 import com.helger.http.csp.CSPPolicy;
 import com.helger.http.csp.CSPSourceList;

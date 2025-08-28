@@ -16,12 +16,12 @@
  */
 package com.helger.phoss.smp.backend.xml.spi;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.IsSPIImplementation;
+import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
 import com.helger.phoss.smp.backend.ISMPBackendRegistry;
 import com.helger.phoss.smp.backend.xml.mgr.SMPManagerProviderXML;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Register the XML backend to the global SMP backend registry.

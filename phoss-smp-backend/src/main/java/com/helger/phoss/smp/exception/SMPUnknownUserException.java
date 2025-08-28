@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.exception;
 
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.Nullable;
 
 /**
  * This exception is thrown if the provided user name does not exist.

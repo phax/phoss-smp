@@ -10,15 +10,15 @@
  */
 package com.helger.phoss.smp;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.Since;
-import com.helger.commons.id.IHasID;
-import com.helger.commons.lang.EnumHelper;
-import com.helger.commons.name.IHasDisplayName;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.Since;
+import com.helger.base.id.IHasID;
+import com.helger.base.lang.EnumHelper;
+import com.helger.base.name.IHasDisplayName;
 import com.helger.peppol.sml.ESMPAPIType;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Defines the type of REST responses to be returned. Either Peppol (using objects in namespace

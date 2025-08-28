@@ -34,15 +34,13 @@ package com.helger.phoss.smp.rest;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.http.EHttpMethod;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.regex.RegExHelper;
-import com.helger.commons.state.EContinue;
+import com.helger.base.state.EContinue;
+import com.helger.cache.regex.RegExHelper;
+import com.helger.http.EHttpMethod;
+import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.api.APIDescriptor;
 import com.helger.photon.api.APIPath;
@@ -54,6 +52,7 @@ import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXFilterUnifiedResponse;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.ServletException;
 
 /**

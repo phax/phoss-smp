@@ -10,12 +10,10 @@
  */
 package com.helger.phoss.smp.domain.user;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -29,6 +27,8 @@ import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * User management sanity methods

@@ -18,16 +18,14 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.mime.MimeType;
+import com.helger.annotation.Nonempty;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.mime.CMimeType;
+import com.helger.mime.MimeType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
@@ -46,9 +44,11 @@ import com.helger.xml.microdom.serialize.MicroWriter;
 import com.helger.xml.serialize.write.IXMLWriterSettings;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * REST API to export all Service Groups that have the state "outbound migration
- * is in progress" into XML v1
+ * REST API to export all Service Groups that have the state "outbound migration is in progress"
+ * into XML v1
  *
  * @author Philip Helger
  * @since 5.6.0

@@ -12,17 +12,14 @@ package com.helger.phoss.smp.domain;
 
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.lang.ClassHelper;
-import com.helger.commons.state.ETriState;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.exception.InitializationException;
+import com.helger.base.lang.clazz.ClassHelper;
+import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
@@ -52,6 +49,9 @@ import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolConfigurableURLProvider;
 import com.helger.web.scope.mgr.WebScoped;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
@@ -114,7 +114,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   /**
    * @deprecated Only called via reflection
    */
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   public SMPMetaManager ()
   {}

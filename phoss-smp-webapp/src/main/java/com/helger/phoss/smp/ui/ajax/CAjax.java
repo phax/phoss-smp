@@ -18,13 +18,11 @@ package com.helger.phoss.smp.ui.ajax;
 
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.http.EHttpMethod;
+import com.helger.annotation.concurrent.Immutable;
+import com.helger.http.EHttpMethod;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.photon.ajax.GlobalAjaxInvoker;
 import com.helger.photon.ajax.IAjaxRegistry;
@@ -35,6 +33,8 @@ import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This class defines the available ajax functions for the public application.

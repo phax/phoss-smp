@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * Base class for all SMP server specific exceptions

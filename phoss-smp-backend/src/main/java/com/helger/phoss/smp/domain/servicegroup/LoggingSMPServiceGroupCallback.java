@@ -10,13 +10,13 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.CSMPServer;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Logging implementation of {@link ISMPServiceGroupCallback}

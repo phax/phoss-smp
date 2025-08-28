@@ -18,14 +18,15 @@ package com.helger.phoss.smp.ui.secure.hc;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.name.IHasDisplayName;
+import com.helger.annotation.Nonempty;
+import com.helger.base.name.IHasDisplayName;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.uicore.html.select.HCExtSelect;
+import com.helger.text.compare.ComparatorHelper;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Select box for active SMP users (depending on the backend).
@@ -48,7 +49,8 @@ public class HCUserSelect extends HCExtSelect
     // Use active users only
     for (final IUser aUser : PhotonSecurityManager.getUserMgr ()
                                                   .getAllActiveUsers ()
-                                                  .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale)))
+                                                  .getSortedInline (ComparatorHelper.getComparatorCollating (IHasDisplayName::getDisplayName,
+                                                                                                             aDisplayLocale)))
       addOption (aUser.getID (), getDisplayName (aUser));
 
     if (!hasSelectedOption ())

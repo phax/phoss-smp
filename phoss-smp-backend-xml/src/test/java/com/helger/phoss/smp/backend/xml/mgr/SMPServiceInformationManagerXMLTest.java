@@ -24,10 +24,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.XMLOffsetDateTime;
+import com.helger.collection.CollectionFind;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -111,13 +111,13 @@ public final class SMPServiceInformationManagerXMLTest
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getProcessCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getProcessCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getAllProcesses ()
-                                      .get (0)
-                                      .getEndpointCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (0)
+                                    .getEndpointCount ());
       }
 
       {
@@ -142,20 +142,20 @@ public final class SMPServiceInformationManagerXMLTest
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getProcessCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getProcessCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getAllProcesses ()
-                                      .get (0)
-                                      .getEndpointCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (0)
+                                    .getEndpointCount ());
         assertEquals ("http://localhost/as2-ver2",
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getAllProcesses ()
-                                      .get (0)
-                                      .getAllEndpoints ()
-                                      .get (0)
-                                      .getEndpointReference ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (0)
+                                    .getAllEndpoints ()
+                                    .get (0)
+                                    .getEndpointReference ());
       }
 
       {
@@ -181,13 +181,13 @@ public final class SMPServiceInformationManagerXMLTest
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getProcessCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getProcessCount ());
         assertEquals (2,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getAllProcesses ()
-                                      .get (0)
-                                      .getEndpointCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (0)
+                                    .getEndpointCount ());
       }
 
       {
@@ -214,18 +214,18 @@ public final class SMPServiceInformationManagerXMLTest
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());
         assertEquals (2,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getProcessCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getProcessCount ());
         assertEquals (2,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getAllProcesses ()
-                                      .get (0)
-                                      .getEndpointCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (0)
+                                    .getEndpointCount ());
         assertEquals (1,
-                      CollectionHelper.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
-                                      .getAllProcesses ()
-                                      .get (1)
-                                      .getEndpointCount ());
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (1)
+                                    .getEndpointCount ());
       }
     }
     finally

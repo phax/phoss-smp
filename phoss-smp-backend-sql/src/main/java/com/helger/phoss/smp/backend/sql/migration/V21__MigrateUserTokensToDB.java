@@ -18,14 +18,12 @@ package com.helger.phoss.smp.backend.sql.migration;
 
 import java.io.File;
 
-import javax.annotation.Nonnull;
-
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.photon.io.WebFileIO;
 import com.helger.photon.jdbc.security.UserManagerJDBC;
@@ -36,6 +34,8 @@ import com.helger.photon.security.token.user.UserToken;
 import com.helger.photon.security.token.user.UserTokenManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.web.scope.mgr.WebScoped;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Migrate all security user tokens from the XML file to the DB

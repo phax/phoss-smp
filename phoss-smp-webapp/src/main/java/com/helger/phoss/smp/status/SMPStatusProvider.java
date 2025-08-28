@@ -21,24 +21,22 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
-
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTWebDateHelper;
-import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.lang.ServiceLoaderHelper;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.system.SystemProperties;
-import com.helger.commons.timing.StopWatch;
+import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.debug.GlobalDebug;
+import com.helger.base.spi.ServiceLoaderHelper;
+import com.helger.base.string.StringHelper;
+import com.helger.base.system.SystemProperties;
+import com.helger.base.timing.StopWatch;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsOrderedMap;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.web.PDTWebDateHelper;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
 import com.helger.peppol.sml.ISMLInfo;
@@ -51,6 +49,8 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.phoss.smp.settings.ISMPSettings;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * The main class to provide the SMP status content.
@@ -180,7 +180,7 @@ public final class SMPStatusProvider
     for (final ISMPStatusProviderExtensionSPI aImpl : LIST)
     {
       final ICommonsOrderedMap <String, ?> aMap = aImpl.getAdditionalStatusData (bDisableLongRunningOperations);
-      aStatusData.addAll (aMap);
+      aStatusData.addAllAny (aMap);
     }
     final long nMillis = aSW.stopAndGetMillis ();
     if (nMillis > 100)

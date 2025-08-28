@@ -16,10 +16,8 @@
  */
 package com.helger.phoss.smp.servlet;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.http.CHttp;
-import com.helger.commons.state.EContinue;
+import com.helger.base.state.EContinue;
+import com.helger.http.CHttp;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.ui.SMPLoginManager;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
@@ -28,6 +26,7 @@ import com.helger.photon.security.util.SecurityHelper;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.ServletException;
 
 /**

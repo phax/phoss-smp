@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.domain.businesscard;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Logging implementation of {@link ISMPBusinessCardCallback}

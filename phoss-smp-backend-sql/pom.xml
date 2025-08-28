@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>7.2.9-SNAPSHOT</version>
+    <version>8.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend-sql</artifactId>
   <packaging>bundle</packaging>
@@ -59,7 +59,7 @@
       <artifactId>phoss-smp-backend</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
+      <groupId>com.helger.db</groupId>
       <artifactId>ph-db-jdbc</artifactId>
       <version>${ph-db.version}</version>
     </dependency>
@@ -82,9 +82,24 @@
       <artifactId>flyway-core</artifactId>
       <version>${flyway.version}</version>
     </dependency>
-    <dependency>
+     <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-db2</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+   <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-mysql</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-oracle</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
       <version>${flyway.version}</version>
     </dependency>
     
@@ -111,7 +126,7 @@
           <instructions>
             <Automatic-Module-Name>com.helger.phoss.smp.backend.sql</Automatic-Module-Name>
             <Export-Package>com.helger.phoss.smp.backend.sql.*</Export-Package>
-            <Import-Package>!javax.annotation.*,*</Import-Package>
+            <Import-Package>!jakarta.annotation.*,*</Import-Package>
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI</Provide-Capability>
           </instructions>

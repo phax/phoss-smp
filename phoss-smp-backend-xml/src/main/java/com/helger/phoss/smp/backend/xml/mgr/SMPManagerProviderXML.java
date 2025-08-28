@@ -16,12 +16,9 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.state.ETriState;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.base.exception.InitializationException;
+import com.helger.base.state.ETriState;
+import com.helger.base.tostring.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
@@ -37,6 +34,9 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.

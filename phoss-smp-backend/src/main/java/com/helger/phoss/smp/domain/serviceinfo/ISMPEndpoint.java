@@ -12,15 +12,15 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.time.LocalDate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.compare.CompareHelper;
-import com.helger.commons.compare.IComparator;
-import com.helger.commons.datetime.XMLOffsetDateTime;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.compare.CompareHelper;
+import com.helger.base.compare.IComparator;
+import com.helger.base.string.StringHelper;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Represents a single SMP endpoint that is contained in a single

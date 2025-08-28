@@ -12,10 +12,10 @@ package com.helger.phoss.smp.backend;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Base interface for {@link SMPBackendRegistry}.

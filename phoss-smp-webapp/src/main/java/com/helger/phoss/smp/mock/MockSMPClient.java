@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.mock;
 
-import com.helger.commons.url.URLHelper;
+import com.helger.base.url.URLHelper;
 import com.helger.smpclient.peppol.SMPClient;
 
 /**

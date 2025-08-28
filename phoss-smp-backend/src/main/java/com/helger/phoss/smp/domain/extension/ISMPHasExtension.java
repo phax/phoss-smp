@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.extension;
 
-import javax.annotation.Nonnull;
-
 import com.helger.smpclient.extension.SMPExtensionList;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Base interface for objects having an extension (service group, redirect,

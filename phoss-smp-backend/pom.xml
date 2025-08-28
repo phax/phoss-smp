@@ -16,7 +16,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>7.2.9-SNAPSHOT</version>
+    <version>8.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend</artifactId>
   <packaging>bundle</packaging>
@@ -136,7 +136,7 @@
           <instructions>
             <Automatic-Module-Name>com.helger.phoss.smp</Automatic-Module-Name>
             <Export-Package>com.helger.phoss.smp.*</Export-Package>
-            <Import-Package>!javax.annotation.*,*</Import-Package>
+            <Import-Package>!jakarta.annotation.*,*</Import-Package>
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
             <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.commons.typeconvert.ITypeConverterRegistrarSPI,
 osgi.serviceloader; osgi.serviceloader=com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI</Provide-Capability>

@@ -18,10 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
+import com.helger.annotation.Nonempty;
+import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.impl.HCNodeList;
@@ -38,6 +36,8 @@ import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.column.DTCol;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * A read-only page that shows all the applied identifier mappings.

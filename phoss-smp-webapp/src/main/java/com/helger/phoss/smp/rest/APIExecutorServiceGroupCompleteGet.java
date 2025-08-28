@@ -18,11 +18,9 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
+import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
@@ -35,6 +33,8 @@ import com.helger.smpclient.peppol.marshal.SMPMarshallerCompleteServiceGroupType
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
+import jakarta.annotation.Nonnull;
+
 public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExecutor
 {
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
@@ -44,7 +44,7 @@ public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExec
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())

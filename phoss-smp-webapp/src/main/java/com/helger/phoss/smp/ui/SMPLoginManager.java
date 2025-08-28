@@ -18,8 +18,6 @@ package com.helger.phoss.smp.ui;
 
 import java.time.Duration;
 
-import javax.annotation.Nonnull;
-
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.app.html.IHTMLProvider;
@@ -28,6 +26,8 @@ import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * The login manager to be used. Manages login process incl. UI.

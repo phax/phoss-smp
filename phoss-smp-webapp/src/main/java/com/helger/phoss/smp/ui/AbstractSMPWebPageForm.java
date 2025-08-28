@@ -18,12 +18,10 @@ package com.helger.phoss.smp.ui;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.error.IError;
-import com.helger.commons.id.IHasID;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.id.IHasID;
+import com.helger.base.string.StringHelper;
+import com.helger.diagnostics.error.IError;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.photon.bootstrap4.alert.BootstrapBox;
 import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
@@ -31,6 +29,8 @@ import com.helger.photon.bootstrap4.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageForm;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Base class for form based pages

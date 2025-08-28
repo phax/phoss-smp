@@ -12,10 +12,7 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -25,9 +22,11 @@ import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * This class is internally used to convert {@link SMPServiceGroup} from and to
- * XML.
+ * This class is internally used to convert {@link SMPServiceGroup} from and to XML.
  *
  * @author Philip Helger
  */
@@ -44,12 +43,12 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
-                                                                    sNamespaceURI,
-                                                                    ELEMENT_PARTICIPANT_ID));
+    aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
+                                                                 sNamespaceURI,
+                                                                 ELEMENT_PARTICIPANT_ID));
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
-              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_EXTENSION)
+              .addText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

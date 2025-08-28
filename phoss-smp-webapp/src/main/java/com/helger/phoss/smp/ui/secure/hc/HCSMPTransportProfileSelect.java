@@ -19,14 +19,14 @@ package com.helger.phoss.smp.ui.secure.hc;
 import java.util.Comparator;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.name.IHasName;
+import com.helger.annotation.Nonempty;
+import com.helger.base.name.IHasName;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Select for the default transport profiles

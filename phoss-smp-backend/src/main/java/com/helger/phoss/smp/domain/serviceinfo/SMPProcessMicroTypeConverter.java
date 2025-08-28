@@ -10,18 +10,18 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.annotation.Nonempty;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPProcess} from and to XML.
@@ -40,14 +40,14 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter <
                                               @Nonnull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getProcessIdentifier (),
-                                                                    sNamespaceURI,
-                                                                    ELEMENT_PROCESS_IDENTIFIER));
+    aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getProcessIdentifier (),
+                                                                 sNamespaceURI,
+                                                                 ELEMENT_PROCESS_IDENTIFIER));
     for (final ISMPEndpoint aEndpoint : aValue.getAllEndpoints ())
-      aElement.appendChild (MicroTypeConverter.convertToMicroElement (aEndpoint, sNamespaceURI, ELEMENT_ENDPOINT));
+      aElement.addChild (MicroTypeConverter.convertToMicroElement (aEndpoint, sNamespaceURI, ELEMENT_ENDPOINT));
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
-              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_EXTENSION)
+              .addText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

@@ -10,9 +10,7 @@
  */
 package com.helger.phoss.smp.mock;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.state.ETriState;
+import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -23,6 +21,8 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This {@link ISMPManagerProvider} implementation returns non-<code>null</code>

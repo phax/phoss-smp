@@ -13,23 +13,23 @@ package com.helger.phoss.smp.exchange;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTWebDateHelper;
-import com.helger.commons.error.level.EErrorLevel;
-import com.helger.commons.error.level.IErrorLevel;
-import com.helger.commons.error.level.IHasErrorLevel;
-import com.helger.commons.lang.StackTraceHelper;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.rt.StackTraceHelper;
+import com.helger.base.string.StringHelper;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.web.PDTWebDateHelper;
+import com.helger.diagnostics.error.level.EErrorLevel;
+import com.helger.diagnostics.error.level.IErrorLevel;
+import com.helger.diagnostics.error.level.IHasErrorLevel;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 @Immutable
 public final class ImportActionItem implements IHasErrorLevel
@@ -120,9 +120,9 @@ public final class ImportActionItem implements IHasErrorLevel
     eAction.setAttribute ("datetime", PDTWebDateHelper.getAsStringXSD (m_aDT));
     eAction.setAttribute ("level", getErrorLevelName ());
     eAction.setAttribute ("participantID", m_sPI);
-    eAction.appendElement ("message").appendText (m_sMsg);
+    eAction.addElement ("message").addText (m_sMsg);
     if (m_aLinkedException != null)
-      eAction.appendElement ("exception").appendText (StackTraceHelper.getStackAsString (m_aLinkedException));
+      eAction.addElement ("exception").addText (StackTraceHelper.getStackAsString (m_aLinkedException));
     return eAction;
   }
 
@@ -134,7 +134,8 @@ public final class ImportActionItem implements IHasErrorLevel
                             .addIfNotNull ("participantID", m_sPI)
                             .add ("message", m_sMsg)
                             .addIfNotNull ("exception",
-                                           m_aLinkedException != null ? StackTraceHelper.getStackAsString (m_aLinkedException)
+                                           m_aLinkedException != null ? StackTraceHelper.getStackAsString (
+                                                                                                           m_aLinkedException)
                                                                       : null);
   }
 

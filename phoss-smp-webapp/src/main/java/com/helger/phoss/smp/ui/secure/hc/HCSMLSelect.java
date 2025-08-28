@@ -19,18 +19,19 @@ package com.helger.phoss.smp.ui.secure.hc;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.name.IHasDisplayName;
-import com.helger.commons.url.SimpleURL;
+import com.helger.annotation.Nonempty;
+import com.helger.base.name.IHasDisplayName;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
+import com.helger.text.compare.ComparatorHelper;
+import com.helger.url.SimpleURL;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public class HCSMLSelect extends HCExtSelect
 {
@@ -58,7 +59,8 @@ public class HCSMLSelect extends HCExtSelect
     super (aRF);
     for (final ISMLInfo aItem : SMPMetaManager.getSMLInfoMgr ()
                                               .getAllSMLInfos ()
-                                              .getSortedInline (IHasDisplayName.getComparatorCollating (aDisplayLocale)))
+                                              .getSortedInline (ComparatorHelper.getComparatorCollating (IHasDisplayName::getDisplayName,
+                                                                                                         aDisplayLocale)))
       if (aFilter == null || aFilter.test (aItem))
         addOption (aItem.getID (), getDisplayName (aItem));
     addOptionPleaseSelect (aDisplayLocale);

@@ -19,13 +19,9 @@ package com.helger.phoss.smp.ui.pub;
 import java.util.Comparator;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.compare.ESortOrder;
-import com.helger.commons.url.SimpleURL;
+import com.helger.annotation.Nonempty;
+import com.helger.base.compare.ESortOrder;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -45,7 +41,11 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This is the start page of the public application. It lists all available
@@ -133,9 +133,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
           aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
                                                     aDisplayLocale));
         }
-        final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope,
-                                                                 aServiceGroup.getParticipantIdentifier ()
-                                                                              .getURIEncoded ());
+        final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
         aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
                                                                                                                               sDisplayName)
                                                                                                                    .setTargetBlank ()

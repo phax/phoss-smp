@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.ui.cache;
 
-import com.helger.commons.cache.Cache;
+import com.helger.cache.impl.Cache;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 
 /**

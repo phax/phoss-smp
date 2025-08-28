@@ -19,20 +19,16 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.state.EChange;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.typeconvert.TypeConverter;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
@@ -40,9 +36,13 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Implementation of {@link ISMPParticipantMigrationManager} for MongoDB
@@ -216,8 +216,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     final Document aMatch = getCollection ().find (Filters.and (new Document (BSON_DIRECTION, eDirection.getID ()),
                                                                 new Document (BSON_STATE, eState.getID ()),
                                                                 new Document (BSON_PARTICIPANT_ID,
-                                                                              toBson (aParticipantID))))
-                                            .first ();
+                                                                              toBson (aParticipantID)))).first ();
     if (aMatch == null)
       return null;
     return toDomain (aMatch);

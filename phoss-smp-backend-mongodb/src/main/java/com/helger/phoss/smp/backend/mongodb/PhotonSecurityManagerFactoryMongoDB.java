@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
-import javax.annotation.Nonnull;
-
 import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.mongodb.audit.AuditManagerMongoDB;
 import com.helger.photon.audit.IAuditManager;
@@ -30,6 +28,8 @@ import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.user.UserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
 import com.helger.photon.security.usergroup.UserGroupManager;
+
+import jakarta.annotation.Nonnull;
 
 public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {

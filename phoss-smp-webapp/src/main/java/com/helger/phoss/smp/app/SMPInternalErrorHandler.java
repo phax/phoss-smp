@@ -19,15 +19,12 @@ package com.helger.phoss.smp.app;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.email.EmailAddress;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.email.EmailAddress;
+import com.helger.base.string.StringHelper;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPConfigProvider;
@@ -36,6 +33,9 @@ import com.helger.photon.core.interror.InternalErrorSettings;
 import com.helger.photon.core.interror.callback.AbstractErrorCallback;
 import com.helger.smtp.settings.SMTPSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public final class SMPInternalErrorHandler extends AbstractErrorCallback
 {

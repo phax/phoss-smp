@@ -12,20 +12,19 @@ package com.helger.phoss.smp.domain.pmigration;
 
 import java.time.LocalDateTime;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.ContainsSoftMigration;
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.ContainsSoftMigration;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * This class is internally used to convert {@link SMPParticipantMigration} from
- * and to XML.
+ * This class is internally used to convert {@link SMPParticipantMigration} from and to XML.
  *
  * @author Philip Helger
  * @since 5.4.0
@@ -48,9 +47,9 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
     aElement.setAttribute (ATTR_ID, aValue.getID ());
     aElement.setAttribute (ATTR_DIRECTION, aValue.getDirection ().getID ());
     aElement.setAttribute (ATTR_STATE, aValue.getState ().getID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
-                                                                    sNamespaceURI,
-                                                                    ELEMENT_PARTICIPANT_IDENTIFIER));
+    aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
+                                                                 sNamespaceURI,
+                                                                 ELEMENT_PARTICIPANT_IDENTIFIER));
     aElement.setAttributeWithConversion (ATTR_INITIATION_DATETIME, aValue.getInitiationDateTime ());
     aElement.setAttribute (ATTR_MIGRATION_KEY, aValue.getMigrationKey ());
     return aElement;

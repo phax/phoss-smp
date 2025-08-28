@@ -10,13 +10,10 @@
  */
 package com.helger.phoss.smp.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-
-import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.callback.CallbackList;
-import com.helger.commons.state.EChange;
+import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.base.callback.CallbackList;
+import com.helger.base.state.EChange;
 import com.helger.dao.DAOException;
 import com.helger.photon.io.dao.AbstractPhotonSimpleDAO;
 import com.helger.settings.ISettings;
@@ -26,10 +23,12 @@ import com.helger.settings.factory.ISettingsFactory;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.MicroDocument;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
  * This class manages and persists the SMP settings.<br>
- * Use <code>SMPMetaManager.getSettingsMgr()</code> to get the singleton
- * instance.
+ * Use <code>SMPMetaManager.getSettingsMgr()</code> to get the singleton instance.
  *
  * @author Philip Helger
  */
@@ -61,7 +60,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   {
     final IMicroDocument ret = new MicroDocument ();
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
-    ret.appendChild (aConverter.convertToMicroElement (m_aSMPSettings.internalGetAsMutableSettings (), null, "root"));
+    ret.addChild (aConverter.convertToMicroElement (m_aSMPSettings.internalGetAsMutableSettings (), null, "root"));
     return ret;
   }
 

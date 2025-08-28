@@ -10,8 +10,8 @@
  */
 package com.helger.phoss.smp.mock;
 
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.state.EChange;
+import com.helger.base.state.EChange;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 

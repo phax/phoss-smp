@@ -16,16 +16,15 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.UsedViaReflection;
+import com.helger.annotation.style.UsedViaReflection;
 import com.helger.phoss.smp.config.SMPHttpConfiguration;
 import com.helger.scope.singleton.AbstractSessionSingleton;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * A helper class that checks once per session if proxy information are
- * configured or not. Usually this information does not change, it it is not
- * worth the effort to query that in every request.
+ * A helper class that checks once per session if proxy information are configured or not. Usually
+ * this information does not change, it it is not worth the effort to query that in every request.
  *
  * @author Philip Helger
  */
@@ -34,7 +33,7 @@ public final class SecureSessionState extends AbstractSessionSingleton
   private final boolean m_bHttpProxyEnabled;
   private final boolean m_bHttpsProxyEnabled;
 
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   public SecureSessionState ()
   {

@@ -16,29 +16,26 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import java.net.ProxySelector;
 import java.time.OffsetDateTime;
 import java.util.TimeZone;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import com.helger.commons.collection.ArrayHelper;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.datetime.PDTConfig;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.io.resource.ClassPathResource;
-import com.helger.commons.lang.priviledged.IPrivilegedAction;
-import com.helger.commons.regex.RegExHelper;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.URLHelper;
+import com.helger.base.array.ArrayHelper;
+import com.helger.base.debug.GlobalDebug;
+import com.helger.base.exception.InitializationException;
+import com.helger.base.string.StringHelper;
+import com.helger.base.url.URLHelper;
+import com.helger.cache.regex.RegExHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.zone.PDTConfig;
 import com.helger.html.hc.config.HCSettings;
+import com.helger.io.resource.ClassPathResource;
 import com.helger.network.proxy.ProxySelectorProxySettingsManager;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.IProxySettingsProvider;
@@ -85,6 +82,8 @@ import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletContext;
 
 /**
@@ -180,7 +179,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     _initTimeZone ();
   }
 
-  @SuppressWarnings ("removal")
   @Override
   protected void initGlobalSettings ()
   {
@@ -217,11 +215,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       // Peppol SMP is always http only
       UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
     }
-    // Instead of the service using the X-XSS-Protection header, a better way to
-    // protect against XSS attacks is final to define a final strong
-    // Content-Security-Policy header final that prevents the final execution of
-    // embedded final JavaScript code.
-    UnifiedResponseDefaultSettings.setEnableXSSFilter (false);
 
     // Make sure the nonce attributes are used
     // Required for CSP to work
@@ -444,7 +437,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     // Cleanup proxy selector (avoid ClassLoader leak)
     if (ProxySelectorProxySettingsManager.isDefault ())
-      IPrivilegedAction.proxySelectorSetDefault (null);
+      ProxySelector.setDefault (null);
 
     // Reset for unit tests
     BasePageUtilsHttpClient.HttpClientConfigRegistry.setToDefault ();

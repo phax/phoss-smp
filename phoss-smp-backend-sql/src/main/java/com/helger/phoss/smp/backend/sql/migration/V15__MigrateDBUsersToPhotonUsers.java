@@ -16,17 +16,15 @@
  */
 package com.helger.phoss.smp.backend.sql.migration;
 
-import javax.annotation.Nonnull;
-
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.collection.impl.CommonsLinkedHashMap;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
-import com.helger.commons.io.resource.FileSystemResource;
+import com.helger.collection.commons.CommonsLinkedHashMap;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsOrderedMap;
+import com.helger.io.resource.FileSystemResource;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
@@ -39,11 +37,12 @@ import com.helger.photon.security.user.IUserManager;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xml.microdom.util.XMLMapHandler;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * This was introduced in V5.5.2 to work around an issue with plain DBs because
- * in V2, the "smp_secuser" table does not exist yet. Unfortunately this table
- * would be required when creating a new user with
- * "PhotonSecurityManager.getUserMgr ()"
+ * This was introduced in V5.5.2 to work around an issue with plain DBs because in V2, the
+ * "smp_secuser" table does not exist yet. Unfortunately this table would be required when creating
+ * a new user with "PhotonSecurityManager.getUserMgr ()"
  *
  * @author Philip Helger
  */
@@ -114,8 +113,7 @@ public final class V15__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
                                   new FileSystemResource (WebFileIO.getDataIO ()
                                                                    .getFile ("migrations/db-photon-user-mapping-" +
                                                                              eDBType.getID () +
-                                                                             ".xml")))
-                       .isFailure ())
+                                                                             ".xml"))).isFailure ())
         LOGGER.error ("Failed to store mapping of DB users to ph-oton users as XML");
       LOGGER.info ("Finished migrating all DB users to ph-oton users");
     }

@@ -18,15 +18,13 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.mime.MimeType;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
+import com.helger.mime.CMimeType;
+import com.helger.mime.MimeType;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.BadRequestFault;
@@ -60,6 +58,8 @@ import com.helger.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.sun.xml.ws.client.ClientTransportException;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * REST API to start an outbound migration for a participant
  *
@@ -79,7 +79,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -172,10 +172,10 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
 
     // Build result
     final IMicroDocument aResponseDoc = new MicroDocument ();
-    final IMicroElement eRoot = aResponseDoc.appendElement ("migrationOutboundResponse");
+    final IMicroElement eRoot = aResponseDoc.addElement ("migrationOutboundResponse");
     eRoot.setAttribute ("success", true);
-    eRoot.appendElement (XML_ELEMENT_PARTICIPANT_ID).appendText (sServiceGroupID);
-    eRoot.appendElement (XML_ELEMENT_MIGRATION_KEY).appendText (sMigrationKey);
+    eRoot.addElement (XML_ELEMENT_PARTICIPANT_ID).addText (sServiceGroupID);
+    eRoot.addElement (XML_ELEMENT_MIGRATION_KEY).addText (sMigrationKey);
 
     final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
     aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())

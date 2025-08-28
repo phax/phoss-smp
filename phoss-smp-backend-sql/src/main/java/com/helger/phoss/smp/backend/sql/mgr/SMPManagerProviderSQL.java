@@ -16,14 +16,11 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.state.ETriState;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.base.state.ETriState;
+import com.helger.base.tostring.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -44,6 +41,9 @@ import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.jdbc.PhotonSecurityManagerFactoryJDBC;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * A JDBC based implementation of the {@link ISMPManagerProvider} interface.

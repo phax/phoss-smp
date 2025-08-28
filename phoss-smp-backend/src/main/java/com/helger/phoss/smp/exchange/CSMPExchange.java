@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exchange;
 
-import javax.annotation.concurrent.Immutable;
+import com.helger.annotation.concurrent.Immutable;
 
 /**
  * Constants for import/export of SMP data.

@@ -13,20 +13,16 @@ package com.helger.phoss.smp.settings;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.DevelopersNote;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.state.EChange;
-import com.helger.commons.string.ToStringGenerator;
-import com.helger.commons.type.ObjectType;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.state.EChange;
+import com.helger.base.tostring.ToStringGenerator;
+import com.helger.base.type.ObjectType;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.config.value.ConfiguredValue;
 import com.helger.peppol.sml.ISMLInfo;
@@ -36,10 +32,12 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * This class contains the settings to be applied for the current SMP instance.
- * It is based on the {@link SMPServerConfiguration} but allows for changes at
- * runtime!
+ * This class contains the settings to be applied for the current SMP instance. It is based on the
+ * {@link SMPServerConfiguration} but allows for changes at runtime!
  *
  * @author Philip Helger
  */
@@ -80,9 +78,7 @@ public class SMPSettings implements ISMPSettings
 
   private final Settings m_aSettings = new Settings ("smp-settings");
 
-  @Deprecated (forRemoval = true, since = "7.1.4")
-  @DevelopersNote ("Use the factory methods instead - the constructor will be made private")
-  public SMPSettings (final boolean bInitFromConfiguration)
+  private SMPSettings (final boolean bInitFromConfiguration)
   {
     if (bInitFromConfiguration)
     {
@@ -227,9 +223,8 @@ public class SMPSettings implements ISMPSettings
   @Nonnull
   public String getDirectoryHostName ()
   {
-    // TODO select between test and prod in default
-    return m_aSettings.getAsString (KEY_SMP_DIRECTORY_HOSTNAME,
-                                    true ? DEFAULT_SMP_DIRECTORY_HOSTNAME_PROD : DEFAULT_SMP_DIRECTORY_HOSTNAME_TEST);
+    // No default value, because it depends on the Network stage
+    return m_aSettings.getAsString (KEY_SMP_DIRECTORY_HOSTNAME);
   }
 
   @Nonnull

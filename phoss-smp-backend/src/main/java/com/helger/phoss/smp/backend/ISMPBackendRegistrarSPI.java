@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.backend;
 
-import javax.annotation.Nonnull;
+import com.helger.annotation.style.IsSPIInterface;
 
-import com.helger.commons.annotation.IsSPIInterface;
+import jakarta.annotation.Nonnull;
 
 /**
  * SPI interface to be implemented by SMP backend modules. They are than

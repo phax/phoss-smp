@@ -14,24 +14,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import javax.annotation.Nonnull;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.mock.CommonsTestHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
+import com.helger.unittest.support.TestHelper;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.serialize.MicroWriter;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Test class for class {@link SMPBusinessCard}
@@ -61,10 +61,10 @@ public final class SMPBusinessCardTest
     // Ensure XML representation is identical
     final String sXML1 = MicroWriter.getNodeAsString (e);
     final String sXML2 = MicroWriter.getNodeAsString (e2);
-    CommonsTestHelper._assertEquals ("XML representation must be identical", sXML1, sXML2);
+    assertEquals ("XML representation must be identical", sXML1, sXML2);
 
     // Ensure they are equals
-    CommonsTestHelper.testDefaultImplementationWithEqualContentObject (aBC, aObj2);
+    TestHelper.testDefaultImplementationWithEqualContentObject (aBC, aObj2);
   }
 
   @Test

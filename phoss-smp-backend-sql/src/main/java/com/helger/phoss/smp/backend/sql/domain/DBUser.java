@@ -18,7 +18,7 @@ package com.helger.phoss.smp.backend.sql.domain;
 
 import java.io.Serializable;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * Represents a single user within the SMP database.

@@ -16,12 +16,12 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-
+import com.helger.annotation.concurrent.Immutable;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 @Immutable
 public final class SMPMongoConfiguration

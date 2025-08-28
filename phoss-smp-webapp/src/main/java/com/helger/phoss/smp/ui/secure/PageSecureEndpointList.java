@@ -18,16 +18,11 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.attr.StringMap;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.compare.ESortOrder;
-import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SimpleURL;
+import com.helger.annotation.Nonempty;
+import com.helger.base.compare.ESortOrder;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -52,11 +47,16 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.typeconvert.collection.StringMap;
+import com.helger.url.ISimpleURL;
+import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * Class to manage endpoints that belong to a service group. To use this page at
- * least one service group must exist.
+ * Class to manage endpoints that belong to a service group. To use this page at least one service
+ * group must exist.
  *
  * @author Philip Helger
  */
@@ -104,7 +104,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     {
       final IParticipantIdentifier aParticipantID = aServiceInfo.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
-      final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope, aParticipantID.getURIEncoded ());
+      final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
 
       for (final ISMPProcess aProcess : aServiceInfo.getAllProcesses ())
       {

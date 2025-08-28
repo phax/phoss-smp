@@ -16,11 +16,8 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.state.ETriState;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.base.state.ETriState;
+import com.helger.base.tostring.ToStringGenerator;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.mongodb.PhotonSecurityManagerFactoryMongoDB;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
@@ -33,6 +30,9 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.

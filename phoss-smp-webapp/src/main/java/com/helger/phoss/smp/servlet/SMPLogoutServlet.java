@@ -18,16 +18,16 @@ package com.helger.phoss.smp.servlet;
 
 import java.util.EnumSet;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.http.EHttpMethod;
-import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SimpleURL;
+import com.helger.http.EHttpMethod;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.core.servlet.LogoutXServletHandler;
 import com.helger.servlet.StaticServerInfo;
+import com.helger.url.ISimpleURL;
+import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXServlet;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Handles the log-out of a user. Can be called with a user context and without.

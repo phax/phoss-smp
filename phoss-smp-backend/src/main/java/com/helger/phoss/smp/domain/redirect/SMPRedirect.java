@@ -12,21 +12,15 @@ package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.VisibleForTesting;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.string.ToStringGenerator;
-import com.helger.commons.type.ObjectType;
-import com.helger.commons.url.IURLProtocol;
-import com.helger.commons.url.URLHelper;
-import com.helger.commons.url.URLProtocolRegistry;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.style.VisibleForTesting;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.string.StringHelper;
+import com.helger.base.tostring.ToStringGenerator;
+import com.helger.base.type.ObjectType;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp2.doctype.BDXR2DocumentTypeIdentifier;
@@ -35,7 +29,13 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.security.certificate.CertificateHelper;
+import com.helger.url.codec.URLCoder;
+import com.helger.url.protocol.IURLProtocol;
+import com.helger.url.protocol.URLProtocolRegistry;
 import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Default implementation of the {@link ISMPRedirect} interface.
@@ -179,9 +179,9 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
           if (sOriginalPathPart.length () > 0)
           {
             // First decode, to ensure it is not double encoded
-            final String sDecoded = URLHelper.urlDecodeOrNull (sOriginalPathPart);
+            final String sDecoded = URLCoder.urlDecodeOrNull (sOriginalPathPart);
             // If decoding failed, assume it to be not encoded
-            final String sEncoded = URLHelper.urlEncode (sDecoded != null ? sDecoded : sOriginalPathPart);
+            final String sEncoded = URLCoder.urlEncode (sDecoded != null ? sDecoded : sOriginalPathPart);
             aSB.append (sEncoded).append ('/');
           }
       if (!bEndsWithSlash)

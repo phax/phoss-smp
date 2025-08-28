@@ -16,16 +16,13 @@
  */
 package com.helger.phoss.smp.rest;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.http.CHttp;
-import com.helger.commons.state.EHandled;
-import com.helger.commons.string.StringHelper;
+import com.helger.base.debug.GlobalDebug;
+import com.helger.base.state.EHandled;
+import com.helger.base.string.StringHelper;
+import com.helger.http.CHttp;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
@@ -39,6 +36,9 @@ import com.helger.photon.api.AbstractAPIExceptionMapper;
 import com.helger.photon.api.InvokableAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Special API exception mapper for the SMP REST API.

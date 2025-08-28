@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.businesscard;
 
-import javax.annotation.Nonnull;
+import com.helger.base.callback.ICallback;
 
-import com.helger.commons.callback.ICallback;
+import jakarta.annotation.Nonnull;
 
 /**
  * Callback interface for {@link ISMPBusinessCardManager} objects.

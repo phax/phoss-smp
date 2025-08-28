@@ -12,13 +12,13 @@ package com.helger.phoss.smp.config;
 
 import java.net.Proxy;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-
+import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettings;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class provides easy access to certain configuration properties using
@@ -42,8 +42,7 @@ public final class SMPHttpConfiguration
   }
 
   /**
-   * @return The proxy host to be used for "http" calls. May be
-   *         <code>null</code>.
+   * @return The proxy host to be used for "http" calls. May be <code>null</code>.
    * @see #getHttpsProxyHost()
    * @since 5.0.7
    */
@@ -64,8 +63,7 @@ public final class SMPHttpConfiguration
   }
 
   /**
-   * @return The proxy host to be used for "https" calls. May be
-   *         <code>null</code>.
+   * @return The proxy host to be used for "https" calls. May be <code>null</code>.
    * @see #getHttpProxyHost()
    * @since 5.0.7
    */
@@ -86,8 +84,8 @@ public final class SMPHttpConfiguration
   }
 
   /**
-   * @return The username for proxy calls. Valid for https and https proxy. May
-   *         be <code>null</code>.
+   * @return The username for proxy calls. Valid for https and https proxy. May be
+   *         <code>null</code>.
    * @since 5.0.7
    */
   @Nullable
@@ -97,8 +95,8 @@ public final class SMPHttpConfiguration
   }
 
   /**
-   * @return The password for proxy calls. Valid for https and https proxy. May
-   *         be <code>null</code>.
+   * @return The password for proxy calls. Valid for https and https proxy. May be
+   *         <code>null</code>.
    * @since 5.0.7
    */
   @Nullable
@@ -108,8 +106,7 @@ public final class SMPHttpConfiguration
   }
 
   /**
-   * @return A single object for all http (but not https) proxy settings. May be
-   *         <code>null</code>.
+   * @return A single object for all http (but not https) proxy settings. May be <code>null</code>.
    * @see #getAsHttpsProxySettings()
    * @since 5.0.7
    */
@@ -124,8 +121,7 @@ public final class SMPHttpConfiguration
   }
 
   /**
-   * @return A single object for all https (but not http) proxy settings. May be
-   *         <code>null</code>.
+   * @return A single object for all https (but not http) proxy settings. May be <code>null</code>.
    * @see #getAsHttpProxySettings()
    * @since 5.0.7
    */

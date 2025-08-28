@@ -21,23 +21,19 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.state.ESuccess;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.type.ObjectType;
-import com.helger.commons.typeconvert.TypeConverter;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.state.ESuccess;
+import com.helger.base.string.StringHelper;
+import com.helger.base.type.ObjectType;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.backend.mongodb.MongoClientProvider;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.photon.audit.AuditItem;
@@ -47,11 +43,14 @@ import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditor;
 import com.helger.security.authentication.subject.user.CUserID;
 import com.helger.security.authentication.subject.user.ICurrentUserIDProvider;
+import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.MongoCollection;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * A special implementation of {@link IAuditor} writing data to a MongoDB
- * collection
+ * A special implementation of {@link IAuditor} writing data to a MongoDB collection
  *
  * @author Philip Helger
  */
@@ -72,8 +71,7 @@ public class AuditorMongoDB implements IAuditor
   private final ICurrentUserIDProvider m_aCurrentUserIDProvider;
 
   /**
-   * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the
-   * collection name.
+   * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the collection name.
    *
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
@@ -147,9 +145,9 @@ public class AuditorMongoDB implements IAuditor
   {
     final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (),
                                                      CUserID.USER_ID_GUEST);
-    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName ()
-                                                                                                : sAction,
-                                                                      aArgs);
+    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType
+                                                                                                                   .getName ()
+                                                                                                : sAction, aArgs);
     final IAuditItem aAuditItem = new AuditItem (sUserID, eActionType, eSuccess, sFullAction);
 
     if (MongoClientSingleton.isDBWritable ())

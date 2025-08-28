@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.smlhook;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
+import com.helger.annotation.concurrent.Immutable;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This class provides the {@link IRegistrationHook} instance that matches the

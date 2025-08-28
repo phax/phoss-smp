@@ -24,18 +24,16 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTFromString;
-import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.state.EValidity;
-import com.helger.commons.state.IValidityIndicator;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.state.EValidity;
+import com.helger.base.state.IValidityIndicator;
+import com.helger.base.string.StringHelper;
+import com.helger.datetime.format.PDTFromString;
+import com.helger.datetime.format.PDTToString;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
@@ -56,6 +54,8 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
+
+import jakarta.annotation.Nonnull;
 
 public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 {

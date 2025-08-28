@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.migration;
 
-import javax.annotation.concurrent.Immutable;
+import com.helger.annotation.concurrent.Immutable;
 
 /**
  * This class contains global SMP server migration IDs.

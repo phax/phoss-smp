@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.exchange;
 
-import javax.annotation.Nonnull;
+import com.helger.annotation.Nonempty;
+import com.helger.base.id.IHasID;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.id.IHasID;
+import jakarta.annotation.Nonnull;
 
 /**
  * Defines the potential actions, listed in the import summary

@@ -12,14 +12,14 @@ package com.helger.phoss.smp;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.io.resource.ClassPathResource;
-import com.helger.commons.locale.LocaleCache;
+import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.exception.InitializationException;
+import com.helger.io.resource.ClassPathResource;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
+import com.helger.text.locale.LocaleCache;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This class contains global SMP server constants.
@@ -36,8 +36,7 @@ public final class CSMPServer
 
   /**
    * The default time zone is (for historical reasons) UTC, but
-   * https://github.com/phax/phoss-smp/issues/167 asked to make this
-   * customizable
+   * https://github.com/phax/phoss-smp/issues/167 asked to make this customizable
    */
   public static final String DEFAULT_TIMEZONE = "UTC";
 
@@ -65,8 +64,8 @@ public final class CSMPServer
   {}
 
   /**
-   * @return The version number of the SMP server read from the internal
-   *         properties file. Never <code>null</code>.
+   * @return The version number of the SMP server read from the internal properties file. Never
+   *         <code>null</code>.
    */
   @Nonnull
   public static String getVersionNumber ()
@@ -75,8 +74,8 @@ public final class CSMPServer
   }
 
   /**
-   * @return The build timestamp of the SMP server read from the internal
-   *         properties file. Never <code>null</code>.
+   * @return The build timestamp of the SMP server read from the internal properties file. Never
+   *         <code>null</code>.
    */
   @Nonnull
   public static String getBuildTimestamp ()

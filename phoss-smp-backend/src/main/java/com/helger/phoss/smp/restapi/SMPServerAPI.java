@@ -12,19 +12,14 @@ package com.helger.phoss.smp.restapi;
 
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.state.EChange;
-import com.helger.commons.state.ESuccess;
-import com.helger.commons.statistics.IMutableStatisticsHandlerKeyedCounter;
-import com.helger.commons.statistics.IStatisticsHandlerKeyedCounter;
-import com.helger.commons.statistics.StatisticsManager;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.state.EChange;
+import com.helger.base.state.ESuccess;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -48,6 +43,9 @@ import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.photon.security.user.IUser;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
+import com.helger.statistics.api.IMutableStatisticsHandlerKeyedCounter;
+import com.helger.statistics.api.IStatisticsHandlerKeyedCounter;
+import com.helger.statistics.impl.StatisticsManager;
 import com.helger.xsds.peppol.smp1.CompleteServiceGroupType;
 import com.helger.xsds.peppol.smp1.EndpointType;
 import com.helger.xsds.peppol.smp1.ProcessListType;
@@ -60,6 +58,8 @@ import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 import com.helger.xsds.peppol.smp1.SignedServiceMetadataType;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This class implements all the service methods, that must be provided by the Peppol REST service.

@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.callback.ICallback;
+import com.helger.base.callback.ICallback;
 import com.helger.peppolid.IParticipantIdentifier;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Interface for an SMP service group callback.

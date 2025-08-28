@@ -12,10 +12,7 @@ package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -27,6 +24,9 @@ import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPRedirect} from and to XML.
@@ -49,17 +49,17 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUPD_ID, aValue.getServiceGroupID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
-                                                                    sNamespaceURI,
-                                                                    ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
+    aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
+                                                                 sNamespaceURI,
+                                                                 ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
     aElement.setAttribute (ATTR_TARGET_HREF, aValue.getTargetHref ());
-    aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE_SUID).appendText (aValue.getSubjectUniqueIdentifier ());
+    aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE_SUID).addText (aValue.getSubjectUniqueIdentifier ());
     if (aValue.hasCertificate ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE)
-              .appendText (CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
+      aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE)
+              .addText (CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
-              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_EXTENSION)
+              .addText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

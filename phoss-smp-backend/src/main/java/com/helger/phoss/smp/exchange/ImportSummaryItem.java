@@ -10,8 +10,8 @@
  */
 package com.helger.phoss.smp.exchange;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.Nonnegative;
+import com.helger.annotation.concurrent.NotThreadSafe;
 
 /**
  * A single item for the Import summary

@@ -13,19 +13,19 @@ package com.helger.phoss.smp.security;
 import java.security.KeyStore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.exception.InitializationException;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.exception.InitializationException;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKeyStore;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class holds the global trust store.
@@ -80,7 +80,7 @@ public final class SMPTrustManager extends AbstractGlobalSingleton
   /**
    * @deprecated Only called via reflection
    */
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   public SMPTrustManager ()
   {

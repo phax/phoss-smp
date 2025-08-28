@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.servlet;
 
-import com.helger.commons.http.EHttpMethod;
+import com.helger.http.EHttpMethod;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.core.interror.InternalErrorBuilder;

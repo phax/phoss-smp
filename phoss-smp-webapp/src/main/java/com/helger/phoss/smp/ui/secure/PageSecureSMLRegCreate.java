@@ -22,16 +22,15 @@ import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.text.util.TextHelper;
-import com.helger.commons.url.URLHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
+import com.helger.base.text.TextFormatter;
+import com.helger.base.url.URLHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
@@ -50,6 +49,8 @@ import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+
+import jakarta.annotation.Nonnull;
 
 public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
 {
@@ -215,8 +216,8 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                    .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
                                                                                            sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. http://smp.example.org"))
-                                                   .setHelpText (TextHelper.getFormattedText (HELPTEXT_LOGICAL_ADDRESS,
-                                                                                              sDefaultLogicalAddress))
+                                                   .setHelpText (TextFormatter.getFormattedText (HELPTEXT_LOGICAL_ADDRESS,
+                                                                                                 sDefaultLogicalAddress))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_LOGICAL_ADDRESS)));
 
       final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));

@@ -19,27 +19,22 @@ package com.helger.phoss.smp.ui.secure;
 import java.time.LocalDate;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.WorkInProgress;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.compare.CompareHelper;
-import com.helger.commons.compare.ESortOrder;
-import com.helger.commons.datetime.PDTFromString;
-import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.id.factory.GlobalIDFactory;
-import com.helger.commons.locale.country.CountryCache;
-import com.helger.commons.regex.RegExHelper;
-import com.helger.commons.state.ESuccess;
-import com.helger.commons.state.EValidity;
-import com.helger.commons.state.IValidityIndicator;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.URLValidator;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.WorkInProgress;
+import com.helger.base.compare.CompareHelper;
+import com.helger.base.compare.ESortOrder;
+import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.base.state.ESuccess;
+import com.helger.base.state.EValidity;
+import com.helger.base.state.IValidityIndicator;
+import com.helger.base.string.StringHelper;
+import com.helger.base.string.StringImplode;
+import com.helger.cache.regex.RegExHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
+import com.helger.datetime.format.PDTFromString;
+import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.ext.HCExtHelper;
@@ -118,7 +113,13 @@ import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.servlet.request.IRequestParamMap;
 import com.helger.servlet.request.RequestParamMap;
 import com.helger.smtp.util.EmailAddressValidator;
+import com.helger.text.locale.country.CountryCache;
+import com.helger.url.ISimpleURL;
+import com.helger.url.validate.URLValidator;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 @WorkInProgress
 public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBusinessCard>
@@ -724,7 +725,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sIdentifierID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
-                                                                                    Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                                                       Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
@@ -775,7 +776,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sContactID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
-                                                                                 Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                                                    Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
@@ -859,7 +860,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final String sEntityID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
-                                                                                Integer.toString (GlobalIDFactory.getNewIntID ());
+                                                                                   Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final BootstrapCard aPanel = new BootstrapCard ().setID (sEntityID);
     aPanel.createAndAddHeader ().addChild ("Business Entity");
@@ -956,8 +957,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                  .setCtrl (new HCTextArea (new RequestField (sFieldWebsiteURIs,
                                                                                              aExistingEntity == null
                                                                                                                      ? null
-                                                                                                                     : StringHelper.getImploded ('\n',
-                                                                                                                                                 aExistingEntity.websiteURIs ()))))
+                                                                                                                     : StringImplode.imploder ()
+                                                                                                                                    .source (aExistingEntity.websiteURIs ())
+                                                                                                                                    .separator ('\n')
+                                                                                                                                    .build ())))
                                                  .setHelpText ("Put each Website URI in a separate line")
                                                  .setErrorList (aFormErrors.getListOfField (sFieldWebsiteURIs)));
 

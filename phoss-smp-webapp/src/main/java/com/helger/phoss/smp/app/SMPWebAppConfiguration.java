@@ -18,18 +18,18 @@ package com.helger.phoss.smp.app;
 
 import java.net.URL;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.ISimpleURL;
-import com.helger.commons.url.SimpleURL;
-import com.helger.commons.url.URLHelper;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.debug.GlobalDebug;
+import com.helger.base.string.StringHelper;
+import com.helger.base.url.URLHelper;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
+import com.helger.url.ISimpleURL;
+import com.helger.url.SimpleURL;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class provides access to the web application settings.
@@ -44,7 +44,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   /**
    * @deprecated Only called via reflection
    */
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   private SMPWebAppConfiguration ()
   {}

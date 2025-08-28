@@ -28,26 +28,23 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.collection.impl.CommonsLinkedHashMap;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTToString;
-import com.helger.commons.datetime.XMLOffsetDateTime;
-import com.helger.commons.debug.GlobalDebug;
-import com.helger.commons.lang.ClassHelper;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.SimpleURL;
-import com.helger.commons.url.URLHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.base.debug.GlobalDebug;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.lang.clazz.ClassHelper;
+import com.helger.base.string.StringHelper;
+import com.helger.base.url.URLHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsLinkedHashMap;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
+import com.helger.datetime.format.PDTToString;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -81,6 +78,9 @@ import com.helger.security.certificate.CertificateHelper;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
+import com.helger.url.SimpleURL;
+
+import jakarta.annotation.Nonnull;
 
 public class PageSecureTasksProblems extends AbstractSMPWebPage
 {
@@ -288,7 +288,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     boolean bHasError = false;
     try
     {
-      for (final String sAlias : CollectionHelper.newList (aTrustStore.aliases ()))
+      for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
       {
         final Certificate aCert = aTrustStore.getCertificate (sAlias);
         if (aCert instanceof X509Certificate)

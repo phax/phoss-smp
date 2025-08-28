@@ -19,15 +19,13 @@ package com.helger.phoss.smp.sql.status;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.collection.impl.CommonsLinkedHashMap;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.collection.commons.CommonsLinkedHashMap;
+import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.db.api.jdbc.JDBCHelper;
 import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
@@ -35,6 +33,8 @@ import com.helger.db.jdbc.executor.DBNoConnectionException;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * SQL specific status item provider.

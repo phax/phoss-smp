@@ -16,10 +16,8 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.annotation.Nonempty;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.util.PDTIOHelper;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -39,6 +37,8 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Class to export service groups with all contents

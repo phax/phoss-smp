@@ -12,17 +12,17 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.time.LocalDateTime;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.ContainsSoftMigration;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.datetime.XMLOffsetDateTime;
-import com.helger.commons.string.StringParser;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.ContainsSoftMigration;
+import com.helger.base.string.StringParser;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPEndpoint} from and to XML.
@@ -60,16 +60,16 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     if (aValue.hasServiceExpirationDateTime ())
       aElement.setAttributeWithConversion (ATTR_SERVICE_EXPIRATION_DATE, aValue.getServiceExpirationDateTime ());
     if (aValue.hasCertificate ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_CERTIFICATE).appendText (aValue.getCertificate ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE).addText (aValue.getCertificate ());
     if (aValue.hasServiceDescription ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_SERVICE_DESCRIPTION).appendText (aValue.getServiceDescription ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_SERVICE_DESCRIPTION).addText (aValue.getServiceDescription ());
     if (aValue.hasTechnicalContactUrl ())
       aElement.setAttribute (ATTR_TECHNICAL_CONTACT_URL, aValue.getTechnicalContactUrl ());
     if (aValue.hasTechnicalInformationUrl ())
       aElement.setAttribute (ATTR_TECHNICAL_INFORMATION_URL, aValue.getTechnicalInformationUrl ());
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
-              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_EXTENSION)
+              .addText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

@@ -21,30 +21,28 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsTreeMap;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.PDTWebDateHelper;
-import com.helger.commons.io.stream.StreamHelper;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.mime.MimeType;
-import com.helger.commons.mutable.MutableInt;
-import com.helger.commons.timing.StopWatch;
+import com.helger.annotation.Nonempty;
+import com.helger.base.io.stream.StreamHelper;
+import com.helger.base.numeric.mutable.MutableInt;
+import com.helger.base.timing.StopWatch;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsTreeMap;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.web.PDTWebDateHelper;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
+import com.helger.mime.CMimeType;
+import com.helger.mime.MimeType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -71,6 +69,8 @@ import com.helger.xml.microdom.serialize.MicroWriter;
 import com.helger.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * REST API to import Service Groups from XML v1
  *
@@ -91,7 +91,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -185,11 +185,11 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     {
       // Create XML version
       final IMicroDocument aResponseDoc = new MicroDocument ();
-      final IMicroElement eRoot = aResponseDoc.appendElement ("importResult");
+      final IMicroElement eRoot = aResponseDoc.addElement ("importResult");
       eRoot.setAttribute ("version", "1");
       eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
 
-      final IMicroElement eSettings = eRoot.appendElement ("settings");
+      final IMicroElement eSettings = eRoot.addElement ("settings");
       eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
       eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
       eSettings.setAttribute ("defaultOwnerLoginName", aDefaultOwner.getLoginName ());
@@ -197,15 +197,15 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       final ICommonsMap <String, MutableInt> aErrorLevelCount = new CommonsTreeMap <> ();
       for (final ImportActionItem aAction : aActionList)
       {
-        eRoot.appendChild (aAction.getAsMicroElement ("action"));
+        eRoot.addChild (aAction.getAsMicroElement ("action"));
         aErrorLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
       }
 
       {
-        final IMicroElement eSummary = eRoot.appendElement ("summary");
+        final IMicroElement eSummary = eRoot.addElement ("summary");
         eSummary.setAttribute ("durationMillis", aSW.getMillis ());
         for (final Map.Entry <String, MutableInt> aEntry : aErrorLevelCount.entrySet ())
-          eSummary.appendElement ("errorlevel")
+          eSummary.addElement ("errorlevel")
                   .setAttribute ("id", aEntry.getKey ())
                   .setAttribute ("count", aEntry.getValue ().intValue ());
 
@@ -223,10 +223,10 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       final IJsonObject aJson = new JsonObject ();
       aJson.add ("version", "1");
       aJson.add ("importStartDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
-      aJson.addJson ("settings",
-                     new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
-                                      .add ("defaultOwnerID", aDefaultOwner.getID ())
-                                      .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
+      aJson.add ("settings",
+                 new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
+                                  .add ("defaultOwnerID", aDefaultOwner.getID ())
+                                  .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
       final IJsonArray aActions = new JsonArray ();
       final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
       for (final ImportActionItem aAction : aActionList)
@@ -234,7 +234,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
         aActions.add (aAction.getAsJsonObject ());
         aLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
       }
-      aJson.addJson ("actions", aActions);
+      aJson.add ("actions", aActions);
 
       {
         final IJsonObject aSummary = new JsonObject ();
@@ -242,11 +242,11 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
         final IJsonArray aLevels = new JsonArray ();
         for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
           aLevels.add (new JsonObject ().add ("id", aEntry.getKey ()).add ("count", aEntry.getValue ().intValue ()));
-        aSummary.addJson ("errorlevels", aLevels);
+        aSummary.add ("errorlevels", aLevels);
 
         aImportSummary.appendTo (aSummary);
 
-        aJson.addJson ("summary", aSummary);
+        aJson.add ("summary", aSummary);
       }
 
       final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);

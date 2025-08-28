@@ -16,11 +16,11 @@
  */
 package com.helger.phoss.smp.ui.ajax;
 
-import javax.annotation.Nonnull;
-
 import com.helger.photon.core.ajax.executor.AbstractAjaxExecutorWithContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Base class for AJAX executors

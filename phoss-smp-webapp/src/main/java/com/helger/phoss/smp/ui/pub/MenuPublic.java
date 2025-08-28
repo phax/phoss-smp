@@ -16,10 +16,10 @@
  */
 package com.helger.phoss.smp.ui.pub;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
+import com.helger.annotation.concurrent.Immutable;
 import com.helger.photon.core.menu.IMenuTree;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This class contains the menu structure for the public application.

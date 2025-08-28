@@ -16,19 +16,19 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
-import javax.annotation.Nonnull;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.io.stream.StreamHelper;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.io.stream.StreamHelper;
+import com.helger.base.string.StringHelper;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 import com.mongodb.client.MongoCollection;
+
+import jakarta.annotation.Nonnull;
 
 public class MongoClientSingleton extends AbstractGlobalWebSingleton
 {

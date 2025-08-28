@@ -16,17 +16,14 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.OverridingMethodsMustInvokeSuper;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -34,6 +31,9 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.mongodb.client.MongoCollection;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Abstract base class for MongoDB backends
@@ -62,8 +62,8 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {}
 
   /**
-   * @return The name of the collection as provided in the constructor. Neither
-   *         <code>null</code> nor empty.
+   * @return The name of the collection as provided in the constructor. Neither <code>null</code>
+   *         nor empty.
    */
   @Nonnull
   @Nonempty

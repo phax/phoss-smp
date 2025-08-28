@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.smlhook;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
+import com.helger.annotation.concurrent.Immutable;
 import com.helger.peppolid.IParticipantIdentifier;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * An implementation of {@link IRegistrationHook} that does nothing.

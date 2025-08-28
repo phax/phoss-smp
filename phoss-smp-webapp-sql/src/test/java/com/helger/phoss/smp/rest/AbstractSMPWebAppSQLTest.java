@@ -16,9 +16,9 @@
  */
 package com.helger.phoss.smp.rest;
 
-import com.helger.commons.io.resource.FileSystemResource;
-import com.helger.commons.io.resource.IReadableResource;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.io.resource.FileSystemResource;
+import com.helger.io.resource.IReadableResource;
 import com.helger.photon.security.CSecurity;
 
 abstract class AbstractSMPWebAppSQLTest

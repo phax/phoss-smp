@@ -12,29 +12,28 @@ package com.helger.phoss.smp.backend;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.collection.impl.CommonsLinkedHashMap;
-import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.concurrent.SimpleReadWriteLock;
-import com.helger.commons.lang.ServiceLoaderHelper;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.concurrent.SimpleReadWriteLock;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.spi.ServiceLoaderHelper;
+import com.helger.base.string.StringHelper;
+import com.helger.base.tostring.ToStringGenerator;
+import com.helger.collection.commons.CommonsLinkedHashMap;
+import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * This class contains all registered SMP backends with an ID and an
- * {@link ISMPManagerProvider} factory to be used. The registration of the
- * respective backends happens via the SPI interface
+ * This class contains all registered SMP backends with an ID and an {@link ISMPManagerProvider}
+ * factory to be used. The registration of the respective backends happens via the SPI interface
  * {@link ISMPBackendRegistrarSPI}.
  *
  * @author Philip Helger
@@ -88,13 +87,12 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   }
 
   /**
-   * Find and instantiate the {@link ISMPManagerProvider} for the provided
-   * backend ID.
+   * Find and instantiate the {@link ISMPManagerProvider} for the provided backend ID.
    *
    * @param sBackendID
    *        The backend ID to be searched. May be <code>null</code> or empty.
-   * @return <code>null</code> if no manager provider for the provided ID is
-   *         present or if the factory created a <code>null</code> instance.
+   * @return <code>null</code> if no manager provider for the provided ID is present or if the
+   *         factory created a <code>null</code> instance.
    */
   @Nullable
   public ISMPManagerProvider getManagerProvider (@Nullable final String sBackendID)
@@ -107,8 +105,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   }
 
   /**
-   * @return A set with all registered backend IDs. Never <code>null</code> but
-   *         maybe empty.
+   * @return A set with all registered backend IDs. Never <code>null</code> but maybe empty.
    */
   @Nonnull
   @ReturnsMutableCopy
@@ -118,8 +115,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   }
 
   /**
-   * Remove all registered backends and re-read the information from the SPI
-   * providers.
+   * Remove all registered backends and re-read the information from the SPI providers.
    */
   public void reinitialize ()
   {

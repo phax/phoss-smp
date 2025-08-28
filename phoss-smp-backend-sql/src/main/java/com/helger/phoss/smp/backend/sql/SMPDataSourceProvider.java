@@ -20,13 +20,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.db.jdbc.IHasDataSource;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * The main data source provider, only instantiated from

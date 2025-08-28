@@ -10,20 +10,20 @@
  */
 package com.helger.phoss.smp.config;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-
 import org.apache.hc.core5.util.Timeout;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.mime.EMimeContentType;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.base.string.StringHelper;
 import com.helger.config.IConfig;
+import com.helger.mime.EMimeContentType;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.security.keystore.EKeyStoreType;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class provides easy access to certain configuration properties using
@@ -99,9 +99,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The backend to be used. Depends on the different possible
-   *         implementations. Should not be <code>null</code>. Property
-   *         <code>smp.backend</code>.
+   * @return The backend to be used. Depends on the different possible implementations. Should not
+   *         be <code>null</code>. Property <code>smp.backend</code>.
    * @see com.helger.phoss.smp.backend.SMPBackendRegistry
    */
   @Nullable
@@ -111,8 +110,7 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The type to the keystore. This is usually JKS. Property
-   *         <code>smp.keystore.type</code>.
+   * @return The type to the keystore. This is usually JKS. Property <code>smp.keystore.type</code>.
    * @since 5.0.4
    */
   @Nonnull
@@ -123,8 +121,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The path to the keystore. May be a classpath or an absolute file
-   *         path. Property <code>smp.keystore.path</code>.
+   * @return The path to the keystore. May be a classpath or an absolute file path. Property
+   *         <code>smp.keystore.path</code>.
    */
   @Nullable
   public static String getKeyStorePath ()
@@ -143,8 +141,7 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The alias of the SMP key in the keystore. Property
-   *         <code>smp.keystore.key.alias</code>.
+   * @return The alias of the SMP key in the keystore. Property <code>smp.keystore.key.alias</code>.
    */
   @Nullable
   public static String getKeyStoreKeyAlias ()
@@ -153,9 +150,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The password used to access the private key. May be different than
-   *         the password to the overall keystore. Property
-   *         <code>smp.keystore.key.password</code>.
+   * @return The password used to access the private key. May be different than the password to the
+   *         overall keystore. Property <code>smp.keystore.key.password</code>.
    */
   @Nullable
   public static char [] getKeyStoreKeyPassword ()
@@ -175,8 +171,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The path to the truststore. May be a classpath or an absolute file
-   *         path. Property <code>smp.truststore.path</code>.
+   * @return The path to the truststore. May be a classpath or an absolute file path. Property
+   *         <code>smp.truststore.path</code>.
    */
   @Nullable
   public static String getTrustStorePath ()
@@ -195,9 +191,9 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return <code>true</code> if all paths should be forced to the ROOT ("/")
-   *         context, <code>false</code> if the context should remain as it is.
-   *         Property <code>smp.forceroot</code>.
+   * @return <code>true</code> if all paths should be forced to the ROOT ("/") context,
+   *         <code>false</code> if the context should remain as it is. Property
+   *         <code>smp.forceroot</code>.
    */
   public static boolean isForceRoot ()
   {
@@ -205,9 +201,9 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The server URL that should be used to create absolute URLs inside
-   *         the application. This may be helpful when running on a proxied
-   *         Tomcat behind a web server. Property <code>smp.publicurl</code>.
+   * @return The server URL that should be used to create absolute URLs inside the application. This
+   *         may be helpful when running on a proxied Tomcat behind a web server. Property
+   *         <code>smp.publicurl</code>.
    */
   @Nullable
   public static String getPublicServerURL ()
@@ -216,8 +212,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The public server URL mode to use. This was introduced for issue
-   *         #131. May be <code>null</code>.
+   * @return The public server URL mode to use. This was introduced for issue #131. May be
+   *         <code>null</code>.
    * @since 5.2.4
    */
   @Nullable
@@ -227,9 +223,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The identifier types to be used. Never <code>null</code>. Defaults
-   *         to {@link ESMPIdentifierType#PEPPOL}. Property
-   *         <code>smp.identifiertype</code>.
+   * @return The identifier types to be used. Never <code>null</code>. Defaults to
+   *         {@link ESMPIdentifierType#PEPPOL}. Property <code>smp.identifiertype</code>.
    */
   @Nonnull
   public static ESMPIdentifierType getIdentifierType ()
@@ -250,8 +245,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return <code>true</code> if the exceptions in the REST API should be
-   *         logged, <code>false</code> if not. By default it is disabled.
+   * @return <code>true</code> if the exceptions in the REST API should be logged,
+   *         <code>false</code> if not. By default it is disabled.
    * @since 5.1.0
    */
   public static boolean isRESTLogExceptions ()
@@ -260,10 +255,9 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return <code>true</code> if in case of an exception in the REST API´,
-   *         payload text should be provided as test, <code>false</code> if not.
-   *         By default it is enabled. For security reasons it should be
-   *         disabled.
+   * @return <code>true</code> if in case of an exception in the REST API´, payload text should be
+   *         provided as test, <code>false</code> if not. By default it is enabled. For security
+   *         reasons it should be disabled.
    * @since 5.2.1
    */
   public static boolean isRESTPayloadOnError ()
@@ -272,9 +266,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return <code>true</code> if the remote query API (get endpoints and
-   *         business cards from other SMP server) is disabled. By default it is
-   *         disabled.
+   * @return <code>true</code> if the remote query API (get endpoints and business cards from other
+   *         SMP server) is disabled. By default it is disabled.
    * @since 5.3.0-RC2
    */
   public static boolean isRestRemoteQueryAPIDisabled ()
@@ -284,9 +277,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return <code>true</code> if the status servlet at
-   *         <code>/smp-status/</code> is enabled, <code>false</code> if it is
-   *         disabled. By default it is enabled.
+   * @return <code>true</code> if the status servlet at <code>/smp-status/</code> is enabled,
+   *         <code>false</code> if it is disabled. By default it is enabled.
    * @since 5.0.6
    */
   public static boolean isStatusEnabled ()
@@ -295,9 +287,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return <code>true</code> if the certificate not before and not after dates
-   *         should be listed in the status or not. Defaults to
-   *         <code>false</code>.
+   * @return <code>true</code> if the certificate not before and not after dates should be listed in
+   *         the status or not. Defaults to <code>false</code>.
    * @since 5.7.0
    */
   public static boolean isStatusShowCertificateDates ()
@@ -338,8 +329,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The SMP-ID to be used in the SML. Only relevant when SML connection
-   *         is active. Property <code>sml.smpid</code>.
+   * @return The SMP-ID to be used in the SML. Only relevant when SML connection is active. Property
+   *         <code>sml.smpid</code>.
    */
   @Nullable
   public static String getSMLSMPID ()
@@ -348,23 +339,9 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The default IP address to be used for the SML registration (in the
-   *         form <code>1.2.3.4</code>). May be <code>null</code> in which case
-   *         the name must be manually provided.
-   * @since 5.0.3
-   */
-  @Nullable
-  @Deprecated (forRemoval = true, since = "7.1.1")
-  public static String getSMLSMPIP ()
-  {
-    return _getConfig ().getAsString (KEY_SML_SMP_IP);
-  }
-
-  /**
-   * @return The default hostname to be used for the SML registration including
-   *         an "http://" prefix as in <code>http://smp.example.org</code>. May
-   *         be <code>null</code> in which case the name must be manually
-   *         provided.
+   * @return The default hostname to be used for the SML registration including an "http://" prefix
+   *         as in <code>http://smp.example.org</code>. May be <code>null</code> in which case the
+   *         name must be manually provided.
    * @since 5.0.3
    */
   @Nullable
@@ -379,9 +356,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The connection timeout in milliseconds used for connecting to the
-   *         SML server. May be <code>null</code> in which case the system
-   *         default timeout should be used.
+   * @return The connection timeout in milliseconds used for connecting to the SML server. May be
+   *         <code>null</code> in which case the system default timeout should be used.
    * @since 6.0.0
    */
   @Nullable
@@ -394,9 +370,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The request timeout used for connecting to the SML server. The
-   *         default is defined in {@link #DEFAULT_SML_REQUEST_TIMEOUT} since
-   *         5.1.1.
+   * @return The request timeout used for connecting to the SML server. The default is defined in
+   *         {@link #DEFAULT_SML_REQUEST_TIMEOUT} since 5.1.1.
    * @since 6.0.0
    */
   @Nonnull

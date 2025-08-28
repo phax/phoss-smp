@@ -12,13 +12,13 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import java.util.Comparator;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.MustImplementEqualsAndHashcode;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.id.IHasID;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.MustImplementEqualsAndHashcode;
+import com.helger.base.id.IHasID;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Base interface for a single SMP service group.

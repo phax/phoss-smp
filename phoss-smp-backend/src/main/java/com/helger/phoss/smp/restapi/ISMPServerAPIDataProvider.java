@@ -12,10 +12,10 @@ package com.helger.phoss.smp.restapi;
 
 import java.net.URI;
 
-import javax.annotation.Nonnull;
-
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * This interface must be implemented by all real SMP implementations, so that

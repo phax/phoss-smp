@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import javax.annotation.concurrent.Immutable;
+import com.helger.annotation.concurrent.Immutable;
 
 /**
  * This class defines the menu item constants for the secure application

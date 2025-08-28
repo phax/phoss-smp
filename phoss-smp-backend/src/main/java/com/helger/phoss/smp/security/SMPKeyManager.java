@@ -18,8 +18,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -47,11 +45,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.ws.TrustManagerTrustAll;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.exception.InitializationException;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.http.security.TrustManagerTrustAll;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
@@ -59,6 +57,9 @@ import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class holds the private key for signing and the certificate for checking.
@@ -128,7 +129,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   /**
    * @deprecated Only called via reflection
    */
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   public SMPKeyManager ()
   {

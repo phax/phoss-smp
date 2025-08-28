@@ -16,10 +16,10 @@
  */
 package com.helger.phoss.smp.status;
 
-import javax.annotation.Nullable;
+import com.helger.annotation.style.IsSPIInterface;
+import com.helger.collection.commons.ICommonsOrderedMap;
 
-import com.helger.commons.annotation.IsSPIInterface;
-import com.helger.commons.collection.impl.ICommonsOrderedMap;
+import jakarta.annotation.Nullable;
 
 /**
  * An SPI interface to be implemented by the real backends to add additional,

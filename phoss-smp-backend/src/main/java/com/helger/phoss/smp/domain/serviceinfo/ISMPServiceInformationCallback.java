@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import javax.annotation.Nonnull;
+import com.helger.base.callback.ICallback;
 
-import com.helger.commons.callback.ICallback;
+import jakarta.annotation.Nonnull;
 
 /**
  * Interface for an SMP service information callback.

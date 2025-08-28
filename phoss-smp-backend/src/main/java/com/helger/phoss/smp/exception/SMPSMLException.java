@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * This exception is thrown if an error occurred communicating with the SML

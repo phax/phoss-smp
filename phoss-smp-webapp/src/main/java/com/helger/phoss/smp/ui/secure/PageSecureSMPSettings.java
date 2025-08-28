@@ -18,12 +18,9 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.url.URLHelper;
-import com.helger.commons.url.URLValidator;
+import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
+import com.helger.base.url.URLHelper;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -48,6 +45,9 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.uicore.page.EWebPageSimpleFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.url.validate.URLValidator;
+
+import jakarta.annotation.Nonnull;
 
 public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <ISMPSettings>
 {

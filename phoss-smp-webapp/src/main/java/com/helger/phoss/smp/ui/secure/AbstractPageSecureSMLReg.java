@@ -16,10 +16,9 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import javax.annotation.Nonnull;
 import javax.net.ssl.SSLSocketFactory;
 
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
@@ -27,6 +26,8 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+
+import jakarta.annotation.Nonnull;
 
 public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
 {

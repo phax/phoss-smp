@@ -19,9 +19,7 @@ package com.helger.phoss.smp.ui;
 import java.util.Locale;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.string.StringHelper;
+import com.helger.base.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.metadata.HCHead;
 import com.helger.html.hc.html.root.HCHtml;
@@ -35,6 +33,8 @@ import com.helger.photon.core.interror.InternalErrorBuilder;
 import com.helger.photon.core.menu.IMenuItemPage;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.forcedredirect.ForcedRedirectException;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Main class for creating HTML output

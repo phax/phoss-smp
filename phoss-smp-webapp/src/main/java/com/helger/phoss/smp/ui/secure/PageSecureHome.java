@@ -19,9 +19,7 @@ package com.helger.phoss.smp.ui.secure;
 import java.util.Locale;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
+import com.helger.annotation.Nonempty;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
@@ -37,6 +35,8 @@ import com.helger.photon.uicore.page.system.BasePageShowChildren.ShowChildrenCal
 import com.helger.photon.uicore.page.system.BasePageShowChildrenRenderer;
 import com.helger.tree.util.TreeVisitor;
 import com.helger.tree.withid.DefaultTreeItemWithID;
+
+import jakarta.annotation.Nonnull;
 
 public class PageSecureHome extends AbstractSMPWebPage
 {

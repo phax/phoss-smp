@@ -12,17 +12,17 @@ package com.helger.phoss.smp.exchange;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.collection.impl.CommonsEnumMap;
-import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.collection.commons.CommonsEnumMap;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.xml.microdom.IMicroElement;
+
+import jakarta.annotation.Nonnull;
 
 @NotThreadSafe
 public final class ImportSummary
@@ -61,7 +61,7 @@ public final class ImportSummary
   {
     ValueEnforcer.notNull (aElement, "Element");
     for (final Map.Entry <EImportSummaryAction, ImportSummaryItem> eItem : m_aMap.entrySet ())
-      aElement.appendElement ("action")
+      aElement.addElement ("action")
               .setAttribute ("id", eItem.getKey ().getID ())
               .setAttribute ("success", eItem.getValue ().getSuccessCount ())
               .setAttribute ("error", eItem.getValue ().getErrorCount ());
@@ -75,6 +75,6 @@ public final class ImportSummary
       aActions.add (new JsonObject ().add ("id", eItem.getKey ().getID ())
                                      .add ("success", eItem.getValue ().getSuccessCount ())
                                      .add ("error", eItem.getValue ().getErrorCount ()));
-    aJson.addJson ("actions", aActions);
+    aJson.add ("actions", aActions);
   }
 }

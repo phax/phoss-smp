@@ -10,16 +10,13 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.state.EChange;
-import com.helger.commons.string.ToStringGenerator;
-import com.helger.commons.type.ObjectType;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.state.EChange;
+import com.helger.base.tostring.ToStringGenerator;
+import com.helger.base.type.ObjectType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
@@ -27,6 +24,9 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This class represents a single service group.
@@ -45,9 +45,8 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   private final IParticipantIdentifier m_aParticipantIdentifier;
 
   /**
-   * Create a unified participant identifier with a lower cased value, because
-   * according to the Peppol policy for identifiers, the values must be treated
-   * case-sensitive.
+   * Create a unified participant identifier with a lower cased value, because according to the
+   * Peppol policy for identifiers, the values must be treated case-sensitive.
    *
    * @param aParticipantIdentifier
    *        The original participant identifier. May not be <code>null</code>.

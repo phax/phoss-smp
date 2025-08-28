@@ -16,14 +16,14 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
-
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.io.stream.StreamHelper;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.io.stream.StreamHelper;
+import com.helger.base.string.StringImplode;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * DataSource provider singleton
@@ -41,18 +41,17 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     DB_TYPE = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
     if (DB_TYPE == null)
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
-                                       StringHelper.imploder ()
-                                                   .source (EDatabaseType.values (), EDatabaseType::getID)
-                                                   .separator (", ")
-                                                   .build () +
+                                       StringImplode.imploder ()
+                                                    .source (EDatabaseType.values (), EDatabaseType::getID)
+                                                    .separator (", ")
+                                                    .build () +
                                        " - provided value is '" +
                                        sDBType +
                                        "'");
   }
 
   /**
-   * @return The database system determined from the configuration file. Never
-   *         <code>null</code>.
+   * @return The database system determined from the configuration file. Never <code>null</code>.
    */
   @Nonnull
   public static EDatabaseType getDatabaseType ()
@@ -65,7 +64,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   /**
    * @deprecated Only called via reflection
    */
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   public SMPDataSourceSingleton ()
   {}
@@ -84,8 +83,8 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   }
 
   /**
-   * @return The singleton DataSource provider to use. Uses the configuration
-   *         file to determine the settings.
+   * @return The singleton DataSource provider to use. Uses the configuration file to determine the
+   *         settings.
    */
   @Nonnull
   public SMPDataSourceProvider getDataSourceProvider ()

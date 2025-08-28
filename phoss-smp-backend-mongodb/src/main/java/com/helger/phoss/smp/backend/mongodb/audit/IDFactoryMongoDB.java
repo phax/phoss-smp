@@ -18,20 +18,20 @@ package com.helger.phoss.smp.backend.mongodb.audit;
 
 import java.util.Date;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.id.factory.AbstractPersistingLongIDFactory;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.id.factory.AbstractPersistingLongIDFactory;
+import com.helger.base.tostring.ToStringGenerator;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.mongodb.client.MongoCollection;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Implementation of a long ID factory using MongoDB

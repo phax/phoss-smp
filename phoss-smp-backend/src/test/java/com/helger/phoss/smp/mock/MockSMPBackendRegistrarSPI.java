@@ -10,12 +10,12 @@
  */
 package com.helger.phoss.smp.mock;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.IsSPIImplementation;
-import com.helger.commons.factory.FactoryNewInstance;
+import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.base.lang.clazz.FactoryNewInstance;
 import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
 import com.helger.phoss.smp.backend.ISMPBackendRegistry;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Register the mock backend to the global SMP backend registry.

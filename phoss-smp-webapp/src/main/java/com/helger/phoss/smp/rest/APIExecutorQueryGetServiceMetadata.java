@@ -21,28 +21,25 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.CGlobal;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.base64.Base64;
-import com.helger.commons.datetime.OffsetDate;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.datetime.XMLOffsetDate;
-import com.helger.commons.http.CHttp;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.timing.StopWatch;
+import com.helger.annotation.Nonempty;
+import com.helger.base.CGlobal;
+import com.helger.base.codec.base64.Base64;
+import com.helger.base.string.StringHelper;
+import com.helger.base.timing.StopWatch;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.rt.OffsetDate;
+import com.helger.datetime.xml.XMLOffsetDate;
+import com.helger.http.CHttp;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.json.serialize.JsonWriter;
 import com.helger.json.serialize.JsonWriterSettings;
+import com.helger.mime.CMimeType;
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -61,6 +58,9 @@ import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xsds.bdxr.smp2.ac.CertificateType;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExecutorQuery
 {
@@ -97,7 +97,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       SMPJsonResponse.convertCertificate (aJsonCert, Base64.encodeBytes (aCert.getContentBinaryObjectValue ()));
       aJsonCerts.add (aJsonCert);
     }
-    ret.addJson ("certificates", aJsonCerts);
+    ret.add ("certificates", aJsonCerts);
 
     final SMPExtensionList aExts = SMPExtensionList.ofBDXR2 (aEndpoint.getSMPExtensions ());
     if (aExts != null)
@@ -115,7 +115,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sPathServiceGroupID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the remote query API disabled?
     if (SMPServerConfiguration.isRestRemoteQueryAPIDisabled ())

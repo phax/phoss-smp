@@ -16,15 +16,15 @@
  */
 package com.helger.phoss.smp.ui.ajax;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.state.ETriState;
+import com.helger.base.state.ETriState;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Mark the "Backend connection established" status as "undefined"

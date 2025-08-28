@@ -10,14 +10,14 @@
  */
 package com.helger.phoss.smp.mock;
 
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.UnsupportedOperation;
-import com.helger.commons.callback.CallbackList;
-import com.helger.commons.state.EChange;
+import com.helger.annotation.style.UnsupportedOperation;
+import com.helger.base.callback.CallbackList;
+import com.helger.base.state.EChange;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
+
+import jakarta.annotation.Nullable;
 
 /**
  * Mock implementation of {@link ISMPSettingsManager}.

@@ -19,26 +19,26 @@ package com.helger.phoss.smp.mock;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.io.resource.IReadableResource;
-import com.helger.commons.lang.ClassPathHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.lang.ClassPathHelper;
 import com.helger.config.ConfigFactory;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.config.source.EConfigSourceType;
 import com.helger.config.source.MultiConfigurationValueProvider;
-import com.helger.config.source.res.ConfigurationSourceProperties;
+import com.helger.config.source.resource.properties.ConfigurationSourceProperties;
+import com.helger.io.resource.IReadableResource;
 import com.helger.peppol.sml.ESML;
 import com.helger.phoss.smp.config.SMPConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 public class SMPServerRESTTestRule extends ExternalResource
 {

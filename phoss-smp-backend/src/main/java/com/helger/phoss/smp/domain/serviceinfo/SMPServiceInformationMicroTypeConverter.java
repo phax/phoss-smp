@@ -10,12 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.annotation.Nonempty;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -27,9 +24,11 @@ import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * This class is internally used to convert {@link SMPServiceInformation} from
- * and to XML.
+ * This class is internally used to convert {@link SMPServiceInformation} from and to XML.
  *
  * @author Philip Helger
  */
@@ -47,14 +46,14 @@ public final class SMPServiceInformationMicroTypeConverter implements IMicroType
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getServiceGroupID ());
-    aElement.appendChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
-                                                                    sNamespaceURI,
-                                                                    ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
+    aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getDocumentTypeIdentifier (),
+                                                                 sNamespaceURI,
+                                                                 ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
     for (final ISMPProcess aProcess : aValue.getAllProcesses ())
-      aElement.appendChild (MicroTypeConverter.convertToMicroElement (aProcess, sNamespaceURI, ELEMENT_PROCESS));
+      aElement.addChild (MicroTypeConverter.convertToMicroElement (aProcess, sNamespaceURI, ELEMENT_PROCESS));
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_EXTENSION)
-              .appendText (aValue.getExtensions ().getExtensionsAsJsonString ());
+      aElement.addElementNS (sNamespaceURI, ELEMENT_EXTENSION)
+              .addText (aValue.getExtensions ().getExtensionsAsJsonString ());
     return aElement;
   }
 

@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.ui.pub;
 
-import javax.annotation.concurrent.Immutable;
+import com.helger.annotation.concurrent.Immutable;
 
 /**
  * This class contains all the menu item constants for the public application.

@@ -16,14 +16,14 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-
-import com.helger.commons.annotation.PresentForCodeCoverage;
-import com.helger.commons.annotation.Since;
+import com.helger.annotation.concurrent.Immutable;
+import com.helger.annotation.misc.Since;
+import com.helger.annotation.style.PresentForCodeCoverage;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * SMP Flyway configuration

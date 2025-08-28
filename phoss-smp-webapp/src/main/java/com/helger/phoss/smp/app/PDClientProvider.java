@@ -16,20 +16,19 @@
  */
 package com.helger.phoss.smp.app;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
-
-import com.helger.commons.annotation.UsedViaReflection;
-import com.helger.commons.io.stream.StreamHelper;
+import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.io.stream.StreamHelper;
 import com.helger.pd.client.PDClient;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * A singleton that keeps track of the {@link PDClient} creation (Peppol
- * Directory client). It avoid instantiating the object too often and ensures
- * the object is correctly closed upon shutdown.
+ * A singleton that keeps track of the {@link PDClient} creation (Peppol Directory client). It avoid
+ * instantiating the object too often and ensures the object is correctly closed upon shutdown.
  *
  * @author Philip Helger
  */
@@ -41,7 +40,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   /**
    * @deprecated Only called via reflection
    */
-  @Deprecated
+  @Deprecated (forRemoval = false)
   @UsedViaReflection
   public PDClientProvider ()
   {}
@@ -74,8 +73,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   }
 
   /**
-   * @return The {@link PDClient} to be used with the current settings. Never
-   *         <code>null</code>.
+   * @return The {@link PDClient} to be used with the current settings. Never <code>null</code>.
    */
   @Nonnull
   public PDClient getPDClient ()

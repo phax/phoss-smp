@@ -22,9 +22,9 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.id.factory.GlobalIDFactory;
-import com.helger.commons.io.file.SimpleFileIO;
-import com.helger.commons.string.StringParser;
+import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.base.string.StringParser;
+import com.helger.io.file.SimpleFileIO;
 import com.helger.phoss.smp.backend.mongodb.audit.IDFactoryMongoDB;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.io.WebFileIO;

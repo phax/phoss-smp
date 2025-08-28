@@ -27,15 +27,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Function;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.CollectionHelper;
-import com.helger.commons.datetime.PDTFactory;
-import com.helger.commons.lang.ClassHelper;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
+import com.helger.base.lang.clazz.ClassHelper;
+import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.textlevel.HCSpan;
@@ -58,6 +55,9 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * This page displays information about the certificate configured in the SMP Server configuration
@@ -278,7 +278,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           try
           {
             int nKeyEntries = 0;
-            for (final String sAlias : CollectionHelper.newList (aKeyStore.aliases ()))
+            for (final String sAlias : new CommonsArrayList <> (aKeyStore.aliases ()))
             {
               if (aKeyStore.isKeyEntry (sAlias))
                 nKeyEntries++;
@@ -396,7 +396,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
         final HCOL aOL = new HCOL ();
         try
         {
-          for (final String sAlias : CollectionHelper.newList (aTrustStore.aliases ()))
+          for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
           {
             final Certificate aCert = aTrustStore.getCertificate (sAlias);
             if (aCert instanceof X509Certificate)
@@ -549,7 +549,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           final HCOL aOL = new HCOL ();
           try
           {
-            for (final String sAlias : CollectionHelper.newList (aTrustStore.aliases ()))
+            for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
             {
               final Certificate aCert = aTrustStore.getCertificate (sAlias);
               if (aCert instanceof X509Certificate)

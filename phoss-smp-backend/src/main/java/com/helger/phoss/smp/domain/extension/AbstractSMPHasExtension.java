@@ -10,13 +10,13 @@
  */
 package com.helger.phoss.smp.domain.extension;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.hashcode.HashCodeGenerator;
-import com.helger.commons.string.ToStringGenerator;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.tostring.ToStringGenerator;
 import com.helger.smpclient.extension.SMPExtensionList;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Abstract implementation class for {@link ISMPHasExtension}. All extensions

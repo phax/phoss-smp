@@ -12,13 +12,10 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.time.LocalDate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.id.factory.GlobalIDFactory;
+import com.helger.annotation.Nonempty;
+import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -29,9 +26,11 @@ import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 /**
- * This class is internally used to convert {@link SMPBusinessCard} from and to
- * XML.
+ * This class is internally used to convert {@link SMPBusinessCard} from and to XML.
  * <p>
  * The files in this package are licensed under Apache 2.0 license
  * </p>
@@ -69,35 +68,35 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     aElement.setAttribute (ATTR_SERVICE_GROUP_ID, aValue.getID ());
     for (final SMPBusinessCardEntity aEntity : aValue.getAllEntities ())
     {
-      final IMicroElement eEntity = aElement.appendElement (sNamespaceURI, ELEMENT_ENTITY);
+      final IMicroElement eEntity = aElement.addElementNS (sNamespaceURI, ELEMENT_ENTITY);
       if (!bManualExport)
         eEntity.setAttribute (ATTR_ID, aEntity.getID ());
       for (final SMPBusinessCardName aItem : aEntity.names ())
       {
-        final IMicroElement eName = eEntity.appendElement (sNamespaceURI, ELEMENT_NAME);
+        final IMicroElement eName = eEntity.addElementNS (sNamespaceURI, ELEMENT_NAME);
         eName.setAttribute (ATTR_NAME, aItem.getName ());
         eName.setAttribute (ATTR_LANGUAGE_CODE, aItem.getLanguageCode ());
       }
       eEntity.setAttribute (ATTR_COUNTRY_CODE, aEntity.getCountryCode ());
       if (aEntity.hasGeographicalInformation ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION)
-               .appendText (aEntity.getGeographicalInformation ());
+        eEntity.addElementNS (sNamespaceURI, ELEMENT_GEOGRAPHICAL_INFORMATION)
+               .addText (aEntity.getGeographicalInformation ());
       }
       for (final SMPBusinessCardIdentifier aIdentifier : aEntity.identifiers ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_IDENTIFIER)
+        eEntity.addElementNS (sNamespaceURI, ELEMENT_IDENTIFIER)
                .setAttribute (ATTR_ID, aIdentifier.getID ())
                .setAttribute (ATTR_SCHEME, aIdentifier.getScheme ())
                .setAttribute (ATTR_VALUE, aIdentifier.getValue ());
       }
       for (final String sWebsiteURI : aEntity.websiteURIs ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_WEBSITE_URI).appendText (sWebsiteURI);
+        eEntity.addElementNS (sNamespaceURI, ELEMENT_WEBSITE_URI).addText (sWebsiteURI);
       }
       for (final SMPBusinessCardContact aContact : aEntity.contacts ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_CONTACT)
+        eEntity.addElementNS (sNamespaceURI, ELEMENT_CONTACT)
                .setAttribute (ATTR_ID, aContact.getID ())
                .setAttribute (ATTR_TYPE, aContact.getType ())
                .setAttribute (ATTR_NAME, aContact.getName ())
@@ -106,8 +105,8 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
       }
       if (aEntity.hasAdditionalInformation ())
       {
-        eEntity.appendElement (sNamespaceURI, ELEMENT_ADDITIONAL_INFORMATION)
-               .appendText (aEntity.getAdditionalInformation ());
+        eEntity.addElementNS (sNamespaceURI, ELEMENT_ADDITIONAL_INFORMATION)
+               .addText (aEntity.getAdditionalInformation ());
       }
       eEntity.setAttributeWithConversion (ATTR_REGISTRATION_DATE, aEntity.getRegistrationDate ());
     }

@@ -19,14 +19,12 @@ package com.helger.phoss.smp.rest;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.mime.MimeType;
+import com.helger.annotation.Nonempty;
+import com.helger.mime.CMimeType;
+import com.helger.mime.MimeType;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.BadRequestFault;
@@ -62,6 +60,8 @@ import com.helger.xml.serialize.write.EXMLSerializeIndent;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.sun.xml.ws.client.ClientTransportException;
 
+import jakarta.annotation.Nonnull;
+
 /**
  * REST API to perform an inbound migration for a participant
  *
@@ -90,7 +90,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
     final IUser aOwningUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, sServiceGroupID);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -215,7 +215,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     }
 
     final IMicroDocument aResponseDoc = new MicroDocument ();
-    final IMicroElement eRoot = aResponseDoc.appendElement ("migrationInboundResponse");
+    final IMicroElement eRoot = aResponseDoc.addElement ("migrationInboundResponse");
     eRoot.setAttribute ("success", aSG != null && aMigration != null);
     eRoot.setAttribute ("serviceGroupCreated", aSG != null);
     eRoot.setAttribute ("migrationCreated", aMigration != null);
@@ -233,7 +233,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                          @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
                          @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
   {
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())

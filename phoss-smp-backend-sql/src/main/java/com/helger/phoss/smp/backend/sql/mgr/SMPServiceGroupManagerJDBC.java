@@ -19,29 +19,26 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import javax.annotation.CheckForSigned;
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.annotation.ReturnsMutableCopy;
-import com.helger.commons.annotation.ReturnsMutableObject;
-import com.helger.commons.callback.CallbackList;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsHashSet;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsSet;
-import com.helger.commons.equals.EqualsHelper;
-import com.helger.commons.mutable.MutableBoolean;
-import com.helger.commons.state.EChange;
-import com.helger.commons.state.ESuccess;
-import com.helger.commons.string.StringHelper;
-import com.helger.commons.wrapper.Wrapper;
+import com.helger.annotation.CheckForSigned;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.base.callback.CallbackList;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.equals.EqualsHelper;
+import com.helger.base.numeric.mutable.MutableBoolean;
+import com.helger.base.state.EChange;
+import com.helger.base.state.ESuccess;
+import com.helger.base.string.StringHelper;
+import com.helger.base.wrapper.Wrapper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
@@ -62,6 +59,8 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
@@ -83,8 +82,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
    * Constructor
    *
    * @param aDBExecSupplier
-   *        The supplier for {@link DBExecutor} objects. May not be
-   *        <code>null</code>.
+   *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
   public SMPServiceGroupManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
@@ -511,10 +509,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (m_aCache != null && m_aCache.containsKey (aParticipantID.getURIEncoded ()))
       return true;
 
-    return 1 == newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_group" +
-                                           " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                           new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                      aParticipantID.getValue ()));
+    return 1 ==
+           newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_group" +
+                                      " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                      new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                 aParticipantID.getValue ()));
   }
 
   @CheckForSigned

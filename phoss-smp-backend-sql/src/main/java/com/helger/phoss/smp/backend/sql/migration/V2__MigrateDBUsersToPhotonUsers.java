@@ -16,10 +16,10 @@
  */
 package com.helger.phoss.smp.backend.sql.migration;
 
-import javax.annotation.Nonnull;
-
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+
+import jakarta.annotation.Nonnull;
 
 public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
 {

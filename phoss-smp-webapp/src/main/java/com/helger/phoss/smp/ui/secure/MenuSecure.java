@@ -16,15 +16,13 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.collection.impl.CommonsHashMap;
-import com.helger.commons.collection.impl.ICommonsMap;
+import com.helger.annotation.concurrent.Immutable;
+import com.helger.annotation.style.UsedViaReflection;
+import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -40,6 +38,9 @@ import com.helger.photon.core.menu.filter.MenuObjectFilterUserAssignedToUserGrou
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.system.BasePageShowChildren;
 import com.helger.web.scope.singleton.AbstractRequestWebSingleton;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 @Immutable
 public final class MenuSecure
@@ -60,7 +61,8 @@ public final class MenuSecure
   {
     private final ICommonsMap <String, Boolean> m_aMap = new CommonsHashMap <> ();
 
-    @Deprecated
+    @Deprecated (forRemoval = false)
+    @UsedViaReflection
     public CurrentUserToUserGroupAssignmentCache ()
     {}
 

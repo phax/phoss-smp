@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.smlhook;
 
-import javax.annotation.Nonnull;
-
 import com.helger.peppolid.IParticipantIdentifier;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Base interface for the callback to modify the SML.

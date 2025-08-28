@@ -22,8 +22,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-import javax.annotation.Nonnull;
-
 import org.bson.Document;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +41,8 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Test class for class {@link SMPRedirectManagerMongoDB}.

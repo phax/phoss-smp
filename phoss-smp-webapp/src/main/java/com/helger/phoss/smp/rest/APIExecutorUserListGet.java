@@ -18,11 +18,9 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.string.StringHelper;
+import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
+import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
@@ -35,6 +33,8 @@ import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupReferenceLi
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupReferenceListType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
+import jakarta.annotation.Nonnull;
+
 public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
 {
   public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
@@ -46,7 +46,7 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
     final String sPathUserID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_USER_ID));
 
     // No service group available
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope, null);
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 

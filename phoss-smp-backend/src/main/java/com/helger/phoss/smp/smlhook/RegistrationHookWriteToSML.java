@@ -13,8 +13,6 @@ package com.helger.phoss.smp.smlhook;
 import java.net.URL;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -22,8 +20,9 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.exception.InitializationException;
-import com.helger.commons.ws.HostnameVerifierVerifyAll;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.base.exception.InitializationException;
+import com.helger.http.security.HostnameVerifierVerifyAll;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
@@ -34,11 +33,13 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * An implementation of the RegistrationHook that informs the SML of updates to
- * this SMP's identifiers.<br>
- * The design of this hook is very bogus! It relies on the postUpdate always
- * being called in order in this Thread.
+ * An implementation of the RegistrationHook that informs the SML of updates to this SMP's
+ * identifiers.<br>
+ * The design of this hook is very bogus! It relies on the postUpdate always being called in order
+ * in this Thread.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */

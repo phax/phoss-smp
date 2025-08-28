@@ -16,15 +16,14 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import javax.annotation.Nonnegative;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.id.factory.AbstractPersistingLongIDFactory;
-import com.helger.commons.mutable.MutableLong;
-import com.helger.commons.string.StringParser;
+import com.helger.annotation.Nonnegative;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.id.factory.AbstractPersistingLongIDFactory;
+import com.helger.base.numeric.mutable.MutableLong;
+import com.helger.base.string.StringParser;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 
@@ -49,8 +48,8 @@ public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
    * Constructor
    *
    * @param nInitialCount
-   *        The count to be used if no database entry is available. This is
-   *        purely for migrating existing counter from file based to DB based.
+   *        The count to be used if no database entry is available. This is purely for migrating
+   *        existing counter from file based to DB based.
    */
   public SMPIDFactoryJDBC (@Nonnegative final long nInitialCount)
   {

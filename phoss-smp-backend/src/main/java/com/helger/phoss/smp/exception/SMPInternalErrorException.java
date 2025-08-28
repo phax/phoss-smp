@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * Exception that is thrown to indicate an HTTP 500 error.

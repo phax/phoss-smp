@@ -18,15 +18,11 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Comparator;
 
-import javax.annotation.Nonnull;
-
-import com.helger.commons.annotation.Nonempty;
-import com.helger.commons.collection.attr.StringMap;
-import com.helger.commons.collection.impl.CommonsArrayList;
-import com.helger.commons.collection.impl.CommonsHashMap;
-import com.helger.commons.collection.impl.ICommonsList;
-import com.helger.commons.collection.impl.ICommonsMap;
-import com.helger.commons.url.ISimpleURL;
+import com.helger.annotation.Nonempty;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.grouping.HCLI;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -54,10 +50,14 @@ import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.typeconvert.collection.StringMap;
+import com.helger.url.ISimpleURL;
+
+import jakarta.annotation.Nonnull;
 
 /**
- * Class to manage endpoints that belong to a service group. To use this page at
- * least one service group must exist.
+ * Class to manage endpoints that belong to a service group. To use this page at least one service
+ * group must exist.
  *
  * @author Philip Helger
  */

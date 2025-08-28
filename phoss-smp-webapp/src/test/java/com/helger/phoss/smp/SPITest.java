@@ -18,8 +18,8 @@ package com.helger.phoss.smp;
 
 import org.junit.Test;
 
-import com.helger.commons.mock.SPITestHelper;
 import com.helger.photon.core.mock.PhotonCoreValidator;
+import com.helger.unittestext.SPITestHelper;
 
 /**
  * Test SPI definitions and web.xml

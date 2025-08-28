@@ -10,14 +10,12 @@
  */
 package com.helger.phoss.smp.exchange;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.Immutable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.ValueEnforcer;
-import com.helger.commons.collection.impl.ICommonsList;
+import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -31,6 +29,8 @@ import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Export Service Groups to XML.
@@ -50,11 +50,9 @@ public final class ServiceGroupExport
    * Create XML export data for the provided service groups.
    *
    * @param aServiceGroups
-   *        The service groups to export. May not be <code>null</code> but maybe
-   *        empty.
+   *        The service groups to export. May not be <code>null</code> but maybe empty.
    * @param bIncludeBusinessCards
-   *        <code>true</code> to include Business Cards, <code>false</code> to
-   *        skip them
+   *        <code>true</code> to include Business Cards, <code>false</code> to skip them
    * @return The created XML document. Never <code>null</code>.
    */
   @Nonnull
@@ -72,7 +70,7 @@ public final class ServiceGroupExport
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
     final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.appendElement (CSMPExchange.ELEMENT_SMP_DATA);
+    final IMicroElement eRoot = aDoc.addElement (CSMPExchange.ELEMENT_SMP_DATA);
     eRoot.setAttribute (CSMPExchange.ATTR_VERSION, CSMPExchange.VERSION_10);
 
     final ICommonsList <ISMPServiceGroup> aSortedServiceGroups = aServiceGroups.getSorted (ISMPServiceGroup.comparator ());
@@ -80,23 +78,22 @@ public final class ServiceGroupExport
     // Add all service groups
     for (final ISMPServiceGroup aServiceGroup : aSortedServiceGroups)
     {
-      final IMicroElement eServiceGroup = eRoot.appendChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
-                                                                                                       CSMPExchange.ELEMENT_SERVICEGROUP));
+      final IMicroElement eServiceGroup = eRoot.addChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
+                                                                                                    CSMPExchange.ELEMENT_SERVICEGROUP));
 
       // Add all service information
       final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup.getParticipantIdentifier ());
       for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
       {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
-                                                                             CSMPExchange.ELEMENT_SERVICEINFO));
+        eServiceGroup.addChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
+                                                                          CSMPExchange.ELEMENT_SERVICEINFO));
       }
 
       // Add all redirects
       final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aServiceGroup.getParticipantIdentifier ());
       for (final ISMPRedirect aServiceInfo : aAllRedirects.getSortedInline (ISMPRedirect.comparator ()))
       {
-        eServiceGroup.appendChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
-                                                                             CSMPExchange.ELEMENT_REDIRECT));
+        eServiceGroup.addChild (MicroTypeConverter.convertToMicroElement (aServiceInfo, CSMPExchange.ELEMENT_REDIRECT));
       }
     }
 
@@ -110,10 +107,10 @@ public final class ServiceGroupExport
         final ISMPBusinessCard aBusinessCard = aBusinessCardMgr.getSMPBusinessCardOfID (aServiceGroup.getParticipantIdentifier ());
         if (aBusinessCard != null)
         {
-          eRoot.appendChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
-                                                                                      null,
-                                                                                      CSMPExchange.ELEMENT_BUSINESSCARD,
-                                                                                      true));
+          eRoot.addChild (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
+                                                                                   null,
+                                                                                   CSMPExchange.ELEMENT_BUSINESSCARD,
+                                                                                   true));
         }
       }
     }

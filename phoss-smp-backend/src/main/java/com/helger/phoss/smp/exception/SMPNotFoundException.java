@@ -12,8 +12,8 @@ package com.helger.phoss.smp.exception;
 
 import java.net.URI;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * HTTP 404 exception wrapper

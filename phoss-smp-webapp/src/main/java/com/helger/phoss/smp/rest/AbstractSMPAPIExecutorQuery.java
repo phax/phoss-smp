@@ -18,9 +18,6 @@ package com.helger.phoss.smp.rest;
 
 import java.net.URI;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -28,6 +25,9 @@ import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolConfigurableURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
 {

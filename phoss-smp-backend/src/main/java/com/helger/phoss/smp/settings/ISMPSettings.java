@@ -10,11 +10,11 @@
  */
 package com.helger.phoss.smp.settings;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import com.helger.commons.type.ITypedObject;
+import com.helger.base.type.ITypedObject;
 import com.helger.peppol.sml.ISMLInfo;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * Runtime settings for this SMP server instance.

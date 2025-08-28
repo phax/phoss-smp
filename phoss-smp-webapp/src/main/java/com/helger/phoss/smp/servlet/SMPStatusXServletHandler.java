@@ -19,23 +19,23 @@ package com.helger.phoss.smp.servlet;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.commons.mime.CMimeType;
-import com.helger.commons.mime.MimeType;
 import com.helger.json.IJsonObject;
+import com.helger.mime.CMimeType;
+import com.helger.mime.MimeType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.status.SMPStatusProvider;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
 
+import jakarta.annotation.Nonnull;
+
 /**
- * Create SMP status as JSON object. See
- * https://github.com/phax/phoss-smp/wiki/Status-API for details.
+ * Create SMP status as JSON object. See https://github.com/phax/phoss-smp/wiki/Status-API for
+ * details.
  *
  * @author Philip Helger
  * @since 5.0.6
@@ -56,7 +56,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
     if (SMPServerConfiguration.isStatusEnabled ())
     {
       // Special boolean parameter to ensure status works as health check
-      final boolean bDisableLongRunningOperations = aRequestScope.params ().getAsBoolean ("disable-long-running", false);
+      final boolean bDisableLongRunningOperations = aRequestScope.params ()
+                                                                 .getAsBoolean ("disable-long-running", false);
       aStatusData = SMPStatusProvider.getDefaultStatusData (bDisableLongRunningOperations);
     }
     else
