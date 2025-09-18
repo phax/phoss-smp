@@ -39,9 +39,16 @@ public final class SMPDBExecutor extends DBExecutor
     final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
     if (StringHelper.isNotEmpty (sSchemaName))
     {
+      final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
+      final EDatabaseType eDBType = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
+
       // Quotes around are required for special chars
       // MySQL rules: https://dev.mysql.com/doc/refman/8.4/en/identifiers.html
-      TABLE_NAME_CUSTOMIZER = x -> "\"" + sSchemaName + "\".smp_" + x;
+      TABLE_NAME_CUSTOMIZER = switch (eDBType)
+      {
+        case MYSQL -> x -> '"' + sSchemaName + ".smp_" + x + "'";
+        default -> x -> '"' + sSchemaName + "\".smp_" + x;
+      };
     }
     else
       TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
