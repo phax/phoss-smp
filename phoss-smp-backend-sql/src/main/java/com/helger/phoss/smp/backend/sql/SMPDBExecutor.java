@@ -46,7 +46,8 @@ public final class SMPDBExecutor extends DBExecutor
       // MySQL rules: https://dev.mysql.com/doc/refman/8.4/en/identifiers.html
       TABLE_NAME_CUSTOMIZER = switch (eDBType)
       {
-        case MYSQL -> x -> '"' + sSchemaName + ".smp_" + x + "'";
+        // Use backtick as char of choice
+        case MYSQL -> x -> '`' + sSchemaName + "`.smp_" + x;
         default -> x -> '"' + sSchemaName + "\".smp_" + x;
       };
     }
