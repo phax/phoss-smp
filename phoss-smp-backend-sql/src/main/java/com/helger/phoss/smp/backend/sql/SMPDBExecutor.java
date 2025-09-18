@@ -35,18 +35,13 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
+    // Schema names must not contain leading or trailing spaces
     final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
     if (StringHelper.isNotEmpty (sSchemaName))
     {
-      final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
-      final EDatabaseType eDBType = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
-
-      // Quotes around are required for special chars (does not work in MySQL)
-      final boolean bQuoteSchema = eDBType != EDatabaseType.MYSQL;
-      if (bQuoteSchema)
-        TABLE_NAME_CUSTOMIZER = x -> "\"" + sSchemaName + "\".smp_" + x;
-      else
-        TABLE_NAME_CUSTOMIZER = x -> sSchemaName + ".smp_" + x;
+      // Quotes around are required for special chars
+      // MySQL rules: https://dev.mysql.com/doc/refman/8.4/en/identifiers.html
+      TABLE_NAME_CUSTOMIZER = x -> "\"" + sSchemaName + "\".smp_" + x;
     }
     else
       TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;
