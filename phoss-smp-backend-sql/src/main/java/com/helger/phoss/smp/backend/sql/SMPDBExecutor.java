@@ -21,7 +21,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.base.string.StringHelper;
+import com.helger.db.api.helper.DBSystemHelper;
 import com.helger.db.jdbc.executor.DBExecutor;
 
 /**
@@ -35,21 +35,12 @@ public final class SMPDBExecutor extends DBExecutor
   public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    // Schema names must not contain leading or trailing spaces
-    final String sSchemaName = StringHelper.trim (SMPJDBCConfiguration.getJdbcSchema ());
-    if (StringHelper.isNotEmpty (sSchemaName))
+    final String sTableNamePrefix = DBSystemHelper.getTableNamePrefix (SMPDataSourceSingleton.getDatabaseType (),
+                                                                       SMPJDBCConfiguration.getJdbcSchema ());
+    if (sTableNamePrefix.length () > 0)
     {
-      final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
-      final EDatabaseType eDBType = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
-
-      // Quotes around are required for special chars
-      // MySQL rules: https://dev.mysql.com/doc/refman/8.4/en/identifiers.html
-      TABLE_NAME_CUSTOMIZER = switch (eDBType)
-      {
-        // Use backtick as char of choice
-        case MYSQL -> x -> '`' + sSchemaName + "`.smp_" + x;
-        default -> x -> '"' + sSchemaName + "\".smp_" + x;
-      };
+      final String sRealPrefix = sTableNamePrefix + "smp_";
+      TABLE_NAME_CUSTOMIZER = x -> sRealPrefix + x;
     }
     else
       TABLE_NAME_CUSTOMIZER = x -> "smp_" + x;

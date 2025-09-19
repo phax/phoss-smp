@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
+import com.helger.db.api.EDatabaseSystemType;
 import com.helger.phoss.smp.backend.sql.SMPFlywayConfiguration;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V10__MigrateRolesToDB;
@@ -49,8 +49,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
- * This class has the sole purpose of encapsulating the org.flywaydb classes, so
- * that it's usage can be turned off (for whatever reason).
+ * This class has the sole purpose of encapsulating the org.flywaydb classes, so that it's usage can
+ * be turned off (for whatever reason).
  *
  * @author Philip Helger
  */
@@ -71,7 +71,7 @@ final class FlywayMigrator
   private FlywayMigrator ()
   {}
 
-  void runFlyway (@Nonnull final EDatabaseType eDBType)
+  void runFlyway (@Nonnull final EDatabaseSystemType eDBType)
   {
     ValueEnforcer.notNull (eDBType, "DBType");
 

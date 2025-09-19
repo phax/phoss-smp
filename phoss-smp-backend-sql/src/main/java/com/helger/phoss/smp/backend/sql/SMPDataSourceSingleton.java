@@ -16,10 +16,13 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.util.EnumSet;
+
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.string.StringImplode;
+import com.helger.db.api.EDatabaseSystemType;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
@@ -33,16 +36,20 @@ import jakarta.annotation.Nonnull;
 @ThreadSafe
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
-  private static final EDatabaseType DB_TYPE;
+  private static final EnumSet <EDatabaseSystemType> ALLOWED_DB_TYPES = EnumSet.of (EDatabaseSystemType.DB2,
+                                                                                    EDatabaseSystemType.MYSQL,
+                                                                                    EDatabaseSystemType.ORACLE,
+                                                                                    EDatabaseSystemType.POSTGRESQL);
+  private static final EDatabaseSystemType DB_TYPE;
 
   static
   {
     final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
-    DB_TYPE = EDatabaseType.getFromCaseIDInsensitiveOrNull (sDBType);
-    if (DB_TYPE == null)
+    DB_TYPE = EDatabaseSystemType.getFromIDCaseInsensitiveOrNull (sDBType);
+    if (DB_TYPE == null || !ALLOWED_DB_TYPES.contains (DB_TYPE))
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
                                        StringImplode.imploder ()
-                                                    .source (EDatabaseType.values (), EDatabaseType::getID)
+                                                    .source (ALLOWED_DB_TYPES, EDatabaseSystemType::getID)
                                                     .separator (", ")
                                                     .build () +
                                        " - provided value is '" +
@@ -54,7 +61,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
    * @return The database system determined from the configuration file. Never <code>null</code>.
    */
   @Nonnull
-  public static EDatabaseType getDatabaseType ()
+  public static EDatabaseSystemType getDatabaseType ()
   {
     return DB_TYPE;
   }

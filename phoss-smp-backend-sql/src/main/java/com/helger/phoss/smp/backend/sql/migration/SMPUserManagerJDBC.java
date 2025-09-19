@@ -28,11 +28,11 @@ import com.helger.base.type.ObjectType;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.domain.DBUser;
 
@@ -83,7 +83,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
       // Drop the Foreign Key Constraint - do this all the time
       try
       {
-        final EDatabaseType eDBType = SMPDataSourceSingleton.getDatabaseType ();
+        final EDatabaseSystemType eDBType = SMPDataSourceSingleton.getDatabaseType ();
         switch (eDBType)
         {
           case MYSQL:

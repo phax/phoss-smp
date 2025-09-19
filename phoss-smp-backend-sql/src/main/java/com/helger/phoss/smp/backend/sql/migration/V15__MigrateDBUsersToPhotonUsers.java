@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import com.helger.collection.commons.CommonsLinkedHashMap;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsOrderedMap;
+import com.helger.db.api.EDatabaseSystemType;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.phoss.smp.CSMPServer;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.domain.DBUser;
@@ -55,7 +55,7 @@ public final class V15__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
     try (final WebScoped aWS = new WebScoped ())
     {
       LOGGER.info ("Migrating all old DB users to ph-oton users");
-      final EDatabaseType eDBType = SMPDataSourceSingleton.getDatabaseType ();
+      final EDatabaseSystemType eDBType = SMPDataSourceSingleton.getDatabaseType ();
 
       // Old JDBC user manager
       final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (SMPDBExecutor::new);

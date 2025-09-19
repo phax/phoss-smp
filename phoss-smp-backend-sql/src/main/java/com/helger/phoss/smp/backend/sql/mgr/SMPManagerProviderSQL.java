@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import com.helger.base.state.ETriState;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.dao.DAOException;
+import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.backend.sql.EDatabaseType;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPFlywayConfiguration;
@@ -57,7 +57,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
   private static final String SML_INFO_XML = "sml-info.xml";
 
-  private final EDatabaseType m_eDBType;
+  private final EDatabaseSystemType m_eDBType;
 
   public SMPManagerProviderSQL ()
   {
