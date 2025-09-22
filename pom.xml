@@ -69,7 +69,7 @@
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>11.13.1</flyway.version>
-    <log4j.version>2.25.1</log4j.version>
+    <log4j.version>2.25.2</log4j.version>
     <mongodb.version>5.6.0</mongodb.version>
     <protobuf.version>4.32.1</protobuf.version>
     <ph-db.version>8.0.1</ph-db.version>
@@ -80,7 +80,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-parent-pom</artifactId>
-        <version>12.0.1</version>
+        <version>12.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -94,7 +94,7 @@
       <dependency>
         <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>8.0.1</version>
+        <version>8.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
