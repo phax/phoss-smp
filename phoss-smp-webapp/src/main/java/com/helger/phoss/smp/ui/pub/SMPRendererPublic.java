@@ -115,7 +115,7 @@ public final class SMPRendererPublic
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
       aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.ML_AUTO)
                                                   .addClass (CBootstrapCSS.MR_2)
-                                                  .addChild ("Goto manager")
+                                                  .addChild ("Goto Administration")
                                                   .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                              "/")));
       aToggleable.addAndReturnText ()
