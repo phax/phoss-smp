@@ -262,6 +262,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     final String sParticipantIDValue = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_VALUE);
     IParticipantIdentifier aParticipantID = null;
     boolean bParticipantSourceIsThisSMP = false;
+    String sOutboundMigrationID = null;
     final String sOwningUserID = aWPEC.params ().getAsStringTrimmed (FIELD_OWNING_USER_ID);
     final IUser aOwningUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
@@ -292,7 +293,15 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
             if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aParticipantID))
             {
               bParticipantSourceIsThisSMP = true;
-              LOGGER.info ("The inbound participant migration is for a participant from this SMP!");
+              final IParticipantIdentifier aFinalParticipantID = aParticipantID;
+              // TODO create a specific API for that
+              final ISMPParticipantMigration aOutboundMigration = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (EParticipantMigrationState.IN_PROGRESS)
+                                                                                          .findFirst (x -> x.getParticipantIdentifier ()
+                                                                                                            .hasSameContent (aFinalParticipantID));
+              sOutboundMigrationID = aOutboundMigration == null ? null : aOutboundMigration.getID ();
+              LOGGER.info ("The inbound participant migration is for a participant from this SMP (Migration ID '" +
+                           sOutboundMigrationID +
+                           "')!");
             }
             else
               aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE,
@@ -410,15 +419,15 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                         "'."));
       }
 
-      if (bParticipantSourceIsThisSMP)
+      if (sOutboundMigrationID != null)
       {
         // Special case - existing migration from this SMP to this SMP
         // Also immediately close the outbound migration
-        if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationKey, EParticipantMigrationState.MIGRATED)
-                                    .isChanged ())
+        if (aParticipantMigrationMgr.setParticipantMigrationState (sOutboundMigrationID,
+                                                                   EParticipantMigrationState.MIGRATED).isChanged ())
         {
           aRedirectNotes.addChild (success ("The outbound Participant Migration with ID '" +
-                                            sMigrationKey +
+                                            sOutboundMigrationID +
                                             "' for '" +
                                             aParticipantID.getURIEncoded () +
                                             "' was successfully finalized!"));
@@ -426,7 +435,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
         else
         {
           aRedirectNotes.addChild (error ("Failed to finalize the outbound Participant Migration with ID '" +
-                                          sMigrationKey +
+                                          sOutboundMigrationID +
                                           "' for '" +
                                           aParticipantID.getURIEncoded () +
                                           "'. Please see the logs for details."));
