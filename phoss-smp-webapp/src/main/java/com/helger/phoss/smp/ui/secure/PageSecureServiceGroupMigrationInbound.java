@@ -86,9 +86,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
- * Class to migrate an existing Service Group from another SMP to this SMP. If a
- * migration is approved by the SMK/SML it means, the service group needs to be
- * created on this SMP.
+ * Class to migrate an existing Service Group from another SMP to this SMP. If a migration is
+ * approved by the SMK/SML it means, the service group needs to be created on this SMP.
  *
  * @author Philip Helger
  */
@@ -118,7 +117,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPParticipantMigration aSelectedObject)
+      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                                    @Nullable final ISMPParticipantMigration aSelectedObject)
       {
         final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
         if (aParticipantMigrationMgr.deleteParticipantMigrationOfID (aSelectedObject.getID ()).isChanged ())
@@ -151,14 +151,16 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
 
   @Override
   @Nullable
-  protected ISMPParticipantMigration getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMPParticipantMigration getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                                        @Nullable final String sID)
   {
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     return aParticipantMigrationMgr.getParticipantMigrationOfID (sID);
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPParticipantMigration aSelectedObject)
+  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+                                     @Nonnull final ISMPParticipantMigration aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -172,11 +174,13 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                                                                    aSelectedObject.getParticipantIdentifier ()
                                                                                                   .getURIEncoded ())).addChild (aSelectedObject.getParticipantIdentifier ()
                                                                                                                                                .getURIEncoded ())));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Migration state").setCtrl (aSelectedObject.getState ().getDisplayName ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Migration state")
+                                                 .setCtrl (aSelectedObject.getState ().getDisplayName ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Initiation datetime")
                                                  .setCtrl (PDTToString.getAsString (aSelectedObject.getInitiationDateTime (),
                                                                                     aDisplayLocale)));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Migration Key").setCtrl (code (aSelectedObject.getMigrationKey ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Migration Key")
+                                                 .setCtrl (code (aSelectedObject.getMigrationKey ())));
 
     aNodeList.addChild (aForm);
   }
@@ -208,17 +212,21 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_SCHEME,
-                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getScheme ()
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ()
+                                                                                            .getScheme ()
                                                                            : sDefaultScheme)).setPlaceholder ("Identifier scheme"));
       aRow.createColumn (GS_IDENTIFIER_VALUE)
           .addChild (new HCEdit (new RequestField (FIELD_PARTICIPANT_ID_VALUE,
-                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ().getValue ()
-                                                                           : null)).setPlaceholder ("Identifier value"));
+                                                   aSelectedObject != null ? aSelectedObject.getParticipantIdentifier ()
+                                                                                            .getValue () : null))
+                                                                                                                 .setPlaceholder ("Identifier value"));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme" +
-                                                                 (sDefaultScheme == null ? "" : " (default: " + sDefaultScheme + ")") +
+                                                                 (sDefaultScheme == null ? "" : " (default: " +
+                                                                                                sDefaultScheme +
+                                                                                                ")") +
                                                                  ", the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));
@@ -253,6 +261,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     final String sParticipantIDScheme = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_SCHEME);
     final String sParticipantIDValue = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_VALUE);
     IParticipantIdentifier aParticipantID = null;
+    boolean bParticipantSourceIsThisSMP = false;
     final String sOwningUserID = aWPEC.params ().getAsStringTrimmed (FIELD_OWNING_USER_ID);
     final IUser aOwningUser = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwningUserID);
     final String sExtension = aWPEC.params ().getAsStringTrimmed (FIELD_EXTENSION);
@@ -262,7 +271,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       aFormErrors.addFieldError (FIELD_MIGRATION_KEY, "The migration key must not be empty!");
     else
       if (!SMPParticipantMigration.isValidMigrationKey (sMigrationKey))
-        aFormErrors.addFieldError (FIELD_MIGRATION_KEY, "The migration key is not valid. Please verify the received code is correct.");
+        aFormErrors.addFieldError (FIELD_MIGRATION_KEY,
+                                   "The migration key is not valid. Please verify the received code is correct.");
 
     if (aIdentifierFactory.isParticipantIdentifierSchemeMandatory () && StringHelper.isEmpty (sParticipantIDScheme))
       aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_SCHEME, "Participant ID scheme must not be empty!");
@@ -276,8 +286,18 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
           aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE, "The provided participant ID has an invalid syntax!");
         else
           if (aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID) != null)
-            aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE,
-                                       "Another service group for the same participant ID is already present (may be case insensitive)!");
+          {
+            // There is an edge case, when a participant is migrated from this SMP to this SMP.
+            // So show the error only, if no outbound migration for the participant is present.
+            if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aParticipantID))
+            {
+              bParticipantSourceIsThisSMP = true;
+              LOGGER.info ("The inbound participant migration is for a participant from this SMP!");
+            }
+            else
+              aFormErrors.addFieldError (FIELD_PARTICIPANT_ID_VALUE,
+                                         "Another service group for the same participant ID is already present (may be case insensitive)!");
+          }
       }
 
     if (StringHelper.isEmpty (sOwningUserID))
@@ -326,7 +346,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                                 aParticipantID.getURIEncoded () +
                                                 "' in SML, hence the migration failed." +
                                                 " Please check the participant identifier and the migration key.\n" +
-                                                BootstrapTechnicalUI.getTechnicalDetailsString (ex, CSMPServer.DEFAULT_LOCALE))
+                                                BootstrapTechnicalUI.getTechnicalDetailsString (ex,
+                                                                                                CSMPServer.DEFAULT_LOCALE))
                                     .build ());
         if (false)
           aWPEC.postRedirectGetInternal (error ("Failed to confirm the migration for participant '" +
@@ -342,27 +363,35 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       // PID is available on this SMP)
       ISMPServiceGroup aSG = null;
       Exception aCaughtEx = null;
-      try
+      if (bParticipantSourceIsThisSMP)
       {
-        // Do NOT create in SMK/SML
-        aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, false);
-      }
-      catch (final Exception ex)
-      {
-        aCaughtEx = ex;
-      }
-
-      if (aSG != null)
-      {
-        aRedirectNotes.addChild (success ("The new SMP Service Group for participant '" +
-                                          aParticipantID.getURIEncoded () +
-                                          "' was successfully created."));
+        // Special case - existing migration from this SMP to this SMP
+        aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
       }
       else
       {
-        aRedirectNotes.addChild (error ("Error creating the new SMP Service Group for participant '" +
-                                        aParticipantID.getURIEncoded () +
-                                        "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
+        try
+        {
+          // Do NOT create in SMK/SML
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, false);
+        }
+        catch (final Exception ex)
+        {
+          aCaughtEx = ex;
+        }
+
+        if (aSG != null)
+        {
+          aRedirectNotes.addChild (success ("The new SMP Service Group for participant '" +
+                                            aParticipantID.getURIEncoded () +
+                                            "' was successfully created."));
+        }
+        else
+        {
+          aRedirectNotes.addChild (error ("Error creating the new SMP Service Group for participant '" +
+                                          aParticipantID.getURIEncoded () +
+                                          "'.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
+        }
       }
 
       // Remember internally
@@ -376,7 +405,32 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       }
       else
       {
-        aRedirectNotes.addChild (error ("Failed to store the participant migration for '" + aParticipantID.getURIEncoded () + "'."));
+        aRedirectNotes.addChild (error ("Failed to store the participant migration for '" +
+                                        aParticipantID.getURIEncoded () +
+                                        "'."));
+      }
+
+      if (bParticipantSourceIsThisSMP)
+      {
+        // Special case - existing migration from this SMP to this SMP
+        // Also immediately close the outbound migration
+        if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationKey, EParticipantMigrationState.MIGRATED)
+                                    .isChanged ())
+        {
+          aRedirectNotes.addChild (success ("The outbound Participant Migration with ID '" +
+                                            sMigrationKey +
+                                            "' for '" +
+                                            aParticipantID.getURIEncoded () +
+                                            "' was successfully finalized!"));
+        }
+        else
+        {
+          aRedirectNotes.addChild (error ("Failed to finalize the outbound Participant Migration with ID '" +
+                                          sMigrationKey +
+                                          "' for '" +
+                                          aParticipantID.getURIEncoded () +
+                                          "'. Please see the logs for details."));
+        }
       }
 
       aWPEC.postRedirectGetInternal (aRedirectNotes);
@@ -407,7 +461,9 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       aRow.addCell (code (aCurObject.getMigrationKey ()));
 
       final IHCCell <?> aActionCell = aRow.addCell ();
-      aActionCell.addChild (createDeleteLink (aWPEC, aCurObject, "Delete Participant Migration of '" + sParticipantID + "'"));
+      aActionCell.addChild (createDeleteLink (aWPEC,
+                                              aCurObject,
+                                              "Delete Participant Migration of '" + sParticipantID + "'"));
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
@@ -441,7 +497,8 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       if (aSettings.isSMLEnabled () || aSettings.isSMLRequired ())
       {
         aWarnBox.addChild (div (new BootstrapButton ().addChild ("Create a new SML Configuration")
-                                                      .setOnClick (createCreateURL (aWPEC, CMenuSecure.MENU_SML_CONFIGURATION))
+                                                      .setOnClick (createCreateURL (aWPEC,
+                                                                                    CMenuSecure.MENU_SML_CONFIGURATION))
                                                       .setIcon (EDefaultIcon.YES)));
       }
       eCanMigrate = EValidity.INVALID;
