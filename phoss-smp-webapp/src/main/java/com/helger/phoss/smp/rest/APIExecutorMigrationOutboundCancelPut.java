@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.http.CHttp;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -37,7 +36,7 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 import jakarta.annotation.Nonnull;
@@ -52,11 +51,12 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorMigrationOutboundCancelPut.class);
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
@@ -127,6 +127,6 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                  "' on Service Group ID '" +
                  sServiceGroupID +
                  "' was successfully cancelled!");
-    aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
+    aUnifiedResponse.createOk ();
   }
 }

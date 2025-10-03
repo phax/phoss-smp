@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
-import com.helger.mime.CMimeType;
-import com.helger.mime.MimeType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -39,12 +37,9 @@ import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.serialize.MicroWriter;
-import com.helger.xml.serialize.write.IXMLWriterSettings;
-import com.helger.xml.serialize.write.XMLWriterSettings;
 
 import jakarta.annotation.Nonnull;
 
@@ -60,15 +55,16 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
 
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorExportSpecificXMLVer1.class);
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-
     final String sLogPrefix = "[REST API Export-Specific-XML-V1] ";
+
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
 
     // Only authenticated user may do so
@@ -104,10 +100,6 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
     LOGGER.info (sLogPrefix + "Finished creating Export data");
 
     // Build the XML response
-    final IXMLWriterSettings aXWS = new XMLWriterSettings ();
-    aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aDoc, aXWS), aXWS.getCharset ())
-                    .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                         aXWS.getCharset ().name ()))
-                    .disableCaching ();
+    aUnifiedResponse.xml (aDoc);
   }
 }

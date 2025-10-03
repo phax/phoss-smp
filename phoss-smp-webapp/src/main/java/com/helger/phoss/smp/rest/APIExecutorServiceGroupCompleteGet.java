@@ -27,7 +27,7 @@ import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerCompleteServiceGroupType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerCompleteServiceGroupType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -37,11 +37,12 @@ import jakarta.annotation.Nonnull;
 
 public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExecutor
 {
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);

@@ -16,6 +16,9 @@
  */
 package com.helger.phoss.smp.rest;
 
+import java.util.Map;
+
+import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.cache.regex.RegExHelper;
 import com.helger.collection.commons.ICommonsList;
@@ -23,9 +26,14 @@ import com.helger.http.CHttpHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.http.basicauth.HttpBasicAuth;
 import com.helger.http.header.HttpHeaderMap;
+import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
+import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.api.IAPIExecutor;
+import com.helger.photon.app.PhotonUnifiedResponse;
+import com.helger.servlet.response.UnifiedResponse;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -39,8 +47,7 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
    *
    * @param sAuthHeader
    *        The HTTP header value to be interpreted. May be <code>null</code>.
-   * @return <code>null</code> if the passed value is not a correct HTTP Bearer
-   *         header value.
+   * @return <code>null</code> if the passed value is not a correct HTTP Bearer header value.
    */
   @Nullable
   private static String _getBearerToken (@Nullable final String sAuthHeader)
@@ -93,4 +100,28 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
                                         CHttpHeader.AUTHORIZATION +
                                         "' is malformed. Contains neither a Bearer Token nor Basic Auth");
   }
+
+  protected abstract void invokeAPI (@Nonnull IAPIDescriptor aAPIDescriptor,
+                                     @Nonnull @Nonempty String sPath,
+                                     @Nonnull Map <String, String> aPathVariables,
+                                     @Nonnull IRequestWebScopeWithoutResponse aRequestScope,
+                                     @Nonnull PhotonUnifiedResponse aUnifiedResponse) throws Exception;
+
+  public final void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                               @Nonnull @Nonempty final String sPath,
+                               @Nonnull final Map <String, String> aPathVariables,
+                               @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                               @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  {
+    final PhotonUnifiedResponse aPUR = (PhotonUnifiedResponse) aUnifiedResponse;
+
+    // JSON responses should always be formatted
+    aPUR.setJsonWriterSettings (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED);
+
+    // Disable caching by default
+    aPUR.disableCaching ();
+
+    invokeAPI (aAPIDescriptor, sPath, aPathVariables, aRequestScope, aPUR);
+  }
+
 }

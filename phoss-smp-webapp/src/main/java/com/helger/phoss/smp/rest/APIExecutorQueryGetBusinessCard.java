@@ -31,13 +31,9 @@ import com.helger.base.CGlobal;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.datetime.helper.PDTFactory;
-import com.helger.http.CHttp;
 import com.helger.httpclient.HttpClientManager;
 import com.helger.httpclient.response.ResponseHandlerByteArray;
 import com.helger.json.IJsonObject;
-import com.helger.json.serialize.JsonWriter;
-import com.helger.json.serialize.JsonWriterSettings;
-import com.helger.mime.CMimeType;
 import com.helger.peppol.businesscard.generic.PDBusinessCard;
 import com.helger.peppol.businesscard.helper.PDBusinessCardHelper;
 import com.helger.peppol.sml.ESMPAPIType;
@@ -49,7 +45,8 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
+import com.helger.smpclient.httpclient.SMPHttpClientSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 import jakarta.annotation.Nonnull;
@@ -63,12 +60,15 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetBusinessCard.class);
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[QueryAPI] ";
+
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
@@ -78,6 +78,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       throw new SMPPreconditionFailedException ("The remote query API is disabled. getRemoteBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
+
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
 
@@ -87,11 +88,16 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
+    if (aQueryParams == null)
+    {
+      LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
+      aUnifiedResponse.createNotFound ();
+      return;
+    }
 
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
-    final String sLogPrefix = "[QueryAPI] ";
     LOGGER.info (sLogPrefix +
                  "BusinessCard of '" +
                  aParticipantID.getURIEncoded () +
@@ -101,15 +107,15 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
                  aQueryParams.getSMPHostURI () +
                  "'");
 
-    IJsonObject aJson = null;
+    final SMPHttpClientSettings aHCS = new SMPHttpClientSettings ();
 
-    final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
+    final String sBCURL = StringHelper.trimEnd (aQueryParams.getSMPHostURI ().toString (), '/') +
                           "/businesscard/" +
                           aParticipantID.getURIEncoded ();
     LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
 
     byte [] aData;
-    try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
+    try (final HttpClientManager aHttpClientMgr = HttpClientManager.create (aHCS))
     {
       final HttpGet aGet = new HttpGet (sBCURL);
       aData = aHttpClientMgr.execute (aGet, new ResponseHandlerByteArray ());
@@ -118,6 +124,8 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     {
       aData = null;
     }
+
+    IJsonObject aJson = null;
     if (aData == null)
     {
       LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
@@ -135,11 +143,13 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
         aJson = aBC.getAsJson ();
       }
     }
+
     aSW.stop ();
+
     if (aJson == null)
     {
       LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.createNotFound ();
     }
     else
     {
@@ -151,10 +161,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());
 
-      final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
-      aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
-                      .setMimeType (CMimeType.APPLICATION_JSON)
-                      .enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
+      aUnifiedResponse.json (aJson).enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
     }
   }
 }

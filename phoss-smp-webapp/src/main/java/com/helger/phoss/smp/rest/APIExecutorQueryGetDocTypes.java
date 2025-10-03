@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,14 +32,10 @@ import com.helger.base.timing.StopWatch;
 import com.helger.collection.commons.CommonsTreeMap;
 import com.helger.collection.commons.ICommonsSortedMap;
 import com.helger.datetime.helper.PDTFactory;
-import com.helger.http.CHttp;
 import com.helger.httpclient.HttpClientManager;
 import com.helger.httpclient.response.ResponseHandlerByteArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
-import com.helger.json.serialize.JsonWriter;
-import com.helger.json.serialize.JsonWriterSettings;
-import com.helger.mime.CMimeType;
 import com.helger.peppol.businesscard.generic.PDBusinessCard;
 import com.helger.peppol.businesscard.helper.PDBusinessCardHelper;
 import com.helger.peppol.sml.ESMPAPIType;
@@ -53,9 +48,10 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
 import com.helger.smpclient.bdxr2.BDXR2ClientReadOnly;
+import com.helger.smpclient.httpclient.SMPHttpClientSettings;
 import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -64,14 +60,20 @@ import jakarta.annotation.Nonnull;
 
 public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
 {
+  public static final String PARAM_XML_SCHEMA_VALIDATION = "xmlSchemaValidation";
+  public static final String PARAM_BUSINESS_CARD = "businessCard";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetDocTypes.class);
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[QueryAPI] ";
+
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
@@ -86,18 +88,22 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
 
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
-    {
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
-    }
-    final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
 
-    final boolean bQueryBusinessCard = aRequestScope.params ().getAsBoolean ("businessCard", false);
-    final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean ("xmlSchemaValidation", true);
+    final SMPQueryParams aSMPQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
+    if (aSMPQueryParams == null)
+    {
+      LOGGER.error (sLogPrefix + "Participant ID '" + sPathServiceGroupID + "' is not registered in the DNS");
+      aUnifiedResponse.createNotFound ();
+      return;
+    }
+
+    final boolean bQueryBusinessCard = aRequestScope.params ().getAsBoolean (PARAM_BUSINESS_CARD, false);
+    final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean (PARAM_XML_SCHEMA_VALIDATION, true);
+    final boolean bVerifySignature = true;
 
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
-
-    final String sLogPrefix = "[QueryAPI] ";
 
     LOGGER.info (sLogPrefix +
                  "Document types of '" +
@@ -105,17 +111,20 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
                  "' are queried using SMP API '" +
                  eAPIType +
                  "' from '" +
-                 aQueryParams.getSMPHostURI () +
+                 aSMPQueryParams.getSMPHostURI () +
                  "'; XSD validation=" +
-                 bXMLSchemaValidation);
+                 bXMLSchemaValidation +
+                 "; signature verification=" +
+                 bVerifySignature);
 
     ICommonsSortedMap <String, String> aSGHrefs = null;
     switch (eAPIType)
     {
       case PEPPOL:
       {
-        final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aQueryParams.getSMPHostURI ());
+        final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aSMPQueryParams.getSMPHostURI ());
         aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
+        aSMPClient.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
         final com.helger.xsds.peppol.smp1.ServiceGroupType aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
@@ -137,8 +146,9 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       case OASIS_BDXR_V1:
       {
         aSGHrefs = new CommonsTreeMap <> ();
-        final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aQueryParams.getSMPHostURI ());
+        final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aSMPQueryParams.getSMPHostURI ());
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
+        aBDXR1Client.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
         final com.helger.xsds.bdxr.smp1.ServiceGroupType aSG = aBDXR1Client.getServiceGroupOrNull (aParticipantID);
@@ -160,8 +170,9 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       case OASIS_BDXR_V2:
       {
         aSGHrefs = new CommonsTreeMap <> ();
-        final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aQueryParams.getSMPHostURI ());
+        final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aSMPQueryParams.getSMPHostURI ());
         aBDXR2Client.setXMLSchemaValidation (bXMLSchemaValidation);
+        aBDXR2Client.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
         final com.helger.xsds.bdxr.smp2.ServiceGroupType aSG = aBDXR2Client.getServiceGroupOrNull (aParticipantID);
@@ -184,16 +195,21 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     }
     IJsonObject aJson = null;
     if (aSGHrefs != null)
+    {
       aJson = SMPJsonResponse.convert (eAPIType, aParticipantID, aSGHrefs, aIF);
+    }
+
     if (bQueryBusinessCard)
     {
-      final String sBCURL = aQueryParams.getSMPHostURI ().toString () +
+      final SMPHttpClientSettings aHCS = new SMPHttpClientSettings ();
+
+      final String sBCURL = StringHelper.trimEnd (aSMPQueryParams.getSMPHostURI ().toString (), '/') +
                             "/businesscard/" +
                             aParticipantID.getURIEncoded ();
       LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
 
       byte [] aData;
-      try (HttpClientManager aHttpClientMgr = new HttpClientManager ())
+      try (final HttpClientManager aHttpClientMgr = HttpClientManager.create (aHCS))
       {
         final HttpGet aGet = new HttpGet (sBCURL);
         aData = aHttpClientMgr.execute (aGet, new ResponseHandlerByteArray ());
@@ -202,13 +218,14 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       {
         aData = null;
       }
+
       if (aData == null)
       {
         LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
       }
       else
       {
-        final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
+        final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, StandardCharsets.UTF_8);
         if (aBC == null)
         {
           LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
@@ -218,15 +235,17 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
           // Business Card found
           if (aJson == null)
             aJson = new JsonObject ();
-          aJson.add ("businessCard", aBC.getAsJson ());
+          aJson.add (PARAM_BUSINESS_CARD, aBC.getAsJson ());
         }
       }
     }
+
     aSW.stop ();
+
     if (aJson == null)
     {
       LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.createNotFound ();
     }
     else
     {
@@ -235,10 +254,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());
 
-      final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
-      aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
-                      .setMimeType (CMimeType.APPLICATION_JSON)
-                      .enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
+      aUnifiedResponse.json (aJson).enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
     }
   }
 }

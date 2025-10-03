@@ -24,7 +24,6 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
-import com.helger.http.CHttp;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
@@ -35,7 +34,7 @@ import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceMetadataType;
 import com.helger.smpclient.bdxr2.marshal.BDXR2MarshallerServiceMetadata;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
@@ -46,11 +45,12 @@ import jakarta.annotation.Nonnull;
 
 public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
 {
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
@@ -120,8 +120,8 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
     }
 
     if (eSuccess.isFailure ())
-      aUnifiedResponse.setStatus (CHttp.HTTP_INTERNAL_SERVER_ERROR);
+      aUnifiedResponse.createInternalServerError ();
     else
-      aUnifiedResponse.setStatus (CHttp.HTTP_OK).disableCaching ();
+      aUnifiedResponse.createOk ();
   }
 }

@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.mime.CMimeType;
-import com.helger.mime.MimeType;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.BadRequestFault;
@@ -48,14 +46,11 @@ import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.serialize.MicroWriter;
-import com.helger.xml.serialize.write.EXMLSerializeIndent;
-import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.sun.xml.ws.client.ClientTransportException;
 
 import jakarta.annotation.Nonnull;
@@ -72,11 +67,12 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
   public static final String XML_ELEMENT_MIGRATION_KEY = "migrationKey";
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorMigrationOutboundStartPut.class);
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
@@ -177,10 +173,6 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     eRoot.addElement (XML_ELEMENT_PARTICIPANT_ID).addText (sServiceGroupID);
     eRoot.addElement (XML_ELEMENT_MIGRATION_KEY).addText (sMigrationKey);
 
-    final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
-    aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
-                    .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                         aXWS.getCharset ().name ()))
-                    .disableCaching ();
+    aUnifiedResponse.xml (aResponseDoc);
   }
 }

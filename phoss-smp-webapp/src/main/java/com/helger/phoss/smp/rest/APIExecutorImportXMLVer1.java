@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -39,10 +38,6 @@ import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
-import com.helger.json.serialize.JsonWriter;
-import com.helger.json.serialize.JsonWriterSettings;
-import com.helger.mime.CMimeType;
-import com.helger.mime.MimeType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -56,18 +51,15 @@ import com.helger.phoss.smp.exchange.ServiceGroupImport;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
-import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
-import com.helger.xml.microdom.serialize.MicroWriter;
-import com.helger.xml.serialize.write.EXMLSerializeIndent;
-import com.helger.xml.serialize.write.XMLWriterSettings;
 
 import jakarta.annotation.Nonnull;
 
@@ -85,11 +77,12 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
 
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorImportXMLVer1.class);
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
@@ -212,10 +205,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
         aImportSummary.appendTo (eSummary);
       }
 
-      final XMLWriterSettings aXWS = new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN);
-      aUnifiedResponse.setContentAndCharset (MicroWriter.getNodeAsString (aResponseDoc, aXWS), aXWS.getCharset ())
-                      .setMimeType (new MimeType (CMimeType.APPLICATION_XML).addParameter (CMimeType.PARAMETER_NAME_CHARSET,
-                                                                                           aXWS.getCharset ().name ()));
+      aUnifiedResponse.xml (aResponseDoc);
     }
     else
     {
@@ -249,9 +239,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
         aJson.add ("summary", aSummary);
       }
 
-      final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
-      aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8).setMimeType (CMimeType.APPLICATION_JSON);
+      aUnifiedResponse.json (aJson);
     }
-    aUnifiedResponse.disableCaching ();
   }
 }

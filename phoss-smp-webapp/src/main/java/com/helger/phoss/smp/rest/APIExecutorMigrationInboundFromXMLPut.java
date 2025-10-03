@@ -26,7 +26,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
@@ -42,12 +42,14 @@ import jakarta.annotation.Nonnull;
  */
 public final class APIExecutorMigrationInboundFromXMLPut extends AbstractSMPAPIExecutor
 {
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[REST API Migration-Inbound-XML] ";
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -56,8 +58,6 @@ public final class APIExecutorMigrationInboundFromXMLPut extends AbstractSMPAPIE
       throw new SMPPreconditionFailedException ("The writable REST API is disabled. migrationInbound will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
-
-    final String sLogPrefix = "[REST API Migration-Inbound-XML] ";
 
     // Parse main payload
     final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
@@ -84,6 +84,10 @@ public final class APIExecutorMigrationInboundFromXMLPut extends AbstractSMPAPIE
                                         aDataProvider.getCurrentURI ());
 
     // Response is filled inside
-    APIExecutorMigrationInboundFromPathPut.migrationInbound (sServiceGroupID, sMigrationKey, sLogPrefix, aRequestScope, aUnifiedResponse);
+    APIExecutorMigrationInboundFromPathPut.migrationInbound (sServiceGroupID,
+                                                             sMigrationKey,
+                                                             sLogPrefix,
+                                                             aRequestScope,
+                                                             aUnifiedResponse);
   }
 }

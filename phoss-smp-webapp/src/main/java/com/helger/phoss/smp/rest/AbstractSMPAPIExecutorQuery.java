@@ -23,7 +23,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolConfigurableURLProvider;
+import com.helger.smpclient.url.PeppolNaptrURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 
 import jakarta.annotation.Nonnull;
@@ -47,7 +47,7 @@ abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
     @Nonnull
     private static ISMPURLProvider _getURLProvider (@Nonnull final ESMPAPIType eAPIType)
     {
-      return eAPIType == ESMPAPIType.PEPPOL ? PeppolConfigurableURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
+      return eAPIType == ESMPAPIType.PEPPOL ? PeppolNaptrURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
     }
 
     @Nullable
@@ -69,5 +69,4 @@ abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
       return ret;
     }
   }
-
 }

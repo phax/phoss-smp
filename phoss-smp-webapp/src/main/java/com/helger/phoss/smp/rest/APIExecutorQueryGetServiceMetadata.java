@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -32,14 +31,10 @@ import com.helger.base.timing.StopWatch;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.rt.OffsetDate;
 import com.helger.datetime.xml.XMLOffsetDate;
-import com.helger.http.CHttp;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
-import com.helger.json.serialize.JsonWriter;
-import com.helger.json.serialize.JsonWriterSettings;
-import com.helger.mime.CMimeType;
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -50,7 +45,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
-import com.helger.servlet.response.UnifiedResponse;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
 import com.helger.smpclient.bdxr2.BDXR2ClientReadOnly;
 import com.helger.smpclient.extension.SMPExtensionList;
@@ -108,12 +103,14 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     return ret;
   }
 
-  public void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                         @Nonnull @Nonempty final String sPath,
-                         @Nonnull final Map <String, String> aPathVariables,
-                         @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                         @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  @Override
+  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
+                            @Nonnull @Nonempty final String sPath,
+                            @Nonnull final Map <String, String> aPathVariables,
+                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[QueryAPI] ";
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
@@ -134,6 +131,12 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     }
 
     final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
+    if (aQueryParams == null)
+    {
+      LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
+      aUnifiedResponse.createNotFound ();
+      return;
+    }
 
     final String sDocTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
     final IDocumentTypeIdentifier aDocTypeID = aIF.parseDocumentTypeIdentifier (sDocTypeID);
@@ -146,7 +149,6 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
-    final String sLogPrefix = "[QueryAPI] ";
     LOGGER.info (sLogPrefix +
                  "Participant information of '" +
                  aParticipantID.getURIEncoded () +
@@ -215,7 +217,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     if (aJson == null)
     {
       LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
-      aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+      aUnifiedResponse.createNotFound ();
     }
     else
     {
@@ -224,10 +226,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       aJson.add ("queryDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("queryDurationMillis", aSW.getMillis ());
 
-      final String sRet = new JsonWriter (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED).writeAsString (aJson);
-      aUnifiedResponse.setContentAndCharset (sRet, StandardCharsets.UTF_8)
-                      .setMimeType (CMimeType.APPLICATION_JSON)
-                      .enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
+      aUnifiedResponse.json (aJson).enableCaching (1 * CGlobal.SECONDS_PER_HOUR);
     }
   }
 }
