@@ -123,5 +123,4 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
 
     invokeAPI (aAPIDescriptor, sPath, aPathVariables, aRequestScope, aPUR);
   }
-
 }

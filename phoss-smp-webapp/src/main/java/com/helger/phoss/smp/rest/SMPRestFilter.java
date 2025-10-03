@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.base.state.EContinue;
 import com.helger.cache.regex.RegExHelper;
 import com.helger.http.EHttpMethod;
+import com.helger.http.EHttpVersion;
 import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.api.APIDescriptor;
@@ -48,12 +49,15 @@ import com.helger.photon.api.GlobalAPIInvoker;
 import com.helger.photon.api.IAPIExceptionMapper;
 import com.helger.photon.api.IAPIRegistry;
 import com.helger.photon.api.InvokableAPIDescriptor;
+import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.servlet.response.UnifiedResponse;
+import com.helger.web.scope.IRequestWebScope;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXFilterUnifiedResponse;
 
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This is the SMP REST filter that MUST be implemented as a filter on "/*"
@@ -326,6 +330,16 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
   }
 
+  @Nonnull
+  @Override
+  protected PhotonUnifiedResponse createUnifiedResponse (@Nonnull final EHttpVersion eHttpVersion,
+                                                         @Nonnull final EHttpMethod eHttpMethod,
+                                                         @Nonnull final HttpServletRequest aHttpRequest,
+                                                         @Nonnull final IRequestWebScope aRequestScope)
+  {
+    return new PhotonUnifiedResponse (eHttpVersion, eHttpMethod, aHttpRequest, aRequestScope);
+  }
+
   @Override
   @Nonnull
   protected EContinue onFilterBefore (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
@@ -336,7 +350,9 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     {
       LOGGER.debug ("REST Filter path variants:");
       LOGGER.debug ("a) " + aRequestScope.getRequest ().getRequestURI ());
-      LOGGER.debug ("b) " + new StringBuilder (aRequestScope.getRequest ().getRequestURL ().toString ()).toString ());
+      LOGGER.debug ("b) " +
+                    new StringBuilder (new StringBuilder (aRequestScope.getRequest ().getRequestURL ().toString ())
+                                                                                                                   .toString ()).toString ());
       LOGGER.debug ("c) " + aRequestScope.getRequestURIEncoded ());
       LOGGER.debug ("d) " + aRequestScope.getRequestURLEncoded ().toString ());
       LOGGER.debug ("e) " + aRequestScope.getRequestURIDecoded ());
