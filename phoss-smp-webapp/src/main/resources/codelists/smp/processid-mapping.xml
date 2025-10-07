@@ -49,6 +49,7 @@
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p002:01:1.0" name="Peppol predefined" state="dep" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:2017:pracc:p003:01:1.0" name="Peppol predefined" state="dep" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:edec:bis:reporting:1.0" name="Peppol predefined" state="act" />
+  <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:advanced_transport_execution_plan:1" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:despatch_advice_only:1" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_receipt_advice:1" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" name="Peppol predefined" state="act" />
@@ -122,6 +123,6 @@
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:bii36:ver2.0" name="Peppol predefined" state="dep" />
   <item id="cenbii-procid-ubl::urn:www.cenbii.eu:profile:biixy:ver2.0" name="Peppol predefined" state="act" />
   <item id="cenbii-procid-ubl::urn:www.peppol.eu:profile:bis63a:ver1.0" name="Peppol predefined" state="dep" />
-  <item id="oioubl-procid-ubl::Procurement-ReminderOnly-1.0" name="Peppol predefined" state="act" />
-  <item id="oioubl-procid-ubl::Reference-Utility-1.0" name="Peppol predefined" state="act" />
+  <item id="oioubl-procid-ubl::Procurement-ReminderOnly-1.0" name="Peppol predefined" state="dep" />
+  <item id="oioubl-procid-ubl::Reference-Utility-1.0" name="Peppol predefined" state="dep" />
 </root>

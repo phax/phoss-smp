@@ -180,7 +180,10 @@
   <item id="busdox-docid-qns::urn:kosit:names:spec:peppol-reporting:schema:xsd:Reporting-1::APData##Reporting::1.0" name="Peppol German Peppol Usage Evaluation AP" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:kosit:profile:reporting:1.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:logistics:trns:despatch_advice_response:1::2.1" name="Peppol Despatch Advice Response" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:logistics:trns:application_response:1::2.1" name="Peppol Logistics Application Response V1" state="act">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:advanced_transport_execution_plan:1" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:logistics:trns:despatch_advice_response:1::2.1" name="Peppol Despatch Advice Response V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ApplicationResponse-2::ApplicationResponse##urn:fdc:peppol.eu:poacc:trns:catalogue_response:3::2.1" name="Peppol Catalogue Response transaction 3.0" state="act">
@@ -358,13 +361,13 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@aunz-1::2.1" name="Peppol A-NZ PINT Credit Note v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Credit Note v1.0" state="dep">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Credit Note v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@aunz-1::2.1" name="Peppol A-NZ PINT Self-Billing Credit Note v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Credit Note v1.0" state="dep">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Credit Note v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:www.cenbii.eu:transaction:biicoretrdm014:ver1.0:#urn:www.cenbii.eu:profile:biixx:ver1.0#urn:www.difi.no:ehf:kreditnota:ver1::2.0" name="Peppol Standalone Credit Note according to EHF V1" state="act">
@@ -382,7 +385,7 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2::CreditNote##urn:www.cenbii.eu:transaction:biitrns014:ver2.0:extended:urn:www.peppol.eu:bis:peppol5a:ver2.0:extended:e-fff:ver3.0::2.1" name="e-FFF 3.0 CreditNote" state="dep">
     <procid scheme="cenbii-procid-ubl" value="urn:www.cenbii.eu:profile:bii05:ver1.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:DespatchAdvice-2::DespatchAdvice##urn:fdc:peppol.eu:logistics:trns:advanced_despatch_advice:1::2.1" name="Peppol Advanced Despatch Advice" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:DespatchAdvice-2::DespatchAdvice##urn:fdc:peppol.eu:logistics:trns:advanced_despatch_advice:1::2.1" name="Peppol Advanced Despatch Advice V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_only:1" />
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_response:1" />
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_receipt_advice:1" />
@@ -563,7 +566,7 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@jp-1::2.1" name="Peppol JP PINT Invoice v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Invoice v1.0" state="dep">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:billing-1@my-1::2.1" name="Peppol MY PINT Invoice v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:billing" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:nontaxinvoice-1@jp-1::2.1" name="Peppol JP BIS Invoice for Non-tax Registered Businesses" state="rem">
@@ -575,7 +578,7 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@jp-1::2.1" name="Peppol JP BIS Self-Billing Invoice" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Invoice v1.0" state="dep">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:peppol:pint:selfbilling-1@my-1::2.1" name="Peppol MY PINT Self-Billing Invoice v1.0" state="rem">
     <procid scheme="cenbii-procid-ubl" value="urn:peppol:bis:selfbilling" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Invoice-2::Invoice##urn:www.cenbii.eu:transaction:biicoretrdm010:ver1.0:#urn:www.peppol.eu:bis:peppol4a:ver1.0#urn:www.difi.no:ehf:faktura:ver1::2.0" name="Peppol EHF Invoice V1" state="dep">
@@ -715,13 +718,13 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Qualification-2::Qualification##urn:fdc:peppol.eu:prac:trns:t019:1.1::2.2" name="Peppol Qualification / Qualification V1.1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:prac:bis:p011:1.1" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ReceiptAdvice-2::ReceiptAdvice##urn:fdc:peppol.eu:logistics:trns:receipt_advice:1::2.3" name="Peppol Receipt Advice" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ReceiptAdvice-2::ReceiptAdvice##urn:fdc:peppol.eu:logistics:trns:receipt_advice:1::2.3" name="Peppol Receipt Advice V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:despatch_advice_w_receipt_advice:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:ReceiptAdvice-2::ReceiptAdvice##urn:fdc:www.efaktura.gov.pl:ver1.0:trns:receipt_advice:ver1.0::2.1" name="Peppol PEF.PL Receipt Advice v1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:www.efaktura.gov.pl:ver1.0:receipt_advice:ver1.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Reminder-2::Reminder##OIOUBL-2.02::2.0" name="Peppol OIOUBL Reminder V2.02" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Reminder-2::Reminder##OIOUBL-2.02::2.0" name="Peppol OIOUBL Reminder V2.02" state="dep">
     <procid scheme="oioubl-procid-ubl" value="Procurement-ReminderOnly-1.0" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Reminder-2::Reminder##urn:www.cenbii.eu:transaction:biicoretrdm017:ver1.0:#urn:www.cenbii.eu:profile:biixy:ver1.0#urn:www.difi.no:ehf:purring:ver1::2.0" name="Peppol EHF Reminder 1.1 (Profile XY) (Reminder)" state="act">
@@ -766,25 +769,31 @@
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TenderWithdrawal-2::TenderWithdrawal##urn:fdc:peppol.eu:prac:trns:t013:1.1::2.2" name="Peppol Tender Withdrawal / Tender Withdrawal V1.1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:prac:bis:p007:1.1" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportExecutionPlan-2::TransportExecutionPlan##urn:fdc:peppol.eu:logistics:trns:transport_execution_plan:1::2.3" name="Peppol Transport Execution Plan" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportExecutionPlan-2::TransportExecutionPlan##urn:fdc:peppol.eu:logistics:trns:transport_execution_plan:1::2.3" name="Peppol Transport Execution Plan V1" state="dep">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:transport_execution_plan_only:1" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportExecutionPlanRequest-2::TransportExecutionPlanRequest##urn:fdc:peppol.eu:logistics:trns:transport_execution_plan_request:1::2.3" name="Peppol Transport Execution Plan Request" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportExecutionPlan-2::TransportExecutionPlan##urn:fdc:peppol.eu:logistics:trns:transport_execution_plan:1::2.4" name="Peppol Transport Execution Plan V1.2" state="act">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:transport_execution_plan_only:1" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportExecutionPlanRequest-2::TransportExecutionPlanRequest##urn:fdc:peppol.eu:logistics:trns:transport_execution_plan_request:1::2.3" name="Peppol Transport Execution Plan Request V1" state="dep">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:transport_execution_plan_w_request:1" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportationStatus-2::TransportationStatus##urn:fdc:peppol.eu:logistics:trns:transportation_status:1::2.3" name="Peppol Transportation Status" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportExecutionPlanRequest-2::TransportExecutionPlanRequest##urn:fdc:peppol.eu:logistics:trns:transport_execution_plan_request:1::2.4" name="Peppol Transport Execution Plan Request V1.2" state="act">
+    <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:transport_execution_plan_w_request:1" />
+  </item>
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportationStatus-2::TransportationStatus##urn:fdc:peppol.eu:logistics:trns:transportation_status:1::2.3" name="Peppol Transportation Status V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:transportation_status_only:1" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportationStatusRequest-2::TransportationStatusRequest##urn:fdc:peppol.eu:logistics:trns:transportation_status_request:1::2.3" name="Peppol Transportation Status Request" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:TransportationStatusRequest-2::TransportationStatusRequest##urn:fdc:peppol.eu:logistics:trns:transportation_status_request:1::2.3" name="Peppol Transportation Status Request V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:transportation_status_w_request:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:UtilityStatement-2::UtilityStatement##urn:fdc:www.efaktura.gov.pl:ver2.0:trns:us:ver1.0::2.1" name="Peppol PL Dokument pomocniczy ver. 1.0" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:www.efaktura.gov.pl:ver2.0:us:ver1.0" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Waybill-2::Waybill##urn:fdc:peppol.eu:logistics:trns:waybill:1::2.3" name="Peppol Waybill" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:Waybill-2::Waybill##urn:fdc:peppol.eu:logistics:trns:waybill:1::2.3" name="Peppol Waybill V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:waybill:1" />
   </item>
-  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:WeightStatement-2::WeightStatement##urn:fdc:peppol.eu:logistics:trns:weight_statement:1::2.3" name="Peppol Weight Statement" state="act">
+  <item id="busdox-docid-qns::urn:oasis:names:specification:ubl:schema:xsd:WeightStatement-2::WeightStatement##urn:fdc:peppol.eu:logistics:trns:weight_statement:1::2.3" name="Peppol Weight Statement V1" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:logistics:bis:weight_statement:1" />
   </item>
   <item id="busdox-docid-qns::urn:oasis:names:tc:ebxml-regrep:xsd:lcm:4.0::SubmitObjectsRequest##urn:fdc:peppol.eu:prac:trns:t015:1.1::4.0" name="Peppol Publish Notice / Publish Notice V1.1" state="act">
@@ -805,7 +814,7 @@
   <item id="busdox-docid-qns::urn:oasis:names:tc:ebxml-regrep:xsd:query:4.0::QueryResponse##urn:fdc:peppol.eu:prac:trns:t012:1.2::4.0" name="Peppol Search Notices / Search Notice Response V1.2" state="act">
     <procid scheme="cenbii-procid-ubl" value="urn:fdc:peppol.eu:prac:bis:p006:1.2" />
   </item>
-  <item id="busdox-docid-qns::urn:oioubl:names:specification:oioubl:schema:xsd:UtilityStatement-2::UtilityStatement##OIOUBL-2.02::2.0" name="Peppol OIOUBL UtilityStatement V2.02" state="act">
+  <item id="busdox-docid-qns::urn:oioubl:names:specification:oioubl:schema:xsd:UtilityStatement-2::UtilityStatement##OIOUBL-2.02::2.0" name="Peppol OIOUBL UtilityStatement V2.02" state="dep">
     <procid scheme="oioubl-procid-ubl" value="Reference-Utility-1.0" />
   </item>
   <item id="busdox-docid-qns::urn:peppol:doctype:bilateral##eb2b:bilateral::0" name="Peppol Bilaterally agreed Document - eB2B Extension" state="act">
