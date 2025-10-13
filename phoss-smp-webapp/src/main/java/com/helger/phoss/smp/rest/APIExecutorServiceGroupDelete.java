@@ -36,6 +36,8 @@ import jakarta.annotation.Nonnull;
 
 public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
 {
+  public static final String PARAM_DELETE_IN_SML = "delete-in-sml";
+
   @Override
   protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                             @Nonnull @Nonempty final String sPath,
@@ -54,7 +56,7 @@ public final class APIExecutorServiceGroupDelete extends AbstractSMPAPIExecutor
     }
 
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
-    final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString ("delete-in-sml"));
+    final boolean bDeleteInSML = !"false".equalsIgnoreCase (aRequestScope.params ().getAsString (PARAM_DELETE_IN_SML));
 
     switch (SMPServerConfiguration.getRESTType ())
     {

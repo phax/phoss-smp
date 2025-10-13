@@ -57,8 +57,7 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.xsds.peppol.smp1.ServiceGroupReferenceListType ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
-                                                                                                                                             aCredentials);
+        final var ret = new SMPServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID, aCredentials);
         aBytes = new SMPMarshallerServiceGroupReferenceListType ().setUseSchema (XML_SCHEMA_VALIDATION)
                                                                   .getAsBytes (ret);
         break;
@@ -66,8 +65,7 @@ public final class APIExecutorUserListGet extends AbstractSMPAPIExecutor
       case OASIS_BDXR_V1:
       {
         // Unspecified extension
-        final com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID,
-                                                                                                                                             aCredentials);
+        final var ret = new BDXR1ServerAPI (aDataProvider).getServiceGroupReferenceList (sPathUserID, aCredentials);
         aBytes = new BDXR1MarshallerServiceGroupReferenceListType ().setUseSchema (XML_SCHEMA_VALIDATION)
                                                                     .getAsBytes (ret);
         break;

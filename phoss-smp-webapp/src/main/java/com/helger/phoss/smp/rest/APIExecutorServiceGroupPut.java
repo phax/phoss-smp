@@ -78,8 +78,8 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.xsds.peppol.smp1.ServiceGroupType aServiceGroup = new SMPMarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION)
-                                                                                                               .read (aServiceGroupDoc);
+        final var aServiceGroup = new SMPMarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                      .read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
           new SMPServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
@@ -92,8 +92,8 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V1:
       {
-        final com.helger.xsds.bdxr.smp1.ServiceGroupType aServiceGroup = new BDXR1MarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION)
-                                                                                                               .read (aServiceGroupDoc);
+        final var aServiceGroup = new BDXR1MarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                        .read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
           new BDXR1ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,
@@ -106,8 +106,8 @@ public final class APIExecutorServiceGroupPut extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V2:
       {
-        final com.helger.xsds.bdxr.smp2.ServiceGroupType aServiceGroup = new BDXR2MarshallerServiceGroup ().setUseSchema (XML_SCHEMA_VALIDATION)
-                                                                                                           .read (aServiceGroupDoc);
+        final var aServiceGroup = new BDXR2MarshallerServiceGroup ().setUseSchema (XML_SCHEMA_VALIDATION)
+                                                                    .read (aServiceGroupDoc);
         if (aServiceGroup != null)
         {
           new BDXR2ServerAPI (aDataProvider).saveServiceGroup (sPathServiceGroupID,

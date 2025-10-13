@@ -70,6 +70,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_CONNECTION_TIMEOUT_MS = "sml.connection.timeout.ms";
   public static final String KEY_SML_REQUEST_TIMEOUT_MS = "sml.request.timeout.ms";
 
+  public static final String KEY_HREDELIVERY_XML_ROOT_NO_NS_PREFIX = "hredelivery.xml.root.no.nsprefix";
+
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
   public static final ESMPRESTType DEFAULT_SMP_REST_TYPE = ESMPRESTType.PEPPOL;
@@ -85,6 +87,8 @@ public final class SMPServerConfiguration
   public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE = "bdxr-as4-signing-encryption";
 
   public static final Timeout DEFAULT_SML_REQUEST_TIMEOUT = Timeout.ofSeconds (30);
+
+  public static final boolean DEFAULT_HREDELIVERY_XML_ROOT_NO_NS_PREFIX = false;
 
   private SMPServerConfiguration ()
   {}
@@ -381,5 +385,17 @@ public final class SMPServerConfiguration
     if (ret >= 0)
       return Timeout.ofMilliseconds (ret);
     return DEFAULT_SML_REQUEST_TIMEOUT;
+  }
+
+  /**
+   * @return <code>true</code> if the OASIS BDXR 1 SMP binding is used and the root element should
+   *         use an empty XML namespace prefix, <code>false</code> if the default namespace prefix
+   *         should be used.
+   * @since 8.0.1
+   */
+  public static boolean isHRXMLNoRootNamespacePrefix ()
+  {
+    return _getConfig ().getAsBoolean (KEY_HREDELIVERY_XML_ROOT_NO_NS_PREFIX,
+                                       DEFAULT_HREDELIVERY_XML_ROOT_NO_NS_PREFIX);
   }
 }

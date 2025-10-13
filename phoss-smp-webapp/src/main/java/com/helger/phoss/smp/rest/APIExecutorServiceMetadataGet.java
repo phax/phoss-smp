@@ -39,6 +39,7 @@ import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.phoss.smp.security.SMPKeyManager;
+import com.helger.phoss.smp.xml.BDXR1NamespaceContextRootNoPrefix;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerSignedServiceMetadataType;
@@ -73,8 +74,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     {
       case PEPPOL:
       {
-        final com.helger.xsds.peppol.smp1.SignedServiceMetadataType ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
-                                                                                                                                   sPathDocumentTypeID);
+        final var ret = new SMPServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
+                                                                                 sPathDocumentTypeID);
 
         // Convert to DOM document
         final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
@@ -85,11 +86,13 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V1:
       {
-        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
-                                                                                                                                   sPathDocumentTypeID);
+        final var ret = new BDXR1ServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
+                                                                                   sPathDocumentTypeID);
 
         // Convert to DOM document
         final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
+        if (SMPServerConfiguration.isHRXMLNoRootNamespacePrefix ())
+          aMarshaller.setNamespaceContext (BDXR1NamespaceContextRootNoPrefix.getInstance ());
         // Disable XSD check, because Signature is added later
         aMarshaller.setUseSchema (false);
         aDoc = aMarshaller.getAsDocument (ret);
@@ -97,8 +100,8 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
       }
       case OASIS_BDXR_V2:
       {
-        final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new BDXR2ServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
-                                                                                                                             sPathDocumentTypeID);
+        final var ret = new BDXR2ServerAPI (aDataProvider).getServiceRegistration (sPathServiceGroupID,
+                                                                                   sPathDocumentTypeID);
 
         // Convert to DOM document
         final BDXR2MarshallerServiceMetadata aMarshaller = new BDXR2MarshallerServiceMetadata ();

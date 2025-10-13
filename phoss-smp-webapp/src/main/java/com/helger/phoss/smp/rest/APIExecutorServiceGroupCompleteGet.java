@@ -26,6 +26,7 @@ import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
+import com.helger.phoss.smp.xml.BDXR1NamespaceContextRootNoPrefix;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerCompleteServiceGroupType;
@@ -53,15 +54,18 @@ public final class APIExecutorServiceGroupCompleteGet extends AbstractSMPAPIExec
       case PEPPOL:
       {
         // Unspecified extension
-        final com.helger.xsds.peppol.smp1.CompleteServiceGroupType ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sPathServiceGroupID);
+        final var ret = new SMPServerAPI (aDataProvider).getCompleteServiceGroup (sPathServiceGroupID);
         aBytes = new SMPMarshallerCompleteServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V1:
       {
         // Unspecified extension
-        final com.helger.xsds.bdxr.smp1.CompleteServiceGroupType ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sPathServiceGroupID);
-        aBytes = new BDXR1MarshallerCompleteServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        final var ret = new BDXR1ServerAPI (aDataProvider).getCompleteServiceGroup (sPathServiceGroupID);
+        final var m = new BDXR1MarshallerCompleteServiceGroupType ();
+        if (SMPServerConfiguration.isHRXMLNoRootNamespacePrefix ())
+          m.setNamespaceContext (BDXR1NamespaceContextRootNoPrefix.getInstance ());
+        aBytes = m.setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       // Not supported with OASIS BDXR v2
