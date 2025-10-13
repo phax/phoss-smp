@@ -71,6 +71,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_REQUEST_TIMEOUT_MS = "sml.request.timeout.ms";
 
   public static final String KEY_HREDELIVERY_XML_ROOT_NO_NS_PREFIX = "hredelivery.xml.root.no.nsprefix";
+  public static final String KEY_HREDELIVERY_SG_EXTENSION_ON_SI = "hredelivery.sg.extension.on.si";
 
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
@@ -89,6 +90,7 @@ public final class SMPServerConfiguration
   public static final Timeout DEFAULT_SML_REQUEST_TIMEOUT = Timeout.ofSeconds (30);
 
   public static final boolean DEFAULT_HREDELIVERY_XML_ROOT_NO_NS_PREFIX = false;
+  public static final boolean DEFAULT_HREDELIVERY_SG_EXTENSION_ON_SI = false;
 
   private SMPServerConfiguration ()
   {}
@@ -397,5 +399,15 @@ public final class SMPServerConfiguration
   {
     return _getConfig ().getAsBoolean (KEY_HREDELIVERY_XML_ROOT_NO_NS_PREFIX,
                                        DEFAULT_HREDELIVERY_XML_ROOT_NO_NS_PREFIX);
+  }
+
+  /**
+   * @return <code>true</code> if the ServiceGroup extension should also be emitted in the
+   *         ServiceInformation extension. The default is <code>false</code>.
+   * @since 8.0.1
+   */
+  public static boolean isHRIncludeSGExtOnSI ()
+  {
+    return _getConfig ().getAsBoolean (KEY_HREDELIVERY_SG_EXTENSION_ON_SI, DEFAULT_HREDELIVERY_SG_EXTENSION_ON_SI);
   }
 }

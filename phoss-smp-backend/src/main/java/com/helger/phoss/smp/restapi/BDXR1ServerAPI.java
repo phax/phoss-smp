@@ -28,6 +28,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -455,6 +456,14 @@ public final class BDXR1ServerAPI
       if (aRedirect != null)
       {
         aSignedServiceMetadata.setServiceMetadata (aRedirect.getAsJAXBObjectBDXR1 ());
+
+        if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
+        {
+          // Copy extensions over (#376)
+          aSignedServiceMetadata.getServiceMetadata ()
+                                .getRedirect ()
+                                .setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
+        }
       }
       else
       {
@@ -465,6 +474,11 @@ public final class BDXR1ServerAPI
         final ServiceMetadataType aSM = aServiceInfo == null ? null : aServiceInfo.getAsJAXBObjectBDXR1 ();
         if (aSM != null)
         {
+          if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
+          {
+            // Copy extensions over (#376)
+            aSM.getServiceInformation ().setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
+          }
           aSignedServiceMetadata.setServiceMetadata (aSM);
         }
         else
