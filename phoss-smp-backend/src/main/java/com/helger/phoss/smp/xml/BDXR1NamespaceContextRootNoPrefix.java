@@ -21,6 +21,7 @@ import jakarta.annotation.Nonnull;
  * @author Philip Helger
  * @since 8.0.1
  */
+@Deprecated (forRemoval = true, since = "8.0.2")
 public class BDXR1NamespaceContextRootNoPrefix extends BDXR1NamespaceContext
 {
   private static final class SingletonHolder

@@ -40,6 +40,7 @@ import jakarta.annotation.Nonnull;
 
 public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
 {
+  @SuppressWarnings ("removal")
   @Override
   protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                             @Nonnull @Nonempty final String sPath,

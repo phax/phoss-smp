@@ -57,6 +57,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataGet.class);
 
+  @SuppressWarnings ("removal")
   @Override
   protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                             @Nonnull @Nonempty final String sPath,

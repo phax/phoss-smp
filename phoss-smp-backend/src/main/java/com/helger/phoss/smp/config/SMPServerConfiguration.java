@@ -70,6 +70,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_CONNECTION_TIMEOUT_MS = "sml.connection.timeout.ms";
   public static final String KEY_SML_REQUEST_TIMEOUT_MS = "sml.request.timeout.ms";
 
+  @Deprecated (forRemoval = true, since = "8.0.2")
   public static final String KEY_HREDELIVERY_XML_ROOT_NO_NS_PREFIX = "hredelivery.xml.root.no.nsprefix";
   public static final String KEY_HREDELIVERY_SG_EXTENSION_ON_SI = "hredelivery.sg.extension.on.si";
 
@@ -395,6 +396,7 @@ public final class SMPServerConfiguration
    *         should be used.
    * @since 8.0.1
    */
+  @Deprecated (forRemoval = true, since = "8.0.2")
   public static boolean isHRXMLNoRootNamespacePrefix ()
   {
     return _getConfig ().getAsBoolean (KEY_HREDELIVERY_XML_ROOT_NO_NS_PREFIX,
