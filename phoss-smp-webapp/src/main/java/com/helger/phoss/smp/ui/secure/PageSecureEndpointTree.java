@@ -31,6 +31,7 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -40,7 +41,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.nicename.NiceNameUI;
+import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.app.url.LinkHelper;
@@ -126,9 +127,9 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
               final String sTransportProfile = aEndpoint.getTransportProfile ();
               final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
-              aBodyRow.addCell (new HCA (aViewURL).addChild (NiceNameUI.getTransportProfile (sTransportProfile,
-                                                                                             aTPCache.getFromCache (sTransportProfile),
-                                                                                             false)));
+              aBodyRow.addCell (new HCA (aViewURL).addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                                aTPCache.getFromCache (sTransportProfile),
+                                                                                                false)));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());
 
@@ -158,7 +159,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
             // Show process + endpoints
             final HCLI aLI = aULP.addItem ();
-            final HCDiv aDiv = div (NiceNameUI.getProcessID (aDocTypeID, aProcess.getProcessIdentifier (), false));
+            final HCDiv aDiv = div (NiceNameUI.createProcessID (aDocTypeID, aProcess.getProcessIdentifier (), false));
             aLI.addChild (aDiv);
             if (aEndpoints.isEmpty ())
             {
@@ -175,8 +176,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 
           // Show document types + children
           final HCLI aLI = aULDT.addItem ();
-          final HCDiv aDiv = div ().addChild (NiceNameUI.getDocumentTypeID (aServiceInfo.getDocumentTypeIdentifier (),
-                                                                            false))
+          final HCDiv aDiv = div ().addChild (NiceNameUI.createDocTypeID (aServiceInfo.getDocumentTypeIdentifier (),
+                                                                          false))
                                    .addChild (" ")
                                    .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                               SMPRestFilter.PATH_SERVICES +

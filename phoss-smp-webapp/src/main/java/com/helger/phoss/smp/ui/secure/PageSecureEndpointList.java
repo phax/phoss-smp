@@ -28,6 +28,7 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -36,7 +37,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.nicename.NiceNameUI;
+import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -116,14 +117,14 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           final HCRow aRow = aTable.addBodyRow ();
           final ISimpleURL aViewURL = createViewURL (aWPEC, aServiceInfo, aParams);
           aRow.addCell (new HCA (aViewURL).addChild (aServiceInfo.getServiceGroupID ()));
-          aRow.addCell (NiceNameUI.getDocumentTypeID (aDocTypeID, false));
-          aRow.addCell (NiceNameUI.getProcessID (aDocTypeID, aProcessID, false));
+          aRow.addCell (NiceNameUI.createDocTypeID (aDocTypeID, false));
+          aRow.addCell (NiceNameUI.createProcessID (aDocTypeID, aProcessID, false));
 
           final String sTransportProfile = aEndpoint.getTransportProfile ();
           aRow.addCell (new HCA (createViewURL (aWPEC, CMenuSecure.MENU_TRANSPORT_PROFILES, sTransportProfile))
-                                                                                                               .addChild (NiceNameUI.getTransportProfile (sTransportProfile,
-                                                                                                                                                          aTPCache.getFromCache (sTransportProfile),
-                                                                                                                                                          false)));
+                                                                                                               .addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                                                                                             aTPCache.getFromCache (sTransportProfile),
+                                                                                                                                                             false)));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);

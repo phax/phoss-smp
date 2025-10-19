@@ -92,6 +92,10 @@
       <artifactId>ph-oton-bootstrap4-stub</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.helger.peppol.ui</groupId>
+      <artifactId>peppol-ui</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.helger</groupId>
       <artifactId>phoss-directory-client</artifactId>
     </dependency>

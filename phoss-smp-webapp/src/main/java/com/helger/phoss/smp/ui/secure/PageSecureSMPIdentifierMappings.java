@@ -23,7 +23,8 @@ import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.phoss.smp.nicename.NiceNameEntry;
+import com.helger.peppol.ui.types.nicename.NiceNameEntry;
+import com.helger.peppol.ui.types.nicename.NiceNameManager;
 import com.helger.phoss.smp.nicename.NiceNameHandler;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.CBootstrapCSS;
@@ -68,21 +69,13 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
       aRow.addCell (span (aEntry.getKey ()).addClass (CBootstrapCSS.TEXT_BREAK));
       aRow.addCell (aEntry.getValue ().getName ());
 
-      final String sState;
-      switch (aEntry.getValue ().getState ())
+      final String sState = switch (aEntry.getValue ().getState ())
       {
-        case ACTIVE:
-          sState = "Active";
-          break;
-        case DEPRECATED:
-          sState = "Deprecated";
-          break;
-        case REMOVED:
-          sState = "Removed";
-          break;
-        default:
-          sState = "Unknown";
-      }
+        case ACTIVE -> "Active";
+        case DEPRECATED -> "Deprecated";
+        case REMOVED -> "Removed";
+        default -> "Unknown";
+      };
       aRow.addCell (sState);
     }
     return new HCNodeList ().addChild (aTable).addChild (BootstrapDataTables.createDefaultDataTables (aWPEC, aTable));
@@ -92,8 +85,8 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
   protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeEntries = NiceNameHandler.getAllDocumentTypeMappings ();
-    final ICommonsOrderedMap <String, NiceNameEntry> aProcEntries = NiceNameHandler.getAllProcessMappings ();
+    final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeEntries = NiceNameManager.getAllDocumentTypeMappings ();
+    final ICommonsOrderedMap <String, NiceNameEntry> aProcEntries = NiceNameManager.getAllProcessMappings ();
 
     if (aDocTypeEntries.isNotEmpty () || aProcEntries.isNotEmpty ())
       aNodeList.addChild (info ("The lists below are only for display purposes. The lists are not in any way limiting the registration possibilities in the Endpoints."));

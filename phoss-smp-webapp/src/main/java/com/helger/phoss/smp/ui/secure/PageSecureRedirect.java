@@ -34,6 +34,7 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -44,7 +45,6 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.nicename.NiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -233,8 +233,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                                                    CMenuSecure.MENU_SERVICE_GROUPS,
                                                                                    aSelectedObject.getServiceGroupID ())).addChild (aSelectedObject.getServiceGroupID ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID")
-                                                 .setCtrl (NiceNameUI.getDocumentTypeID (aSelectedObject.getDocumentTypeIdentifier (),
-                                                                                         true)));
+                                                 .setCtrl (NiceNameUI.createDocTypeID (aSelectedObject.getDocumentTypeIdentifier (),
+                                                                                       true)));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Target URL")
                                                  .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getTargetHref (),
                                                                                     HC_Target.BLANK)));
@@ -427,7 +427,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (NiceNameUI.getDocumentTypeID (aCurObject.getDocumentTypeIdentifier (), false));
+      aRow.addCell (NiceNameUI.createDocTypeID (aCurObject.getDocumentTypeIdentifier (), false));
       aRow.addCell (aCurObject.getTargetHref ());
 
       final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);

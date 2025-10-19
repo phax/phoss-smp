@@ -19,45 +19,18 @@ package com.helger.phoss.smp.nicename;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.annotation.concurrent.GuardedBy;
-import com.helger.annotation.style.ReturnsMutableCopy;
-import com.helger.base.concurrent.SimpleReadWriteLock;
 import com.helger.base.string.StringHelper;
-import com.helger.base.string.StringParser;
-import com.helger.collection.commons.CommonsArrayList;
-import com.helger.collection.commons.CommonsLinkedHashMap;
-import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.io.resource.ClassPathResource;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.io.resource.IReadableResource;
-import com.helger.peppolid.IDocumentTypeIdentifier;
-import com.helger.peppolid.IProcessIdentifier;
-import com.helger.peppolid.factory.SimpleIdentifierFactory;
-import com.helger.peppolid.peppol.EPeppolCodeListItemState;
-import com.helger.peppolid.peppol.PeppolIdentifierHelper;
-import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
-import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifierParts;
-import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
+import com.helger.peppol.ui.types.nicename.NiceNameManager;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.serialize.MicroReader;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 public final class NiceNameHandler
 {
-  private static final String PREFIX_WILDCARD = PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_PEPPOL_DOCTYPE_WILDCARD +
-                                                "::";
   private static final Logger LOGGER = LoggerFactory.getLogger (NiceNameHandler.class);
-
-  private static final SimpleReadWriteLock RW_LOCK = new SimpleReadWriteLock ();
-  @GuardedBy ("RW_LOCK")
-  private static final ICommonsOrderedMap <String, NiceNameEntry> DOCTYPE_IDS = new CommonsLinkedHashMap <> ();
-  @GuardedBy ("RW_LOCK")
-  private static final ICommonsOrderedMap <String, NiceNameEntry> PROCESS_IDS = new CommonsLinkedHashMap <> ();
 
   @Nonnull
   private static ClassLoader _getCL ()
@@ -65,80 +38,8 @@ public final class NiceNameHandler
     return NiceNameHandler.class.getClassLoader ();
   }
 
-  static
-  {
-    reloadNames ();
-  }
-
   private NiceNameHandler ()
   {}
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public static ICommonsOrderedMap <String, NiceNameEntry> readEntries (@Nonnull final IReadableResource aRes,
-                                                                        final boolean bReadProcIDs)
-  {
-    LOGGER.info ("Trying to read nice name entries from '" + aRes.getPath () + "'");
-
-    final ICommonsOrderedMap <String, NiceNameEntry> ret = new CommonsLinkedHashMap <> ();
-    final IMicroDocument aDoc = MicroReader.readMicroXML (aRes);
-    if (aDoc != null && aDoc.getDocumentElement () != null)
-    {
-      for (final IMicroElement eChild : aDoc.getDocumentElement ().getAllChildElements ("item"))
-      {
-        String sID = eChild.getAttributeValue ("id");
-        final String sName = eChild.getAttributeValue ("name");
-        EPeppolCodeListItemState eState = EPeppolCodeListItemState.getFromIDOrNull (eChild.getAttributeValue ("state"));
-        if (eState == null)
-        {
-          final String sDeprecated = eChild.getAttributeValue ("deprecated");
-          if (sDeprecated != null)
-          {
-            // Legacy attribute is present
-            eState = StringParser.parseBool (sDeprecated, false) ? EPeppolCodeListItemState.DEPRECATED
-                                                                 : EPeppolCodeListItemState.ACTIVE;
-          }
-          else
-            eState = EPeppolCodeListItemState.ACTIVE;
-        }
-
-        ICommonsList <IProcessIdentifier> aProcIDs = null;
-        if (bReadProcIDs)
-        {
-          aProcIDs = new CommonsArrayList <> ();
-          for (final IMicroElement eItem : eChild.getAllChildElements ("procid"))
-            aProcIDs.add (new SimpleProcessIdentifier (eItem.getAttributeValue ("scheme"),
-                                                       eItem.getAttributeValue ("value")));
-        }
-
-        String sSpecialLabel = null;
-        if (sID.startsWith (PREFIX_WILDCARD))
-        {
-          // When loading wildcards, a special handling is needed
-          // Because the identifiers in the codelist are without "*" we need to
-          // add the "*" here, because the SMP entries need the "*" to be
-          // correct
-          sSpecialLabel = "Wildcard";
-
-          final IDocumentTypeIdentifier aDT = SimpleIdentifierFactory.INSTANCE.parseDocumentTypeIdentifier (sID);
-          final IPeppolDocumentTypeIdentifierParts aParts = PeppolDocumentTypeIdentifierParts.extractFromIdentifier (aDT);
-          if (aParts != null)
-          {
-            // Add the "*" to the Customization ID for the SMP
-            final PeppolDocumentTypeIdentifierParts aStarParts = new PeppolDocumentTypeIdentifierParts (aParts.getRootNS (),
-                                                                                                        aParts.getLocalName (),
-                                                                                                        aParts.getCustomizationID () +
-                                                                                                                                "*",
-                                                                                                        aParts.getVersion ());
-            sID = PREFIX_WILDCARD + aStarParts.getAsDocumentTypeIdentifierValue ();
-          }
-        }
-
-        ret.put (sID, new NiceNameEntry (sName, eState, sSpecialLabel, aProcIDs));
-      }
-    }
-    return ret;
-  }
 
   public static void reloadNames ()
   {
@@ -159,11 +60,9 @@ public final class NiceNameHandler
       // Use defaults
       if (aDocTypeIDRes == null)
         aDocTypeIDRes = new ClassPathResource ("codelists/smp/doctypeid-mapping.xml", _getCL ());
-
-      final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeIDs = readEntries (aDocTypeIDRes, true);
-      RW_LOCK.writeLocked ( () -> DOCTYPE_IDS.setAll (aDocTypeIDs));
-      LOGGER.info ("Loaded " + aDocTypeIDs.size () + " document type nice name entries");
+      NiceNameManager.loadDocTypeNames (aDocTypeIDRes);
     }
+
     // Processes
     {
       IReadableResource aProcessIDRes = null;
@@ -181,70 +80,7 @@ public final class NiceNameHandler
       // Use defaults
       if (aProcessIDRes == null)
         aProcessIDRes = new ClassPathResource ("codelists/smp/processid-mapping.xml", _getCL ());
-
-      final ICommonsOrderedMap <String, NiceNameEntry> aProcessIDs = readEntries (aProcessIDRes, false);
-      RW_LOCK.writeLocked ( () -> PROCESS_IDS.setAll (aProcessIDs));
-      LOGGER.info ("Loaded " + aProcessIDs.size () + " process nice name entries");
+      NiceNameManager.loadProcessNames (aProcessIDRes);
     }
-  }
-
-  @Nullable
-  public static NiceNameEntry getDocTypeNiceName (@Nullable final IDocumentTypeIdentifier aDocTypeID)
-  {
-    return aDocTypeID == null ? null : getDocTypeNiceName (aDocTypeID.getURIEncoded ());
-  }
-
-  @Nullable
-  public static NiceNameEntry getDocTypeNiceName (@Nullable final String sID)
-  {
-    if (StringHelper.isEmpty (sID))
-      return null;
-
-    RW_LOCK.readLock ().lock ();
-    try
-    {
-      return DOCTYPE_IDS.get (sID);
-    }
-    finally
-    {
-      RW_LOCK.readLock ().unlock ();
-    }
-  }
-
-  @Nullable
-  public static NiceNameEntry getProcessNiceName (@Nullable final IProcessIdentifier aProcessID)
-  {
-    return aProcessID == null ? null : getProcessNiceName (aProcessID.getURIEncoded ());
-  }
-
-  @Nullable
-  public static NiceNameEntry getProcessNiceName (@Nullable final String sID)
-  {
-    if (StringHelper.isEmpty (sID))
-      return null;
-
-    RW_LOCK.readLock ().lock ();
-    try
-    {
-      return PROCESS_IDS.get (sID);
-    }
-    finally
-    {
-      RW_LOCK.readLock ().unlock ();
-    }
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public static ICommonsOrderedMap <String, NiceNameEntry> getAllDocumentTypeMappings ()
-  {
-    return RW_LOCK.readLockedGet (DOCTYPE_IDS::getClone);
-  }
-
-  @Nonnull
-  @ReturnsMutableCopy
-  public static ICommonsOrderedMap <String, NiceNameEntry> getAllProcessMappings ()
-  {
-    return RW_LOCK.readLockedGet (PROCESS_IDS::getClone);
   }
 }

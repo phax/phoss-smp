@@ -43,6 +43,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -64,7 +65,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.nicename.NiceNameUI;
+import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
@@ -422,7 +423,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     // Document type identifier
     {
       final HCNodeList aCtrl = new HCNodeList ();
-      aCtrl.addChild (div (NiceNameUI.getDocumentTypeID (aDocumentTypeID, true)));
+      aCtrl.addChild (div (NiceNameUI.createDocTypeID (aDocumentTypeID, true)));
       try
       {
         final IPeppolDocumentTypeIdentifierParts aParts = PeppolDocumentTypeIdentifierParts.extractFromIdentifier (aDocumentTypeID);
@@ -436,15 +437,15 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Document type ID").setCtrl (aCtrl));
     }
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Process ID")
-                                                 .setCtrl (NiceNameUI.getProcessID (aSelectedObject.getDocumentTypeIdentifier (),
-                                                                                    aSelectedProcess.getProcessIdentifier (),
-                                                                                    true)));
+                                                 .setCtrl (NiceNameUI.createProcessID (aSelectedObject.getDocumentTypeIdentifier (),
+                                                                                       aSelectedProcess.getProcessIdentifier (),
+                                                                                       true)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Transport profile")
                                                  .setCtrl (new HCA (createViewURL (aWPEC,
                                                                                    CMenuSecure.MENU_TRANSPORT_PROFILES,
-                                                                                   aSelectedEndpoint.getTransportProfile ())).addChild (NiceNameUI.getTransportProfile (aSelectedEndpoint.getTransportProfile (),
-                                                                                                                                                                        true))));
+                                                                                   aSelectedEndpoint.getTransportProfile ())).addChild (SMPNiceNameUI.getTransportProfile (aSelectedEndpoint.getTransportProfile (),
+                                                                                                                                                                           true))));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
                                                  .setCtrl (StringHelper.isNotEmpty (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),

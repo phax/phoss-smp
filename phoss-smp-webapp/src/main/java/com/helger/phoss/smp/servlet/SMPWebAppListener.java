@@ -57,6 +57,7 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
+import com.helger.phoss.smp.nicename.NiceNameHandler;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
@@ -307,6 +308,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       aCFM.registerAll (SMPConfigProvider.getConfig ());
       aCFM.registerAll (PDClientConfiguration.getConfig ());
     }
+
+    NiceNameHandler.reloadNames ();
 
     {
       LOGGER.info ("Init of Directory client stuff");
