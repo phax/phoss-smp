@@ -37,7 +37,6 @@ import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.util.PDTDisplayHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
-import com.helger.html.hc.html.grouping.HCHR;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.textlevel.HCCode;
@@ -47,7 +46,6 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.peppolid.peppol.doctype.IPeppolDocumentTypeIdentifierParts;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
-import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
@@ -62,13 +60,7 @@ import com.helger.photon.uictrls.datatables.EDataTablesFilterType;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.photon.uictrls.datatables.plugins.DataTablesPluginSearchHighlight;
-import com.helger.photon.uictrls.prism.EPrismLanguage;
-import com.helger.photon.uictrls.prism.HCPrismJS;
-import com.helger.smpclient.extension.SMPExtension;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.serialize.write.EXMLSerializeIndent;
-import com.helger.xml.serialize.write.XMLWriter;
-import com.helger.xml.serialize.write.XMLWriterSettings;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -289,30 +281,6 @@ public final class SMPCommonUI
     // Will be a DB query
     final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);
     return aOwner == null ? sOwnerID : aOwner.getLoginName () + " (" + aOwner.getDisplayName () + ")";
-  }
-
-  @Nullable
-  public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
-  {
-    final ICommonsList <SMPExtension> aExtensions = aHasExtension.getExtensions ().extensions ();
-    if (aExtensions.isEmpty ())
-      return null;
-
-    final HCNodeList aNL = new HCNodeList ();
-    for (final SMPExtension aExtension : aExtensions)
-    {
-      if (aNL.hasChildren ())
-      {
-        // add a separator line
-        aNL.addChild (new HCHR ());
-      }
-
-      // Use only the XML element of the first extension
-      final String sXML = XMLWriter.getNodeAsString (aExtension.getAny (),
-                                                     new XMLWriterSettings ().setIndent (EXMLSerializeIndent.INDENT_AND_ALIGN));
-      aNL.addChild (new HCPrismJS (EPrismLanguage.MARKUP).addChild (sXML));
-    }
-    return aNL;
   }
 
   @Nullable

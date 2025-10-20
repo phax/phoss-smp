@@ -22,7 +22,6 @@ import java.util.Locale;
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -34,6 +33,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
+import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
@@ -48,8 +48,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
- * This is the start page of the public application. It lists all available
- * service groups.
+ * This is the start page of the public application. It lists all available service groups.
  *
  * @author Philip Helger
  */
@@ -93,8 +92,9 @@ public final class PagePublicStart extends AbstractSMPWebPage
       {
         // Dynamic
         final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                            new DTCol (bShowExtensionDetails ? "Extension"
-                                                                             : "Extension?").setDataSort (1, 0),
+                                            new DTCol (bShowExtensionDetails ? "Extension" : "Extension?").setDataSort (
+                                                                                                                        1,
+                                                                                                                        0),
                                             new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
         aFinalTable = aTable;
       }
@@ -124,7 +124,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
         if (bShowExtensionDetails)
         {
           if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
-            aRow.addCell (code (HCExtHelper.nl2divList (aServiceGroup.getExtensions ().getFirstExtensionXMLString ())));
+            aRow.addCell (SMPExtensionUI.getSerializedExtensions (aServiceGroup.getExtensions ()));
           else
             aRow.addCell ();
         }

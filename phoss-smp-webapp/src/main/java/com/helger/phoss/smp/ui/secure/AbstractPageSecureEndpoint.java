@@ -68,6 +68,7 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
+import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
@@ -90,6 +91,7 @@ import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uicore.page.handler.IWebPageActionHandler;
 import com.helger.security.certificate.CertificateHelper;
+import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
@@ -504,7 +506,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     if (aSelectedEndpoint.getExtensions ().extensions ().isNotEmpty ())
     {
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedEndpoint)));
+                                                   .setCtrl (SMPExtensionUI.getExtensionDisplay (aSelectedEndpoint)));
     }
     aNodeList.addChild (aForm);
   }
@@ -660,9 +662,17 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aFormErrors.addFieldError (FIELD_TECHNICAL_CONTACT, "Technical Contact must not be empty!");
     if (StringHelper.isNotEmpty (sExtension))
     {
-      final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
-      if (aDoc == null)
-        aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be XML content.");
+      if (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED)
+      {
+        final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
+        if (aDoc == null)
+          aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be valid XML content.");
+      }
+      else
+      {
+        if (new SMPExtensionList ().setExtensionAsString (sExtension).isUnchanged ())
+          aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be valid JSON or XML content.");
+      }
     }
     if (aFormErrors.isEmpty ())
     {
@@ -905,10 +915,12 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
                                                                                              aSelectedEndpoint != null
-                                                                                                                       ? aSelectedEndpoint.getExtensions ()
-                                                                                                                                          .getFirstExtensionXMLString ()
+                                                                                                                       ? SMPExtensionUI.getSerializedExtensionsForEdit (aSelectedEndpoint.getExtensions ())
                                                                                                                        : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
-                                                 .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
+                                                 .setHelpText ("Optional extension to the endpoint. If present it must be valid " +
+                                                               (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
+                                                                                                              : "JSON or XML") +
+                                                               " content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
 }

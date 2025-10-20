@@ -31,14 +31,12 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.IHCNode;
-import com.helger.html.hc.ext.HCExtHelper;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
@@ -64,6 +62,7 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
+import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
 import com.helger.photon.app.url.LinkHelper;
@@ -100,6 +99,7 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
@@ -474,7 +474,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                  .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.getExtensions ().extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (SMPCommonUI.getExtensionDisplay (aSelectedObject)));
+                                                   .setCtrl (SMPExtensionUI.getExtensionDisplay (aSelectedObject)));
 
     if (bShowBusinessCard)
     {
@@ -562,10 +562,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
                                                                                              aSelectedObject != null
-                                                                                                                     ? aSelectedObject.getExtensions ()
-                                                                                                                                      .getFirstExtensionXMLString ()
+                                                                                                                     ? SMPExtensionUI.getSerializedExtensionsForEdit (aSelectedObject.getExtensions ())
                                                                                                                      : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
-                                                 .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
+                                                 .setHelpText ("Optional extension to the service group. If present it must be valid " +
+                                                               (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
+                                                                                                              : "JSON or XML") +
+                                                               " content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
 
@@ -613,9 +615,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     if (StringHelper.isNotEmpty (sExtension))
     {
-      final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
-      if (aDoc == null)
-        aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be XML content.");
+      if (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED)
+      {
+        final IMicroDocument aDoc = MicroReader.readMicroXML (sExtension);
+        if (aDoc == null)
+          aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be valid XML content.");
+      }
+      else
+      {
+        if (new SMPExtensionList ().setExtensionAsString (sExtension).isUnchanged ())
+          aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be valid JSON or XML content.");
+      }
     }
 
     if (aFormErrors.isEmpty ())
@@ -742,8 +752,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       if (bShowExtensionDetails)
       {
         if (aCurObject.getExtensions ().extensions ().isNotEmpty ())
-          aRow.addCell (new HCCode ().addChildren (HCExtHelper.nl2divList (aCurObject.getExtensions ()
-                                                                                     .getFirstExtensionXMLString ())));
+          aRow.addCell (SMPExtensionUI.getSerializedExtensions (aCurObject.getExtensions ()));
         else
           aRow.addCell ();
       }
