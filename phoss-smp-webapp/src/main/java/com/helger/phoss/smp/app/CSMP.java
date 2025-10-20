@@ -84,6 +84,7 @@ public final class CSMP
   public static final ICommonsMap <String, String> USER_ADMINISTRATOR_CUSTOMATTRS = null;
 
   public static final int TEXT_AREA_CERT_ROWS = 10;
+  public static final int TEXT_AREA_CERT_EXTENSION = 6;
 
   public static final boolean ENABLE_ISSUE_56 = false;
 

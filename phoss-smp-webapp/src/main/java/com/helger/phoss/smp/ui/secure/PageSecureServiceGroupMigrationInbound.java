@@ -42,6 +42,7 @@ import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
@@ -241,7 +242,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_OWNING_USER_ID)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION)))
+                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }

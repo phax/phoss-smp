@@ -907,7 +907,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                              aSelectedEndpoint != null
                                                                                                                        ? aSelectedEndpoint.getExtensions ()
                                                                                                                                           .getFirstExtensionXMLString ()
-                                                                                                                       : null)))
+                                                                                                                       : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the endpoint. If present it must be valid XML content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
