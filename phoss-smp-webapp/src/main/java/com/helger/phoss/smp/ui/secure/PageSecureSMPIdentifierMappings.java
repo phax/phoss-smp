@@ -74,7 +74,6 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
         case ACTIVE -> "Active";
         case DEPRECATED -> "Deprecated";
         case REMOVED -> "Removed";
-        default -> "Unknown";
       };
       aRow.addCell (sState);
     }
