@@ -78,6 +78,7 @@ import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.core.requestparam.RequestParameterManager;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.ServletSettings;
+import com.helger.servlet.StaticServerInfo;
 import com.helger.servlet.response.UnifiedResponseDefaultSettings;
 import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
@@ -196,11 +197,29 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Set configs with variables
     PDClientConfiguration.setConfig (SMPConfigProvider.getConfig ());
     SMPClientConfiguration.setConfig (SMPConfigProvider.getConfig ());
+
     if (SMPServerConfiguration.isForceRoot ())
     {
+      // Avoid inconsistency
+      if (StaticServerInfo.isSet () && StringHelper.isNotEmpty (StaticServerInfo.getInstance ().getContextPath ()))
+      {
+        throw new InitializationException ("You cannot use cannot use a custom public URL containing a path ('" +
+                                           StaticServerInfo.getInstance ().getFullContextPath () +
+                                           "') and forcing it to root in the same time (via configuration property '" +
+                                           SMPServerConfiguration.KEY_SMP_FORCE_ROOT +
+                                           "').");
+      }
+
       // Enforce an empty context path according to the specs!
       ServletContextPathHolder.setCustomContextPath ("");
     }
+    else
+      if (StaticServerInfo.isSet () && StringHelper.isNotEmpty (StaticServerInfo.getInstance ().getContextPath ()))
+      {
+        // Enforce the provided context path according to the specs!
+        ServletContextPathHolder.setCustomContextPath (StaticServerInfo.getInstance ().getContextPath ());
+      }
+
     RequestParameterManager.getInstance ().setParameterHandler (new RequestParameterHandlerURLPathNamed ());
     if (!GlobalDebug.isProductionMode ())
     {
