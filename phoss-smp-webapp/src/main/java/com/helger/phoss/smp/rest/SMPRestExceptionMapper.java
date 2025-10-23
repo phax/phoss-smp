@@ -58,7 +58,7 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
                                          @Nonnull final Throwable t,
                                          final boolean bForceNoStackTrace)
   {
-    final boolean bConfiguredToLog = SMPServerConfiguration.isRESTLogExceptions ();
+    final boolean bConfiguredToLog = SMPServerConfiguration.isRestLogExceptions ();
     if (bConfiguredToLog)
     {
       if (bForceNoStackTrace)
@@ -78,7 +78,7 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
                                               final int nStatusCode,
                                               @Nullable final String sContent)
   {
-    if (SMPServerConfiguration.isRESTPayloadOnError ())
+    if (SMPServerConfiguration.isRestPayloadOnError ())
     {
       // With payload
       setSimpleTextResponse (aUnifiedResponse, nStatusCode, sContent);

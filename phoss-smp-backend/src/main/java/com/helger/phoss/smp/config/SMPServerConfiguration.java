@@ -255,8 +255,20 @@ public final class SMPServerConfiguration
    * @return <code>true</code> if the exceptions in the REST API should be logged,
    *         <code>false</code> if not. By default it is disabled.
    * @since 5.1.0
+   * @deprecated Use {@link #isRestLogExceptions()} instead
    */
+  @Deprecated (forRemoval = true, since = "8.0.2")
   public static boolean isRESTLogExceptions ()
+  {
+    return isRestLogExceptions ();
+  }
+
+  /**
+   * @return <code>true</code> if the exceptions in the REST API should be logged,
+   *         <code>false</code> if not. By default it is disabled.
+   * @since 8.0.2
+   */
+  public static boolean isRestLogExceptions ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_LOG_EXCEPTIONS, DEFAULT_SMP_REST_LOG_EXCEPTIONS);
   }
@@ -266,8 +278,21 @@ public final class SMPServerConfiguration
    *         provided as test, <code>false</code> if not. By default it is enabled. For security
    *         reasons it should be disabled.
    * @since 5.2.1
+   * @deprecated Use {@link #isRestPayloadOnError()} instead
    */
+  @Deprecated (forRemoval = true, since = "8.0.2")
   public static boolean isRESTPayloadOnError ()
+  {
+    return isRestPayloadOnError ();
+  }
+
+  /**
+   * @return <code>true</code> if in case of an exception in the REST API´, payload text should be
+   *         provided as test, <code>false</code> if not. By default it is enabled. For security
+   *         reasons it should be disabled.
+   * @since 8.0.2
+   */
+  public static boolean isRestPayloadOnError ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_PAYLOAD_ON_ERROR, DEFAULT_SMP_REST_PAYLOAD_ON_ERROR);
   }
