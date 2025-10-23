@@ -36,6 +36,7 @@ import com.helger.phoss.smp.config.SMPConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
+import com.helger.servlet.StaticServerInfo;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -107,6 +108,8 @@ public class SMPServerRESTTestRule extends ExternalResource
       // Reset for next run
       SMPMetaManager.setManagerProvider (null);
       LOGGER.info ("Finished shutting down SMP server");
+
+      StaticServerInfo.clearDefault ();
     }
     catch (final IOException ex)
     {
@@ -126,8 +129,8 @@ public class SMPServerRESTTestRule extends ExternalResource
   }
 
   /**
-   * @return The full URL with port and context path that is the basis for the
-   *         running test instance.
+   * @return The full URL with port and context path that is the basis for the running test
+   *         instance.
    */
   @Nonnull
   @Nonempty
