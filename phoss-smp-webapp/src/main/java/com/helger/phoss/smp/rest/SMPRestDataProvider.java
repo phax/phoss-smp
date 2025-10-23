@@ -218,26 +218,21 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   @Nonnull
   public URI getCurrentURI ()
   {
-    final String ret;
-    switch (_getEffectiveServerNameMode ())
+    final String ret = switch (_getEffectiveServerNameMode ())
     {
-      case STATIC_SERVER_INFO:
-        // Do not decode params - '#' lets URI parser fail!
-        // getRequestURIEncoded contains the context path
-        ret = StaticServerInfo.getInstance ().getFullServerPath () + m_aRequestScope.getRequestURIEncoded ();
-        break;
-      case REQUEST_SCOPE:
-        ret = m_aRequestScope.getRequestURLEncoded ().toString ();
-        break;
-      case X_FORWARDED_HEADER:
-        ret = _getXForwardedHeaderBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ()).toString ();
-        break;
-      case FORWARDED_HEADER:
-        ret = _getForwardedHeaderBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ()).toString ();
-        break;
-      default:
-        throw new IllegalStateException ("Unhandled server name mode");
-    }
+      /*
+       * Do not decode params - '#' lets URI parser fail! getRequestURIEncoded contains the context
+       * path
+       */
+      case STATIC_SERVER_INFO -> StaticServerInfo.getInstance ().getFullServerPath () +
+                                 m_aRequestScope.getRequestURIEncoded ();
+      case REQUEST_SCOPE -> m_aRequestScope.getRequestURLEncoded ().toString ();
+      case X_FORWARDED_HEADER -> _getXForwardedHeaderBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ())
+                                                                     .toString ();
+      case FORWARDED_HEADER -> _getForwardedHeaderBasedHostName ().append (m_aRequestScope.getRequestURIEncoded ())
+                                                                  .toString ();
+      default -> throw new IllegalStateException ("Unhandled server name mode");
+    };
     return URLHelper.getAsURI (ret);
   }
 
@@ -249,27 +244,20 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   {
     final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
 
-    final String ret;
-    switch (_getEffectiveServerNameMode ())
+    final String ret = switch (_getEffectiveServerNameMode ())
     {
-      case STATIC_SERVER_INFO:
-        ret = StaticServerInfo.getInstance ().getFullServerPath () +
-              (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
-        break;
-      case REQUEST_SCOPE:
-        ret = m_aRequestScope.getFullServerPath () + (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
-        break;
-      case X_FORWARDED_HEADER:
-        ret = _getXForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope.getContextPath ())
-                                                  .toString ();
-        break;
-      case FORWARDED_HEADER:
-        ret = _getForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope.getContextPath ())
-                                                 .toString ();
-        break;
-      default:
-        throw new IllegalStateException ("Unhandled server name mode");
-    }
+      case STATIC_SERVER_INFO -> StaticServerInfo.getInstance ().getFullServerPath () +
+                                 (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
+      case REQUEST_SCOPE -> m_aRequestScope.getFullServerPath () +
+                            (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
+      case X_FORWARDED_HEADER -> _getXForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope
+                                                                                                                 .getContextPath ())
+                                                                     .toString ();
+      case FORWARDED_HEADER -> _getForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope
+                                                                                                              .getContextPath ())
+                                                                  .toString ();
+      default -> throw new IllegalStateException ("Unhandled server name mode");
+    };
     return ret;
   }
 
