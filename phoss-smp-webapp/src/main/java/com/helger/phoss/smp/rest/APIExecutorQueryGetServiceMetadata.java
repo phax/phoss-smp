@@ -172,8 +172,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
         aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
         aSMPClient.setVerifySignature (bVerifySignature);
 
-        final com.helger.xsds.peppol.smp1.SignedServiceMetadataType aSSM = aSMPClient.getServiceMetadataOrNull (aParticipantID,
-                                                                                                                aDocTypeID);
+        final var aSSM = aSMPClient.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSSM != null)
         {
           final com.helger.xsds.peppol.smp1.ServiceMetadataType aSM = aSSM.getServiceMetadata ();
@@ -187,8 +186,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR1Client.setVerifySignature (bVerifySignature);
 
-        final com.helger.xsds.bdxr.smp1.SignedServiceMetadataType aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID,
-                                                                                                                aDocTypeID);
+        final var aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSSM != null)
         {
           final com.helger.xsds.bdxr.smp1.ServiceMetadataType aSM = aSSM.getServiceMetadata ();
@@ -202,8 +200,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
         aBDXR2Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR2Client.setVerifySignature (bVerifySignature);
 
-        final com.helger.xsds.bdxr.smp2.ServiceMetadataType aSM = aBDXR2Client.getServiceMetadataOrNull (aParticipantID,
-                                                                                                         aDocTypeID);
+        final var aSM = aBDXR2Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSM != null)
         {
           aJson = SMPJsonResponse.convert (aParticipantID, aDocTypeID, aSM);

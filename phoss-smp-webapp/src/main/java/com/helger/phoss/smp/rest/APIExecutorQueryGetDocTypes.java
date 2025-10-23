@@ -127,13 +127,12 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
         aSMPClient.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
-        final com.helger.xsds.peppol.smp1.ServiceGroupType aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
+        final var aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
         // Map from cleaned URL to original URL
         if (aSG != null && aSG.getServiceMetadataReferenceCollection () != null)
         {
           aSGHrefs = new CommonsTreeMap <> ();
-          for (final com.helger.xsds.peppol.smp1.ServiceMetadataReferenceType aSMR : aSG.getServiceMetadataReferenceCollection ()
-                                                                                        .getServiceMetadataReference ())
+          for (final var aSMR : aSG.getServiceMetadataReferenceCollection ().getServiceMetadataReference ())
           {
             // Decoded href is important for unification
             final String sHref = CIdentifier.createPercentDecoded (aSMR.getHref ());
@@ -151,13 +150,12 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
         aBDXR1Client.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
-        final com.helger.xsds.bdxr.smp1.ServiceGroupType aSG = aBDXR1Client.getServiceGroupOrNull (aParticipantID);
+        final var aSG = aBDXR1Client.getServiceGroupOrNull (aParticipantID);
         // Map from cleaned URL to original URL
         if (aSG != null && aSG.getServiceMetadataReferenceCollection () != null)
         {
           aSGHrefs = new CommonsTreeMap <> ();
-          for (final com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceType aSMR : aSG.getServiceMetadataReferenceCollection ()
-                                                                                      .getServiceMetadataReference ())
+          for (final var aSMR : aSG.getServiceMetadataReferenceCollection ().getServiceMetadataReference ())
           {
             // Decoded href is important for unification
             final String sHref = CIdentifier.createPercentDecoded (aSMR.getHref ());
@@ -175,12 +173,12 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
         aBDXR2Client.setVerifySignature (bVerifySignature);
 
         // Get all HRefs and sort them by decoded URL
-        final com.helger.xsds.bdxr.smp2.ServiceGroupType aSG = aBDXR2Client.getServiceGroupOrNull (aParticipantID);
+        final var aSG = aBDXR2Client.getServiceGroupOrNull (aParticipantID);
         // Map from cleaned URL to original URL
         if (aSG != null && aSG.hasServiceReferenceEntries ())
         {
           aSGHrefs = new CommonsTreeMap <> ();
-          for (final com.helger.xsds.bdxr.smp2.ac.ServiceReferenceType aSR : aSG.getServiceReference ())
+          for (final var aSR : aSG.getServiceReference ())
           {
             // Decoded href is important for unification
             final String sSrcID = CIdentifier.getURIEncodedBDXR2 (aSR.getID ().getSchemeID (),
