@@ -181,6 +181,15 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     _initTimeZone ();
   }
 
+  private static boolean _hasStaticServerInfoPath ()
+  {
+    if (!StaticServerInfo.isSet ())
+      return false;
+
+    final String sCtx = StaticServerInfo.getInstance ().getContextPath ();
+    return sCtx != null && !sCtx.equals ("/");
+  }
+
   @Override
   protected void initGlobalSettings ()
   {
@@ -201,7 +210,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     if (SMPServerConfiguration.isForceRoot ())
     {
       // Avoid inconsistency
-      if (StaticServerInfo.isSet () && StringHelper.isNotEmpty (StaticServerInfo.getInstance ().getContextPath ()))
+      if (_hasStaticServerInfoPath ())
       {
         throw new InitializationException ("You cannot use cannot use a custom public URL containing a path ('" +
                                            StaticServerInfo.getInstance ().getFullContextPath () +
@@ -214,7 +223,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       ServletContextPathHolder.setCustomContextPath ("");
     }
     else
-      if (StaticServerInfo.isSet () && StringHelper.isNotEmpty (StaticServerInfo.getInstance ().getContextPath ()))
+      if (_hasStaticServerInfoPath ())
       {
         // Enforce the provided context path according to the specs!
         ServletContextPathHolder.setCustomContextPath (StaticServerInfo.getInstance ().getContextPath ());
