@@ -27,7 +27,6 @@ import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
-import com.helger.phoss.smp.xml.BDXR1NamespaceContextRootNoPrefix;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
@@ -40,7 +39,6 @@ import jakarta.annotation.Nonnull;
 
 public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
 {
-  @SuppressWarnings ("removal")
   @Override
   protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                             @Nonnull @Nonempty final String sPath,
@@ -63,10 +61,7 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
       case OASIS_BDXR_V1:
       {
         final var ret = new BDXR1ServerAPI (aDataProvider).getServiceGroup (sPathServiceGroupID);
-        final var m = new BDXR1MarshallerServiceGroupType ();
-        if (SMPServerConfiguration.isHRXMLNoRootNamespacePrefix ())
-          m.setNamespaceContext (BDXR1NamespaceContextRootNoPrefix.getInstance ());
-        aBytes = m.setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
+        aBytes = new BDXR1MarshallerServiceGroupType ().setUseSchema (XML_SCHEMA_VALIDATION).getAsBytes (ret);
         break;
       }
       case OASIS_BDXR_V2:

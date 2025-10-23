@@ -39,7 +39,6 @@ import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
 import com.helger.phoss.smp.security.SMPKeyManager;
-import com.helger.phoss.smp.xml.BDXR1NamespaceContextRootNoPrefix;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerSignedServiceMetadataType;
@@ -57,7 +56,6 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataGet.class);
 
-  @SuppressWarnings ("removal")
   @Override
   protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
                             @Nonnull @Nonempty final String sPath,
@@ -92,8 +90,6 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 
         // Convert to DOM document
         final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
-        if (SMPServerConfiguration.isHRXMLNoRootNamespacePrefix ())
-          aMarshaller.setNamespaceContext (BDXR1NamespaceContextRootNoPrefix.getInstance ());
         // Disable XSD check, because Signature is added later
         aMarshaller.setUseSchema (false);
         aDoc = aMarshaller.getAsDocument (ret);
