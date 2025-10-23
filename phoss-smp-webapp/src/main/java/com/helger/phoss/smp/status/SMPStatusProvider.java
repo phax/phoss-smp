@@ -112,10 +112,12 @@ public final class SMPStatusProvider
     aStatusData.add ("smp.publicurl", SMPServerConfiguration.getPublicServerURL ());
     // New in 5.1.0
     aStatusData.add ("smp.forceroot", SMPServerConfiguration.isForceRoot ());
+    // New in 8.0.2
+    aStatusData.add ("smp.publicurl.mode", SMPServerConfiguration.getPublicServerURLMode ());
     // New in 5.2.0
-    aStatusData.add ("smp.rest.log-exceptions", SMPServerConfiguration.isRESTLogExceptions ());
+    aStatusData.add ("smp.rest.log-exceptions", SMPServerConfiguration.isRestLogExceptions ());
     // New in 5.2.1
-    aStatusData.add ("smp.rest.payload-on-error", SMPServerConfiguration.isRESTPayloadOnError ());
+    aStatusData.add ("smp.rest.payload-on-error", SMPServerConfiguration.isRestPayloadOnError ());
 
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLEnabled ());
@@ -147,9 +149,8 @@ public final class SMPStatusProvider
       if (aKeyEntry != null)
       {
         final Certificate [] aChain = aKeyEntry.getCertificateChain ();
-        if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
+        if (aChain.length > 0 && aChain[0] instanceof final X509Certificate aX509Cert)
         {
-          final X509Certificate aX509Cert = (X509Certificate) aChain[0];
           aStatusData.add ("smp.certificate.issuer", aX509Cert.getIssuerX500Principal ().getName ());
           aStatusData.add ("smp.certificate.subject", aX509Cert.getSubjectX500Principal ().getName ());
 
