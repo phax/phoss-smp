@@ -187,7 +187,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       return false;
 
     final String sCtx = StaticServerInfo.getInstance ().getContextPath ();
-    return sCtx != null && !sCtx.equals ("/");
+    return StringHelper.isNotEmpty (sCtx) && !sCtx.equals ("/");
   }
 
   @Override
