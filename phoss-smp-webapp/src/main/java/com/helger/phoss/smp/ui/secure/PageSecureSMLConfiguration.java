@@ -30,8 +30,8 @@ import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
-import com.helger.peppol.sml.CSMLDefault;
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -63,6 +63,8 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   private static final String FIELD_DISPLAY_NAME = "displayname";
   private static final String FIELD_DNS_ZONE = "dnszone";
   private static final String FIELD_MANAGEMENT_ADDRESS_URL = "mgmtaddrurl";
+  private static final String FIELD_URL_SUFFIX_MANAGE_SMP = "managesmp";
+  private static final String FIELD_URL_SUFFIX_MANAGE_PARTICIPANT = "manageparticipant";
   private static final String FIELD_CLIENT_CERTIFICATE_REQUIRED = "clientcert";
 
   private static final boolean DEFAULT_CLIENT_CERTIFICATE_REQUIRED = true;
@@ -142,9 +144,13 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     }
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Management Service URL")
                                                  .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManagementServiceURL ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("URL suffix to manage SMPs")
+                                                 .setCtrl (code (aSelectedObject.getURLSuffixManageSMP ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Manage Service Metadata Endpoint")
                                                  .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManageServiceMetaDataEndpointAddress ()
                                                                                                    .toExternalForm ())));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("URL suffix to manage Participants")
+                                                 .setCtrl (code (aSelectedObject.getURLSuffixManageParticipant ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Manage Participant Identifier Endpoint")
                                                  .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManageParticipantIdentifierEndpointAddress ()
                                                                                                    .toExternalForm ())));
@@ -192,12 +198,24 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                                                                          aSelectedObject != null
                                                                                                                  ? aSelectedObject.getManagementServiceURL ()
                                                                                                                  : null)))
-                                                 .setHelpText ("The service URL where the SML management application is running on including the host name. It may not contain the '" +
-                                                               CSMLDefault.MANAGEMENT_SERVICE_METADATA +
-                                                               "' or '" +
-                                                               CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER +
-                                                               "' path elements!")
+                                                 .setHelpText ("The service URL where the SML management application is running on including the host name. It must not contain the suffixes to manage SMPs or participants!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_MANAGEMENT_ADDRESS_URL)));
+
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("URL suffix to manage SMPs")
+                                                 .setCtrl (new HCEdit (new RequestField (FIELD_URL_SUFFIX_MANAGE_SMP,
+                                                                                         aSelectedObject != null
+                                                                                                                 ? aSelectedObject.getURLSuffixManageSMP ()
+                                                                                                                 : SMLInfo.DEFAULT_SUFFIX_MANAGE_SMP)))
+                                                 .setHelpText ("This suffix is appended to the Management Service URL. If may be empty or alternatively it must start with a slash ('/').")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_URL_SUFFIX_MANAGE_SMP)));
+
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("URL suffix to manage Participants")
+                                                 .setCtrl (new HCEdit (new RequestField (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT,
+                                                                                         aSelectedObject != null
+                                                                                                                 ? aSelectedObject.getURLSuffixManageParticipant ()
+                                                                                                                 : SMLInfo.DEFAULT_SUFFIX_MANAGE_PARTICIPANT)))
+                                                 .setHelpText ("This suffix is appended to the Management Service URL. If may be empty or alternatively it must start with a slash ('/').")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Client Certificate required?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_CLIENT_CERTIFICATE_REQUIRED,
@@ -220,6 +238,8 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     final String sDisplayName = aWPEC.params ().getAsStringTrimmed (FIELD_DISPLAY_NAME);
     final String sDNSZone = aWPEC.params ().getAsStringTrimmed (FIELD_DNS_ZONE);
     final String sManagementAddressURL = aWPEC.params ().getAsStringTrimmed (FIELD_MANAGEMENT_ADDRESS_URL);
+    final String sURLSuffixManageSMP = aWPEC.params ().getAsStringTrimmed (FIELD_URL_SUFFIX_MANAGE_SMP);
+    final String sURLSuffixManageParticipant = aWPEC.params ().getAsStringTrimmed (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT);
     final boolean bClientCertificateRequired = aWPEC.params ()
                                                     .isCheckBoxChecked (FIELD_CLIENT_CERTIFICATE_REQUIRED,
                                                                         DEFAULT_CLIENT_CERTIFICATE_REQUIRED);
@@ -244,6 +264,20 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                      "The Management Address URL should only be use the 'http' or the 'https' protocol!");
     }
 
+    if (StringHelper.isNotEmpty (sURLSuffixManageSMP))
+    {
+      if (!SMLInfo.isValidURLSuffix (sURLSuffixManageSMP))
+        aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_SMP,
+                                   "The URL suffix must be empty or start with a slash followed by at least one character.");
+    }
+
+    if (StringHelper.isNotEmpty (sURLSuffixManageParticipant))
+    {
+      if (!SMLInfo.isValidURLSuffix (sURLSuffixManageParticipant))
+        aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT,
+                                   "The URL suffix must be empty or start with a slash followed by at least one character.");
+    }
+
     if (aFormErrors.isEmpty ())
     {
       // Lowercase with the US locale - not display locale specific
@@ -255,6 +289,8 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
                                    sDisplayName,
                                    sDNSZoneLC,
                                    sManagementAddressURL,
+                                   sURLSuffixManageSMP,
+                                   sURLSuffixManageParticipant,
                                    bClientCertificateRequired);
         aWPEC.postRedirectGetInternal (success ("The SML configuration '" +
                                                 sDisplayName +
@@ -262,7 +298,12 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
       }
       else
       {
-        aSMLInfoMgr.createSMLInfo (sDisplayName, sDNSZoneLC, sManagementAddressURL, bClientCertificateRequired);
+        aSMLInfoMgr.createSMLInfo (sDisplayName,
+                                   sDNSZoneLC,
+                                   sManagementAddressURL,
+                                   sURLSuffixManageSMP,
+                                   sURLSuffixManageParticipant,
+                                   bClientCertificateRequired);
         aWPEC.postRedirectGetInternal (success ("The new SML configuration '" +
                                                 sDisplayName +
                                                 "' was successfully created."));

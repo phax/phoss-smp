@@ -38,7 +38,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   {
     // Add the default transport profiles
     for (final ESML e : ESML.values ())
-      internalCreateItem (new SMLInfo (e));
+      internalCreateItem (SMLInfo.builder (e).build ());
     return EChange.CHANGED;
   }
 
@@ -46,18 +46,28 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   public ISMLInfo createSMLInfo (@Nonnull @Nonempty final String sDisplayName,
                                  @Nonnull @Nonempty final String sDNSZone,
                                  @Nonnull @Nonempty final String sManagementServiceURL,
+                                 @Nonnull final String sURLSuffixManageSMP,
+                                 @Nonnull final String sURLSuffixManageParticipant,
                                  final boolean bClientCertificateRequired)
   {
-    final SMLInfo aSMLInfo = new SMLInfo (sDisplayName, sDNSZone, sManagementServiceURL, bClientCertificateRequired);
+    final SMLInfo aSMLInfo = SMLInfo.builder ()
+                                    .idNewPersistent ()
+                                    .displayName (sDisplayName)
+                                    .dnsZone (sDNSZone)
+                                    .managementServiceURL (sManagementServiceURL)
+                                    .urlSuffixManageSMP (sURLSuffixManageSMP)
+                                    .urlSuffixManageParticipant (sURLSuffixManageParticipant)
+                                    .clientCertificateRequired (bClientCertificateRequired)
+                                    .build ();
 
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMLInfo);
-    });
+    m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMLInfo); });
     AuditHelper.onAuditCreateSuccess (SMLInfo.OT,
                                       aSMLInfo.getID (),
                                       sDisplayName,
                                       sDNSZone,
                                       sManagementServiceURL,
+                                      sURLSuffixManageSMP,
+                                      sURLSuffixManageParticipant,
                                       Boolean.valueOf (bClientCertificateRequired));
     return aSMLInfo;
   }
@@ -67,6 +77,8 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
                                 @Nonnull @Nonempty final String sDisplayName,
                                 @Nonnull @Nonempty final String sDNSZone,
                                 @Nonnull @Nonempty final String sManagementServiceURL,
+                                @Nonnull final String sURLSuffixManageSMP,
+                                @Nonnull final String sURLSuffixManageParticipant,
                                 final boolean bClientCertificateRequired)
   {
     final SMLInfo aSMLInfo = getOfID (sSMLInfoID);
@@ -79,15 +91,18 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
     m_aRWLock.writeLock ().lock ();
     try
     {
-      EChange eChange = EChange.UNCHANGED;
-      eChange = eChange.or (aSMLInfo.setDisplayName (sDisplayName));
-      eChange = eChange.or (aSMLInfo.setDNSZone (sDNSZone));
-      eChange = eChange.or (aSMLInfo.setManagementServiceURL (sManagementServiceURL));
-      eChange = eChange.or (aSMLInfo.setClientCertificateRequired (bClientCertificateRequired));
-      if (eChange.isUnchanged ())
+      final SMLInfo aNewSMLInfo = SMLInfo.builder (aSMLInfo)
+                                         .displayName (sDisplayName)
+                                         .dnsZone (sDNSZone)
+                                         .managementServiceURL (sManagementServiceURL)
+                                         .urlSuffixManageSMP (sURLSuffixManageSMP)
+                                         .urlSuffixManageParticipant (sURLSuffixManageParticipant)
+                                         .clientCertificateRequired (bClientCertificateRequired)
+                                         .build ();
+      if (aSMLInfo.equals (aNewSMLInfo))
         return EChange.UNCHANGED;
 
-      internalUpdateItem (aSMLInfo);
+      internalUpdateItem (aNewSMLInfo);
     }
     finally
     {
@@ -99,6 +114,8 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
                                       sDisplayName,
                                       sDNSZone,
                                       sManagementServiceURL,
+                                      sURLSuffixManageSMP,
+                                      sURLSuffixManageParticipant,
                                       Boolean.valueOf (bClientCertificateRequired));
     return EChange.CHANGED;
   }

@@ -52,6 +52,8 @@ public final class SMLInfoManagerMongoDBTest
         final ISMLInfo aCreate = aMgr.createSMLInfo (e.getDisplayName (),
                                                      e.getDNSZone (),
                                                      e.getManagementServiceURL (),
+                                                     e.getURLSuffixManageSMP (),
+                                                     e.getURLSuffixManageParticipant (),
                                                      e.isClientCertificateRequired ());
         aCreated.add (aCreate);
       }
@@ -64,8 +66,9 @@ public final class SMLInfoManagerMongoDBTest
                                         "bla " + aCreate.getDisplayName (),
                                         aCreate.getDNSZone (),
                                         aCreate.getManagementServiceURL (),
-                                        aCreate.isClientCertificateRequired ())
-                        .isChanged ());
+                                        aCreate.getURLSuffixManageSMP (),
+                                        aCreate.getURLSuffixManageParticipant (),
+                                        aCreate.isClientCertificateRequired ()).isChanged ());
       for (final ISMLInfo aCreate : aCreated)
       {
         final ISMLInfo aInfo = aMgr.getSMLInfoOfID (aCreate.getID ());
@@ -81,7 +84,13 @@ public final class SMLInfoManagerMongoDBTest
   @Test
   public void testConversion ()
   {
-    final ISMLInfo aInfo = new SMLInfo ("displayName", "DNSZone", "https://url/url", true);
+    final ISMLInfo aInfo = SMLInfo.builder ()
+                                  .idNew ()
+                                  .displayName ("displayName")
+                                  .dnsZone ("DNSZone")
+                                  .managementServiceURL ("https://url/url")
+                                  .clientCertificateRequired (true)
+                                  .build ();
     final Document aSrc = SMLInfoManagerMongoDB.toBson (aInfo);
     assertNotNull (aSrc);
 

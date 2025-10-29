@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import org.bson.Document;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.ContainsSoftMigration;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
@@ -49,6 +50,8 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   private static final String BSON_DISPLAYNAME = "displayname";
   private static final String BSON_DNSZONE = "dnszone";
   private static final String BSON_SERVICEURL = "serviceurl";
+  private static final String BSON_URL_SUFFIX_MANAGE_SMP = "managesmp";
+  private static final String BSON_URL_SUFFIX_MANAGE_PARTICIPANT = "manageparticipant";
   private static final String BSON_CLIENTCERT = "clientcert";
 
   public SMLInfoManagerMongoDB ()
@@ -65,27 +68,51 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                           .append (BSON_DISPLAYNAME, aValue.getDisplayName ())
                           .append (BSON_DNSZONE, aValue.getDNSZone ())
                           .append (BSON_SERVICEURL, aValue.getManagementServiceURL ())
+                          .append (BSON_URL_SUFFIX_MANAGE_SMP, aValue.getURLSuffixManageSMP ())
+                          .append (BSON_URL_SUFFIX_MANAGE_PARTICIPANT, aValue.getURLSuffixManageParticipant ())
                           .append (BSON_CLIENTCERT, Boolean.valueOf (aValue.isClientCertificateRequired ()));
   }
 
   @Nonnull
   @ReturnsMutableCopy
+  @ContainsSoftMigration
   public static SMLInfo toDomain (@Nonnull final Document aDoc)
   {
-    return new SMLInfo (aDoc.getString (BSON_ID),
-                        aDoc.getString (BSON_DISPLAYNAME),
-                        aDoc.getString (BSON_DNSZONE),
-                        aDoc.getString (BSON_SERVICEURL),
-                        aDoc.getBoolean (BSON_CLIENTCERT).booleanValue ());
+    String sURLSuffixSMP = aDoc.getString (BSON_URL_SUFFIX_MANAGE_SMP);
+    if (sURLSuffixSMP == null)
+      sURLSuffixSMP = SMLInfo.DEFAULT_SUFFIX_MANAGE_SMP;
+    String sURLSuffixParticipant = aDoc.getString (BSON_URL_SUFFIX_MANAGE_PARTICIPANT);
+    if (sURLSuffixParticipant == null)
+      sURLSuffixParticipant = SMLInfo.DEFAULT_SUFFIX_MANAGE_PARTICIPANT;
+
+    return SMLInfo.builder ()
+                  .id (aDoc.getString (BSON_ID))
+                  .displayName (aDoc.getString (BSON_DISPLAYNAME))
+                  .dnsZone (aDoc.getString (BSON_DNSZONE))
+                  .managementServiceURL (aDoc.getString (BSON_SERVICEURL))
+                  .urlSuffixManageSMP (sURLSuffixSMP)
+                  .urlSuffixManageParticipant (sURLSuffixParticipant)
+                  .clientCertificateRequired (aDoc.getBoolean (BSON_CLIENTCERT).booleanValue ())
+                  .build ();
   }
 
   @Nonnull
   public ISMLInfo createSMLInfo (@Nonnull @Nonempty final String sDisplayName,
                                  @Nonnull @Nonempty final String sDNSZone,
                                  @Nonnull @Nonempty final String sManagementServiceURL,
+                                 @Nonnull final String sURLSuffixManageSMP,
+                                 @Nonnull final String sURLSuffixManageParticipant,
                                  final boolean bClientCertificateRequired)
   {
-    final SMLInfo aSMLInfo = new SMLInfo (sDisplayName, sDNSZone, sManagementServiceURL, bClientCertificateRequired);
+    final SMLInfo aSMLInfo = SMLInfo.builder ()
+                                    .idNewPersistent ()
+                                    .displayName (sDisplayName)
+                                    .dnsZone (sDNSZone)
+                                    .managementServiceURL (sManagementServiceURL)
+                                    .urlSuffixManageSMP (sURLSuffixManageSMP)
+                                    .urlSuffixManageParticipant (sURLSuffixManageParticipant)
+                                    .clientCertificateRequired (bClientCertificateRequired)
+                                    .build ();
 
     if (!getCollection ().insertOne (toBson (aSMLInfo)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to insert into MongoDB Collection");
@@ -95,6 +122,8 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                                       sDisplayName,
                                       sDNSZone,
                                       sManagementServiceURL,
+                                      sURLSuffixManageSMP,
+                                      sURLSuffixManageParticipant,
                                       Boolean.valueOf (bClientCertificateRequired));
     return aSMLInfo;
   }
@@ -104,6 +133,8 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                                 @Nonnull @Nonempty final String sDisplayName,
                                 @Nonnull @Nonempty final String sDNSZone,
                                 @Nonnull @Nonempty final String sManagementServiceURL,
+                                @Nonnull final String sURLSuffixManageSMP,
+                                @Nonnull final String sURLSuffixManageParticipant,
                                 final boolean bClientCertificateRequired)
   {
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sSMLInfoID),
@@ -112,6 +143,10 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                                                                                  Updates.set (BSON_DNSZONE, sDNSZone),
                                                                                  Updates.set (BSON_SERVICEURL,
                                                                                               sManagementServiceURL),
+                                                                                 Updates.set (BSON_URL_SUFFIX_MANAGE_SMP,
+                                                                                              sURLSuffixManageSMP),
+                                                                                 Updates.set (BSON_URL_SUFFIX_MANAGE_PARTICIPANT,
+                                                                                              sURLSuffixManageParticipant),
                                                                                  Updates.set (BSON_CLIENTCERT,
                                                                                               Boolean.valueOf (bClientCertificateRequired))));
     if (aOldDoc == null)
@@ -123,6 +158,8 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                                       sDisplayName,
                                       sDNSZone,
                                       sManagementServiceURL,
+                                      sURLSuffixManageSMP,
+                                      sURLSuffixManageParticipant,
                                       Boolean.valueOf (bClientCertificateRequired));
     return EChange.CHANGED;
   }

@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
@@ -45,7 +46,12 @@ public final class SMPSettingsManagerMongoDBTest
   {
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
 
-    final ISMLInfo aSMLInfo = aSMLInfoMgr.createSMLInfo ("bla", "foo", "http://bar", true);
+    final ISMLInfo aSMLInfo = aSMLInfoMgr.createSMLInfo ("bla",
+                                                         "foo",
+                                                         "http://bar",
+                                                         SMLInfo.DEFAULT_SUFFIX_MANAGE_SMP,
+                                                         SMLInfo.DEFAULT_SUFFIX_MANAGE_PARTICIPANT,
+                                                         true);
     assertNotNull (aSMLInfo);
 
     try (final SMPSettingsManagerMongoDB aMgr = new SMPSettingsManagerMongoDB ())

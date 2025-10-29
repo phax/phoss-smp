@@ -26,6 +26,8 @@ final class MockSMLInfoManager implements ISMLInfoManager
                                 final String sDisplayName,
                                 final String sDNSZone,
                                 final String sManagementServiceURL,
+                                final String sURLSuffixManageSMP,
+                                final String sURLSuffixManageParticipant,
                                 final boolean bClientCertificateRequired)
   {
     throw new UnsupportedOperationException ();
@@ -49,6 +51,8 @@ final class MockSMLInfoManager implements ISMLInfoManager
   public ISMLInfo createSMLInfo (final String sDisplayName,
                                  final String sDNSZone,
                                  final String sManagementServiceURL,
+                                 final String sURLSuffixManageSMP,
+                                 final String sURLSuffixManageParticipant,
                                  final boolean bClientCertificateRequired)
   {
     throw new UnsupportedOperationException ();
