@@ -210,12 +210,20 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
     private final PDClient m_aPDClient;
+    private final String m_sUserID;
 
-    public PushAllBusinessCardsToDirectory (@Nonnull final PDClient aPDClient)
+    public PushAllBusinessCardsToDirectory (@Nonnull final PDClient aPDClient, @Nonnull final String sUserID)
     {
       super ("PushAllBusinessCardsToDirectory",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"));
       m_aPDClient = aPDClient;
+      m_sUserID = sUserID;
+    }
+
+    @Override
+    protected String getCurrentUserID ()
+    {
+      return m_sUserID;
     }
 
     @Nonnull
@@ -396,7 +404,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                           {
                             PhotonWorkerPool.getInstance ()
                                             .run ("PushAllBusinessCardsToDirectory",
-                                                  new PushAllBusinessCardsToDirectory (aPDClient));
+                                                  new PushAllBusinessCardsToDirectory (aPDClient,
+                                                                                       aWPEC.getLoggedInUserID ()));
 
                             aWPEC.postRedirectGetInternal (success ("The update of the Business Cards in the " +
                                                                     sDirectoryName +
