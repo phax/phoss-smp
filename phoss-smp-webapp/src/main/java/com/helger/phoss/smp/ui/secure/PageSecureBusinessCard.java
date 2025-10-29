@@ -213,7 +213,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     public PushAllBusinessCardsToDirectory (@Nonnull final PDClient aPDClient)
     {
-      super ("BulkChangeEndpointURL",
+      super ("PushAllBusinessCardsToDirectory",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"));
       m_aPDClient = aPDClient;
     }
