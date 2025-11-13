@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.helger.base.codec.base64.Base64;
 import com.helger.base.enforce.ValueEnforcer;
@@ -49,8 +51,10 @@ import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.statistics.api.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.statistics.api.IStatisticsHandlerKeyedCounter;
 import com.helger.statistics.impl.StatisticsManager;
+import com.helger.xml.XMLFactory;
 import com.helger.xsds.bdxr.smp1.CompleteServiceGroupType;
 import com.helger.xsds.bdxr.smp1.EndpointType;
+import com.helger.xsds.bdxr.smp1.ExtensionType;
 import com.helger.xsds.bdxr.smp1.ProcessListType;
 import com.helger.xsds.bdxr.smp1.ProcessType;
 import com.helger.xsds.bdxr.smp1.ServiceGroupReferenceListType;
@@ -413,6 +417,32 @@ public final class BDXR1ServerAPI
     }
   }
 
+  @Nullable
+  private static List <ExtensionType> _createHREDeliveryExtension (@Nonnull final IParticipantIdentifier aPathServiceGroupID)
+  {
+    final String sValue = aPathServiceGroupID.getValue ();
+
+    // The extension handling is only for HR participant identifiers
+    if (!sValue.startsWith ("9934:"))
+      return null;
+
+    final String sNamespaceURI = "http://porezna-uprava.hr/mps/extension";
+    final Document aDoc = XMLFactory.newDocument ();
+    final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, "HRMPS"));
+    // Take everything after 9934:
+    eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, "ParticipantOIB"))
+         .appendChild (aDoc.createTextNode (sValue.substring (5)));
+
+    // On startup it is ensured that the value is present and configured correctly
+    eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, "AccessPointOIB"))
+         .appendChild (aDoc.createTextNode (SMPServerConfiguration.getHREdeliveryAccessPointOIB ()));
+
+    final ExtensionType aExtension = new ExtensionType ();
+    aExtension.setExtensionID ("eRacunParticipantData");
+    aExtension.setAny (eRoot);
+    return new CommonsArrayList <> (aExtension);
+  }
+
   @Nonnull
   public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sPathServiceGroupID,
                                                            @Nonnull final String sPathDocTypeID) throws SMPServerException
@@ -464,6 +494,13 @@ public final class BDXR1ServerAPI
                                 .getRedirect ()
                                 .setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
         }
+        else
+          if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+          {
+            aSignedServiceMetadata.getServiceMetadata ()
+                                  .getRedirect ()
+                                  .setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
+          }
       }
       else
       {
@@ -472,21 +509,23 @@ public final class BDXR1ServerAPI
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                            aPathDocTypeID);
         final ServiceMetadataType aSM = aServiceInfo == null ? null : aServiceInfo.getAsJAXBObjectBDXR1 ();
-        if (aSM != null)
-        {
-          if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
-          {
-            // Copy extensions over (#376)
-            aSM.getServiceInformation ().setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
-          }
-          aSignedServiceMetadata.setServiceMetadata (aSM);
-        }
-        else
+        if (aSM == null)
         {
           // Neither nor is present, or no endpoint is available
           throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
+        if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
+        {
+          // Copy extensions over (#376)
+          aSM.getServiceInformation ().setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
+        }
+        else
+          if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+          {
+            aSM.getServiceInformation ().setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
+          }
+        aSignedServiceMetadata.setServiceMetadata (aSM);
       }
 
       // Signature must be added by the rest service
@@ -757,29 +796,26 @@ public final class BDXR1ServerAPI
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                  aPathDocTypeID);
-        if (aRedirect != null)
-        {
-          // Handle redirect
-          final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
-          if (eChange.isUnchanged ())
-          {
-            // Most likely an internal error or an inconsistency
-            throw new SMPNotFoundException ("redirect(" +
-                                            aPathServiceGroupID.getURIEncoded () +
-                                            ", " +
-                                            aPathDocTypeID.getURIEncoded () +
-                                            ")",
-                                            m_aAPIDataProvider.getCurrentURI ());
-          }
-          LOGGER.info (sLog + " SUCCESS - Redirect");
-          STATS_COUNTER_SUCCESS.increment (sAction);
-        }
-        else
+        if (aRedirect == null)
         {
           // Neither redirect nor endpoint found
           throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
+        // Handle redirect
+        final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
+        if (eChange.isUnchanged ())
+        {
+          // Most likely an internal error or an inconsistency
+          throw new SMPNotFoundException ("redirect(" +
+                                          aPathServiceGroupID.getURIEncoded () +
+                                          ", " +
+                                          aPathDocTypeID.getURIEncoded () +
+                                          ")",
+                                          m_aAPIDataProvider.getCurrentURI ());
+        }
+        LOGGER.info (sLog + " SUCCESS - Redirect");
+        STATS_COUNTER_SUCCESS.increment (sAction);
       }
     }
     catch (final SMPServerException ex)

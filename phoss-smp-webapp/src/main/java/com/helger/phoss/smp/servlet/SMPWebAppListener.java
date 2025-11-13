@@ -45,6 +45,7 @@ import com.helger.pd.client.PDClientConfiguration;
 import com.helger.pd.client.PDHttpClientSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPSecurity;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
@@ -190,6 +191,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     return StringHelper.isNotEmpty (sCtx) && !sCtx.equals ("/");
   }
 
+  @SuppressWarnings ("removal")
   @Override
   protected void initGlobalSettings ()
   {
@@ -259,21 +261,50 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Check SMP ID
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
     if (StringHelper.isEmpty (sSMPID))
-      throw new IllegalArgumentException ("The SMP ID is missing. It must match the regular expression '" +
-                                          CSMPServer.PATTERN_SMP_ID +
-                                          "'!");
+      throw new InitializationException ("The SMP ID is missing. It must match the regular expression '" +
+                                         CSMPServer.PATTERN_SMP_ID +
+                                         "'!");
     if (!RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, sSMPID))
-      throw new IllegalArgumentException ("The provided SMP ID '" +
-                                          sSMPID +
-                                          "' is not valid when used as a DNS name. It must match the regular expression '" +
-                                          CSMPServer.PATTERN_SMP_ID +
-                                          "'!");
+      throw new InitializationException ("The provided SMP ID '" +
+                                         sSMPID +
+                                         "' is not valid when used as a DNS name. It must match the regular expression '" +
+                                         CSMPServer.PATTERN_SMP_ID +
+                                         "'!");
     LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
     LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
 
     // Check other consistency stuff
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.isEmpty (SMPWebAppConfiguration.getImprintText ()))
       LOGGER.warn ("The custom Imprint is enabled in the configuration, but no imprint text is configured. Therefore no imprint will be shown.");
+
+    if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+    {
+      // Okay, the configuration wants to run in HR eDelivery extension mode
+
+      // Must be BDXR1 mode
+      if (SMPServerConfiguration.getRESTType () != ESMPRESTType.OASIS_BDXR_V1)
+        throw new InitializationException ("The HR eDelivery Extension mode only works with the REST type OASIS BDXR SMP v1");
+
+      // Check AP OIB
+      final String sAPOIB = SMPServerConfiguration.getHREdeliveryAccessPointOIB ();
+      if (StringHelper.isEmpty (sAPOIB))
+        throw new InitializationException ("When using HR eDelivery Extension mode, an AccessPoint OIB must be provided and it must match the regular expression '" +
+                                           CSMPServer.PATTERN_HR_OIB +
+                                           "'!");
+      if (!RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_HR_OIB, sAPOIB))
+        throw new InitializationException ("The provided HR AccessPoint OIB '" +
+                                           sAPOIB +
+                                           "' is not valid. It must match the regular expression '" +
+                                           CSMPServer.PATTERN_HR_OIB +
+                                           "'!");
+
+      // Backwards configuration check
+      if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
+        throw new InitializationException ("As the HR eDelivery Extension mode is enabled, the configuration property '" +
+                                           SMPServerConfiguration.KEY_HREDELIVERY_SG_EXTENSION_ON_SI +
+                                           "' must be removed");
+
+    }
   }
 
   @Override

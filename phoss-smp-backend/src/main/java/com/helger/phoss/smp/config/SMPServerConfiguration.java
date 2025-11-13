@@ -70,7 +70,10 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_CONNECTION_TIMEOUT_MS = "sml.connection.timeout.ms";
   public static final String KEY_SML_REQUEST_TIMEOUT_MS = "sml.request.timeout.ms";
 
+  @Deprecated (forRemoval = true, since = "8.0.6")
   public static final String KEY_HREDELIVERY_SG_EXTENSION_ON_SI = "hredelivery.sg.extension.on.si";
+  public static final String KEY_SMP_HREDELIVERY_EXTENSION = "smp.hredelivery.extension";
+  public static final String KEY_SMP_HREDELIVERY_ACCESSPOINTOIB = "smp.hredelivery.accesspointoib";
 
   public static final boolean DEFAULT_SMP_FORCEROOT = false;
   public static final ESMPIdentifierType DEFAULT_SMP_IDENTIFIER_TYPE = ESMPIdentifierType.PEPPOL;
@@ -88,7 +91,9 @@ public final class SMPServerConfiguration
 
   public static final Timeout DEFAULT_SML_REQUEST_TIMEOUT = Timeout.ofSeconds (30);
 
+  @Deprecated (forRemoval = true, since = "8.0.6")
   public static final boolean DEFAULT_HREDELIVERY_SG_EXTENSION_ON_SI = false;
+  public static final boolean DEFAULT_SMP_HREDELIVERY_EXTENSION = false;
 
   private SMPServerConfiguration ()
   {}
@@ -417,8 +422,29 @@ public final class SMPServerConfiguration
    *         ServiceInformation extension. The default is <code>false</code>.
    * @since 8.0.1
    */
+  @Deprecated (forRemoval = true, since = "8.0.6")
   public static boolean isHRIncludeSGExtOnSI ()
   {
     return _getConfig ().getAsBoolean (KEY_HREDELIVERY_SG_EXTENSION_ON_SI, DEFAULT_HREDELIVERY_SG_EXTENSION_ON_SI);
+  }
+
+  /**
+   * @return <code>true</code> if the extension mode for HR eDelivery is enabled, <code>false</code>
+   *         if not.
+   * @since 8.0.6
+   */
+  public static boolean isHREdeliveryExtensionMode ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_HREDELIVERY_EXTENSION, DEFAULT_SMP_HREDELIVERY_EXTENSION);
+  }
+
+  /**
+   * @return The HR OIB number of the Access Point. This must be an 11-digit number.
+   * @since 8.0.6
+   */
+  @Nullable
+  public static String getHREdeliveryAccessPointOIB ()
+  {
+    return _getConfig ().getAsString (KEY_SMP_HREDELIVERY_ACCESSPOINTOIB);
   }
 }

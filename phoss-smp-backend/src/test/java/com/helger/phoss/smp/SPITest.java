@@ -26,4 +26,7 @@ public final class SPITest
   {
     SPITestHelper.testIfAllSPIImplementationsAreValid ();
   }
+
+  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-\\.]+";
+
 }
