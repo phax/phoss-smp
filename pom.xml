@@ -68,7 +68,7 @@
 
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
-    <flyway.version>11.15.0</flyway.version>
+    <flyway.version>11.17.0</flyway.version>
     <log4j.version>2.25.2</log4j.version>
     <mongodb.version>5.6.1</mongodb.version>
     <protobuf.version>4.33.0</protobuf.version>
@@ -122,21 +122,21 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>12.1.0</version>
+        <version>12.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol.ui</groupId>
         <artifactId>peppol-shared-ui-parent-pom</artifactId>
-        <version>0.9.3</version>
+        <version>0.9.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.14.6</version>
+        <version>0.14.7</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
