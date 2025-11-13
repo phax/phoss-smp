@@ -32,7 +32,10 @@ public final class CSMPServer
   public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
 
   /** A regular expression pattern to validate the SMP ID. */
-  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-\\.]+";
+  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-]+";
+
+  /** A regular expression pattern to validate HR OIBs. */
+  public static final String PATTERN_HR_OIB = "[0-9]{11}";
 
   /**
    * The default time zone is (for historical reasons) UTC, but
