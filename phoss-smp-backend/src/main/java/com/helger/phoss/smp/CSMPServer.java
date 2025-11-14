@@ -37,6 +37,7 @@ public final class CSMPServer
   /** A regular expression pattern to validate HR OIBs. */
   public static final String PATTERN_HR_OIB = "[0-9]{11}";
 
+  public static final String HR_EXTENSION_DEFAULT_PREFIX = "hrext";
   public static final String HR_EXTENSION_NAMESPACE_URI = "http://porezna-uprava.hr/mps/extension";
 
   /**

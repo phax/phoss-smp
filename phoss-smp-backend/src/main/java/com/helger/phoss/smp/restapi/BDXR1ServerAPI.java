@@ -433,14 +433,15 @@ public final class BDXR1ServerAPI
         return null;
 
     final String sNamespaceURI = CSMPServer.HR_EXTENSION_NAMESPACE_URI;
+    String sNSPrefix = CSMPServer.HR_EXTENSION_DEFAULT_PREFIX + ':';
     final Document aDoc = XMLFactory.newDocument ();
-    final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, "HRMPS"));
+    final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "HRMPS"));
     // Take everything after 9934:
-    eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, "ParticipantOIB"))
+    eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "ParticipantOIB"))
          .appendChild (aDoc.createTextNode (sValue.substring (nCharsToSkip)));
 
     // On startup it is ensured that the value is present and configured correctly
-    eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, "AccessPointOIB"))
+    eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "AccessPointOIB"))
          .appendChild (aDoc.createTextNode (SMPServerConfiguration.getHREdeliveryAccessPointOIB ()));
 
     final ExtensionType aExtension = new ExtensionType ();

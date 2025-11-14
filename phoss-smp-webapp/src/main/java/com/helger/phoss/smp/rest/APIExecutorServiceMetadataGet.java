@@ -102,7 +102,9 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
           var aSpecialNSCtx = BDXR1NamespaceContext.getInstance ().getClone ();
           aSpecialNSCtx.removeMapping (CBDXRSMP1.DEFAULT_PREFIX);
           aSpecialNSCtx.addMapping (CBDXRSMP1.DEFAULT_PREFIX + "hr", CBDXRSMP1.NAMESPACE_URI);
-          aSpecialNSCtx.addMapping ("hrext", CSMPServer.HR_EXTENSION_NAMESPACE_URI);
+          // Has no impact in reality
+          if (false)
+            aSpecialNSCtx.addMapping (CSMPServer.HR_EXTENSION_DEFAULT_PREFIX, CSMPServer.HR_EXTENSION_NAMESPACE_URI);
           aMarshaller.setNamespaceContext (aSpecialNSCtx);
         }
 
