@@ -423,15 +423,21 @@ public final class BDXR1ServerAPI
     final String sValue = aPathServiceGroupID.getValue ();
 
     // The extension handling is only for HR participant identifiers
-    if (!sValue.startsWith ("9934:"))
-      return null;
+    int nCharsToSkip = -1;
+    if (sValue.startsWith ("9934:"))
+      nCharsToSkip = 5;
+    else
+      if (sValue.startsWith ("0088:385"))
+        nCharsToSkip = 8;
+      else
+        return null;
 
     final String sNamespaceURI = "http://porezna-uprava.hr/mps/extension";
     final Document aDoc = XMLFactory.newDocument ();
     final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, "HRMPS"));
     // Take everything after 9934:
     eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, "ParticipantOIB"))
-         .appendChild (aDoc.createTextNode (sValue.substring (5)));
+         .appendChild (aDoc.createTextNode (sValue.substring (nCharsToSkip)));
 
     // On startup it is ensured that the value is present and configured correctly
     eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, "AccessPointOIB"))
