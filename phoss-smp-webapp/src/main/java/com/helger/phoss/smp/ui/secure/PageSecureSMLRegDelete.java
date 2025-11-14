@@ -150,7 +150,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
 
     if (bShowInput)
     {
-      final Predicate <ISMLInfo> aSMLFilter = ISMLInfo::isClientCertificateRequired;
+      final Predicate <ISMLInfo> aSMLFilter = null;
 
       // Delete SMP from SML
       final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);

@@ -198,12 +198,12 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         LOGGER.error ("Error determining localhost address", ex);
       }
 
-      final Predicate <ISMLInfo> aSMLFilter = ISMLInfo::isClientCertificateRequired;
+      final Predicate <ISMLInfo> aSMLFilter = null;
 
       // Update SMP at SML
       {
         final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);
-        aForm.addChild (info ("Update this SMP at the SML. This must only be done when either the IP address or the host name of the SMP changed!"));
+        aForm.addChild (info ("Update this SMP at the SML. This must only be done when the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                   aDefaultSML == null

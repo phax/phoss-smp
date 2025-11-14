@@ -202,7 +202,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
         LOGGER.error ("Error determining localhost address", ex);
       }
 
-      final Predicate <ISMLInfo> aSMLFilter = ISMLInfo::isClientCertificateRequired;
+      final Predicate <ISMLInfo> aSMLFilter = null;
 
       // Register SMP at SML
       final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);
