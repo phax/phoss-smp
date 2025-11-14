@@ -99,11 +99,11 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
         {
           // Special namespace prefix to identify phoss SMP instances
-          var aNSCtx = BDXR1NamespaceContext.getInstance ().getClone ();
-          aNSCtx.removeMapping (CBDXRSMP1.DEFAULT_PREFIX);
-          aNSCtx.addMapping (CBDXRSMP1.DEFAULT_PREFIX + "hr", CBDXRSMP1.NAMESPACE_URI);
-          aNSCtx.addMapping ("hrext", CSMPServer.HR_EXTENSION_NAMESPACE_URI);
-          aMarshaller.setNamespaceContext (aNSCtx);
+          var aSpecialNSCtx = BDXR1NamespaceContext.getInstance ().getClone ();
+          aSpecialNSCtx.removeMapping (CBDXRSMP1.DEFAULT_PREFIX);
+          aSpecialNSCtx.addMapping (CBDXRSMP1.DEFAULT_PREFIX + "hr", CBDXRSMP1.NAMESPACE_URI);
+          aSpecialNSCtx.addMapping ("hrext", CSMPServer.HR_EXTENSION_NAMESPACE_URI);
+          aMarshaller.setNamespaceContext (aSpecialNSCtx);
         }
 
         aDoc = aMarshaller.getAsDocument (ret);
