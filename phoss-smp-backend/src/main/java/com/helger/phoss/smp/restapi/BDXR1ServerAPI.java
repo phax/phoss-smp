@@ -423,7 +423,7 @@ public final class BDXR1ServerAPI
     final String sValue = aPathServiceGroupID.getValue ();
 
     // The extension handling is only for HR participant identifiers
-    int nCharsToSkip = -1;
+    final int nCharsToSkip;
     if (sValue.startsWith ("9934:"))
       nCharsToSkip = 5;
     else
