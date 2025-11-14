@@ -37,6 +37,8 @@ public final class CSMPServer
   /** A regular expression pattern to validate HR OIBs. */
   public static final String PATTERN_HR_OIB = "[0-9]{11}";
 
+  public static final String HR_EXTENSION_NAMESPACE_URI = "http://porezna-uprava.hr/mps/extension";
+
   /**
    * The default time zone is (for historical reasons) UTC, but
    * https://github.com/phax/phoss-smp/issues/167 asked to make this customizable

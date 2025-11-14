@@ -432,7 +432,7 @@ public final class BDXR1ServerAPI
       else
         return null;
 
-    final String sNamespaceURI = "http://porezna-uprava.hr/mps/extension";
+    final String sNamespaceURI = CSMPServer.HR_EXTENSION_NAMESPACE_URI;
     final Document aDoc = XMLFactory.newDocument ();
     final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, "HRMPS"));
     // Take everything after 9934:

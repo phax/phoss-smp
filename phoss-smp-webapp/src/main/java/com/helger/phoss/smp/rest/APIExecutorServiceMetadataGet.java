@@ -32,6 +32,7 @@ import com.helger.base.debug.GlobalDebug;
 import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.base.string.StringHelper;
 import com.helger.mime.CMimeType;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
@@ -42,6 +43,7 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerSignedServiceMetadataType;
+import com.helger.smpclient.bdxr1.marshal.BDXR1NamespaceContext;
 import com.helger.smpclient.bdxr2.marshal.BDXR2MarshallerServiceMetadata;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerSignedServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -49,6 +51,7 @@ import com.helger.xml.serialize.write.IXMLWriterSettings;
 import com.helger.xml.serialize.write.XMLWriter;
 import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.helger.xml.transform.XMLTransformerFactory;
+import com.helger.xsds.bdxr.smp1.CBDXRSMP1;
 
 import jakarta.annotation.Nonnull;
 
@@ -92,6 +95,17 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
         // Disable XSD check, because Signature is added later
         aMarshaller.setUseSchema (false);
+
+        if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+        {
+          // Special namespace prefix to identify phoss SMP instances
+          var aNSCtx = BDXR1NamespaceContext.getInstance ().getClone ();
+          aNSCtx.removeMapping (CBDXRSMP1.DEFAULT_PREFIX);
+          aNSCtx.addMapping (CBDXRSMP1.DEFAULT_PREFIX + "hr", CBDXRSMP1.NAMESPACE_URI);
+          aNSCtx.addMapping ("hrext", CSMPServer.HR_EXTENSION_NAMESPACE_URI);
+          aMarshaller.setNamespaceContext (aNSCtx);
+        }
+
         aDoc = aMarshaller.getAsDocument (ret);
         break;
       }
