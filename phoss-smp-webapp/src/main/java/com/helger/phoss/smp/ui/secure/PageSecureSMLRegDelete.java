@@ -118,6 +118,11 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
     final ISMLInfo aDefaultSML = SMPMetaManager.getSettings ().getSMLInfo ();
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
 
+    if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+    {
+      aNodeList.addChild (warn (HR_EXT_WARNING));
+    }
+
     if (aDefaultSML != null)
     {
       // Check if this SMP is already registered

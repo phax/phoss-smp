@@ -39,6 +39,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.BDMSLClient;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
@@ -255,10 +256,15 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final FormErrorList aFormErrors = new FormErrorList ();
 
-    aNodeList.addChild (info ().addChildren (div ("Prepare the update of your SMP certificate in the future."),
-                                             div ("Note: this is a custom SML extension that only works with the CEF SML instances!")));
+    if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+    {
+      aNodeList.addChild (warn (AbstractPageSecureSMLReg.HR_EXT_WARNING));
+    }
 
-    aNodeList.addChild (warn ("This step MUST be performed with the old SMP certificate installed, as long as it is valid"));
+    aNodeList.addChild (info ().addChildren (div ("Prepare the update of your SMP certificate in the future."),
+                                             div ("Note: this is a custom SML extension that only works with the EC SML instances!")));
+
+    aNodeList.addChild (warn ("This step MUST be performed with the old SMP certificate installed, as long as it is valid!"));
 
     // check for expired certificate
     boolean bShowForm = true;

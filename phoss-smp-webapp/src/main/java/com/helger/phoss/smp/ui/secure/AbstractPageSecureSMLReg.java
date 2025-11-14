@@ -34,6 +34,7 @@ public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
   protected static final String HELPTEXT_SMP_ID = "This is the unique ID your SMP will have inside the SML. All continuing operations must use this ID. This ID is taken from the configuration file. All uppercase names are appreciated!";
   protected static final String HELPTEXT_LOGICAL_ADDRESS = "This must be the public fully qualified domain name of your SMP. This can be either a domain name like ''http://smp.example.org'' or an IP address like ''http://1.1.1.1''! The hostname of localhost is ''{0}''.";
   protected static final String DEFAULT_PHYSICAL_ADDRESS = "1.1.1.1";
+  protected static final String HR_EXT_WARNING = "This SMP is configured to run in HR eDelivery Extension Mode. The Croatian AMS (=SML) does not seem to offer the necessary server interface. So don't wonder if you receive weird error messages.";
 
   protected AbstractPageSecureSMLReg (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
   {
