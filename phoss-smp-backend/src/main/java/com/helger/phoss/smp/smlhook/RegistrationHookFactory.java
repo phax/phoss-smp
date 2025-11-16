@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.smlhook;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * This class provides the {@link IRegistrationHook} instance that matches the
@@ -38,7 +38,7 @@ public final class RegistrationHookFactory
    *         {@link RegistrationHookDoNothing} or an instance of
    *         {@link RegistrationHookWriteToSML}.
    */
-  @Nonnull
+  @NonNull
   public static IRegistrationHook getInstance ()
   {
     return SMPMetaManager.getSettings ().isSMLEnabled () ? HOOK_WRITE_TO_SML : HOOK_DO_NOTHING;

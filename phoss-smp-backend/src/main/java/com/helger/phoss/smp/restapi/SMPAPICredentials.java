@@ -10,14 +10,14 @@
  */
 package com.helger.phoss.smp.restapi;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class contains the different representations of the SMP API credentials.
@@ -91,15 +91,15 @@ public class SMPAPICredentials
                                        .getToString ();
   }
 
-  @Nonnull
-  public static SMPAPICredentials createForBasicAuth (@Nonnull final BasicAuthClientCredentials aBasicAuth)
+  @NonNull
+  public static SMPAPICredentials createForBasicAuth (@NonNull final BasicAuthClientCredentials aBasicAuth)
   {
     ValueEnforcer.notNull (aBasicAuth, "BasicAuth");
     return new SMPAPICredentials (aBasicAuth, null);
   }
 
-  @Nonnull
-  public static SMPAPICredentials createForBearerToken (@Nonnull @Nonempty final String sBearerToken)
+  @NonNull
+  public static SMPAPICredentials createForBearerToken (@NonNull @Nonempty final String sBearerToken)
   {
     ValueEnforcer.notEmpty (sBearerToken, "BearerToken");
     return new SMPAPICredentials (null, sBearerToken);

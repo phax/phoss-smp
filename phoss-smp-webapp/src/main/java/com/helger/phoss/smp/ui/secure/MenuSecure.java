@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,6 @@ import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.system.BasePageShowChildren;
 import com.helger.web.scope.singleton.AbstractRequestWebSingleton;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 @Immutable
@@ -79,7 +79,7 @@ public final class MenuSecure
     }
   }
 
-  public static void init (@Nonnull final IMenuTree aMenuTree)
+  public static void init (@NonNull final IMenuTree aMenuTree)
   {
     final MenuObjectFilterUserAssignedToUserGroup aFilterAdministrators = new MenuObjectFilterUserAssignedToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID)
     {

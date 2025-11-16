@@ -19,6 +19,8 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import java.util.function.Consumer;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.ContainsSoftMigration;
@@ -35,9 +37,6 @@ import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Implementation of {@link ISMLInfoManager} for MongoDB
@@ -60,9 +59,9 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMLInfo aValue)
+  public static Document toBson (@NonNull final ISMLInfo aValue)
   {
     return new Document ().append (BSON_ID, aValue.getID ())
                           .append (BSON_DISPLAYNAME, aValue.getDisplayName ())
@@ -73,10 +72,10 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                           .append (BSON_CLIENTCERT, Boolean.valueOf (aValue.isClientCertificateRequired ()));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   @ContainsSoftMigration
-  public static SMLInfo toDomain (@Nonnull final Document aDoc)
+  public static SMLInfo toDomain (@NonNull final Document aDoc)
   {
     String sURLSuffixSMP = aDoc.getString (BSON_URL_SUFFIX_MANAGE_SMP);
     if (sURLSuffixSMP == null)
@@ -96,12 +95,12 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
                   .build ();
   }
 
-  @Nonnull
-  public ISMLInfo createSMLInfo (@Nonnull @Nonempty final String sDisplayName,
-                                 @Nonnull @Nonempty final String sDNSZone,
-                                 @Nonnull @Nonempty final String sManagementServiceURL,
-                                 @Nonnull final String sURLSuffixManageSMP,
-                                 @Nonnull final String sURLSuffixManageParticipant,
+  @NonNull
+  public ISMLInfo createSMLInfo (@NonNull @Nonempty final String sDisplayName,
+                                 @NonNull @Nonempty final String sDNSZone,
+                                 @NonNull @Nonempty final String sManagementServiceURL,
+                                 @NonNull final String sURLSuffixManageSMP,
+                                 @NonNull final String sURLSuffixManageParticipant,
                                  final boolean bClientCertificateRequired)
   {
     final SMLInfo aSMLInfo = SMLInfo.builder ()
@@ -128,13 +127,13 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
     return aSMLInfo;
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSMLInfo (@Nullable final String sSMLInfoID,
-                                @Nonnull @Nonempty final String sDisplayName,
-                                @Nonnull @Nonempty final String sDNSZone,
-                                @Nonnull @Nonempty final String sManagementServiceURL,
-                                @Nonnull final String sURLSuffixManageSMP,
-                                @Nonnull final String sURLSuffixManageParticipant,
+                                @NonNull @Nonempty final String sDisplayName,
+                                @NonNull @Nonempty final String sDNSZone,
+                                @NonNull @Nonempty final String sManagementServiceURL,
+                                @NonNull final String sURLSuffixManageSMP,
+                                @NonNull final String sURLSuffixManageParticipant,
                                 final boolean bClientCertificateRequired)
   {
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sSMLInfoID),
@@ -180,7 +179,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMLInfo> getAllSMLInfos ()
   {

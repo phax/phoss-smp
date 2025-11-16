@@ -18,6 +18,7 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +40,6 @@ import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * REST API to export all Service Groups that have the state "outbound migration is in progress"
  * into XML v1
@@ -55,11 +54,11 @@ public final class APIExecutorExportOutboundMigrationInProcessXMLVer extends Abs
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorExportOutboundMigrationInProcessXMLVer.class);
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-OutboundMigrationInProcess-XML-V1] ";
     LOGGER.info (sLogPrefix + "Starting Export for all with outbound migration state 'in progress'");

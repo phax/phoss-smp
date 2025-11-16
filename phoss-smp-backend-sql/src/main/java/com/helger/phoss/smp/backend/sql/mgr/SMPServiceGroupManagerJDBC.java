@@ -19,6 +19,8 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +61,6 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 
@@ -84,7 +84,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPServiceGroupManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPServiceGroupManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
@@ -105,16 +105,16 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       m_aCache = null;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                                                @Nonnull final IParticipantIdentifier aParticipantID,
+  @NonNull
+  public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
+                                                @NonNull final IParticipantIdentifier aParticipantID,
                                                 @Nullable final String sExtension,
                                                 final boolean bCreateInSML) throws SMPServerException
   {
@@ -215,9 +215,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return aServiceGroup;
   }
 
-  @Nonnull
-  public EChange updateSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
-                                        @Nonnull @Nonempty final String sNewOwnerID,
+  @NonNull
+  public EChange updateSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
+                                        @NonNull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sNewExtension) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -304,8 +304,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return eChange;
   }
 
-  @Nonnull
-  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
+  @NonNull
+  public EChange deleteSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                         final boolean bDeleteInSML) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -389,7 +389,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return eChange;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
@@ -409,7 +409,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllSMPServiceGroupIDs ()
   {
@@ -426,9 +426,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@NonNull final String sOwnerID)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
@@ -449,7 +449,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nonnegative
-  public long getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
+  public long getSMPServiceGroupCountOfOwner (@NonNull final String sOwnerID)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");

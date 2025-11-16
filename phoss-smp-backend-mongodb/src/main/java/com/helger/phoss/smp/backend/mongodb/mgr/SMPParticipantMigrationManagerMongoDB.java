@@ -21,6 +21,8 @@ import java.util.Date;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -40,9 +42,6 @@ import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Implementation of {@link ISMPParticipantMigrationManager} for MongoDB
@@ -66,9 +65,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPParticipantMigration aValue)
+  public static Document toBson (@NonNull final ISMPParticipantMigration aValue)
   {
     return new Document ().append (BSON_ID, aValue.getID ())
                           .append (BSON_DIRECTION, aValue.getDirection ().getID ())
@@ -78,9 +77,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
                           .append (BSON_MIGRATION_KEY, aValue.getMigrationKey ());
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPParticipantMigration toDomain (@Nonnull final Document aDoc)
+  public static SMPParticipantMigration toDomain (@NonNull final Document aDoc)
   {
     final String sID = aDoc.getString (BSON_ID);
     final EParticipantMigrationDirection eDirection = EParticipantMigrationDirection.getFromIDOrNull (aDoc.getString (BSON_DIRECTION));
@@ -91,7 +90,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return new SMPParticipantMigration (sID, eDirection, eState, aParticipantID, aInitiationDateTime, sMigrationKey);
   }
 
-  private void _createParticipantMigration (@Nonnull final SMPParticipantMigration aSMPParticipantMigration)
+  private void _createParticipantMigration (@NonNull final SMPParticipantMigration aSMPParticipantMigration)
   {
     ValueEnforcer.notNull (aSMPParticipantMigration, "SMPParticipantMigration");
     if (!getCollection ().insertOne (toBson (aSMPParticipantMigration)).wasAcknowledged ())
@@ -105,9 +104,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
                                       aSMPParticipantMigration.getMigrationKey ());
   }
 
-  @Nonnull
-  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                      @Nonnull @Nonempty final String sMigrationKey)
+  @NonNull
+  public ISMPParticipantMigration createOutboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                      @NonNull @Nonempty final String sMigrationKey)
   {
     final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID,
                                                                                                      sMigrationKey);
@@ -115,9 +114,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return aSMPParticipantMigration;
   }
 
-  @Nonnull
-  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  @NonNull
+  public ISMPParticipantMigration createInboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                     @NonNull @Nonempty final String sMigrationKey)
   {
     final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID,
                                                                                                     sMigrationKey);
@@ -125,7 +124,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return aSMPParticipantMigration;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
     if (StringHelper.isEmpty (sParticipantMigrationID))
@@ -142,8 +141,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return EChange.CHANGED;
   }
 
-  @Nonnull
-  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
+  @NonNull
+  public EChange deleteAllParticipantMigrationsOfParticipant (@NonNull final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -160,9 +159,9 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
-                                               @Nonnull final EParticipantMigrationState eNewState)
+                                               @NonNull final EParticipantMigrationState eNewState)
   {
     ValueEnforcer.notNull (eNewState, "NewState");
 
@@ -204,8 +203,8 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   }
 
   @Nullable
-  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
-                                                                          @Nonnull final EParticipantMigrationState eState,
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                          @NonNull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (eDirection, "Direction");
@@ -222,7 +221,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return toDomain (aMatch);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
@@ -235,7 +234,7 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {

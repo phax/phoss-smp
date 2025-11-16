@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCSmall;
@@ -31,7 +33,6 @@ import com.helger.photon.core.execcontext.ISimpleWebExecutionContext;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 import com.helger.url.SimpleURL;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -42,7 +43,7 @@ import jakarta.annotation.Nullable;
 public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 {
   public SMPLoginHTMLProvider (final boolean bLoginError,
-                               @Nonnull final ICredentialValidationResult aLoginResult,
+                               @NonNull final ICredentialValidationResult aLoginResult,
                                @Nullable final IHCNode aPageTitle)
   {
     super (bLoginError, aLoginResult, aPageTitle);
@@ -50,15 +51,15 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
   }
 
   @Override
-  protected void onBeforeForm (@Nonnull final ISimpleWebExecutionContext aSWEC, @Nonnull final BootstrapForm aForm)
+  protected void onBeforeForm (@NonNull final ISimpleWebExecutionContext aSWEC, @NonNull final BootstrapForm aForm)
   {
     // Change the URL to relative (fixed in ph-oton 8.2.1)
     aForm.setAction (new SimpleURL (aSWEC.getRequestScope ().getURIDecoded ()));
   }
 
   @Override
-  @Nonnull
-  protected IHCNode createPageHeader (@Nonnull final ISimpleWebExecutionContext aSWEC,
+  @NonNull
+  protected IHCNode createPageHeader (@NonNull final ISimpleWebExecutionContext aSWEC,
                                       @Nullable final IHCNode aPageTitle)
   {
     final HCNodeList ret = new HCNodeList ();
@@ -69,7 +70,7 @@ public final class SMPLoginHTMLProvider extends BootstrapLoginHTMLProvider
 
   @Override
   @Nullable
-  protected IHCNode createFormFooter (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  protected IHCNode createFormFooter (@NonNull final ISimpleWebExecutionContext aSWEC)
   {
     final HCDiv aDiv = new HCDiv ().addClass (CBootstrapCSS.D_FLEX).addClass (CBootstrapCSS.MT_3);
     aDiv.addChild (new HCSmall ().addChild (CSMP.getApplicationTitleAndVersion ()));

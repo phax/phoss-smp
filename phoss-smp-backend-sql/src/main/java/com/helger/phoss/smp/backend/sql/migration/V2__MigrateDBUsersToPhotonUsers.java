@@ -18,12 +18,11 @@ package com.helger.phoss.smp.backend.sql.migration;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 public final class V2__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
 {
-  public void migrate (@Nonnull final Context context) throws Exception
+  public void migrate (@NonNull final Context context) throws Exception
   {
     // Empty because of dependencies of this action to action V8 this is now
     // executed as V15

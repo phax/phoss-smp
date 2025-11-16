@@ -19,6 +19,7 @@ package com.helger.phoss.smp.rest;
 import java.io.File;
 import java.util.Arrays;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,6 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
 
-import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
@@ -52,7 +52,7 @@ public final class MainReadFromFileBDXR1
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                 CSecurity.USER_ADMINISTRATOR_PASSWORD);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+  private static void _testResponseJerseyClient (@NonNull final Response aResponseMsg,
                                                  @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);

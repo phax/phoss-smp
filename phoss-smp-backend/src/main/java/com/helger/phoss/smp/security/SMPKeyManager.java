@@ -41,6 +41,8 @@ import javax.xml.crypto.dsig.spec.SignatureMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.apache.xml.security.c14n.Canonicalizer;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -57,9 +59,6 @@ import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class holds the private key for signing and the certificate for checking.
@@ -136,7 +135,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     _loadKeyStore ();
   }
 
-  @Nonnull
+  @NonNull
   public static SMPKeyManager getInstance ()
   {
     return getGlobalSingleton (SMPKeyManager.class);
@@ -156,8 +155,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @return The configured private key. May be <code>null</code> if loading failed. In that case
    *         check the result of {@link #getInitializationError()}.
    */
-  @Nullable
-  public KeyStore.PrivateKeyEntry getPrivateKeyEntry ()
+  public KeyStore.@Nullable PrivateKeyEntry getPrivateKeyEntry ()
   {
     return m_aKeyEntry;
   }
@@ -183,7 +181,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @throws GeneralSecurityException
    *         In case something goes wrong :)
    */
-  @Nonnull
+  @NonNull
   public SSLContext createSSLContext () throws GeneralSecurityException
   {
     // Key manager
@@ -229,7 +227,7 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @throws XMLSignatureException
    *         Some XMLDSig specific stuff failed
    */
-  public void signXML (@Nonnull final Element aElementToSign, @Nonnull final ESMPRESTType eRESTType)
+  public void signXML (@NonNull final Element aElementToSign, @NonNull final ESMPRESTType eRESTType)
                                                                                                      throws NoSuchAlgorithmException,
                                                                                                      InvalidAlgorithmParameterException,
                                                                                                      MarshalException,
@@ -263,24 +261,25 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // 5.0.1 to EXCLUSIVE
     // * Peppol SMP Spec 1.3.0 changed from SHA-1 to SHA-256
     final String sC18N;
-    final String sSignatureMethod;
-    switch (eRESTType)
+    final String sSignatureMethod = switch (eRESTType)
     {
-      case PEPPOL:
+      case PEPPOL ->
+      {
         sC18N = CanonicalizationMethod.INCLUSIVE;
-        sSignatureMethod = SignatureMethod.RSA_SHA256;
-        break;
-      case OASIS_BDXR_V1:
+        yield SignatureMethod.RSA_SHA256;
+      }
+      case OASIS_BDXR_V1 ->
+      {
         sC18N = CanonicalizationMethod.INCLUSIVE;
-        sSignatureMethod = SignatureMethod.RSA_SHA256;
-        break;
-      case OASIS_BDXR_V2:
+        yield SignatureMethod.RSA_SHA256;
+      }
+      case OASIS_BDXR_V2 ->
+      {
         sC18N = Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS;
-        sSignatureMethod = SignatureMethod.RSA_SHA256;
-        break;
-      default:
-        throw new IllegalStateException ("Unsupported REST type");
-    }
+        yield SignatureMethod.RSA_SHA256;
+      }
+      default -> throw new IllegalStateException ("Unsupported REST type");
+    };
     final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (sC18N,
                                                                                                                  (C14NMethodParameterSpec) null),
                                                                     aSignatureFactory.newSignatureMethod (sSignatureMethod,

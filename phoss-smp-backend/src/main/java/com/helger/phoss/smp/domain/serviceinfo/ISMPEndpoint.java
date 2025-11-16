@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.time.LocalDate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.CompareHelper;
 import com.helger.base.compare.IComparator;
@@ -19,38 +22,33 @@ import com.helger.base.string.StringHelper;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
- * Represents a single SMP endpoint that is contained in a single
- * {@link ISMPProcess}.
+ * Represents a single SMP endpoint that is contained in a single {@link ISMPProcess}.
  *
  * @author Philip Helger
  */
 public interface ISMPEndpoint extends ISMPHasExtension
 {
   /**
-   * @return the type of BUSDOX transport that is being used between access
-   *         points, e.g. the BUSDOX START profile ("busdox-transport-start").
-   *         The list of valid transport protocols is found in
-   *         ICT-Transport-Policy_for_using_Identifiers.
+   * @return the type of BUSDOX transport that is being used between access points, e.g. the BUSDOX
+   *         START profile ("busdox-transport-start"). The list of valid transport protocols is
+   *         found in ICT-Transport-Policy_for_using_Identifiers.
    * @see com.helger.peppol.smp.ISMPTransportProfile
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getTransportProfile ();
 
   /**
-   * @return The address of an endpoint, as an WS-Addressing Endpoint Reference
-   *         (EPR). This is just a URL.
+   * @return The address of an endpoint, as an WS-Addressing Endpoint Reference (EPR). This is just
+   *         a URL.
    */
   @Nullable
   String getEndpointReference ();
 
   /**
-   * @return <code>true</code> if this endpoint has an endpoint reference URL,
-   *         <code>false</code> otherwise.
+   * @return <code>true</code> if this endpoint has an endpoint reference URL, <code>false</code>
+   *         otherwise.
    * @see #getEndpointReference()
    */
   default boolean hasEndpointReference ()
@@ -59,31 +57,28 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return Set to ‘true’ if the recipient requires business-level signatures
-   *         for the message, meaning a signature applied to the business
-   *         message before the message is put on the transport. This is
-   *         independent of the transport-level signatures that a specific
-   *         transport profile, such as the START profile, might mandate. This
-   *         flag does not indicate which type of business-level signature might
-   *         be required. Setting or consuming business-level signatures would
-   *         typically be the responsibility of the final senders and receivers
-   *         of messages, rather than a set of APs.
+   * @return Set to ‘true’ if the recipient requires business-level signatures for the message,
+   *         meaning a signature applied to the business message before the message is put on the
+   *         transport. This is independent of the transport-level signatures that a specific
+   *         transport profile, such as the START profile, might mandate. This flag does not
+   *         indicate which type of business-level signature might be required. Setting or consuming
+   *         business-level signatures would typically be the responsibility of the final senders
+   *         and receivers of messages, rather than a set of APs.
    */
   boolean isRequireBusinessLevelSignature ();
 
   /**
-   * @return Indicates the minimum authentication level that recipient requires.
-   *         The specific semantics of this field is defined in a specific
-   *         instance of the BUSDOX infrastructure. It could for example reflect
-   *         the value of the "urn:eu:busdox:attribute:assurance-level" SAML
-   *         attribute defined in the START specification.
+   * @return Indicates the minimum authentication level that recipient requires. The specific
+   *         semantics of this field is defined in a specific instance of the BUSDOX infrastructure.
+   *         It could for example reflect the value of the "urn:eu:busdox:attribute:assurance-level"
+   *         SAML attribute defined in the START specification.
    */
   @Nullable
   String getMinimumAuthenticationLevel ();
 
   /**
-   * @return <code>true</code> if this endpoint has a minimum authentication
-   *         level, <code>false</code> otherwise.
+   * @return <code>true</code> if this endpoint has a minimum authentication level,
+   *         <code>false</code> otherwise.
    * @see #getMinimumAuthenticationLevel()
    */
   default boolean hasMinimumAuthenticationLevel ()
@@ -92,15 +87,15 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return Activation date and time of the service. Senders should ignore
-   *         services that are not yet activated.
+   * @return Activation date and time of the service. Senders should ignore services that are not
+   *         yet activated.
    */
   @Nullable
   XMLOffsetDateTime getServiceActivationDateTime ();
 
   /**
-   * @return Activation date of the service. Senders should ignore services that
-   *         are not yet activated.
+   * @return Activation date of the service. Senders should ignore services that are not yet
+   *         activated.
    */
   @Nullable
   default LocalDate getServiceActivationDate ()
@@ -110,8 +105,8 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return <code>true</code> if this endpoint has a service activation
-   *         datetime, <code>false</code> otherwise.
+   * @return <code>true</code> if this endpoint has a service activation datetime,
+   *         <code>false</code> otherwise.
    * @see #getServiceActivationDate()
    */
   default boolean hasServiceActivationDateTime ()
@@ -120,15 +115,14 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return Expiration date and time of the service. Senders should ignore
-   *         services that are expired.
+   * @return Expiration date and time of the service. Senders should ignore services that are
+   *         expired.
    */
   @Nullable
   XMLOffsetDateTime getServiceExpirationDateTime ();
 
   /**
-   * @return Expiration date of the service. Senders should ignore services that
-   *         are expired.
+   * @return Expiration date of the service. Senders should ignore services that are expired.
    */
   @Nullable
   default LocalDate getServiceExpirationDate ()
@@ -138,8 +132,8 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return <code>true</code> if this endpoint has a service expiration
-   *         datetime, <code>false</code> otherwise.
+   * @return <code>true</code> if this endpoint has a service expiration datetime,
+   *         <code>false</code> otherwise.
    * @see #getServiceExpirationDateTime()
    */
   default boolean hasServiceExpirationDateTime ()
@@ -148,8 +142,8 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return the complete signing certificate of the recipient AP, as a PEM base
-   *         64 encoded X509 DER formatted value.
+   * @return the complete signing certificate of the recipient AP, as a PEM base 64 encoded X509 DER
+   *         formatted value.
    */
   @Nullable
   String getCertificate ();
@@ -171,8 +165,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return a link to human readable contact information. This might also be an
-   *         email address.
+   * @return a link to human readable contact information. This might also be an email address.
    */
   @Nullable
   String getTechnicalContactUrl ();
@@ -183,9 +176,9 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return A URL to human readable documentation of the service format. This
-   *         could for example be a web site containing links to XML Schemas,
-   *         WSDLs, Schematrons and other relevant resources.
+   * @return A URL to human readable documentation of the service format. This could for example be
+   *         a web site containing links to XML Schemas, WSDLs, Schematrons and other relevant
+   *         resources.
    */
   @Nullable
   String getTechnicalInformationUrl ();
@@ -196,27 +189,24 @@ public interface ISMPEndpoint extends ISMPHasExtension
   }
 
   /**
-   * @return This service information object as a Peppol SMP JAXB object for the
-   *         REST interface. Never <code>null</code>.
+   * @return This service information object as a Peppol SMP JAXB object for the REST interface.
+   *         Never <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.peppol.smp1.EndpointType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.@NonNull EndpointType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP v1 JAXB object for
-   *         the REST interface. Never <code>null</code>.
+   * @return This service information object as a BDXR SMP v1 JAXB object for the REST interface.
+   *         Never <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR1 ();
+  com.helger.xsds.bdxr.smp1.@NonNull EndpointType getAsJAXBObjectBDXR1 ();
 
   /**
-   * @return This service information object as a BDXR SMP v2 JAXB object for
-   *         the REST interface. Never <code>null</code>.
+   * @return This service information object as a BDXR SMP v2 JAXB object for the REST interface.
+   *         Never <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.bdxr.smp2.ac.EndpointType getAsJAXBObjectBDXR2 ();
+  com.helger.xsds.bdxr.smp2.ac.@NonNull EndpointType getAsJAXBObjectBDXR2 ();
 
-  @Nonnull
+  @NonNull
   static IComparator <ISMPEndpoint> comparator ()
   {
     return (aElement1, aElement2) -> {

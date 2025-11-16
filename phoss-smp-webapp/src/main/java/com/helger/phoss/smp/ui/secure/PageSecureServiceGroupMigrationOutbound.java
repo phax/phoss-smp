@@ -18,6 +18,7 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,6 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.url.ISimpleURL;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -91,14 +91,14 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   private static final String ACTION_CANCEL_MIGRATION = "cancelmig";
   private static final String ACTION_FINALIZE_MIGRATION = "finishmig";
 
-  public PageSecureServiceGroupMigrationOutbound (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroupMigrationOutbound (@NonNull @Nonempty final String sID)
   {
     super (sID, "Migrate to another SMP");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPParticipantMigration, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMPParticipantMigration aSelectedObject)
       {
         aForm.addChild (question ("Are you sure you want to delete the outbound Participant Migration for participant '" +
@@ -107,7 +107,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final ISMPParticipantMigration aSelectedObject)
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC, @Nullable final ISMPParticipantMigration aSelectedObject)
       {
         final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
         if (aParticipantMigrationMgr.deleteParticipantMigrationOfID (aSelectedObject.getID ()).isChanged ())
@@ -122,8 +122,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                                                                               "cancelmig")
                       {
                         @Override
-                        protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                                  @Nonnull final BootstrapForm aForm,
+                        protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                                  @NonNull final BootstrapForm aForm,
                                                   @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           aForm.addChild (question ("Are you sure you want to cancel the outbound Participant Migration for '" +
@@ -132,7 +132,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         }
 
                         @Override
-                        protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                        protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                                       @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
@@ -158,8 +158,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                                                                               "finalizemig")
                       {
                         @Override
-                        protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                                  @Nonnull final BootstrapForm aForm,
+                        protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                                  @NonNull final BootstrapForm aForm,
                                                   @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           aForm.addChild (question ("Are you sure you want to fianlize the outbound Participant Migration for '" +
@@ -168,7 +168,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         }
 
                         @Override
-                        protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+                        protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                                       @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           final HCNodeList aNL = new HCNodeList ();
@@ -254,8 +254,8 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   }
 
   @Override
-  protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final EWebPageFormAction eFormAction,
+  protected boolean isActionAllowed (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPParticipantMigration aSelectedObject)
   {
     if (eFormAction.isEdit ())
@@ -279,14 +279,14 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
 
   @Override
   @Nullable
-  protected ISMPParticipantMigration getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMPParticipantMigration getSelectedObject (@NonNull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     return aParticipantMigrationMgr.getParticipantMigrationOfID (sID);
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPParticipantMigration aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC, @NonNull final ISMPParticipantMigration aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -310,12 +310,12 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPParticipantMigration aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bIsFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
@@ -352,10 +352,10 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPParticipantMigration aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -427,10 +427,10 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     }
   }
 
-  @Nonnull
-  private IHCNode _createTable (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ICommonsIterable <ISMPParticipantMigration> aMigs,
-                                @Nonnull final EParticipantMigrationState eState)
+  @NonNull
+  private IHCNode _createTable (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final ICommonsIterable <ISMPParticipantMigration> aMigs,
+                                @NonNull final EParticipantMigrationState eState)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
@@ -477,7 +477,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();

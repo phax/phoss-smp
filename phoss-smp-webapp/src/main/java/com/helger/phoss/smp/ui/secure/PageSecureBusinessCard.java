@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.misc.WorkInProgress;
@@ -127,7 +129,6 @@ import com.helger.url.validate.URLValidator;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.web.scope.mgr.WebScoped;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 @WorkInProgress
@@ -212,7 +213,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     private final PDClient m_aPDClient;
     private final String m_sUserID;
 
-    public PushAllBusinessCardsToDirectory (@Nonnull final PDClient aPDClient, @Nonnull final String sUserID)
+    public PushAllBusinessCardsToDirectory (@NonNull final PDClient aPDClient, @NonNull final String sUserID)
     {
       super ("PushAllBusinessCardsToDirectory",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"));
@@ -226,7 +227,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       return m_sUserID;
     }
 
-    @Nonnull
+    @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
       RUNNING_JOBS.incrementAndGet ();
@@ -294,14 +295,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
   }
 
-  public PageSecureBusinessCard (@Nonnull @Nonempty final String sID)
+  public PageSecureBusinessCard (@NonNull @Nonempty final String sID)
   {
     super (sID, "Business Cards");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPBusinessCard, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMPBusinessCard aSelectedObject)
       {
         aForm.addChild (question ("Are you sure you want to delete the Business Card for service group '" +
@@ -310,7 +311,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                     @Nullable final ISMPBusinessCard aSelectedObject)
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
@@ -331,9 +332,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     addCustomHandler (ACTION_PUBLISH_TO_INDEXER,
                       new AbstractBootstrapWebPageActionHandler <ISMPBusinessCard, WebPageExecutionContext> (true)
                       {
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                       @Nonnull final ISMPBusinessCard aSelectedObject)
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
+                                                       @NonNull final ISMPBusinessCard aSelectedObject)
                         {
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
@@ -379,8 +380,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     addCustomHandler (ACTION_PUBLISH_ALL_TO_INDEXER,
                       new AbstractBootstrapWebPageActionHandler <ISMPBusinessCard, WebPageExecutionContext> (false)
                       {
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
                                                        @Nullable final ISMPBusinessCard aSelectedObject)
                         {
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
@@ -417,8 +418,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Override
-  @Nonnull
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  @NonNull
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
@@ -447,7 +448,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
   @Override
   @Nullable
-  protected ISMPBusinessCard getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+  protected ISMPBusinessCard getSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
                                                 @Nullable final String sID)
   {
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
@@ -455,10 +456,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     return aBusinessCardMgr.getSMPBusinessCardOfID (aIdentifierFactory.parseParticipantIdentifier (sID));
   }
 
-  @Nonnull
-  public static IHCNode showBusinessCardEntity (@Nonnull final SMPBusinessCardEntity aEntity,
+  @NonNull
+  public static IHCNode showBusinessCardEntity (@NonNull final SMPBusinessCardEntity aEntity,
                                                 final int nIndex,
-                                                @Nonnull final Locale aDisplayLocale)
+                                                @NonNull final Locale aDisplayLocale)
   {
     final BootstrapCard aPanel = new BootstrapCard ();
     aPanel.createAndAddHeader ().addChild ("Business Entity " + nIndex);
@@ -524,8 +525,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPBusinessCard aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPBusinessCard aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -552,10 +553,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPBusinessCard aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
@@ -786,12 +787,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
   }
 
-  @Nonnull
-  private static HCRow _createIdentifierInputForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                   @Nonnull final String sEntityID,
+  @NonNull
+  private static HCRow _createIdentifierInputForm (@NonNull final ILayoutExecutionContext aLEC,
+                                                   @NonNull final String sEntityID,
                                                    @Nullable final SMPBusinessCardIdentifier aExistingIdentifier,
                                                    @Nullable final String sExistingID,
-                                                   @Nonnull final FormErrorList aFormErrors)
+                                                   @NonNull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sIdentifierID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
@@ -837,12 +838,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     return aRow;
   }
 
-  @Nonnull
-  private static HCRow _createContactInputForm (@Nonnull final ILayoutExecutionContext aLEC,
-                                                @Nonnull final String sEntityID,
+  @NonNull
+  private static HCRow _createContactInputForm (@NonNull final ILayoutExecutionContext aLEC,
+                                                @NonNull final String sEntityID,
                                                 @Nullable final SMPBusinessCardContact aExistingContact,
                                                 @Nullable final String sExistingID,
-                                                @Nonnull final FormErrorList aFormErrors)
+                                                @NonNull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final String sContactID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
@@ -920,11 +921,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     return aRow;
   }
 
-  @Nonnull
-  private static IHCNode _createEntityInputForm (@Nonnull final LayoutExecutionContext aLEC,
+  @NonNull
+  private static IHCNode _createEntityInputForm (@NonNull final LayoutExecutionContext aLEC,
                                                  @Nullable final SMPBusinessCardEntity aExistingEntity,
                                                  @Nullable final String sExistingID,
-                                                 @Nonnull final FormErrorList aFormErrors,
+                                                 @NonNull final FormErrorList aFormErrors,
                                                  final boolean bFormSubmitted)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
@@ -1108,12 +1109,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPBusinessCard aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -1183,9 +1184,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
   }
 
-  @Nonnull
-  private IHCNode _createActionCell (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPBusinessCard aCurObject)
+  @NonNull
+  private IHCNode _createActionCell (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPBusinessCard aCurObject)
   {
     final String sDisplayName = aCurObject.getID ();
     final HCNodeList ret = new HCNodeList ();
@@ -1231,7 +1232,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

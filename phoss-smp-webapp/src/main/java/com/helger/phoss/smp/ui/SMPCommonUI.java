@@ -22,6 +22,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,6 @@ import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.photon.uictrls.datatables.plugins.DataTablesPluginSearchHighlight;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -102,7 +102,7 @@ public final class SMPCommonUI
   }
 
   // Based on PeriodFuncTest code
-  @Nonnull
+  @NonNull
   @Nonempty
   private static String _getPeriodString (final int nYears,
                                           final int nMonths,
@@ -148,8 +148,8 @@ public final class SMPCommonUI
     return aSB.append (" and ").append (aParts.getLastOrNull ()).toString ();
   }
 
-  @Nonnull
-  private static String _inGroupsOf (@Nonnull final String s, final int nChars)
+  @NonNull
+  private static String _inGroupsOf (@NonNull final String s, final int nChars)
   {
     if (nChars < 1)
       return s;
@@ -168,30 +168,30 @@ public final class SMPCommonUI
     return aSB.toString ();
   }
 
-  @Nonnull
-  public static String getCertIssuer (@Nonnull final X509Certificate aX509Cert)
+  @NonNull
+  public static String getCertIssuer (@NonNull final X509Certificate aX509Cert)
   {
     return aX509Cert.getIssuerX500Principal ().getName ();
   }
 
-  @Nonnull
-  public static String getCertSubject (@Nonnull final X509Certificate aX509Cert)
+  @NonNull
+  public static String getCertSubject (@NonNull final X509Certificate aX509Cert)
   {
     return aX509Cert.getSubjectX500Principal ().getName ();
   }
 
-  @Nonnull
-  public static String getCertSerialNumber (@Nonnull final X509Certificate aX509Cert)
+  @NonNull
+  public static String getCertSerialNumber (@NonNull final X509Certificate aX509Cert)
   {
     return aX509Cert.getSerialNumber ().toString () +
            " / 0x" +
            _inGroupsOf (aX509Cert.getSerialNumber ().toString (16), 4);
   }
 
-  @Nonnull
-  public static IHCNode getNodeCertNotBefore (@Nonnull final OffsetDateTime aNotBefore,
-                                              @Nonnull final OffsetDateTime aNowDT,
-                                              @Nonnull final Locale aDisplayLocale)
+  @NonNull
+  public static IHCNode getNodeCertNotBefore (@NonNull final OffsetDateTime aNotBefore,
+                                              @NonNull final OffsetDateTime aNowDT,
+                                              @NonNull final Locale aDisplayLocale)
   {
     final HCNodeList ret = new HCNodeList ();
     ret.addChild (PDTToString.getAsString (aNotBefore, aDisplayLocale));
@@ -200,10 +200,10 @@ public final class SMPCommonUI
     return ret;
   }
 
-  @Nonnull
-  public static IHCNode getNodeCertNotAfter (@Nonnull final OffsetDateTime aNotAfter,
-                                             @Nonnull final OffsetDateTime aNowDT,
-                                             @Nonnull final Locale aDisplayLocale)
+  @NonNull
+  public static IHCNode getNodeCertNotAfter (@NonNull final OffsetDateTime aNotAfter,
+                                             @NonNull final OffsetDateTime aNowDT,
+                                             @NonNull final Locale aDisplayLocale)
   {
     final HCNodeList ret = new HCNodeList ();
     ret.addChild (PDTToString.getAsString (aNotAfter, aDisplayLocale));
@@ -217,11 +217,11 @@ public final class SMPCommonUI
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public static BootstrapTable createCertificateDetailsTable (@Nullable final String sAlias,
-                                                              @Nonnull final X509Certificate aX509Cert,
-                                                              @Nonnull final OffsetDateTime aNowLDT,
-                                                              @Nonnull final Locale aDisplayLocale)
+                                                              @NonNull final X509Certificate aX509Cert,
+                                                              @NonNull final OffsetDateTime aNowLDT,
+                                                              @NonNull final Locale aDisplayLocale)
   {
     final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
     final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
@@ -264,8 +264,8 @@ public final class SMPCommonUI
     return aCertDetails;
   }
 
-  @Nonnull
-  public static HCUL getDocumentTypeIDDetails (@Nonnull final IPeppolDocumentTypeIdentifierParts aParts)
+  @NonNull
+  public static HCUL getDocumentTypeIDDetails (@NonNull final IPeppolDocumentTypeIdentifierParts aParts)
   {
     final HCUL aUL = new HCUL ();
     aUL.addItem ().addChild ("Root namespace: ").addChild (new HCCode ().addChild (aParts.getRootNS ()));
@@ -275,8 +275,8 @@ public final class SMPCommonUI
     return aUL;
   }
 
-  @Nonnull
-  public static String getOwnerName (@Nonnull @Nonempty final String sOwnerID)
+  @NonNull
+  public static String getOwnerName (@NonNull @Nonempty final String sOwnerID)
   {
     // Will be a DB query
     final IUser aOwner = PhotonSecurityManager.getUserMgr ().getUserOfID (sOwnerID);

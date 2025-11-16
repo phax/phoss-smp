@@ -26,6 +26,8 @@ import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.api.resolver.ResolvedMigration;
 import org.flywaydb.core.internal.info.MigrationInfoImpl;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +46,6 @@ import com.helger.phoss.smp.backend.sql.migration.V21__MigrateUserTokensToDB;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.photon.audit.AuditHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class has the sole purpose of encapsulating the org.flywaydb classes, so that it's usage can
@@ -71,7 +70,7 @@ final class FlywayMigrator
   private FlywayMigrator ()
   {}
 
-  void runFlyway (@Nonnull final EDatabaseSystemType eDBType)
+  void runFlyway (@NonNull final EDatabaseSystemType eDBType)
   {
     ValueEnforcer.notNull (eDBType, "DBType");
 
@@ -79,7 +78,7 @@ final class FlywayMigrator
 
     final Callback aCallbackLogging = new BaseCallback ()
     {
-      public void handle (@Nonnull final Event aEvent, @Nullable final Context aContext)
+      public void handle (@NonNull final Event aEvent, @Nullable final Context aContext)
       {
         LOGGER.info ("Flyway: Event " + aEvent.getId ());
         if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
@@ -96,7 +95,7 @@ final class FlywayMigrator
     };
     final Callback aCallbackAudit = new BaseCallback ()
     {
-      public void handle (@Nonnull final Event aEvent, @Nullable final Context aContext)
+      public void handle (@NonNull final Event aEvent, @Nullable final Context aContext)
       {
         if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {

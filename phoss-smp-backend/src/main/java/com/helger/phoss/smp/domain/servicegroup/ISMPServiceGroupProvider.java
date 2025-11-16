@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
-import com.helger.peppolid.IParticipantIdentifier;
+import org.jspecify.annotations.Nullable;
 
-import jakarta.annotation.Nullable;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * Base interface for an {@link ISMPServiceGroup} provider.

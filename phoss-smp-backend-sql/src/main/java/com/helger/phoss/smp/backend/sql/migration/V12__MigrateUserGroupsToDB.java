@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,6 @@ import com.helger.photon.security.usergroup.UserGroup;
 import com.helger.photon.security.usergroup.UserGroupManager;
 import com.helger.web.scope.mgr.WebScoped;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Migrate all security users from the XML file to the DB
  *
@@ -49,7 +48,7 @@ public final class V12__MigrateUserGroupsToDB extends BaseJavaMigration
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (V12__MigrateUserGroupsToDB.class);
 
-  public void migrate (@Nonnull final Context context) throws Exception
+  public void migrate (@NonNull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {

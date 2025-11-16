@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * This exception is thrown if an error occurred communicating with the SML
@@ -20,7 +20,7 @@ import jakarta.annotation.Nonnull;
  */
 public class SMPSMLException extends SMPServerException
 {
-  public SMPSMLException (@Nonnull final String sMsg, @Nonnull final Exception aCause)
+  public SMPSMLException (@NonNull final String sMsg, @NonNull final Exception aCause)
   {
     super (sMsg, aCause);
   }

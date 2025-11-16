@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.config;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,6 @@ import com.helger.config.ConfigFactory;
 import com.helger.config.IConfig;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.config.source.MultiConfigurationValueProvider;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * The global configuration provider for SMP V6.
@@ -82,7 +81,7 @@ public final class SMPConfigProvider
    * @return The configuration value provider for SMP client that contains backward compatibility
    *         support.
    */
-  @Nonnull
+  @NonNull
   public static MultiConfigurationValueProvider createSMPClientValueProvider ()
   {
     // Start with default setup
@@ -103,7 +102,7 @@ public final class SMPConfigProvider
   /**
    * @return The current global configuration. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static IConfigWithFallback getConfig ()
   {
     // Inline for performance
@@ -125,8 +124,8 @@ public final class SMPConfigProvider
    *        The configuration to use globally. May not be <code>null</code>.
    * @return The old value of {@link IConfig}. Never <code>null</code>.
    */
-  @Nonnull
-  public static IConfigWithFallback setConfig (@Nonnull final IConfigWithFallback aNewConfig)
+  @NonNull
+  public static IConfigWithFallback setConfig (@NonNull final IConfigWithFallback aNewConfig)
   {
     ValueEnforcer.notNull (aNewConfig, "NewConfig");
     final IConfigWithFallback aOld;

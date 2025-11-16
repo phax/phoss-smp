@@ -21,6 +21,8 @@ import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.compare.ESortOrder;
@@ -85,7 +87,6 @@ import com.helger.text.ReadOnlyMultilingualText;
 import com.helger.url.ISimpleURL;
 import com.helger.web.scope.mgr.WebScoped;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPage
@@ -103,9 +104,9 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     private final String m_sOldUnifiedCert;
     private final String m_sNewCert;
 
-    public BulkChangeCertificate (@Nonnull final Locale aDisplayLocale,
-                                  @Nonnull final String sOldUnifiedCert,
-                                  @Nonnull final String sNewCert)
+    public BulkChangeCertificate (@NonNull final Locale aDisplayLocale,
+                                  @NonNull final String sOldUnifiedCert,
+                                  @NonNull final String sNewCert)
     {
       super ("BulkChangeCertificate",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
@@ -114,7 +115,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       m_sNewCert = sNewCert;
     }
 
-    @Nonnull
+    @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
       RUNNING_JOBS.incrementAndGet ();
@@ -195,14 +196,14 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   private static final String FIELD_OLD_CERTIFICATE = "oldcert";
   private static final String FIELD_NEW_CERTIFICATE = "newcert";
 
-  public PageSecureEndpointChangeCertificate (@Nonnull @Nonempty final String sID)
+  public PageSecureEndpointChangeCertificate (@NonNull @Nonempty final String sID)
   {
     super (sID, "Bulk change certificate");
   }
 
   @Override
-  @Nonnull
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  @NonNull
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -219,7 +220,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   }
 
   @Nullable
-  private static String _getCertificateParsingError (@Nonnull final String sCert)
+  private static String _getCertificateParsingError (@NonNull final String sCert)
   {
     X509Certificate aEndpointCert = null;
     try
@@ -233,8 +234,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     return aEndpointCert != null ? null : "Invalid input string provided";
   }
 
-  @Nonnull
-  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @Nonnull final Locale aDisplayLocale)
+  @NonNull
+  private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @NonNull final Locale aDisplayLocale)
   {
     X509Certificate aEndpointCert = null;
     try
@@ -274,7 +275,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   private static String _getUnifiedCert (@Nullable final String s)
   {
     if (StringHelper.isEmpty (s))
@@ -285,7 +286,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

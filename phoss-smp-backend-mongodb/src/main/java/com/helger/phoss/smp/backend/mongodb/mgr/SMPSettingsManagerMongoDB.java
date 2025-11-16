@@ -19,6 +19,8 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
@@ -30,9 +32,6 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettings;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Implementation of {@link ISMPSettingsManager} for MongoDB
@@ -57,9 +56,9 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
   private final AtomicBoolean m_aInsertDocument = new AtomicBoolean ();
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPSettings aValue)
+  public static Document toBson (@NonNull final ISMPSettings aValue)
   {
     return new Document ().append (BSON_ID, ID_SETTINGS)
                           .append (BSON_SMP_REST_WRITABLE_API_DISABLED,
@@ -76,7 +75,7 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
                           .append (BSON_SML_INFO_ID, aValue.getSMLInfoID ());
   }
 
-  public static void toDomain (@Nonnull final Document aDoc, @Nonnull final SMPSettings aTarget)
+  public static void toDomain (@NonNull final Document aDoc, @NonNull final SMPSettings aTarget)
   {
     ValueEnforcer.notNull (aDoc, "Doc");
     ValueEnforcer.notNull (aTarget, "Target");
@@ -109,20 +108,20 @@ public class SMPSettingsManagerMongoDB extends AbstractManagerMongoDB implements
     m_aInsertDocument.set (aDoc == null);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettings getSettings ()
   {
     return m_aSMPSettings;
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bDirectoryIntegrationEnabled,
                                  final boolean bDirectoryIntegrationRequired,

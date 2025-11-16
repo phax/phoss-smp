@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure;
 import java.net.URL;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.string.StringHelper;
@@ -55,7 +57,6 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.url.ISimpleURL;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo>
@@ -69,14 +70,14 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
   private static final boolean DEFAULT_CLIENT_CERTIFICATE_REQUIRED = true;
 
-  public PageSecureSMLConfiguration (@Nonnull @Nonempty final String sID)
+  public PageSecureSMLConfiguration (@NonNull @Nonempty final String sID)
   {
     super (sID, "SML configuration");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMLInfo, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMLInfo aSelectedObject)
       {
         aForm.addChild (question ("Are you sure you want to delete the SML configuration '" +
@@ -85,7 +86,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                     @Nullable final ISMLInfo aSelectedObject)
       {
         final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
@@ -102,15 +103,15 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   }
 
   @Override
-  protected ISMLInfo getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMLInfo getSelectedObject (@NonNull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
     return aSMLInfoMgr.getSMLInfoOfID (sID);
   }
 
   @Override
-  protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final EWebPageFormAction eFormAction,
+  protected boolean isActionAllowed (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMLInfo aSelectedObject)
   {
     if (eFormAction.isDelete ())
@@ -123,8 +124,8 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMLInfo aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMLInfo aSelectedObject)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
@@ -162,12 +163,12 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMLInfo aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
 
@@ -227,10 +228,10 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMLInfo aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
@@ -312,7 +313,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

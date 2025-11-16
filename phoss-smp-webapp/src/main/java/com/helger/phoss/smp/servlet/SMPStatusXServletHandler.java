@@ -19,6 +19,7 @@ package com.helger.phoss.smp.servlet;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,6 @@ import com.helger.phoss.smp.status.SMPStatusProvider;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Create SMP status as JSON object. See https://github.com/phax/phoss-smp/wiki/Status-API for
@@ -45,8 +44,8 @@ public class SMPStatusXServletHandler implements IXServletSimpleHandler
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPStatusXServletHandler.class);
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  public void handleRequest (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                             @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  public void handleRequest (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                             @NonNull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("Status information requested");

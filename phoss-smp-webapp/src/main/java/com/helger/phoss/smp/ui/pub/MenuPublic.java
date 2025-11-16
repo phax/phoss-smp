@@ -16,10 +16,10 @@
  */
 package com.helger.phoss.smp.ui.pub;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.photon.core.menu.IMenuTree;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * This class contains the menu structure for the public application.
@@ -32,7 +32,7 @@ public final class MenuPublic
   private MenuPublic ()
   {}
 
-  public static void init (@Nonnull final IMenuTree aMenuTree)
+  public static void init (@NonNull final IMenuTree aMenuTree)
   {
     aMenuTree.createRootItem (new PagePublicStart (CMenuPublic.MENU_START));
 

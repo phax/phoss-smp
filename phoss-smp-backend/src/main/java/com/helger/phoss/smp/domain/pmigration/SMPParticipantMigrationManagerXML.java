@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.pmigration;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.ELockType;
 import com.helger.annotation.concurrent.IsLocked;
@@ -23,9 +26,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * The XML implementation of {@link ISMPParticipantMigrationManager}
  *
@@ -37,14 +37,14 @@ public class SMPParticipantMigrationManagerXML extends
                                                implements
                                                ISMPParticipantMigrationManager
 {
-  public SMPParticipantMigrationManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPParticipantMigrationManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPParticipantMigration.class, sFilename);
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPParticipantMigration _createSMPParticipantMigration (@Nonnull final SMPParticipantMigration aSMPParticipantMigration)
+  private ISMPParticipantMigration _createSMPParticipantMigration (@NonNull final SMPParticipantMigration aSMPParticipantMigration)
   {
     m_aRWLock.writeLocked ( () -> {
       internalCreateItem (aSMPParticipantMigration);
@@ -58,9 +58,9 @@ public class SMPParticipantMigrationManagerXML extends
     return aSMPParticipantMigration;
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPParticipantMigration _updateSMPParticipantMigration (@Nonnull final SMPParticipantMigration aSMPParticipantMigration)
+  private ISMPParticipantMigration _updateSMPParticipantMigration (@NonNull final SMPParticipantMigration aSMPParticipantMigration)
   {
     m_aRWLock.writeLocked ( () -> {
       internalUpdateItem (aSMPParticipantMigration);
@@ -74,9 +74,9 @@ public class SMPParticipantMigrationManagerXML extends
     return aSMPParticipantMigration;
   }
 
-  @Nonnull
-  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                      @Nonnull @Nonempty final String sMigrationKey)
+  @NonNull
+  public ISMPParticipantMigration createOutboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                      @NonNull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -85,9 +85,9 @@ public class SMPParticipantMigrationManagerXML extends
     return ret;
   }
 
-  @Nonnull
-  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  @NonNull
+  public ISMPParticipantMigration createInboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                     @NonNull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -96,8 +96,8 @@ public class SMPParticipantMigrationManagerXML extends
     return ret;
   }
 
-  @Nonnull
-  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
+  @NonNull
+  public EChange deleteAllParticipantMigrationsOfParticipant (@NonNull final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -109,7 +109,7 @@ public class SMPParticipantMigrationManagerXML extends
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
     if (StringHelper.isEmpty (sParticipantMigrationID))
@@ -139,9 +139,9 @@ public class SMPParticipantMigrationManagerXML extends
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
-                                               @Nonnull final EParticipantMigrationState eNewState)
+                                               @NonNull final EParticipantMigrationState eNewState)
   {
     ValueEnforcer.notNull (eNewState, "NewState");
 
@@ -183,8 +183,8 @@ public class SMPParticipantMigrationManagerXML extends
   }
 
   @Nullable
-  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
-                                                                          @Nonnull final EParticipantMigrationState eState,
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                          @NonNull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (eDirection, "Direction");
@@ -197,14 +197,14 @@ public class SMPParticipantMigrationManagerXML extends
                            x.getParticipantIdentifier ().hasSameContent (aParticipantID));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     return getAll (x -> x.getDirection ().isOutbound () && x.isMatchingState (eState));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {

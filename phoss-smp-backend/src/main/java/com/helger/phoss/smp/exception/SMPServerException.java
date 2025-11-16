@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Base class for all SMP server specific exceptions
@@ -19,12 +19,12 @@ import jakarta.annotation.Nonnull;
  */
 public class SMPServerException extends Exception
 {
-  public SMPServerException (@Nonnull final String sMessage)
+  public SMPServerException (@NonNull final String sMessage)
   {
     super (sMessage);
   }
 
-  public SMPServerException (@Nonnull final String sMessage, @Nonnull final Throwable aCause)
+  public SMPServerException (@NonNull final String sMessage, @NonNull final Throwable aCause)
   {
     super (sMessage, aCause);
   }

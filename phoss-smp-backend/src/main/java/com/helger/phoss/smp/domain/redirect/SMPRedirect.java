@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.VisibleForTesting;
@@ -34,9 +37,6 @@ import com.helger.url.protocol.IURLProtocol;
 import com.helger.url.protocol.URLProtocolRegistry;
 import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Default implementation of the {@link ISMPRedirect} interface.
  *
@@ -55,10 +55,10 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   private String m_sSubjectUniqueIdentifier;
   private X509Certificate m_aCertificate;
 
-  public SMPRedirect (@Nonnull final IParticipantIdentifier aParticipantID,
-                      @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                      @Nonnull @Nonempty final String sTargetHref,
-                      @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+  public SMPRedirect (@NonNull final IParticipantIdentifier aParticipantID,
+                      @NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                      @NonNull @Nonempty final String sTargetHref,
+                      @NonNull @Nonempty final String sSubjectUniqueIdentifier,
                       @Nullable final X509Certificate aCertificate,
                       @Nullable final String sExtension)
   {
@@ -72,59 +72,59 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     m_sID = m_sServiceGroupID + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
     return m_sID;
   }
 
-  @Nonnull
+  @NonNull
   public IParticipantIdentifier getServiceGroupParticipantIdentifier ()
   {
     return m_aParticipantID;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getServiceGroupID ()
   {
     return m_sServiceGroupID;
   }
 
-  @Nonnull
+  @NonNull
   public final IDocumentTypeIdentifier getDocumentTypeIdentifier ()
   {
     return m_aDocumentTypeIdentifier;
   }
 
-  public final void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
+  public final void setDocumentTypeIdentifier (@NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     m_aDocumentTypeIdentifier = aDocumentTypeIdentifier;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public final String getTargetHref ()
   {
     return m_sTargetHref;
   }
 
-  public final void setTargetHref (@Nonnull @Nonempty final String sTargetHref)
+  public final void setTargetHref (@NonNull @Nonempty final String sTargetHref)
   {
     ValueEnforcer.notEmpty (sTargetHref, "TargetHref");
     m_sTargetHref = sTargetHref;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public final String getSubjectUniqueIdentifier ()
   {
     return m_sSubjectUniqueIdentifier;
   }
 
-  public final void setSubjectUniqueIdentifier (@Nonnull @Nonempty final String sSubjectUniqueIdentifier)
+  public final void setSubjectUniqueIdentifier (@NonNull @Nonempty final String sSubjectUniqueIdentifier)
   {
     ValueEnforcer.notEmpty (sSubjectUniqueIdentifier, "SubjectUniqueIdentifier");
     m_sSubjectUniqueIdentifier = sSubjectUniqueIdentifier;
@@ -197,8 +197,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     return sURL;
   }
 
-  @Nonnull
-  public com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.@NonNull ServiceMetadataType getAsJAXBObjectPeppol ()
   {
     final com.helger.xsds.peppol.smp1.RedirectType aRedirect = new com.helger.xsds.peppol.smp1.RedirectType ();
     aRedirect.setHref (getPercentEncodedURL (m_sTargetHref));
@@ -211,8 +210,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     return ret;
   }
 
-  @Nonnull
-  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ()
+  public com.helger.xsds.bdxr.smp1.@NonNull ServiceMetadataType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.RedirectType aRedirect = new com.helger.xsds.bdxr.smp1.RedirectType ();
     aRedirect.setHref (getPercentEncodedURL (m_sTargetHref));
@@ -225,8 +223,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     return ret;
   }
 
-  @Nonnull
-  public com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ()
+  public com.helger.xsds.bdxr.smp2.@NonNull ServiceMetadataType getAsJAXBObjectBDXR2 ()
   {
     final com.helger.xsds.bdxr.smp2.ServiceMetadataType ret = new com.helger.xsds.bdxr.smp2.ServiceMetadataType ();
     ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());

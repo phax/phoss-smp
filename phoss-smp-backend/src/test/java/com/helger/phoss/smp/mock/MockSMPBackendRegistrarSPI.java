@@ -10,12 +10,12 @@
  */
 package com.helger.phoss.smp.mock;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.base.lang.clazz.FactoryNewInstance;
 import com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI;
 import com.helger.phoss.smp.backend.ISMPBackendRegistry;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Register the mock backend to the global SMP backend registry.
@@ -25,7 +25,7 @@ import jakarta.annotation.Nonnull;
 @IsSPIImplementation
 public final class MockSMPBackendRegistrarSPI implements ISMPBackendRegistrarSPI
 {
-  public void registerSMPBackend (@Nonnull final ISMPBackendRegistry aRegistry)
+  public void registerSMPBackend (@NonNull final ISMPBackendRegistry aRegistry)
   {
     aRegistry.registerSMPBackend ("mock", FactoryNewInstance.create (MockSMPManagerProvider.class));
   }

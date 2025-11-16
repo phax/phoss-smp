@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +40,6 @@ import com.mongodb.event.ClusterListener;
 import com.mongodb.event.CommandFailedEvent;
 import com.mongodb.event.CommandListener;
 import com.mongodb.event.CommandSucceededEvent;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * A provider for {@link MongoCollection} instances. This class ensures, that
@@ -111,8 +110,8 @@ public class MongoClientProvider implements AutoCloseable
   private final MongoDatabase m_aDatabase;
   private final IsWriteable m_aClusterListener = new IsWriteable ();
 
-  public MongoClientProvider (@Nonnull @Nonempty final String sConnectionString,
-                              @Nonnull @Nonempty final String sDBName)
+  public MongoClientProvider (@NonNull @Nonempty final String sConnectionString,
+                              @NonNull @Nonempty final String sDBName)
   {
     ValueEnforcer.notEmpty (sConnectionString, "ConnectionString");
     ValueEnforcer.notEmpty (sDBName, "DBName");
@@ -144,8 +143,8 @@ public class MongoClientProvider implements AutoCloseable
    *        Collection name. May neither be <code>null</code> nor empty.
    * @return The collection with the specified name.
    */
-  @Nonnull
-  public MongoCollection <Document> getCollection (@Nonnull @Nonempty final String sName)
+  @NonNull
+  public MongoCollection <Document> getCollection (@NonNull @Nonempty final String sName)
   {
     ValueEnforcer.notEmpty (sName, "Name");
 

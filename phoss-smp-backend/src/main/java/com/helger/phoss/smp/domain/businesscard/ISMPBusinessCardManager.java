@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
@@ -20,9 +23,6 @@ import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Manager for {@link ISMPBusinessCard} objects. Business card objects require a
@@ -40,7 +40,7 @@ public interface ISMPBusinessCardManager
    *         <code>null</code>.
    * @since 5.0.4
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   CallbackList <ISMPBusinessCardCallback> bcCallbacks ();
 
@@ -56,8 +56,8 @@ public interface ISMPBusinessCardManager
    *         persistence failed.
    */
   @Nullable
-  ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                  @Nonnull Collection <SMPBusinessCardEntity> aEntities);
+  ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
+                                                  @NonNull Collection <SMPBusinessCardEntity> aEntities);
 
   /**
    * Delete the passed SMP business card.
@@ -66,14 +66,14 @@ public interface ISMPBusinessCardManager
    *        The SMP redirect to be deleted. May be <code>null</code>.
    * @return {@link EChange#CHANGED} if the deletion was successful
    */
-  @Nonnull
+  @NonNull
   EChange deleteSMPBusinessCard (@Nullable ISMPBusinessCard aSMPBusinessCard);
 
   /**
    * @return All contained SMP business cards. Never <code>null</code> but maybe
    *         empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ();
 
@@ -82,7 +82,7 @@ public interface ISMPBusinessCardManager
    *         maybe empty.
    * @since 5.6.0
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsSet <String> getAllSMPBusinessCardIDs ();
 

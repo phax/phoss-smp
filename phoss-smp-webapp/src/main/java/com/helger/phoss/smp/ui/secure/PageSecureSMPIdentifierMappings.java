@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.html.hc.IHCNode;
@@ -38,8 +40,6 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * A read-only page that shows all the applied identifier mappings.
  *
@@ -50,15 +50,15 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
 {
   private static final String ACTION_RELOAD = "reload";
 
-  public PageSecureSMPIdentifierMappings (@Nonnull @Nonempty final String sID)
+  public PageSecureSMPIdentifierMappings (@NonNull @Nonempty final String sID)
   {
     super (sID, "Identifier Mappings");
   }
 
-  @Nonnull
-  private IHCNode _createList (@Nonnull final WebPageExecutionContext aWPEC,
-                               @Nonnull final ICommonsOrderedMap <String, NiceNameEntry> aEntries,
-                               @Nonnull final String sSuffix)
+  @NonNull
+  private IHCNode _createList (@NonNull final WebPageExecutionContext aWPEC,
+                               @NonNull final ICommonsOrderedMap <String, NiceNameEntry> aEntries,
+                               @NonNull final String sSuffix)
   {
     final BootstrapTable aTable = new BootstrapTable (new DTCol ("ID").setWidthPerc (60),
                                                       new DTCol ("Name"),
@@ -81,7 +81,7 @@ public final class PageSecureSMPIdentifierMappings extends AbstractSMPWebPage
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ICommonsOrderedMap <String, NiceNameEntry> aDocTypeEntries = NiceNameManager.getAllDocumentTypeMappings ();

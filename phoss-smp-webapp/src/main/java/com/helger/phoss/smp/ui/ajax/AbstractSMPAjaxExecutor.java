@@ -16,11 +16,11 @@
  */
 package com.helger.phoss.smp.ui.ajax;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.photon.core.ajax.executor.AbstractAjaxExecutorWithContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Base class for AJAX executors
@@ -30,7 +30,7 @@ import jakarta.annotation.Nonnull;
 public abstract class AbstractSMPAjaxExecutor extends AbstractAjaxExecutorWithContext <LayoutExecutionContext>
 {
   @Override
-  protected final LayoutExecutionContext createLayoutExecutionContext (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
+  protected final LayoutExecutionContext createLayoutExecutionContext (@NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
     return LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
   }

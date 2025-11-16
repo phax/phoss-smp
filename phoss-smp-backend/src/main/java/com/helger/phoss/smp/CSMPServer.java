@@ -12,14 +12,14 @@ package com.helger.phoss.smp;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.exception.InitializationException;
 import com.helger.io.resource.ClassPathResource;
 import com.helger.settings.ISettings;
 import com.helger.settings.exchange.properties.SettingsPersistenceProperties;
 import com.helger.text.locale.LocaleCache;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * This class contains global SMP server constants.
@@ -73,7 +73,7 @@ public final class CSMPServer
    * @return The version number of the SMP server read from the internal properties file. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static String getVersionNumber ()
   {
     return VERSION_NUMBER;
@@ -83,7 +83,7 @@ public final class CSMPServer
    * @return The build timestamp of the SMP server read from the internal properties file. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static String getBuildTimestamp ()
   {
     return TIMESTAMP;

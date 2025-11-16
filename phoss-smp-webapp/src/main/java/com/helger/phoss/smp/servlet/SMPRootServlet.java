@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.servlet;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXServlet;
 import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * The servlet handling the "/" URL to redirect to "/public"
  *
@@ -43,8 +42,8 @@ public class SMPRootServlet extends AbstractXServlet
   {
     private static final Logger LOGGER = LoggerFactory.getLogger (SMPRootServlet.RootHandler.class);
 
-    public void handleRequest (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                               @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+    public void handleRequest (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                               @NonNull final UnifiedResponse aUnifiedResponse) throws Exception
     {
       String sRedirectURL;
       if (StaticServerInfo.isSet ())

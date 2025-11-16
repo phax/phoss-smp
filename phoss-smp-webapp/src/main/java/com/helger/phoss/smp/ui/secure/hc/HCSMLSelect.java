@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure.hc;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.name.IHasDisplayName;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -30,21 +32,20 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
 import com.helger.text.compare.ComparatorHelper;
 import com.helger.url.SimpleURL;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class HCSMLSelect extends HCExtSelect
 {
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String getDisplayName (@Nonnull final ISMLInfo aObj)
+  public static String getDisplayName (@NonNull final ISMLInfo aObj)
   {
     return "[" + aObj.getDisplayName () + "] " + aObj.getManagementServiceURL () + " (" + aObj.getDNSZone () + ")";
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static HCNodeList getDisplayNameNode (@Nonnull final ISMLInfo aObj)
+  public static HCNodeList getDisplayNameNode (@NonNull final ISMLInfo aObj)
   {
     return new HCNodeList ().addChild ("[" + aObj.getDisplayName () + "] ")
                             .addChild (new HCA (new SimpleURL (aObj.getManagementServiceURL ())).setTargetBlank ()
@@ -52,8 +53,8 @@ public class HCSMLSelect extends HCExtSelect
                             .addChild (" (" + aObj.getDNSZone () + ")");
   }
 
-  public HCSMLSelect (@Nonnull final RequestField aRF,
-                      @Nonnull final Locale aDisplayLocale,
+  public HCSMLSelect (@NonNull final RequestField aRF,
+                      @NonNull final Locale aDisplayLocale,
                       @Nullable final Predicate <? super ISMLInfo> aFilter)
   {
     super (aRF);

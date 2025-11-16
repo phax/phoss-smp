@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.smlhook;
 
-import com.helger.peppolid.IParticipantIdentifier;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.peppolid.IParticipantIdentifier;
 
 /**
  * Base interface for the callback to modify the SML.
@@ -29,7 +29,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void createServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
+  void createServiceGroup (@NonNull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Delete a participant in the SML because the internal adding in the SMP
@@ -40,7 +40,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void undoCreateServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
+  void undoCreateServiceGroup (@NonNull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Delete a participant in the SML.
@@ -50,7 +50,7 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void deleteServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
+  void deleteServiceGroup (@NonNull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
    * Create a participant in the SML because the deletion.
@@ -60,5 +60,5 @@ public interface IRegistrationHook
    * @throws RegistrationHookException
    *         If something goes wrong.
    */
-  void undoDeleteServiceGroup (@Nonnull IParticipantIdentifier aPI) throws RegistrationHookException;
+  void undoDeleteServiceGroup (@NonNull IParticipantIdentifier aPI) throws RegistrationHookException;
 }

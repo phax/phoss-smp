@@ -10,14 +10,14 @@
  */
 package com.helger.phoss.smp.domain.pmigration;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This is the interface for managing participant migrations.
@@ -41,8 +41,8 @@ public interface ISMPParticipantMigrationManager
    *         case persistence failed.
    */
   @Nullable
-  ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID,
-                                                               @Nonnull @Nonempty String sMigrationKey);
+  ISMPParticipantMigration createOutboundParticipantMigration (@NonNull IParticipantIdentifier aParticipantID,
+                                                               @NonNull @Nonempty String sMigrationKey);
 
   /**
    * Create a new inbound participant migration for the provided participant
@@ -58,8 +58,8 @@ public interface ISMPParticipantMigrationManager
    *         case persistence failed.
    */
   @Nullable
-  ISMPParticipantMigration createInboundParticipantMigration (@Nonnull IParticipantIdentifier aParticipantID,
-                                                              @Nonnull @Nonempty String sMigrationKey);
+  ISMPParticipantMigration createInboundParticipantMigration (@NonNull IParticipantIdentifier aParticipantID,
+                                                              @NonNull @Nonempty String sMigrationKey);
 
   /**
    * Delete the participant migration with the provided ID.
@@ -68,7 +68,7 @@ public interface ISMPParticipantMigrationManager
    *        The ID to be deleted. May be <code>null</code>.
    * @return {@link EChange} and never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   EChange deleteParticipantMigrationOfID (@Nullable String sParticipantMigrationID);
 
   /**
@@ -78,8 +78,8 @@ public interface ISMPParticipantMigrationManager
    *        The participant identifier to delete. May not be <code>null</code>.
    * @return {@link EChange} and never <code>null</code>.
    */
-  @Nonnull
-  EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull IParticipantIdentifier aParticipantID);
+  @NonNull
+  EChange deleteAllParticipantMigrationsOfParticipant (@NonNull IParticipantIdentifier aParticipantID);
 
   /**
    * Change the participant migration state of the provided participant ID.
@@ -92,9 +92,9 @@ public interface ISMPParticipantMigrationManager
    *        <code>null</code>.
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
-  @Nonnull
+  @NonNull
   EChange setParticipantMigrationState (@Nullable String sParticipantMigrationID,
-                                        @Nonnull EParticipantMigrationState eNewState);
+                                        @NonNull EParticipantMigrationState eNewState);
 
   /**
    * Find the participant migration with the provided ID.
@@ -122,8 +122,8 @@ public interface ISMPParticipantMigrationManager
    *         The first matching participant otherwise.
    */
   @Nullable
-  ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull EParticipantMigrationDirection eDirection,
-                                                                   @Nonnull EParticipantMigrationState eState,
+  ISMPParticipantMigration getParticipantMigrationOfParticipantID (@NonNull EParticipantMigrationDirection eDirection,
+                                                                   @NonNull EParticipantMigrationState eState,
                                                                    @Nullable IParticipantIdentifier aParticipantID);
 
   /**
@@ -134,7 +134,7 @@ public interface ISMPParticipantMigrationManager
    * @return A list of all contained outbound participant migrations. Never
    *         <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable EParticipantMigrationState eState);
 
@@ -146,7 +146,7 @@ public interface ISMPParticipantMigrationManager
    * @return A list of all contained inbound participant migrations. Never
    *         <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable EParticipantMigrationState eState);
 

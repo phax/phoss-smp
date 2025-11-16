@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.smlhook;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * An implementation of {@link IRegistrationHook} that does nothing.
@@ -23,15 +23,15 @@ import jakarta.annotation.Nonnull;
 @Immutable
 public class RegistrationHookDoNothing implements IRegistrationHook
 {
-  public void createServiceGroup (@Nonnull final IParticipantIdentifier aPI)
+  public void createServiceGroup (@NonNull final IParticipantIdentifier aPI)
   {}
 
-  public void undoCreateServiceGroup (@Nonnull final IParticipantIdentifier aPI)
+  public void undoCreateServiceGroup (@NonNull final IParticipantIdentifier aPI)
   {}
 
-  public void deleteServiceGroup (@Nonnull final IParticipantIdentifier aPI)
+  public void deleteServiceGroup (@NonNull final IParticipantIdentifier aPI)
   {}
 
-  public void undoDeleteServiceGroup (@Nonnull final IParticipantIdentifier aPI)
+  public void undoDeleteServiceGroup (@NonNull final IParticipantIdentifier aPI)
   {}
 }

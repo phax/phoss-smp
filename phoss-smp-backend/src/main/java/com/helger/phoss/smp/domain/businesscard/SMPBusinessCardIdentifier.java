@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
@@ -22,9 +25,6 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.peppol.businesscard.generic.PDIdentifier;
 import com.helger.peppol.businesscard.v3.PD3APIHelper;
 import com.helger.peppol.businesscard.v3.PD3IdentifierType;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * A single business card identifier.
@@ -41,21 +41,21 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
   private final String m_sScheme;
   private final String m_sValue;
 
-  public SMPBusinessCardIdentifier (@Nonnull @Nonempty final String sScheme, @Nonnull @Nonempty final String sValue)
+  public SMPBusinessCardIdentifier (@NonNull @Nonempty final String sScheme, @NonNull @Nonempty final String sValue)
   {
     this (GlobalIDFactory.getNewPersistentStringID (), sScheme, sValue);
   }
 
-  public SMPBusinessCardIdentifier (@Nonnull @Nonempty final String sID,
-                                    @Nonnull @Nonempty final String sScheme,
-                                    @Nonnull @Nonempty final String sValue)
+  public SMPBusinessCardIdentifier (@NonNull @Nonempty final String sID,
+                                    @NonNull @Nonempty final String sScheme,
+                                    @NonNull @Nonempty final String sValue)
   {
     m_sID = ValueEnforcer.notEmpty (sID, "ID");
     m_sScheme = ValueEnforcer.notEmpty (sScheme, "Scheme");
     m_sValue = ValueEnforcer.notEmpty (sValue, "Value");
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
@@ -67,7 +67,7 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
    *
    * @return the identifier scheme. Neither <code>null</code> nor empty.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getScheme ()
   {
@@ -79,14 +79,14 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
    *
    * @return The identifier value. Neither <code>null</code> nor empty.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getValue ()
   {
     return m_sValue;
   }
 
-  @Nonnull
+  @NonNull
   public PD3IdentifierType getAsJAXBObject ()
   {
     return PD3APIHelper.createIdentifier (m_sScheme, m_sValue);
@@ -125,8 +125,8 @@ public class SMPBusinessCardIdentifier implements IHasID <String>, Serializable
                                        .getToString ();
   }
 
-  @Nonnull
-  public static SMPBusinessCardIdentifier createFromGenericObject (@Nonnull final PDIdentifier aEntity)
+  @NonNull
+  public static SMPBusinessCardIdentifier createFromGenericObject (@NonNull final PDIdentifier aEntity)
   {
     return new SMPBusinessCardIdentifier (aEntity.getScheme (), aEntity.getValue ());
   }

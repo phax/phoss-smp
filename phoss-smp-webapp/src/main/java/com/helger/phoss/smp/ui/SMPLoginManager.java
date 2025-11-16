@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui;
 
 import java.time.Duration;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.app.html.IHTMLProvider;
@@ -26,8 +28,6 @@ import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * The login manager to be used. Manages login process incl. UI.
@@ -45,13 +45,13 @@ public final class SMPLoginManager extends BootstrapLoginManager
 
   @Override
   protected IHTMLProvider createLoginScreen (final boolean bLoginError,
-                                             @Nonnull final ICredentialValidationResult aLoginResult)
+                                             @NonNull final ICredentialValidationResult aLoginResult)
   {
     return new SMPLoginHTMLProvider (bLoginError, aLoginResult, getPageTitle ());
   }
 
   @Override
-  protected String getPostLoginRedirectURL (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
+  protected String getPostLoginRedirectURL (@NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
     if (!StaticServerInfo.isSet ())
       return super.getPostLoginRedirectURL (aRequestScope);

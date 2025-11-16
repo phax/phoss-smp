@@ -18,6 +18,7 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +40,6 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * REST API to cancel an outbound migration for a participant
  *
@@ -52,11 +51,11 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorMigrationOutboundCancelPut.class);
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);

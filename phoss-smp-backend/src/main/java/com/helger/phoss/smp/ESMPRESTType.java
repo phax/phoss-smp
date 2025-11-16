@@ -10,15 +10,15 @@
  */
 package com.helger.phoss.smp;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.Since;
 import com.helger.base.id.IHasID;
 import com.helger.base.lang.EnumHelper;
 import com.helger.base.name.IHasDisplayName;
 import com.helger.peppol.sml.ESMPAPIType;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Defines the type of REST responses to be returned. Either Peppol (using objects in namespace
@@ -38,30 +38,30 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
   private final String m_sDisplayName;
   private final ESMPAPIType m_eAPIType;
 
-  ESMPRESTType (@Nonnull @Nonempty final String sID,
-                @Nonnull @Nonempty final String sDisplayName,
-                @Nonnull final ESMPAPIType eAPIType)
+  ESMPRESTType (@NonNull @Nonempty final String sID,
+                @NonNull @Nonempty final String sDisplayName,
+                @NonNull final ESMPAPIType eAPIType)
   {
     m_sID = sID;
     m_sDisplayName = sDisplayName;
     m_eAPIType = eAPIType;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
     return m_sID;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getDisplayName ()
   {
     return m_sDisplayName;
   }
 
-  @Nonnull
+  @NonNull
   public ESMPAPIType getAPIType ()
   {
     return m_eAPIType;
@@ -101,7 +101,7 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
    *         end with a slash.
    * @since 5.7.0
    */
-  @Nonnull
+  @NonNull
   public String getQueryPathPrefix ()
   {
     return this == OASIS_BDXR_V2 ? "bdxr-smp-2/" : "";

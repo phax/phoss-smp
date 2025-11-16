@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +55,6 @@ import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Manager for all {@link SMPServiceInformation} objects.
  *
@@ -87,22 +86,22 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   private final IIdentifierFactory m_aIdentifierFactory;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  public SMPServiceInformationManagerMongoDB (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     super ("smp-serviceinfo");
     m_aIdentifierFactory = aIdentifierFactory;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPEndpoint aValue)
+  public static Document toBson (@NonNull final ISMPEndpoint aValue)
   {
     final Document ret = new Document ().append (BSON_TRANSPORT_PROFILE, aValue.getTransportProfile ());
     if (aValue.hasEndpointReference ())
@@ -127,9 +126,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPEndpoint toEndpoint (@Nonnull final Document aDoc)
+  public static SMPEndpoint toEndpoint (@NonNull final Document aDoc)
   {
     final String sTransportProfile = aDoc.getString (BSON_TRANSPORT_PROFILE);
     final String sEndpointReference = aDoc.getString (BSON_ENDPOINT_REFERENCE);
@@ -158,9 +157,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                             sExtension);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPProcess aValue)
+  public static Document toBson (@NonNull final ISMPProcess aValue)
   {
     final Document ret = new Document ().append (BSON_PROCESS_ID, toBson (aValue.getProcessIdentifier ()));
     final ICommonsList <Document> aEndpoints = new CommonsArrayList <> (aValue.getAllEndpoints (),
@@ -174,7 +173,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   @Nullable
   @ReturnsMutableCopy
-  public static SMPProcess toProcess (@Nonnull final Document aDoc)
+  public static SMPProcess toProcess (@NonNull final Document aDoc)
   {
     final IProcessIdentifier aProcessID = toProcessID ((Document) aDoc.get (BSON_PROCESS_ID));
     final List <Document> aEndpointDocs = aDoc.getList (BSON_ENDPOINTS, Document.class);
@@ -188,9 +187,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return new SMPProcess (aProcessID, aEndpoints, sExtension);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPServiceInformation aValue)
+  public static Document toBson (@NonNull final ISMPServiceInformation aValue)
   {
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_SERVICE_GROUP_ID, aValue.getServiceGroupID ())
@@ -204,9 +203,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public SMPServiceInformation toServiceInformation (@Nonnull final Document aDoc, final boolean bNeedProcesses)
+  public SMPServiceInformation toServiceInformation (@NonNull final Document aDoc, final boolean bNeedProcesses)
   {
     final IParticipantIdentifier aParticipantID = m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
@@ -245,8 +244,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return null;
   }
 
-  @Nonnull
-  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformationObj)
+  @NonNull
+  public ESuccess mergeSMPServiceInformation (@NonNull final ISMPServiceInformation aSMPServiceInformationObj)
   {
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
@@ -331,7 +330,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ESuccess.SUCCESS;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPServiceInformation (@Nullable final ISMPServiceInformation aSMPServiceInformation)
   {
     if (LOGGER.isDebugEnabled ())
@@ -362,7 +361,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     EChange eChange = EChange.UNCHANGED;
@@ -371,7 +370,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return eChange;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
                                    @Nullable final ISMPProcess aProcess)
   {
@@ -422,7 +421,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
@@ -431,7 +430,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ret;
   }
 
-  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
     getCollection ().find ().forEach (x -> aConsumer.accept (toServiceInformation (x, true)));
   }
@@ -442,7 +441,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return getCollection ().countDocuments ();
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
@@ -455,7 +454,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {

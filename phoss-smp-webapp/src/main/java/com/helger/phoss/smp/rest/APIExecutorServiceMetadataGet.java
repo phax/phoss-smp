@@ -23,6 +23,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -53,18 +54,16 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.helger.xml.transform.XMLTransformerFactory;
 import com.helger.xsds.bdxr.smp1.CBDXRSMP1;
 
-import jakarta.annotation.Nonnull;
-
 public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataGet.class);
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final String sPathDocumentTypeID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID));

@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.base.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -55,8 +57,6 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.url.ISimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * The viewport renderer (menu + content area)
  *
@@ -67,8 +67,8 @@ public final class SMPRendererSecure
   private SMPRendererSecure ()
   {}
 
-  @Nonnull
-  private static IHCNode _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
+  @NonNull
+  private static IHCNode _getNavbar (@NonNull final ILayoutExecutionContext aLEC)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
@@ -102,8 +102,8 @@ public final class SMPRendererSecure
     return aNavbar;
   }
 
-  @Nonnull
-  public static IHCNode getMenuContent (@Nonnull final ILayoutExecutionContext aLEC)
+  @NonNull
+  public static IHCNode getMenuContent (@NonNull final ILayoutExecutionContext aLEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final HCNodeList ret = new HCNodeList ();
@@ -190,8 +190,8 @@ public final class SMPRendererSecure
     return ret;
   }
 
-  @Nonnull
-  public static IHCNode getContent (@Nonnull final ILayoutExecutionContext aLEC)
+  @NonNull
+  public static IHCNode getContent (@NonNull final ILayoutExecutionContext aLEC)
   {
     final HCNodeList ret = new HCNodeList ();
 

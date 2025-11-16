@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.compare.ESortOrder;
@@ -80,7 +82,6 @@ import com.helger.url.ISimpleURL;
 import com.helger.url.validate.URLValidator;
 import com.helger.web.scope.mgr.WebScoped;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
@@ -99,8 +100,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     private final String m_sNewURL;
 
     public BulkChangeEndpointURL (@Nullable final IParticipantIdentifier aServiceGroupPID,
-                                  @Nonnull @Nonempty final String sOldURL,
-                                  @Nonnull @Nonempty final String sNewURL)
+                                  @NonNull @Nonempty final String sOldURL,
+                                  @NonNull @Nonempty final String sNewURL)
     {
       super ("BulkChangeEndpointURL",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
@@ -109,7 +110,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       m_sNewURL = sNewURL;
     }
 
-    @Nonnull
+    @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
       RUNNING_JOBS.incrementAndGet ();
@@ -199,14 +200,14 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
   private static final String FIELD_OLD_URL = "oldurl";
   private static final String FIELD_NEW_URL = "newurl";
 
-  public PageSecureEndpointChangeURL (@Nonnull @Nonempty final String sID)
+  public PageSecureEndpointChangeURL (@NonNull @Nonempty final String sID)
   {
     super (sID, "Bulk change URL");
   }
 
   @Override
-  @Nonnull
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  @NonNull
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -223,7 +224,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

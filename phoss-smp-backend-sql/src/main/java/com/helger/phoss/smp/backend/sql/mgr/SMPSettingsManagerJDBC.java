@@ -19,6 +19,8 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +51,6 @@ import com.helger.typeconvert.collection.IStringMap;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.web.scope.singleton.AbstractRequestWebSingleton;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implements ISMPSettingsManager
 {
   private static final String SMP_REST_WRITABLE_API_DISABLED = "smp-rest-writable-api-disabled";
@@ -71,20 +70,20 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPSettingsManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPSettingsManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
   }
 
-  static void setSettingsValueInDB (@Nonnull final DBExecutor aExecutor,
-                                    @Nonnull @Nonempty final String sKey,
+  static void setSettingsValueInDB (@NonNull final DBExecutor aExecutor,
+                                    @NonNull @Nonempty final String sKey,
                                     @Nullable final String sValue)
   {
     ValueEnforcer.notNull (aExecutor, "Executor");
@@ -109,8 +108,8 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     }
   }
 
-  @Nonnull
-  public ESuccess setSettingsValuesInDB (@Nonnull @Nonempty final Map <String, String> aEntries)
+  @NonNull
+  public ESuccess setSettingsValuesInDB (@NonNull @Nonempty final Map <String, String> aEntries)
   {
     ValueEnforcer.notEmpty (aEntries, "Entries");
 
@@ -126,7 +125,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     });
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsMap <String, String> getAllSettingsValuesFromDB ()
   {
@@ -139,7 +138,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   }
 
   @Nullable
-  public static String getSettingsValueFromDB (@Nonnull final DBExecutor aExecutor, @Nullable final String sKey)
+  public static String getSettingsValueFromDB (@NonNull final DBExecutor aExecutor, @Nullable final String sKey)
   {
     if (StringHelper.isEmpty (sKey))
       return null;
@@ -173,14 +172,14 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     public SettingsSingleton ()
     {}
 
-    @Nonnull
+    @NonNull
     public static SettingsSingleton getInstance ()
     {
       return getRequestSingleton (SettingsSingleton.class);
     }
 
-    @Nonnull
-    private static ISMPSettings _createSettingsFromDB (@Nonnull final SMPSettingsManagerJDBC aMgr)
+    @NonNull
+    private static ISMPSettings _createSettingsFromDB (@NonNull final SMPSettingsManagerJDBC aMgr)
     {
       // Queries DB
       final ICommonsMap <String, String> aValues = aMgr.getAllSettingsValuesFromDB ();
@@ -204,8 +203,8 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
       return ret;
     }
 
-    @Nonnull
-    public ISMPSettings getSettings (@Nonnull final SMPSettingsManagerJDBC aMgr)
+    @NonNull
+    public ISMPSettings getSettings (@NonNull final SMPSettingsManagerJDBC aMgr)
     {
       ISMPSettings ret = m_aSMPSettings;
       if (ret == null)
@@ -223,14 +222,14 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     }
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettings getSettings ()
   {
     // Construct to read the settings only once per request
     return SettingsSingleton.getInstance ().getSettings (this);
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bDirectoryIntegrationEnabled,
                                  final boolean bDirectoryIntegrationRequired,

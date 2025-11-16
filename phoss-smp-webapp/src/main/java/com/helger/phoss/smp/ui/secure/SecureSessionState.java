@@ -16,11 +16,11 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.phoss.smp.config.SMPHttpConfiguration;
 import com.helger.scope.singleton.AbstractSessionSingleton;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * A helper class that checks once per session if proxy information are configured or not. Usually
@@ -41,7 +41,7 @@ public final class SecureSessionState extends AbstractSessionSingleton
     m_bHttpsProxyEnabled = SMPHttpConfiguration.getAsHttpsProxySettings () != null;
   }
 
-  @Nonnull
+  @NonNull
   public static SecureSessionState getInstance ()
   {
     return getSessionSingleton (SecureSessionState.class);

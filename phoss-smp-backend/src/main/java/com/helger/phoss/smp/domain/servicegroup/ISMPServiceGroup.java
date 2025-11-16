@@ -12,13 +12,13 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import java.util.Comparator;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.base.id.IHasID;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Base interface for a single SMP service group.
@@ -31,47 +31,42 @@ public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
   /**
    * @return the URI encoded participant identifier is the ID.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getID ();
 
   /**
-   * @return The ID of the owning user of this service group. Never
-   *         <code>null</code>.
+   * @return The ID of the owning user of this service group. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getOwnerID ();
 
   /**
-   * @return The participant identifier of this service group. Never
-   *         <code>null</code>.
+   * @return The participant identifier of this service group. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IParticipantIdentifier getParticipantIdentifier ();
 
   /**
-   * @return This service information object as a Peppol SMP JAXB object for the
-   *         REST interface. Never <code>null</code>.
+   * @return This service information object as a Peppol SMP JAXB object for the REST interface.
+   *         Never <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.peppol.smp1.ServiceGroupType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.@NonNull ServiceGroupType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP v1 JAXB object for
-   *         the REST interface. Never <code>null</code>.
+   * @return This service information object as a BDXR SMP v1 JAXB object for the REST interface.
+   *         Never <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR1 ();
+  com.helger.xsds.bdxr.smp1.@NonNull ServiceGroupType getAsJAXBObjectBDXR1 ();
 
   /**
-   * @return This service information object as a BDXR SMP v2 JAXB object for
-   *         the REST interface. Never <code>null</code>.
+   * @return This service information object as a BDXR SMP v2 JAXB object for the REST interface.
+   *         Never <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.bdxr.smp2.ServiceGroupType getAsJAXBObjectBDXR2 ();
+  com.helger.xsds.bdxr.smp2.@NonNull ServiceGroupType getAsJAXBObjectBDXR2 ();
 
-  @Nonnull
+  @NonNull
   static Comparator <ISMPServiceGroup> comparator ()
   {
     return Comparator.comparing (ISMPServiceGroup::getID);

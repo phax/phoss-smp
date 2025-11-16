@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure.hc;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -26,7 +28,6 @@ import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -36,21 +37,21 @@ import jakarta.annotation.Nullable;
  */
 public class HCServiceGroupSelect extends HCExtSelect
 {
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String getDisplayName (@Nonnull final ISMPServiceGroup aServiceGroup)
+  public static String getDisplayName (@NonNull final ISMPServiceGroup aServiceGroup)
   {
     final String sOwnerName = SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
     return aServiceGroup.getParticipantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]";
   }
 
-  public HCServiceGroupSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCServiceGroupSelect (@NonNull final RequestField aRF, @NonNull final Locale aDisplayLocale)
   {
     this (aRF, aDisplayLocale, null);
   }
 
-  public HCServiceGroupSelect (@Nonnull final RequestField aRF,
-                               @Nonnull final Locale aDisplayLocale,
+  public HCServiceGroupSelect (@NonNull final RequestField aRF,
+                               @NonNull final Locale aDisplayLocale,
                                @Nullable final Predicate <? super ISMPServiceGroup> aFilter)
   {
     super (aRF);

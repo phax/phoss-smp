@@ -12,10 +12,10 @@ package com.helger.phoss.smp.backend;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Base interface for {@link SMPBackendRegistry}.
@@ -37,5 +37,5 @@ public interface ISMPBackendRegistry
    * @throws IllegalArgumentException
    *         If another backend with the same ID is already registered.
    */
-  void registerSMPBackend (@Nonnull @Nonempty String sID, @Nonnull Supplier <? extends ISMPManagerProvider> aFactory);
+  void registerSMPBackend (@NonNull @Nonempty String sID, @NonNull Supplier <? extends ISMPManagerProvider> aFactory);
 }

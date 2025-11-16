@@ -12,6 +12,8 @@ package com.helger.phoss.smp.backend;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +29,6 @@ import com.helger.collection.commons.CommonsLinkedHashMap;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class contains all registered SMP backends with an ID and an {@link ISMPManagerProvider}
@@ -65,7 +64,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   /**
    * @return The singleton instance of this class. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static SMPBackendRegistry getInstance ()
   {
     final SMPBackendRegistry ret = SingletonHolder.INSTANCE;
@@ -73,8 +72,8 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     return ret;
   }
 
-  public void registerSMPBackend (@Nonnull @Nonempty final String sID,
-                                  @Nonnull final Supplier <? extends ISMPManagerProvider> aFactory)
+  public void registerSMPBackend (@NonNull @Nonempty final String sID,
+                                  @NonNull final Supplier <? extends ISMPManagerProvider> aFactory)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");
@@ -107,7 +106,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
   /**
    * @return A set with all registered backend IDs. Never <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllBackendIDs ()
   {

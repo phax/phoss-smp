@@ -18,6 +18,8 @@ package com.helger.phoss.smp.servlet;
 
 import java.util.EnumSet;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.http.EHttpMethod;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.core.servlet.LogoutXServletHandler;
@@ -26,8 +28,6 @@ import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xservlet.AbstractXServlet;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Handles the log-out of a user. Can be called with a user context and without.
@@ -44,7 +44,7 @@ public final class SMPLogoutServlet extends AbstractXServlet
     handlerRegistry ().registerHandler (EHttpMethod.GET, new LogoutXServletHandler ()
     {
       @Override
-      protected ISimpleURL getRedirectURL (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
+      protected ISimpleURL getRedirectURL (@NonNull final IRequestWebScopeWithoutResponse aRequestScope)
       {
         if (!StaticServerInfo.isSet ())
           return super.getRedirectURL (aRequestScope);

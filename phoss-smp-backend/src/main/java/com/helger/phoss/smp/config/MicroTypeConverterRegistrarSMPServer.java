@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.config;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardMicroTypeConverter;
@@ -28,8 +30,6 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformationMicroTypeCon
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistry;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Special micro type converter for this project.
  *
@@ -38,7 +38,7 @@ import jakarta.annotation.Nonnull;
 @IsSPIImplementation
 public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeConverterRegistrarSPI
 {
-  public void registerMicroTypeConverter (@Nonnull final IMicroTypeConverterRegistry aRegistry)
+  public void registerMicroTypeConverter (@NonNull final IMicroTypeConverterRegistry aRegistry)
   {
     aRegistry.registerMicroElementTypeConverter (SMPBusinessCard.class, new SMPBusinessCardMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPEndpoint.class, new SMPEndpointMicroTypeConverter ());

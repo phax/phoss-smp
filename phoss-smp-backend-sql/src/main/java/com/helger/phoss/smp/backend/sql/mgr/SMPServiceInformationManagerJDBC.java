@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -58,9 +61,6 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.photon.audit.AuditHelper;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * A JDBC based implementation of the {@link ISMPServiceInformationManager} interface.
  *
@@ -76,7 +76,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final IDocumentTypeIdentifier m_aDocTypeID;
     final String m_sExt;
 
-    public DocTypeAndExtension (@Nonnull final IDocumentTypeIdentifier aDocTypeID, final String sExt)
+    public DocTypeAndExtension (@NonNull final IDocumentTypeIdentifier aDocTypeID, final String sExt)
     {
       m_aDocTypeID = aDocTypeID;
       m_sExt = sExt;
@@ -108,20 +108,20 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPServiceInformationManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPServiceInformationManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
-  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformation)
+  @NonNull
+  public ESuccess mergeSMPServiceInformation (@NonNull final ISMPServiceInformation aSMPServiceInformation)
   {
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
 
@@ -235,8 +235,8 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return null;
   }
 
-  @Nonnull
-  private EChange _deleteSMPServiceInformationNoCallback (@Nonnull final ISMPServiceInformation aSMPServiceInformation)
+  @NonNull
+  private EChange _deleteSMPServiceInformationNoCallback (@NonNull final ISMPServiceInformation aSMPServiceInformation)
   {
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (-1));
     final DBExecutor aExecutor = newExecutor ();
@@ -268,7 +268,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return EChange.valueOf (ret.get ().longValue () > 0);
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPServiceInformation (@Nullable final ISMPServiceInformation aSMPServiceInformation)
   {
     if (aSMPServiceInformation == null)
@@ -289,7 +289,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null)
@@ -333,7 +333,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
                                    @Nullable final ISMPProcess aProcess)
   {
@@ -370,7 +370,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return EChange.valueOf (ret.get ().longValue () > 0);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
@@ -379,7 +379,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ret;
   }
 
-  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
@@ -462,7 +462,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_metadata");
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
@@ -538,7 +538,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {

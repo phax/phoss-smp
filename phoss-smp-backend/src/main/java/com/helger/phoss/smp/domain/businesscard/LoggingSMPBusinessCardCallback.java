@@ -10,10 +10,9 @@
  */
 package com.helger.phoss.smp.domain.businesscard;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Logging implementation of {@link ISMPBusinessCardCallback}
@@ -25,14 +24,14 @@ public class LoggingSMPBusinessCardCallback implements ISMPBusinessCardCallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPBusinessCardCallback.class);
 
-  public void onSMPBusinessCardCreatedOrUpdated (@Nonnull final ISMPBusinessCard aBusinessCard)
+  public void onSMPBusinessCardCreatedOrUpdated (@NonNull final ISMPBusinessCard aBusinessCard)
   {
     LOGGER.info ("Successfully Created/Updated BusinessCard with ID '" +
                  aBusinessCard.getParticipantIdentifier ().getURIEncoded () +
                  "'");
   }
 
-  public void onSMPBusinessCardDeleted (@Nonnull final ISMPBusinessCard aBusinessCard)
+  public void onSMPBusinessCardDeleted (@NonNull final ISMPBusinessCard aBusinessCard)
   {
     LOGGER.info ("Successfully Deleted BusinessCard with ID '" +
                  aBusinessCard.getParticipantIdentifier ().getURIEncoded () +

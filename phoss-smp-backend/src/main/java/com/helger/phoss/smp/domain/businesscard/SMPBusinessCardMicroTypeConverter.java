@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.time.LocalDate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.collection.commons.CommonsArrayList;
@@ -25,9 +28,6 @@ import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPBusinessCard} from and to XML.
@@ -58,10 +58,10 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
   private static final String ELEMENT_ADDITIONAL_INFORMATION = "additional";
   private static final IMicroQName ATTR_REGISTRATION_DATE = new MicroQName ("regdate");
 
-  @Nonnull
-  public static IMicroElement convertToMicroElement (@Nonnull final ISMPBusinessCard aValue,
+  @NonNull
+  public static IMicroElement convertToMicroElement (@NonNull final ISMPBusinessCard aValue,
                                                      @Nullable final String sNamespaceURI,
-                                                     @Nonnull @Nonempty final String sTagName,
+                                                     @NonNull @Nonempty final String sTagName,
                                                      final boolean bManualExport)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
@@ -113,16 +113,16 @@ public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConver
     return aElement;
   }
 
-  @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final SMPBusinessCard aValue,
+  @NonNull
+  public IMicroElement convertToMicroElement (@NonNull final SMPBusinessCard aValue,
                                               @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+                                              @NonNull @Nonempty final String sTagName)
   {
     return convertToMicroElement (aValue, sNamespaceURI, sTagName, false);
   }
 
-  @Nonnull
-  public SMPBusinessCard convertToNative (@Nonnull final IMicroElement aElement)
+  @NonNull
+  public SMPBusinessCard convertToNative (@NonNull final IMicroElement aElement)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUP_ID);

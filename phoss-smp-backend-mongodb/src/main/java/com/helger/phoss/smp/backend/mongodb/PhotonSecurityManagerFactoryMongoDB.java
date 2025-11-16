@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.mongodb.audit.AuditManagerMongoDB;
 import com.helger.photon.audit.IAuditManager;
@@ -29,33 +31,31 @@ import com.helger.photon.security.user.UserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
 import com.helger.photon.security.usergroup.UserGroupManager;
 
-import jakarta.annotation.Nonnull;
-
 public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {
-  @Nonnull
+  @NonNull
   public IAuditManager createAuditManager () throws Exception
   {
     return new AuditManagerMongoDB ();
   }
 
-  @Nonnull
+  @NonNull
   public IUserManager createUserMgr () throws DAOException
   {
     return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
                             PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
   }
 
-  @Nonnull
+  @NonNull
   public IRoleManager createRoleMgr () throws DAOException
   {
     return new RoleManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
                             PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML);
   }
 
-  @Nonnull
-  public IUserGroupManager createUserGroupMgr (@Nonnull final IUserManager aUserMgr,
-                                               @Nonnull final IRoleManager aRoleMgr) throws DAOException
+  @NonNull
+  public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr,
+                                               @NonNull final IRoleManager aRoleMgr) throws DAOException
   {
     return new UserGroupManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
                                  PhotonSecurityManager.FactoryXML.FILENAME_USERGROUPS_XML,
@@ -63,8 +63,8 @@ public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManage
                                  aRoleMgr);
   }
 
-  @Nonnull
-  public IUserTokenManager createUserTokenMgr (@Nonnull final IUserManager aUserMgr) throws DAOException
+  @NonNull
+  public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr) throws DAOException
   {
     return new UserTokenManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
                                  PhotonSecurityManager.FactoryXML.FILENAME_USERTOKENS_XML);

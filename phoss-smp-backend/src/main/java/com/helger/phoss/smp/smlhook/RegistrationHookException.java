@@ -10,11 +10,11 @@
  */
 package com.helger.phoss.smp.smlhook;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.base.string.StringHelper;
 import com.helger.peppol.smlclient.SMLExceptionHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This exception is thrown when communicating with the SML failed.
@@ -23,7 +23,7 @@ import jakarta.annotation.Nullable;
  */
 public final class RegistrationHookException extends Exception
 {
-  @Nonnull
+  @NonNull
   private static String _getRealMessage (@Nullable final String sMsg, @Nullable final Throwable aCause)
   {
     final String ret = StringHelper.getNotNull (sMsg);

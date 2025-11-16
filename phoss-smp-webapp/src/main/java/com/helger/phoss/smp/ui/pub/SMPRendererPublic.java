@@ -18,6 +18,7 @@ package com.helger.phoss.smp.ui.pub;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +80,6 @@ import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * The public application viewport renderer (menu + content area)
  *
@@ -103,8 +102,8 @@ public final class SMPRendererPublic
   private SMPRendererPublic ()
   {}
 
-  private static void _addNavbarLoginLogout (@Nonnull final ILayoutExecutionContext aLEC,
-                                             @Nonnull final BootstrapNavbar aNavbar)
+  private static void _addNavbarLoginLogout (@NonNull final ILayoutExecutionContext aLEC,
+                                             @NonNull final BootstrapNavbar aNavbar)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
     final IUser aUser = aLEC.getLoggedInUser ();
@@ -175,8 +174,8 @@ public final class SMPRendererPublic
    *        The current web execution context
    * @return The HC Node. Never <code>null</code>.
    */
-  @Nonnull
-  public static IHCNode createLogo (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  @NonNull
+  public static IHCNode createLogo (@NonNull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
 
@@ -194,8 +193,8 @@ public final class SMPRendererPublic
                        .addStyle (CCSSProperties.PADDING.newValue ("0 6px"));
   }
 
-  @Nonnull
-  public static IHCNode createLogoBig (@Nonnull final ISimpleWebExecutionContext aSWEC)
+  @NonNull
+  public static IHCNode createLogoBig (@NonNull final ISimpleWebExecutionContext aSWEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aSWEC.getRequestScope ();
 
@@ -210,8 +209,8 @@ public final class SMPRendererPublic
     return new HCImg ().setSrc (aLogoHref);
   }
 
-  @Nonnull
-  private static BootstrapNavbar _getNavbar (@Nonnull final ILayoutExecutionContext aLEC)
+  @NonNull
+  private static BootstrapNavbar _getNavbar (@NonNull final ILayoutExecutionContext aLEC)
   {
     final ISimpleURL aLinkToStartPage = aLEC.getLinkToMenuItem (aLEC.getMenuTree ().getDefaultMenuItemID ());
 
@@ -223,8 +222,8 @@ public final class SMPRendererPublic
     return aNavBar;
   }
 
-  @Nonnull
-  public static IHCNode getMenuContent (@Nonnull final LayoutExecutionContext aLEC)
+  @NonNull
+  public static IHCNode getMenuContent (@NonNull final LayoutExecutionContext aLEC)
   {
     // Main menu
     final IMenuTree aMenuTree = aLEC.getMenuTree ();
@@ -232,7 +231,7 @@ public final class SMPRendererPublic
                                                                                      aLEC.getSelectedMenuItemID ())
     {
       @Override
-      protected boolean isMenuItemValidToBeDisplayed (@Nonnull final IMenuObject aMenuObj)
+      protected boolean isMenuItemValidToBeDisplayed (@NonNull final IMenuObject aMenuObj)
       {
         // Don't show items that belong to the footer
         if (aMenuObj.attrs ().containsKey (CMenuPublic.FLAG_FOOTER))
@@ -255,7 +254,7 @@ public final class SMPRendererPublic
    *        <code>true</code> to show the author, <code>false</code> to hide it.
    * @return The footer to be used for /public and /secure. Never <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   public static BootstrapContainer createDefaultFooter (final boolean bShowApplicationName,
                                                         final boolean bShowSource,
                                                         final boolean bShowAuthor)
@@ -324,8 +323,8 @@ public final class SMPRendererPublic
     return aContainer;
   }
 
-  @Nonnull
-  public static IHCNode getContent (@Nonnull final LayoutExecutionContext aLEC)
+  @NonNull
+  public static IHCNode getContent (@NonNull final LayoutExecutionContext aLEC)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
     final HCNodeList ret = new HCNodeList ();

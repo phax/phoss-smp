@@ -21,12 +21,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.db.jdbc.IHasDataSource;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * The main data source provider, only instantiated from
@@ -61,7 +60,7 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
     LOGGER.info ("Created new DataSource " + m_aDataSource);
   }
 
-  @Nonnull
+  @NonNull
   public BasicDataSource getDataSource ()
   {
     return m_aDataSource;

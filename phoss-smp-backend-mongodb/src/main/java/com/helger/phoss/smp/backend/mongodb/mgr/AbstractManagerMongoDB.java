@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +33,6 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.mongodb.client.MongoCollection;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Abstract base class for MongoDB backends
@@ -50,7 +49,7 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   private final String m_sCollectionName;
   private final MongoCollection <Document> m_aCollection;
 
-  public AbstractManagerMongoDB (@Nonnull @Nonempty final String sCollectionName)
+  public AbstractManagerMongoDB (@NonNull @Nonempty final String sCollectionName)
   {
     ValueEnforcer.notNull (sCollectionName, "CollectionName");
     m_sCollectionName = sCollectionName;
@@ -65,22 +64,22 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
    * @return The name of the collection as provided in the constructor. Neither <code>null</code>
    *         nor empty.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public final String getCollectionName ()
   {
     return m_sCollectionName;
   }
 
-  @Nonnull
+  @NonNull
   protected final MongoCollection <Document> getCollection ()
   {
     return m_aCollection;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final IIdentifier aValue)
+  public static Document toBson (@NonNull final IIdentifier aValue)
   {
     return new Document ().append (BSON_SCHEME, aValue.getScheme ()).append (BSON_VALUE, aValue.getValue ());
   }

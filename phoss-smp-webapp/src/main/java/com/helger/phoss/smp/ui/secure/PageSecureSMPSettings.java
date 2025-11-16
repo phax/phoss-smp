@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
@@ -47,8 +49,6 @@ import com.helger.photon.uicore.page.EWebPageSimpleFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.url.validate.URLValidator;
 
-import jakarta.annotation.Nonnull;
-
 public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <ISMPSettings>
 {
   private static final String FIELD_SMP_REST_WRITABLE_API_DISABLED = "smprwad";
@@ -62,19 +62,19 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   private static final String FIELD_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE = "smppdiau";
   private static final String FIELD_SMP_DIRECTORY_HOSTNAME = "smppdh";
 
-  public PageSecureSMPSettings (@Nonnull @Nonempty final String sID)
+  public PageSecureSMPSettings (@NonNull @Nonempty final String sID)
   {
     super (sID, "SMP Settings");
   }
 
   @Override
-  protected ISMPSettings getObject (@Nonnull final WebPageExecutionContext aWPEC)
+  protected ISMPSettings getObject (@NonNull final WebPageExecutionContext aWPEC)
   {
     return SMPMetaManager.getSettings ();
   }
 
   @Override
-  protected void showObject (@Nonnull final WebPageExecutionContext aWPEC, @Nonnull final ISMPSettings aObject)
+  protected void showObject (@NonNull final WebPageExecutionContext aWPEC, @NonNull final ISMPSettings aObject)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
@@ -134,10 +134,10 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
-                                                 @Nonnull final ISMPSettings aObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageSimpleFormAction eSimpleFormAction)
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
+                                                 @NonNull final ISMPSettings aObject,
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageSimpleFormAction eSimpleFormAction)
   {
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
@@ -201,11 +201,11 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final ISMPSettings aObject,
-                                @Nonnull final BootstrapForm aForm,
-                                @Nonnull final EWebPageSimpleFormAction eSimpleFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final ISMPSettings aObject,
+                                @NonNull final BootstrapForm aForm,
+                                @NonNull final EWebPageSimpleFormAction eSimpleFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

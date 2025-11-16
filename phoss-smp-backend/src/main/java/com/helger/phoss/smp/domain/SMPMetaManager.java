@@ -12,6 +12,8 @@ package com.helger.phoss.smp.domain;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +51,6 @@ import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolNaptrURLProvider;
 import com.helger.web.scope.mgr.WebScoped;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * The central SMP meta manager containing all the singleton manager instances.
@@ -169,7 +168,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   @Override
-  protected void onAfterInstantiation (@Nonnull final IScope aScope)
+  protected void onAfterInstantiation (@NonNull final IScope aScope)
   {
     if (s_aManagerProvider == null)
       throw new InitializationException ("No ManagerProvider is set. Please call setManagerProvider before you call getInstance!");
@@ -258,67 +257,67 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     }
   }
 
-  @Nonnull
+  @NonNull
   public static SMPMetaManager getInstance ()
   {
     return getGlobalSingleton (SMPMetaManager.class);
   }
 
-  @Nonnull
+  @NonNull
   public static IIdentifierFactory getIdentifierFactory ()
   {
     return getInstance ().m_aIdentifierFactory;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPURLProvider getSMPURLProvider ()
   {
     return getInstance ().m_aSMPURLProvider;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMLInfoManager getSMLInfoMgr ()
   {
     return getInstance ().m_aSMLInfoMgr;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPSettingsManager getSettingsMgr ()
   {
     return getInstance ().m_aSettingsMgr;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPSettings getSettings ()
   {
     return getSettingsMgr ().getSettings ();
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPTransportProfileManager getTransportProfileMgr ()
   {
     return getInstance ().m_aTransportProfileMgr;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPServiceGroupManager getServiceGroupMgr ()
   {
     return getInstance ().m_aServiceGroupMgr;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPRedirectManager getRedirectMgr ()
   {
     return getInstance ().m_aRedirectMgr;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPServiceInformationManager getServiceInformationMgr ()
   {
     return getInstance ().m_aServiceInformationMgr;
   }
 
-  @Nonnull
+  @NonNull
   public static ISMPParticipantMigrationManager getParticipantMigrationMgr ()
   {
     return getInstance ().m_aParticipantMigrationMgr;
@@ -339,13 +338,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     return getBusinessCardMgr () != null;
   }
 
-  @Nonnull
+  @NonNull
   public ETriState getBackendConnectionState ()
   {
     return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionState);
   }
 
-  public void setBackendConnectionState (@Nonnull final ETriState eConnectionEstablished,
+  public void setBackendConnectionState (@NonNull final ETriState eConnectionEstablished,
                                          final boolean bTriggerCallback)
   {
     ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");

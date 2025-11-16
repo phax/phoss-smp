@@ -18,6 +18,8 @@ package com.helger.phoss.smp.backend.xml.mgr;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +48,6 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Manager for all {@link SMPServiceInformation} objects.
  *
@@ -63,12 +62,12 @@ public final class SMPServiceInformationManagerXML extends
 
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPServiceInformationManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
   {
@@ -96,8 +95,8 @@ public final class SMPServiceInformationManagerXML extends
     return null;
   }
 
-  @Nonnull
-  public ESuccess mergeSMPServiceInformation (@Nonnull final ISMPServiceInformation aSMPServiceInformationObj)
+  @NonNull
+  public ESuccess mergeSMPServiceInformation (@NonNull final ISMPServiceInformation aSMPServiceInformationObj)
   {
     final SMPServiceInformation aSMPServiceInformation = (SMPServiceInformation) aSMPServiceInformationObj;
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
@@ -189,7 +188,7 @@ public final class SMPServiceInformationManagerXML extends
     return ESuccess.SUCCESS;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPServiceInformation (@Nullable final ISMPServiceInformation aSMPServiceInformation)
   {
     if (LOGGER.isDebugEnabled ())
@@ -229,7 +228,7 @@ public final class SMPServiceInformationManagerXML extends
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     EChange eChange = EChange.UNCHANGED;
@@ -238,7 +237,7 @@ public final class SMPServiceInformationManagerXML extends
     return eChange;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
                                    @Nullable final ISMPProcess aProcess)
   {
@@ -294,14 +293,14 @@ public final class SMPServiceInformationManagerXML extends
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     return getAll ();
   }
 
-  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
     forEachValue (aConsumer);
   }
@@ -312,7 +311,7 @@ public final class SMPServiceInformationManagerXML extends
     return size ();
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
@@ -325,7 +324,7 @@ public final class SMPServiceInformationManagerXML extends
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {

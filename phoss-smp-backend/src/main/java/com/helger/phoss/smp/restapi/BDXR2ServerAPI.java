@@ -13,6 +13,8 @@ package com.helger.phoss.smp.restapi;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +59,6 @@ import com.helger.xsds.bdxr.smp2.ac.ProcessType;
 import com.helger.xsds.bdxr.smp2.ac.ServiceReferenceType;
 import com.helger.xsds.bdxr.smp2.bc.IDType;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * This class implements all the service methods, that must be provided by the OASIS BDXR SMP v2
  * REST service.
@@ -80,19 +79,19 @@ public final class BDXR2ServerAPI
 
   private final ISMPServerAPIDataProvider m_aAPIDataProvider;
 
-  public BDXR2ServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
+  public BDXR2ServerAPI (@NonNull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIDataProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
   }
 
   @Nullable
-  public static String convertToJsonString (@Nullable final com.helger.xsds.bdxr.smp2.ec.SMPExtensionsType aExtensions)
+  public static String convertToJsonString (final com.helger.xsds.bdxr.smp2.ec.@Nullable SMPExtensionsType aExtensions)
   {
     final SMPExtensionList ret = SMPExtensionList.ofBDXR2 (aExtensions);
     return ret == null ? null : ret.getExtensionsAsJsonString ();
   }
 
-  @Nonnull
+  @NonNull
   public ServiceGroupType getServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID;
@@ -168,10 +167,10 @@ public final class BDXR2ServerAPI
     }
   }
 
-  public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
-                                @Nonnull final ServiceGroupType aServiceGroup,
+  public void saveServiceGroup (@NonNull final String sPathServiceGroupID,
+                                @NonNull final ServiceGroupType aServiceGroup,
                                 final boolean bCreateInSML,
-                                @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+                                @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "PUT /" +
@@ -236,10 +235,10 @@ public final class BDXR2ServerAPI
     }
   }
 
-  @Nonnull
-  public EChange deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
+  @NonNull
+  public EChange deleteServiceGroup (@NonNull final String sPathServiceGroupID,
                                      final boolean bDeleteInSML,
-                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+                                     @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "DELETE /" +
@@ -277,9 +276,9 @@ public final class BDXR2ServerAPI
     }
   }
 
-  @Nonnull
-  public ServiceMetadataType getServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                                     @Nonnull final String sPathDocTypeID) throws SMPServerException
+  @NonNull
+  public ServiceMetadataType getServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                                     @NonNull final String sPathDocTypeID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "getServiceRegistration";
@@ -323,16 +322,13 @@ public final class BDXR2ServerAPI
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                            aPathDocTypeID);
-        if (aServiceInfo != null)
-        {
-          aServiceMetadata = aServiceInfo.getAsJAXBObjectBDXR2 ();
-        }
-        else
+        if (aServiceInfo == null)
         {
           // Neither nor is present, or no endpoint is available
           throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
+        aServiceMetadata = aServiceInfo.getAsJAXBObjectBDXR2 ();
       }
       // Signature must be added by the rest service
 
@@ -348,11 +344,11 @@ public final class BDXR2ServerAPI
     }
   }
 
-  @Nonnull
-  public ESuccess saveServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                           @Nonnull final String sPathDocumentTypeID,
-                                           @Nonnull final ServiceMetadataType aServiceMetadata,
-                                           @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  @NonNull
+  public ESuccess saveServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                           @NonNull final String sPathDocumentTypeID,
+                                           @NonNull final ServiceMetadataType aServiceMetadata,
+                                           @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
@@ -553,9 +549,9 @@ public final class BDXR2ServerAPI
     }
   }
 
-  public void deleteServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                         @Nonnull final String sPathDocTypeID,
-                                         @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                         @NonNull final String sPathDocTypeID,
+                                         @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
@@ -613,29 +609,26 @@ public final class BDXR2ServerAPI
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                  aPathDocTypeID);
-        if (aRedirect != null)
-        {
-          // Handle redirect
-          final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
-          if (eChange.isUnchanged ())
-          {
-            // Most likely an internal error or an inconsistency
-            throw new SMPNotFoundException ("redirect(" +
-                                            aPathServiceGroupID.getURIEncoded () +
-                                            ", " +
-                                            aPathDocTypeID.getURIEncoded () +
-                                            ")",
-                                            m_aAPIDataProvider.getCurrentURI ());
-          }
-          LOGGER.info (sLog + " SUCCESS - Redirect");
-          STATS_COUNTER_SUCCESS.increment (sAction);
-        }
-        else
+        if (aRedirect == null)
         {
           // Neither redirect nor endpoint found
           throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
+        // Handle redirect
+        final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
+        if (eChange.isUnchanged ())
+        {
+          // Most likely an internal error or an inconsistency
+          throw new SMPNotFoundException ("redirect(" +
+                                          aPathServiceGroupID.getURIEncoded () +
+                                          ", " +
+                                          aPathDocTypeID.getURIEncoded () +
+                                          ")",
+                                          m_aAPIDataProvider.getCurrentURI ());
+        }
+        LOGGER.info (sLog + " SUCCESS - Redirect");
+        STATS_COUNTER_SUCCESS.increment (sAction);
       }
     }
     catch (final SMPServerException ex)
@@ -646,8 +639,8 @@ public final class BDXR2ServerAPI
     }
   }
 
-  public void deleteServiceRegistrations (@Nonnull final String sPathServiceGroupID,
-                                          @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistrations (@NonNull final String sPathServiceGroupID,
+                                          @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";
@@ -694,7 +687,7 @@ public final class BDXR2ServerAPI
   /**
    * @return The statistics data with the invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
   {
     return STATS_COUNTER_INVOCATION;
@@ -703,7 +696,7 @@ public final class BDXR2ServerAPI
   /**
    * @return The statistics data with the successful invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
     return STATS_COUNTER_SUCCESS;
@@ -712,7 +705,7 @@ public final class BDXR2ServerAPI
   /**
    * @return The statistics data with the error invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getErrorCounter ()
   {
     return STATS_COUNTER_ERROR;

@@ -19,6 +19,7 @@ package com.helger.phoss.smp.ui.secure;
 import java.time.Duration;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,6 @@ import com.helger.url.SimpleURL;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 @WorkInProgress
@@ -123,8 +123,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       super (false);
     }
 
-    @Nonnull
-    public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+    @NonNull
+    public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
                                    @Nullable final ISMPServiceGroup aSelectedObject)
     {
       final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -291,14 +291,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String PARAM_CREATE_IN_SML = "create-in-sml";
   private static final String PARAM_DELETE_IN_SML = "delete-in-sml";
 
-  public PageSecureServiceGroup (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroup (@NonNull @Nonempty final String sID)
   {
     super (sID, "Service Groups");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceGroup, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
@@ -322,7 +322,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                     @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final HCNodeList aNL = new HCNodeList ();
@@ -362,9 +362,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     addCustomHandler (ACTION_REGISTER_TO_SML,
                       new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
                       {
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                       @Nonnull final ISMPServiceGroup aSelectedObject)
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
+                                                       @NonNull final ISMPServiceGroup aSelectedObject)
                         {
                           final StringMap aTargetParams = new StringMap ();
                           aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
@@ -392,9 +392,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     addCustomHandler (ACTION_UNREGISTER_FROM_SML,
                       new AbstractBootstrapWebPageActionHandler <ISMPServiceGroup, WebPageExecutionContext> (true)
                       {
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                       @Nonnull final ISMPServiceGroup aSelectedObject)
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
+                                                       @NonNull final ISMPServiceGroup aSelectedObject)
                         {
                           final StringMap aTargetParams = new StringMap ();
                           aTargetParams.putIn (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS);
@@ -423,8 +423,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   }
 
   @Override
-  @Nonnull
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  @NonNull
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
@@ -442,7 +442,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
   @Override
   @Nullable
-  protected ISMPServiceGroup getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+  protected ISMPServiceGroup getSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
                                                 @Nullable final String sID)
   {
     if (sID == null)
@@ -454,8 +454,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPServiceGroup aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPServiceGroup aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -497,12 +497,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPServiceGroup aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
@@ -572,10 +572,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPServiceGroup aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -678,7 +678,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

@@ -13,6 +13,9 @@ package com.helger.phoss.smp.domain.serviceinfo;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
@@ -37,9 +40,6 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Default implementation of the {@link ISMPServiceInformation} interface.
@@ -69,8 +69,8 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
    * @param sExtension
    *        Optional extension. May be <code>null</code>.
    */
-  public SMPServiceInformation (@Nonnull final IParticipantIdentifier aParticipantID,
-                                @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
+  public SMPServiceInformation (@NonNull final IParticipantIdentifier aParticipantID,
+                                @NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                 @Nullable final List <SMPProcess> aProcesses,
                                 @Nullable final String sExtension)
   {
@@ -84,33 +84,33 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     m_sID = m_sServiceGroupID + "-" + aDocumentTypeIdentifier.getURIEncoded ();
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
     return m_sID;
   }
 
-  @Nonnull
+  @NonNull
   public IParticipantIdentifier getServiceGroupParticipantIdentifier ()
   {
     return m_aParticipantID;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getServiceGroupID ()
   {
     return m_sServiceGroupID;
   }
 
-  @Nonnull
+  @NonNull
   public IDocumentTypeIdentifier getDocumentTypeIdentifier ()
   {
     return m_aDocumentTypeIdentifier;
   }
 
-  public final void setDocumentTypeIdentifier (@Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
+  public final void setDocumentTypeIdentifier (@NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier)
   {
     ValueEnforcer.notNull (aDocumentTypeIdentifier, "DocumentTypeIdentifier");
     m_aDocumentTypeIdentifier = aDocumentTypeIdentifier;
@@ -122,8 +122,8 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return m_aProcesses.size ();
   }
 
-  @Nonnull
-  private static String _getKey (@Nonnull final IProcessIdentifier aProcessID)
+  @NonNull
+  private static String _getKey (@NonNull final IProcessIdentifier aProcessID)
   {
     return aProcessID.getURIEncoded ();
   }
@@ -136,13 +136,13 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return m_aProcesses.get (_getKey (aProcessID));
   }
 
-  @Nonnull
+  @NonNull
   public ICommonsList <ISMPProcess> getAllProcesses ()
   {
     return new CommonsArrayList <> (m_aProcesses.values ());
   }
 
-  public final void addProcess (@Nonnull final SMPProcess aProcess)
+  public final void addProcess (@NonNull final SMPProcess aProcess)
   {
     ValueEnforcer.notNull (aProcess, "Process");
     final String sProcessID = _getKey (aProcess.getProcessIdentifier ());
@@ -151,20 +151,20 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     m_aProcesses.put (sProcessID, aProcess);
   }
 
-  public final void addProcesses (@Nonnull final Iterable <? extends SMPProcess> aProcesses)
+  public final void addProcesses (@NonNull final Iterable <? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notNull (aProcesses, "Processes");
     for (final SMPProcess aProcess : aProcesses)
       addProcess (aProcess);
   }
 
-  public final void setProcesses (@Nonnull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
+  public final void setProcesses (@NonNull @Nonempty final Map <String, ? extends SMPProcess> aProcesses)
   {
     ValueEnforcer.notEmptyNoNullValue (aProcesses, "Processes");
     m_aProcesses.setAll (aProcesses);
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteProcess (@Nullable final IProcessIdentifier aProcessID)
   {
     if (aProcessID == null)
@@ -191,8 +191,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return m_aProcesses.containsAnyValue (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
   }
 
-  @Nullable
-  public com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.@Nullable ServiceMetadataType getAsJAXBObjectPeppol ()
   {
     if (m_aProcesses.isEmpty ())
     {
@@ -224,8 +223,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return ret;
   }
 
-  @Nullable
-  public com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ()
+  public com.helger.xsds.bdxr.smp1.@Nullable ServiceMetadataType getAsJAXBObjectBDXR1 ()
   {
     if (m_aProcesses.isEmpty ())
     {
@@ -258,8 +256,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
     return ret;
   }
 
-  @Nullable
-  public com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ()
+  public com.helger.xsds.bdxr.smp2.@Nullable ServiceMetadataType getAsJAXBObjectBDXR2 ()
   {
     if (m_aProcesses.isEmpty ())
     {

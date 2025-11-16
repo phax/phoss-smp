@@ -10,13 +10,12 @@
  */
 package com.helger.phoss.smp.config;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.config.fallback.ConfigWithFallback;
 import com.helger.config.value.IConfigurationValueProvider;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Special SMP configuration with fallback
@@ -27,7 +26,7 @@ public class SMPConfig extends ConfigWithFallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPConfig.class);
 
-  public SMPConfig (@Nonnull final IConfigurationValueProvider aValueProvider)
+  public SMPConfig (@NonNull final IConfigurationValueProvider aValueProvider)
   {
     super (aValueProvider);
     setReplaceVariables (true);

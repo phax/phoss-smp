@@ -10,12 +10,12 @@
  */
 package com.helger.phoss.smp.domain.pmigration;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
 import com.helger.base.lang.EnumHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Defines the directions for SMP participant migrations.
@@ -32,12 +32,12 @@ public enum EParticipantMigrationDirection implements IHasID <String>
 
   private final String m_sID;
 
-  EParticipantMigrationDirection (@Nonnull @Nonempty final String sID)
+  EParticipantMigrationDirection (@NonNull @Nonempty final String sID)
   {
     m_sID = sID;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {

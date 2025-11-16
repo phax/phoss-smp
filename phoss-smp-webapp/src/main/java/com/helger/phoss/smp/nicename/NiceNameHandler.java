@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.nicename;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +27,11 @@ import com.helger.io.resource.IReadableResource;
 import com.helger.peppol.ui.types.nicename.NiceNameManager;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 
-import jakarta.annotation.Nonnull;
-
 public final class NiceNameHandler
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (NiceNameHandler.class);
 
-  @Nonnull
+  @NonNull
   private static ClassLoader _getCL ()
   {
     return NiceNameHandler.class.getClassLoader ();

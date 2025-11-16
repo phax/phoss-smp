@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.nicename;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.html.hc.IHCNode;
 import com.helger.peppol.smp.ISMPTransportProfile;
@@ -25,7 +27,6 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -39,7 +40,7 @@ public final class SMPNiceNameUI
   private SMPNiceNameUI ()
   {}
 
-  @Nonnull
+  @NonNull
   public static IHCNode getTransportProfile (@Nullable final String sTransportProfile, final boolean bInDetails)
   {
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
@@ -49,7 +50,7 @@ public final class SMPNiceNameUI
     return getTransportProfile (sTransportProfile, aTP, bInDetails);
   }
 
-  @Nonnull
+  @NonNull
   public static IHCNode getTransportProfile (@Nullable final String sTransportProfile,
                                              @Nullable final ISMPTransportProfile aTP,
                                              final boolean bInDetails)

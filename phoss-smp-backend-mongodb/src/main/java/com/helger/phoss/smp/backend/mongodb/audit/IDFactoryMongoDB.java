@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb.audit;
 import java.util.Date;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,6 @@ import com.helger.base.id.factory.AbstractPersistingLongIDFactory;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.mongodb.client.MongoCollection;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Implementation of a long ID factory using MongoDB
@@ -82,7 +81,7 @@ public class IDFactoryMongoDB extends AbstractPersistingLongIDFactory
    *        Initial count to be used, if no MongoDB document exists. Must be
    *        &ge; 0.
    */
-  public IDFactoryMongoDB (@Nonnull @Nonempty final String sCollectionName,
+  public IDFactoryMongoDB (@NonNull @Nonempty final String sCollectionName,
                            @Nonnegative final int nReserveCount,
                            @Nonnegative final long nInitialCount)
   {

@@ -12,6 +12,8 @@ package com.helger.phoss.smp.mock;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
@@ -22,8 +24,6 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Mock implementation of {@link ISMPRedirectManager}.
  *
@@ -33,7 +33,7 @@ final class MockSMPRedirectManager implements ISMPRedirectManager
 {
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPRedirectCallback> redirectCallbacks ()
   {

@@ -12,6 +12,8 @@ package com.helger.phoss.smp.domain.pmigration;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +30,6 @@ import com.helger.cache.regex.RegExHelper;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppol.sml.CSMLDefault;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Default implementation of {@link ISMPParticipantMigration}
@@ -64,12 +63,12 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
            RegExHelper.stringMatchesPattern (CSMLDefault.MIGRATION_CODE_PATTERN, sMigrationKey);
   }
 
-  public SMPParticipantMigration (@Nonnull @Nonempty final String sID,
-                                  @Nonnull final EParticipantMigrationDirection eDirection,
-                                  @Nonnull final EParticipantMigrationState eState,
-                                  @Nonnull final IParticipantIdentifier aParticipantID,
-                                  @Nonnull final LocalDateTime aInitiationDateTime,
-                                  @Nonnull @Nonempty final String sMigrationKey)
+  public SMPParticipantMigration (@NonNull @Nonempty final String sID,
+                                  @NonNull final EParticipantMigrationDirection eDirection,
+                                  @NonNull final EParticipantMigrationState eState,
+                                  @NonNull final IParticipantIdentifier aParticipantID,
+                                  @NonNull final LocalDateTime aInitiationDateTime,
+                                  @NonNull @Nonempty final String sMigrationKey)
   {
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (eDirection, "Direction");
@@ -89,27 +88,27 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
     m_sMigrationKey = sMigrationKey;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public final String getID ()
   {
     return m_sID;
   }
 
-  @Nonnull
+  @NonNull
   public final EParticipantMigrationDirection getDirection ()
   {
     return m_eDirection;
   }
 
-  @Nonnull
+  @NonNull
   public final EParticipantMigrationState getState ()
   {
     return m_eState;
   }
 
-  @Nonnull
-  public EChange setState (@Nonnull final EParticipantMigrationState eState)
+  @NonNull
+  public EChange setState (@NonNull final EParticipantMigrationState eState)
   {
     ValueEnforcer.notNull (eState, "State");
     if (eState.equals (m_eState))
@@ -118,19 +117,19 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public final IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantID;
   }
 
-  @Nonnull
+  @NonNull
   public final LocalDateTime getInitiationDateTime ()
   {
     return m_aInitiationDateTime;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public final String getMigrationKey ()
   {
@@ -166,9 +165,9 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
                                        .getToString ();
   }
 
-  @Nonnull
-  public static SMPParticipantMigration createOutbound (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                        @Nonnull @Nonempty final String sMigrationKey)
+  @NonNull
+  public static SMPParticipantMigration createOutbound (@NonNull final IParticipantIdentifier aParticipantID,
+                                                        @NonNull @Nonempty final String sMigrationKey)
   {
     // Outbound starts "in progress"
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),
@@ -179,9 +178,9 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
                                         sMigrationKey);
   }
 
-  @Nonnull
-  public static SMPParticipantMigration createInbound (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                       @Nonnull @Nonempty final String sMigrationKey)
+  @NonNull
+  public static SMPParticipantMigration createInbound (@NonNull final IParticipantIdentifier aParticipantID,
+                                                       @NonNull @Nonempty final String sMigrationKey)
   {
     // Inbound is directly "migrated"
     return new SMPParticipantMigration (GlobalIDFactory.getNewPersistentStringID (),

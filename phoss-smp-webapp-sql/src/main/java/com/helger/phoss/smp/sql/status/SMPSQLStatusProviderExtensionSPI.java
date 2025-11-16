@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,6 @@ import com.helger.db.jdbc.executor.DBNoConnectionException;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * SQL specific status item provider.
@@ -84,7 +83,7 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
     }
   }
 
-  @Nonnull
+  @NonNull
   public ICommonsOrderedMap <String, ?> getAdditionalStatusData (final boolean bDisableLongRunningOperations)
   {
     final ICommonsOrderedMap <String, Object> ret = new CommonsLinkedHashMap <> ();

@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.util.PDTIOHelper;
@@ -38,8 +40,6 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Class to export service groups with all contents
  *
@@ -55,8 +55,8 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
     AJAX_EXPORT_SG = CAjax.addAjaxWithLogin (new AbstractSMPAjaxExecutor ()
     {
       @Override
-      protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
-                                        @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
+      protected void mainHandleRequest (@NonNull final LayoutExecutionContext aLEC,
+                                        @NonNull final PhotonUnifiedResponse aAjaxResponse) throws Exception
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -72,13 +72,13 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
     });
   }
 
-  public PageSecureServiceGroupExport (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroupExport (@NonNull @Nonempty final String sID)
   {
     super (sID, "Export");
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();

@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
@@ -23,9 +26,6 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.peppol.businesscard.generic.PDContact;
 import com.helger.peppol.businesscard.v3.PD3ContactType;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * A single business card contact.
@@ -52,7 +52,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
     this (GlobalIDFactory.getNewPersistentStringID (), sType, sName, sPhoneNumber, sEmail);
   }
 
-  public SMPBusinessCardContact (@Nonnull @Nonempty final String sID,
+  public SMPBusinessCardContact (@NonNull @Nonempty final String sID,
                                  @Nullable final String sType,
                                  @Nullable final String sName,
                                  @Nullable final String sPhoneNumber,
@@ -65,7 +65,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
     m_sEmail = sEmail;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
@@ -133,7 +133,7 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
     return hasType () || hasName () || hasPhoneNumber () || hasEmail ();
   }
 
-  @Nonnull
+  @NonNull
   public PD3ContactType getAsJAXBObject ()
   {
     final PD3ContactType ret = new PD3ContactType ();
@@ -182,8 +182,8 @@ public class SMPBusinessCardContact implements IHasID <String>, Serializable
                                        .getToString ();
   }
 
-  @Nonnull
-  public static SMPBusinessCardContact createFromGenericObject (@Nonnull final PDContact aEntity)
+  @NonNull
+  public static SMPBusinessCardContact createFromGenericObject (@NonNull final PDContact aEntity)
   {
     return new SMPBusinessCardContact (aEntity.getType (),
                                        aEntity.getName (),

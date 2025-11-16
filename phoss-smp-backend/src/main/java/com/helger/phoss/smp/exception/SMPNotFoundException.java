@@ -12,8 +12,8 @@ package com.helger.phoss.smp.exception;
 
 import java.net.URI;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * HTTP 404 exception wrapper
@@ -28,7 +28,7 @@ public class SMPNotFoundException extends SMPServerException
    * @param sMessage
    *        the String that is the entity of the 404 response.
    */
-  public SMPNotFoundException (@Nonnull final String sMessage)
+  public SMPNotFoundException (@NonNull final String sMessage)
   {
     this (sMessage, null);
   }
@@ -41,7 +41,7 @@ public class SMPNotFoundException extends SMPServerException
    * @param aNotFoundURI
    *        The URI that was not found.
    */
-  public SMPNotFoundException (@Nonnull final String sMessage, @Nullable final URI aNotFoundURI)
+  public SMPNotFoundException (@NonNull final String sMessage, @Nullable final URI aNotFoundURI)
   {
     super ("Not found: " + sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
   }

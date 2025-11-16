@@ -12,8 +12,8 @@ package com.helger.phoss.smp.exception;
 
 import java.net.URI;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * HTTP 400 (Bad Request) exception wrapper
@@ -31,20 +31,20 @@ public class SMPBadRequestException extends SMPServerException
    * @param aEffectedURI
    *        The URI that was not found.
    */
-  public SMPBadRequestException (@Nonnull final String sMessage, @Nullable final URI aEffectedURI)
+  public SMPBadRequestException (@NonNull final String sMessage, @Nullable final URI aEffectedURI)
   {
     super ("Bad request: " + sMessage + (aEffectedURI == null ? "" : " at '" + aEffectedURI.toString () + "'"));
   }
 
-  @Nonnull
-  public static SMPBadRequestException failedToParseSG (@Nonnull final String sServiceGroupID,
+  @NonNull
+  public static SMPBadRequestException failedToParseSG (@NonNull final String sServiceGroupID,
                                                         @Nullable final URI aEffectedURI)
   {
     return new SMPBadRequestException ("Failed to parse Service Group ID '" + sServiceGroupID + "'", aEffectedURI);
   }
 
-  @Nonnull
-  public static SMPBadRequestException failedToParseDocType (@Nonnull final String sDocTypeID,
+  @NonNull
+  public static SMPBadRequestException failedToParseDocType (@NonNull final String sDocTypeID,
                                                              @Nullable final URI aEffectedURI)
   {
     return new SMPBadRequestException ("Failed to parse Document Type ID '" + sDocTypeID + "'", aEffectedURI);

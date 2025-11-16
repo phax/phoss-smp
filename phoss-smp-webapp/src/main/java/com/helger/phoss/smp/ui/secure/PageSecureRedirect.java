@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.state.EValidity;
@@ -73,7 +75,6 @@ import com.helger.url.ISimpleURL;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedirect>
@@ -87,14 +88,14 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   private static final String ATTR_SERVICE_GROUP = "$servicegroup";
   private static final String ATTR_DOCTYPE_ID = "$doctypeid";
 
-  public PageSecureRedirect (@Nonnull @Nonempty final String sID)
+  public PageSecureRedirect (@NonNull @Nonempty final String sID)
   {
     super (sID, "Redirects");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPRedirect, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMPRedirect aSelectedObject)
       {
         aForm.addChild (new HCHiddenField (FIELD_SERVICE_GROUP_ID, aSelectedObject.getServiceGroupID ()));
@@ -109,7 +110,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                     @Nullable final ISMPRedirect aSelectedObject)
       {
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -122,8 +123,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  @Nonnull
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  @NonNull
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
@@ -140,7 +141,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
   @Override
   @Nullable
-  protected ISMPRedirect getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC, @Nullable final String sID)
+  protected ISMPRedirect getSelectedObject (@NonNull final WebPageExecutionContext aWPEC, @Nullable final String sID)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
@@ -161,8 +162,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final EWebPageFormAction eFormAction,
+  protected boolean isActionAllowed (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPRedirect aSelectedObject)
   {
     if (eFormAction == EWebPageFormAction.VIEW ||
@@ -192,10 +193,10 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  @Nonnull
-  protected BootstrapButtonToolbar createViewToolbar (@Nonnull final WebPageExecutionContext aWPEC,
+  @NonNull
+  protected BootstrapButtonToolbar createViewToolbar (@NonNull final WebPageExecutionContext aWPEC,
                                                       final boolean bCanGoBack,
-                                                      @Nonnull final ISMPRedirect aSelectedObject)
+                                                      @NonNull final ISMPRedirect aSelectedObject)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
@@ -222,8 +223,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPRedirect aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPRedirect aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
@@ -250,10 +251,10 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPRedirect aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
@@ -351,12 +352,12 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPRedirect aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -414,7 +415,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

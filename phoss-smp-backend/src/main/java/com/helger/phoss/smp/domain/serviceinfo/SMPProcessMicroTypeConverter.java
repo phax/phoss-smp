@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -19,9 +22,6 @@ import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPProcess} from and to XML.
@@ -34,10 +34,10 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter <
   private static final String ELEMENT_ENDPOINT = "endpoint";
   private static final String ELEMENT_EXTENSION = "extension";
 
-  @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final SMPProcess aValue,
+  @NonNull
+  public IMicroElement convertToMicroElement (@NonNull final SMPProcess aValue,
                                               @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+                                              @NonNull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getProcessIdentifier (),
@@ -51,8 +51,8 @@ public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter <
     return aElement;
   }
 
-  @Nonnull
-  public SMPProcess convertToNative (@Nonnull final IMicroElement aElement)
+  @NonNull
+  public SMPProcess convertToNative (@NonNull final IMicroElement aElement)
   {
     final SimpleProcessIdentifier aProcessIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PROCESS_IDENTIFIER),
                                                                                            SimpleProcessIdentifier.class);

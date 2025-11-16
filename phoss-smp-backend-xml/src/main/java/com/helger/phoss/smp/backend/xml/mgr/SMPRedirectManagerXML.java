@@ -18,6 +18,8 @@ package com.helger.phoss.smp.backend.xml.mgr;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +45,6 @@ import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Manager for all {@link SMPRedirect} objects.
  *
@@ -58,21 +57,21 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
 
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
-  public SMPRedirectManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPRedirectManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPRedirect.class, sFilename);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPRedirectCallback> redirectCallbacks ()
   {
     return m_aCallbacks;
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPRedirect _createSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
+  private ISMPRedirect _createSMPRedirect (@NonNull final SMPRedirect aSMPRedirect)
   {
     m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMPRedirect); });
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
@@ -86,9 +85,9 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return aSMPRedirect;
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPRedirect _updateSMPRedirect (@Nonnull final SMPRedirect aSMPRedirect)
+  private ISMPRedirect _updateSMPRedirect (@NonNull final SMPRedirect aSMPRedirect)
   {
     m_aRWLock.writeLocked ( () -> { internalUpdateItem (aSMPRedirect); });
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
@@ -103,11 +102,11 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return aSMPRedirect;
   }
 
-  @Nonnull
-  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                 @Nonnull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                                 @Nonnull @Nonempty final String sTargetHref,
-                                                 @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+  @NonNull
+  public ISMPRedirect createOrUpdateSMPRedirect (@NonNull final IParticipantIdentifier aParticipantID,
+                                                 @NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                                                 @NonNull @Nonempty final String sTargetHref,
+                                                 @NonNull @Nonempty final String sSubjectUniqueIdentifier,
                                                  @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
@@ -165,7 +164,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return aNewRedirect;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPRedirect (@Nullable final ISMPRedirect aSMPRedirect)
   {
     if (LOGGER.isDebugEnabled ())
@@ -206,7 +205,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null)
@@ -218,21 +217,21 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return eChange;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     return getAll ();
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     return getAllSMPRedirectsOfServiceGroup (aParticipantID == null ? null : aParticipantID.getURIEncoded ());
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final String sServiceGroupID)
   {

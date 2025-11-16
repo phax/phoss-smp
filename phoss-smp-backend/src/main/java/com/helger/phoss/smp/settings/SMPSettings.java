@@ -13,6 +13,8 @@ package com.helger.phoss.smp.settings;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +33,6 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.settings.ISettings;
 import com.helger.settings.Settings;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class contains the settings to be applied for the current SMP instance. It is based on the
@@ -119,13 +118,13 @@ public class SMPSettings implements ISMPSettings
     }
   }
 
-  @Nonnull
+  @NonNull
   public ObjectType getObjectType ()
   {
     return OT;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
@@ -137,7 +136,7 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.getAsBoolean (KEY_SMP_REST_WRITABLE_API_DISABLED, DEFAULT_SMP_REST_WRITABLE_API_DISABLED);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setRESTWritableAPIDisabled (final boolean bRESTWritableAPIDisabled)
   {
     return m_aSettings.putIn (KEY_SMP_REST_WRITABLE_API_DISABLED, bRESTWritableAPIDisabled);
@@ -148,7 +147,7 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.getAsBoolean (KEY_SML_REQUIRED, DEFAULT_SML_REQUIRED);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setSMLRequired (final boolean bSMLRequired)
   {
     return m_aSettings.putIn (KEY_SML_REQUIRED, bSMLRequired);
@@ -159,7 +158,7 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.getAsBoolean (KEY_SML_ENABLED, DEFAULT_SML_ENABLED);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setSMLEnabled (final boolean bSMLEnabled)
   {
     return m_aSettings.putIn (KEY_SML_ENABLED, bSMLEnabled);
@@ -179,7 +178,7 @@ public class SMPSettings implements ISMPSettings
     return SMPMetaManager.getSMLInfoMgr ().getSMLInfoOfID (sID);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setSMLInfoID (@Nullable final String sSMLInfoID)
   {
     return m_aSettings.putIn (KEY_SML_INFO_ID, sSMLInfoID);
@@ -191,7 +190,7 @@ public class SMPSettings implements ISMPSettings
                                      DEFAULT_SMP_DIRECTORY_INTEGRATION_REQUIRED);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setDirectoryIntegrationRequired (final boolean bPeppolDirectoryIntegrationRequired)
   {
     return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_REQUIRED, bPeppolDirectoryIntegrationRequired);
@@ -202,7 +201,7 @@ public class SMPSettings implements ISMPSettings
     return m_aSettings.getAsBoolean (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED, DEFAULT_SMP_DIRECTORY_INTEGRATION_ENABLED);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setDirectoryIntegrationEnabled (final boolean bPeppolDirectoryIntegrationEnabled)
   {
     return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_ENABLED, bPeppolDirectoryIntegrationEnabled);
@@ -214,34 +213,34 @@ public class SMPSettings implements ISMPSettings
                                      DEFAULT_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setDirectoryIntegrationAutoUpdate (final boolean bPeppolDirectoryIntegrationAutoUpdate)
   {
     return m_aSettings.putIn (KEY_SMP_DIRECTORY_INTEGRATION_AUTO_UPDATE, bPeppolDirectoryIntegrationAutoUpdate);
   }
 
-  @Nonnull
+  @NonNull
   public String getDirectoryHostName ()
   {
     // No default value, because it depends on the Network stage
     return m_aSettings.getAsString (KEY_SMP_DIRECTORY_HOSTNAME);
   }
 
-  @Nonnull
+  @NonNull
   public EChange setDirectoryHostName (@Nullable final String sDirectoryHostName)
   {
     return m_aSettings.putIn (KEY_SMP_DIRECTORY_HOSTNAME, sDirectoryHostName);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   final Settings internalGetAsMutableSettings ()
   {
     return m_aSettings;
   }
 
-  @Nonnull
-  final EChange internalSetFromSettings (@Nonnull final ISettings aSettings)
+  @NonNull
+  final EChange internalSetFromSettings (@NonNull final ISettings aSettings)
   {
     ValueEnforcer.notNull (aSettings, "settings");
     return m_aSettings.setAll (aSettings);
@@ -253,13 +252,13 @@ public class SMPSettings implements ISMPSettings
     return new ToStringGenerator (this).append ("Settings", m_aSettings).getToString ();
   }
 
-  @Nonnull
+  @NonNull
   public static SMPSettings createEmpty ()
   {
     return new SMPSettings (false);
   }
 
-  @Nonnull
+  @NonNull
   public static SMPSettings createInitializedFromConfiguration ()
   {
     return new SMPSettings (true);

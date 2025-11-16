@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -41,8 +42,6 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Test class for class {@link SMPRedirectManagerMongoDB}.
@@ -146,7 +145,7 @@ public final class SMPRedirectManagerMongoDBTest
     }
   }
 
-  private static void _testConversion (@Nonnull final ISMPRedirect aSrc)
+  private static void _testConversion (@NonNull final ISMPRedirect aSrc)
   {
     final Document aDoc = SMPRedirectManagerMongoDB.toBson (aSrc);
     assertNotNull (aDoc);

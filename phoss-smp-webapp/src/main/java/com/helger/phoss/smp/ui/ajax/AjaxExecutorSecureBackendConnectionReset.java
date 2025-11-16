@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.ui.ajax;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,6 @@ import com.helger.base.state.ETriState;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Mark the "Backend connection established" status as "undefined"
@@ -37,8 +36,8 @@ public final class AjaxExecutorSecureBackendConnectionReset extends AbstractSMPA
   private static final Logger LOGGER = LoggerFactory.getLogger (AjaxExecutorSecureBackendConnectionReset.class);
 
   @Override
-  protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
-                                    @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
+  protected void mainHandleRequest (@NonNull final LayoutExecutionContext aLEC,
+                                    @NonNull final PhotonUnifiedResponse aAjaxResponse) throws Exception
   {
     LOGGER.info ("The Backend Connection Established status is reset to undefined");
 

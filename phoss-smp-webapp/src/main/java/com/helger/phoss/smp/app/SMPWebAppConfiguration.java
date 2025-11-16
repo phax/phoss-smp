@@ -18,6 +18,8 @@ package com.helger.phoss.smp.app;
 
 import java.net.URL;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.string.StringHelper;
@@ -28,7 +30,6 @@ import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -52,7 +53,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   /**
    * @return The web application (UI) configuration for the SMP server. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   private static IConfig _getConfig ()
   {
     return SMPConfigProvider.getConfig ();
@@ -155,7 +156,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    * @return Name of the Directory. Usually "Peppol Directory" but maybe "TOOP Directory" as well.
    * @since 5.0.7
    */
-  @Nonnull
+  @NonNull
   public static String getDirectoryName ()
   {
     return _getConfig ().getAsString ("webapp.directory.name", "Peppol Directory");

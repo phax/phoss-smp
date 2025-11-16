@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +81,6 @@ import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
 import com.helger.url.SimpleURL;
 
-import jakarta.annotation.Nonnull;
-
 public class PageSecureTasksProblems extends AbstractSMPWebPage
 {
   /**
@@ -121,14 +120,14 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   {
     private final ICommonsMap <String, CertCacheItem> m_aMap = new CommonsLinkedHashMap <> ();
 
-    @Nonnull
-    CertCacheItem getOrCreate (@Nonnull final String sCert)
+    @NonNull
+    CertCacheItem getOrCreate (@NonNull final String sCert)
     {
       final String sNormalizedCert = CertificateHelper.getWithoutPEMHeader (sCert);
       return m_aMap.computeIfAbsent (sNormalizedCert, k -> new CertCacheItem (m_aMap.size () + 1));
     }
 
-    @Nonnull
+    @NonNull
     Iterable <Map.Entry <String, CertCacheItem>> iterateAll ()
     {
       return m_aMap.entrySet ();
@@ -137,30 +136,30 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
 
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureTasksProblems.class);
 
-  public PageSecureTasksProblems (@Nonnull @Nonempty final String sID)
+  public PageSecureTasksProblems (@NonNull @Nonempty final String sID)
   {
     super (sID, "Tasks/Problems");
   }
 
-  @Nonnull
-  private IHCNode _createInfo (@Nonnull final String sMsg)
+  @NonNull
+  private IHCNode _createInfo (@NonNull final String sMsg)
   {
     return badgeInfo ("Information: " + sMsg);
   }
 
-  @Nonnull
-  private IHCNode _createWarning (@Nonnull final String sMsg)
+  @NonNull
+  private IHCNode _createWarning (@NonNull final String sMsg)
   {
     return badgeWarn ("Warning: " + sMsg);
   }
 
-  @Nonnull
-  private IHCNode _createError (@Nonnull final String sMsg)
+  @NonNull
+  private IHCNode _createError (@NonNull final String sMsg)
   {
     return badgeDanger ("Error: " + sMsg);
   }
 
-  private void _checkSettings (@Nonnull final HCOL aOL)
+  private void _checkSettings (@NonNull final HCOL aOL)
   {
     // Check that public URL is set
 
@@ -205,55 +204,50 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
   }
 
-  private void _checkPrivateKey (@Nonnull final WebPageExecutionContext aWPEC,
-                                 @Nonnull final HCOL aOL,
-                                 @Nonnull final OffsetDateTime aNowDT,
-                                 @Nonnull final OffsetDateTime aNowPlusDT,
-                                 @Nonnull final KeyStore.PrivateKeyEntry aKeyEntry)
+  private void _checkPrivateKey (@NonNull final WebPageExecutionContext aWPEC,
+                                 @NonNull final HCOL aOL,
+                                 @NonNull final OffsetDateTime aNowDT,
+                                 @NonNull final OffsetDateTime aNowPlusDT,
+                                 final KeyStore.@NonNull PrivateKeyEntry aKeyEntry)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final Certificate [] aChain = aKeyEntry.getCertificateChain ();
     for (final Certificate aCert : aChain)
     {
-      if (aCert instanceof X509Certificate)
-      {
-        final X509Certificate aX509Cert = (X509Certificate) aCert;
-
-        final String sLogPrefix = "The provided certificate with subject '" +
-                                  aX509Cert.getSubjectX500Principal ().getName () +
-                                  "' ";
-
-        final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
-        if (aNowDT.isBefore (aNotBefore))
-        {
-          aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
-                       div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
-        }
-
-        final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
-        if (aNowDT.isAfter (aNotAfter))
-        {
-          aOL.addItem (_createError (sLogPrefix + " is already expired."),
-                       div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
-        }
-        else
-          if (aNowPlusDT.isAfter (aNotAfter))
-            aOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
-                         div ("It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
-      }
-      else
+      if (!(aCert instanceof final X509Certificate aX509Cert))
       {
         aOL.addItem (_createError ("At least one of the certificates is not an X.509 certificate! It is internally a " +
                                    ClassHelper.getClassName (aCert)));
         break;
       }
+      final String sLogPrefix = "The provided certificate with subject '" +
+                                aX509Cert.getSubjectX500Principal ().getName () +
+                                "' ";
+
+      final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aX509Cert.getNotBefore ());
+      if (aNowDT.isBefore (aNotBefore))
+      {
+        aOL.addItem (_createError (sLogPrefix + " is not yet valid."),
+                     div ("It will be valid from " + PDTToString.getAsString (aNotBefore, aDisplayLocale)));
+      }
+
+      final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aX509Cert.getNotAfter ());
+      if (aNowDT.isAfter (aNotAfter))
+      {
+        aOL.addItem (_createError (sLogPrefix + " is already expired."),
+                     div ("It was valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
+      }
+      else
+        if (aNowPlusDT.isAfter (aNotAfter))
+          aOL.addItem (_createWarning (sLogPrefix + " will expire soon."),
+                       div ("It is only valid until " + PDTToString.getAsString (aNotAfter, aDisplayLocale)));
     }
   }
 
-  private void _checkKeyStore (@Nonnull final WebPageExecutionContext aWPEC,
-                               @Nonnull final HCOL aOL,
-                               @Nonnull final OffsetDateTime aNowDT,
-                               @Nonnull final OffsetDateTime aNowPlusDT)
+  private void _checkKeyStore (@NonNull final WebPageExecutionContext aWPEC,
+                               @NonNull final HCOL aOL,
+                               @NonNull final OffsetDateTime aNowDT,
+                               @NonNull final OffsetDateTime aNowPlusDT)
   {
     if (!SMPKeyManager.isKeyStoreValid ())
     {
@@ -276,11 +270,11 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
   }
 
-  private void _iterateTrustStore (@Nonnull final WebPageExecutionContext aWPEC,
-                                   @Nonnull final HCOL aOL,
-                                   @Nonnull final OffsetDateTime aNowDT,
-                                   @Nonnull final OffsetDateTime aNowPlusDT,
-                                   @Nonnull final KeyStore aTrustStore)
+  private void _iterateTrustStore (@NonNull final WebPageExecutionContext aWPEC,
+                                   @NonNull final HCOL aOL,
+                                   @NonNull final OffsetDateTime aNowDT,
+                                   @NonNull final OffsetDateTime aNowPlusDT,
+                                   @NonNull final KeyStore aTrustStore)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
@@ -291,10 +285,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
       {
         final Certificate aCert = aTrustStore.getCertificate (sAlias);
-        if (aCert instanceof X509Certificate)
+        if (aCert instanceof final X509Certificate aX509Cert)
         {
-          final X509Certificate aX509Cert = (X509Certificate) aCert;
-
           final String sLogPrefix = "The provided certificate with subject '" +
                                     aX509Cert.getSubjectX500Principal ().getName () +
                                     "' ";
@@ -338,10 +330,10 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                    aTrustStoreOL);
   }
 
-  private void _checkTrustStore (@Nonnull final WebPageExecutionContext aWPEC,
-                                 @Nonnull final HCOL aOL,
-                                 @Nonnull final OffsetDateTime aNowDT,
-                                 @Nonnull final OffsetDateTime aNowPlusDT)
+  private void _checkTrustStore (@NonNull final WebPageExecutionContext aWPEC,
+                                 @NonNull final HCOL aOL,
+                                 @NonNull final OffsetDateTime aNowDT,
+                                 @NonNull final OffsetDateTime aNowPlusDT)
   {
     // check truststore configuration
     if (!SMPTrustManager.isTrustStoreValid ())
@@ -360,7 +352,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
   }
 
-  private void _checkSMLConfiguration (@Nonnull final HCOL aOL)
+  private void _checkSMLConfiguration (@NonNull final HCOL aOL)
   {
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
     final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
@@ -408,10 +400,10 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
   }
 
-  private void _checkDirectoryConfig (@Nonnull final WebPageExecutionContext aWPEC,
-                                      @Nonnull final HCOL aOL,
-                                      @Nonnull final OffsetDateTime aNowDT,
-                                      @Nonnull final OffsetDateTime aNowPlusDT)
+  private void _checkDirectoryConfig (@NonNull final WebPageExecutionContext aWPEC,
+                                      @NonNull final HCOL aOL,
+                                      @NonNull final OffsetDateTime aNowDT,
+                                      @NonNull final OffsetDateTime aNowPlusDT)
   {
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
@@ -468,7 +460,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

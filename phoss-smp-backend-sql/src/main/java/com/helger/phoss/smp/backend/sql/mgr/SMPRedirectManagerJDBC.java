@@ -19,6 +19,8 @@ package com.helger.phoss.smp.backend.sql.mgr;
 import java.security.cert.X509Certificate;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +51,6 @@ import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateHelper;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * A JDBC based implementation of the {@link ISMPRedirectManager} interface.
  *
@@ -70,12 +69,12 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPRedirectManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPRedirectManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPRedirectCallback> redirectCallbacks ()
   {
@@ -83,10 +82,10 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   }
 
   @Nullable
-  public ISMPRedirect createOrUpdateSMPRedirect (@Nonnull final IParticipantIdentifier aParticipantIdentifier,
-                                                 @Nonnull final IDocumentTypeIdentifier aDocTypeID,
-                                                 @Nonnull @Nonempty final String sRedirectUrl,
-                                                 @Nonnull @Nonempty final String sSubjectUniqueIdentifier,
+  public ISMPRedirect createOrUpdateSMPRedirect (@NonNull final IParticipantIdentifier aParticipantIdentifier,
+                                                 @NonNull final IDocumentTypeIdentifier aDocTypeID,
+                                                 @NonNull @Nonempty final String sRedirectUrl,
+                                                 @NonNull @Nonempty final String sSubjectUniqueIdentifier,
                                                  @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
@@ -180,7 +179,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     return aSMPRedirect;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPRedirect (@Nullable final ISMPRedirect aSMPRedirect)
   {
     if (aSMPRedirect == null)
@@ -208,7 +207,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null)
@@ -251,7 +250,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
@@ -274,7 +273,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
   {

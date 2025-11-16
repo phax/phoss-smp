@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui;
 
 import javax.xml.namespace.QName;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
@@ -45,7 +47,6 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
 import com.helger.xsds.bdxr.smp1.CBDXRSMP1;
 import com.helger.xsds.bdxr.smp2.CBDXRSMP2;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.JAXBElement;
 
@@ -109,7 +110,7 @@ public final class SMPExtensionUI
   }
 
   @Nullable
-  public static String getSerializedExtensionsForEdit (@Nonnull final SMPExtensionList aExtensions)
+  public static String getSerializedExtensionsForEdit (@NonNull final SMPExtensionList aExtensions)
   {
     if (ONLY_ONE_EXTENSION_ALLOWED)
       return aExtensions.getFirstExtensionXMLString ();
@@ -133,8 +134,8 @@ public final class SMPExtensionUI
     return null;
   }
 
-  @Nonnull
-  public static IHCNode getSerializedExtensions (@Nonnull final SMPExtensionList aExtensions)
+  @NonNull
+  public static IHCNode getSerializedExtensions (@NonNull final SMPExtensionList aExtensions)
   {
     final HCCode ret = new HCCode ();
     if (ONLY_ONE_EXTENSION_ALLOWED)
@@ -149,7 +150,7 @@ public final class SMPExtensionUI
   }
 
   @Nullable
-  public static IHCNode getExtensionDisplay (@Nonnull final ISMPHasExtension aHasExtension)
+  public static IHCNode getExtensionDisplay (@NonNull final ISMPHasExtension aHasExtension)
   {
     final ICommonsList <SMPExtension> aExtensions = aHasExtension.getExtensions ().extensions ();
     if (aExtensions.isEmpty ())

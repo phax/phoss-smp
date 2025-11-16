@@ -10,11 +10,11 @@
  */
 package com.helger.phoss.smp.settings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.base.type.ITypedObject;
 import com.helger.peppol.sml.ISMLInfo;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Runtime settings for this SMP server instance.
@@ -64,7 +64,7 @@ public interface ISMPSettings extends ITypedObject <String>
    * @return The host name of the Peppol Directory server. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   String getDirectoryHostName ();
 
   /**

@@ -12,12 +12,12 @@ package com.helger.phoss.smp.domain.pmigration;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Defines the details of a single participant migration
@@ -30,13 +30,13 @@ public interface ISMPParticipantMigration extends IHasID <String>
   /**
    * @return Outbound or inbound migration? Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   EParticipantMigrationDirection getDirection ();
 
   /**
    * @return The migration state of this participant. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   EParticipantMigrationState getState ();
 
   /**
@@ -56,7 +56,7 @@ public interface ISMPParticipantMigration extends IHasID <String>
    * @return The participant identifier that is going to be migrated away. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IParticipantIdentifier getParticipantIdentifier ();
 
   /**
@@ -64,13 +64,13 @@ public interface ISMPParticipantMigration extends IHasID <String>
    *         relevant, as the migration key is only valid for some time. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   LocalDateTime getInitiationDateTime ();
 
   /**
    * @return The created migration key. Neither <code>null</code> nor empty.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getMigrationKey ();
 }

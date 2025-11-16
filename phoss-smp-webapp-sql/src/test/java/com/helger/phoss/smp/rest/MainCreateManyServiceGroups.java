@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,6 @@ import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
-import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
@@ -52,7 +52,7 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainCreateManyServiceGroups.class);
 
-  private static void _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+  private static void _testResponseJerseyClient (@NonNull final Response aResponseMsg,
                                                  @Nonempty final int... aStatusCodes)
   {
     final String sResponse = aResponseMsg.readEntity (String.class);

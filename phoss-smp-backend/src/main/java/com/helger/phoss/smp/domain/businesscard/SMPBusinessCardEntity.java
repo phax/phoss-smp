@@ -13,6 +13,9 @@ package com.helger.phoss.smp.domain.businesscard;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -33,9 +36,6 @@ import com.helger.peppol.businesscard.generic.PDContact;
 import com.helger.peppol.businesscard.generic.PDIdentifier;
 import com.helger.peppol.businesscard.generic.PDName;
 import com.helger.peppol.businesscard.v3.PD3BusinessEntityType;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class represents a single Business Card entity - a part of a Business
@@ -73,12 +73,12 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
    * @param sID
    *        The ID of the object. May neither be <code>null</code> nor empty.
    */
-  public SMPBusinessCardEntity (@Nonnull @Nonempty final String sID)
+  public SMPBusinessCardEntity (@NonNull @Nonempty final String sID)
   {
     m_sID = ValueEnforcer.notEmpty (sID, "ID");
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
@@ -88,7 +88,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   /**
    * @return All names of the entity. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public final ICommonsList <SMPBusinessCardName> names ()
   {
@@ -110,7 +110,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
    * @since 5.7.0
    * @see SMPBusinessCardName#getAsJson()
    */
-  @Nonnull
+  @NonNull
   public final IJsonArray getNamesAsJson ()
   {
     return new JsonArray ().addAllMapped (m_aNames, SMPBusinessCardName::getAsJson);
@@ -166,21 +166,21 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
     m_sGeographicalInformation = value;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public ICommonsList <SMPBusinessCardIdentifier> identifiers ()
   {
     return m_aIdentifiers;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public ICommonsList <String> websiteURIs ()
   {
     return m_aWebsiteURIs;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <SMPBusinessCardContact> contacts ()
   {
@@ -241,7 +241,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
     m_aRegistrationDate = value;
   }
 
-  @Nonnull
+  @NonNull
   public PD3BusinessEntityType getAsJAXBObject ()
   {
     final PD3BusinessEntityType ret = new PD3BusinessEntityType ();
@@ -308,8 +308,8 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
                                        .getToString ();
   }
 
-  @Nonnull
-  public static SMPBusinessCardEntity createFromGenericObject (@Nonnull final PDBusinessEntity aEntity)
+  @NonNull
+  public static SMPBusinessCardEntity createFromGenericObject (@NonNull final PDBusinessEntity aEntity)
   {
     ValueEnforcer.notNull (aEntity, "Entity");
     final SMPBusinessCardEntity ret = new SMPBusinessCardEntity ();

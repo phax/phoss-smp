@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import javax.net.ssl.SSLSocketFactory;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
@@ -27,8 +29,6 @@ import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
-import jakarta.annotation.Nonnull;
-
 public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
 {
   protected static final String HELPTEXT_SMP_ID = "This is the unique ID your SMP will have inside the SML. All continuing operations must use this ID. This ID is taken from the configuration file. All uppercase names are appreciated!";
@@ -36,12 +36,12 @@ public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
   protected static final String DEFAULT_PHYSICAL_ADDRESS = "1.1.1.1";
   protected static final String HR_EXT_WARNING = "This SMP is configured to run in HR eDelivery Extension Mode. The Croatian AMS (=SML) does not seem to offer the necessary server interface. So don't wonder if you receive weird error messages.";
 
-  protected AbstractPageSecureSMLReg (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  protected AbstractPageSecureSMLReg (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
     super (sID, sName);
   }
 
-  protected final boolean canShowPage (@Nonnull final WebPageExecutionContext aWPEC)
+  protected final boolean canShowPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
@@ -60,9 +60,9 @@ public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
     return true;
   }
 
-  @Nonnull
-  protected static ManageServiceMetadataServiceCaller createSMLCaller (@Nonnull final ISMLInfo aSML,
-                                                                       @Nonnull final SSLSocketFactory aSocketFactory)
+  @NonNull
+  protected static ManageServiceMetadataServiceCaller createSMLCaller (@NonNull final ISMLInfo aSML,
+                                                                       @NonNull final SSLSocketFactory aSocketFactory)
   {
     final ManageServiceMetadataServiceCaller ret = new ManageServiceMetadataServiceCaller (aSML);
     ret.setSSLSocketFactory (aSocketFactory);

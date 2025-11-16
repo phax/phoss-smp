@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +43,6 @@ import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.jdbc.PhotonSecurityManagerFactoryJDBC;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * A JDBC based implementation of the {@link ISMPManagerProvider} interface.
@@ -88,14 +87,14 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                   .setBackendConnectionStateChangeCallback (eNew -> DBExecutor.resetConnectionEstablished ());
   }
 
-  @Nonnull
+  @NonNull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {
     return ETriState.UNDEFINED;
   }
 
   // TODO currently also file based
-  @Nonnull
+  @NonNull
   public ISMLInfoManager createSMLInfoMgr ()
   {
     try
@@ -108,19 +107,19 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettingsManager createSettingsMgr ()
   {
     return new SMPSettingsManagerJDBC (SMPDBExecutor::new);
   }
 
-  @Nonnull
+  @NonNull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
     return new SMPTransportProfileManagerJDBC (SMPDBExecutor::new);
   }
 
-  @Nonnull
+  @NonNull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
     final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
@@ -129,27 +128,27 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     return ret;
   }
 
-  @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPRedirectManager createRedirectMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     return new SMPRedirectManagerJDBC (SMPDBExecutor::new);
   }
 
-  @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new);
   }
 
-  @Nonnull
+  @NonNull
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     return new SMPParticipantMigrationManagerJDBC (SMPDBExecutor::new);
   }
 
   @Nullable
-  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPBusinessCardManager createBusinessCardMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                        @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new SMPBusinessCardManagerJDBC (SMPDBExecutor::new);
   }

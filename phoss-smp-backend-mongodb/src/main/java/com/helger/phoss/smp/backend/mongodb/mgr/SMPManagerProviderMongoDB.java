@@ -16,6 +16,9 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.base.state.ETriState;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -30,9 +33,6 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
@@ -49,57 +49,57 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
     PhotonSecurityManager.getInstance ();
   }
 
-  @Nonnull
+  @NonNull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {
     return ETriState.UNDEFINED;
   }
 
-  @Nonnull
+  @NonNull
   public ISMLInfoManager createSMLInfoMgr ()
   {
     return new SMLInfoManagerMongoDB ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettingsManager createSettingsMgr ()
   {
     return new SMPSettingsManagerMongoDB ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
     return new SMPTransportProfileManagerMongoDB ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
     return new SMPServiceGroupManagerMongoDB ();
   }
 
-  @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPRedirectManager createRedirectMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     return new SMPRedirectManagerMongoDB (aIdentifierFactory);
   }
 
-  @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     return new SMPServiceInformationManagerMongoDB (aIdentifierFactory);
   }
 
-  @Nonnull
+  @NonNull
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     return new SMPParticipantMigrationManagerMongoDB ();
   }
 
   @Nullable
-  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPBusinessCardManager createBusinessCardMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                        @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new SMPBusinessCardManagerMongoDB (aIdentifierFactory);
   }

@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
@@ -63,8 +65,6 @@ import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 import com.helger.xml.serialize.read.SAXReaderSettings;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Class to import service groups with all contents
  *
@@ -77,13 +77,13 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
   private static final String FIELD_DEFAULT_OWNER = "defaultowner";
   private static final boolean DEFAULT_OVERWRITE_EXISTING = false;
 
-  public PageSecureServiceGroupImport (@Nonnull @Nonempty final String sID)
+  public PageSecureServiceGroupImport (@NonNull @Nonempty final String sID)
   {
     super (sID, "Import");
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

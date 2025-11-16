@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.util.Comparator;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -19,9 +22,6 @@ import com.helger.base.id.IHasID;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This interface represents a single SMP business card for a certain service
@@ -39,14 +39,14 @@ public interface ISMPBusinessCard extends IHasID <String>
    * @return The participant ID of the service group to which this business card
    *         belongs. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IParticipantIdentifier getParticipantIdentifier ();
 
   /**
    * @return A copy of all {@link SMPBusinessCardEntity} objects. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <SMPBusinessCardEntity> getAllEntities ();
 
@@ -70,10 +70,10 @@ public interface ISMPBusinessCard extends IHasID <String>
    * @return This business card as a JAXB object for the REST interface. Never
    *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   PD3BusinessCardType getAsJAXBObject ();
 
-  @Nonnull
+  @NonNull
   static Comparator <ISMPBusinessCard> comparator ()
   {
     return Comparator.comparing (ISMPBusinessCard::getID);

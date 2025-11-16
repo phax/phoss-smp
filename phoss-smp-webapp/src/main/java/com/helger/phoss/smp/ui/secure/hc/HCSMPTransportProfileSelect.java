@@ -19,14 +19,14 @@ package com.helger.phoss.smp.ui.secure.hc;
 import java.util.Comparator;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.name.IHasName;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Select for the default transport profiles
@@ -35,16 +35,16 @@ import jakarta.annotation.Nonnull;
  */
 public class HCSMPTransportProfileSelect extends HCSelect
 {
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String getDisplayName (@Nonnull final ISMPTransportProfile aTP, @Nonnull final Locale aDisplayLocale)
+  public static String getDisplayName (@NonNull final ISMPTransportProfile aTP, @NonNull final Locale aDisplayLocale)
   {
     final String sSuffix = aTP.getState ().isActive () ? ""
                                                        : " [" + aTP.getState ().getDisplayText (aDisplayLocale) + "]";
     return aTP.getName () + " (" + aTP.getID () + ")" + sSuffix;
   }
 
-  public HCSMPTransportProfileSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCSMPTransportProfileSelect (@NonNull final RequestField aRF, @NonNull final Locale aDisplayLocale)
   {
     super (aRF);
 

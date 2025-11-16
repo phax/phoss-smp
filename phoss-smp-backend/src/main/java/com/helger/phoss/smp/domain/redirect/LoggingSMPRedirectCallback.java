@@ -10,10 +10,9 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Logging implementation of {@link ISMPRedirectCallback}
@@ -25,19 +24,19 @@ public class LoggingSMPRedirectCallback implements ISMPRedirectCallback
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPRedirectCallback.class);
 
   @Override
-  public void onSMPRedirectCreated (@Nonnull final ISMPRedirect aRedirect)
+  public void onSMPRedirectCreated (@NonNull final ISMPRedirect aRedirect)
   {
     LOGGER.info ("Successfully Created Redirect '" + aRedirect.getID () + "'");
   }
 
   @Override
-  public void onSMPRedirectUpdated (@Nonnull final ISMPRedirect aRedirect)
+  public void onSMPRedirectUpdated (@NonNull final ISMPRedirect aRedirect)
   {
     LOGGER.info ("Successfully Updated Redirect with ID '" + aRedirect.getID () + "'");
   }
 
   @Override
-  public void onSMPRedirectDeleted (@Nonnull final ISMPRedirect aRedirect)
+  public void onSMPRedirectDeleted (@NonNull final ISMPRedirect aRedirect)
   {
     LOGGER.info ("Successfully Deleted Redirect with ID '" + aRedirect.getID () + "'");
   }

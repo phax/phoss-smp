@@ -19,6 +19,7 @@ package com.helger.phoss.smp.app;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +35,13 @@ import com.helger.photon.core.interror.callback.AbstractErrorCallback;
 import com.helger.smtp.settings.SMTPSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public final class SMPInternalErrorHandler extends AbstractErrorCallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPInternalErrorHandler.class);
 
-  @Nonnull
+  @NonNull
   public static InternalErrorBuilder createInternalErrorBuilder ()
   {
     final InternalErrorBuilder ret = new InternalErrorBuilder ();
@@ -52,7 +52,7 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
   @Override
   protected void onError (@Nullable final Throwable t,
                           @Nullable final IRequestWebScopeWithoutResponse aRequestScope,
-                          @Nonnull @Nonempty final String sErrorCode,
+                          @NonNull @Nonempty final String sErrorCode,
                           @Nullable final Map <String, String> aCustomAttrs)
   {
     createInternalErrorBuilder ().setThrowable (t)

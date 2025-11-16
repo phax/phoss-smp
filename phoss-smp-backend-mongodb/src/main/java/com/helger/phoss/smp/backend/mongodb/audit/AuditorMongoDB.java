@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +47,6 @@ import com.helger.security.authentication.subject.user.CUserID;
 import com.helger.security.authentication.subject.user.ICurrentUserIDProvider;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.MongoCollection;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * A special implementation of {@link IAuditor} writing data to a MongoDB collection
@@ -76,7 +75,7 @@ public class AuditorMongoDB implements IAuditor
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
    */
-  public AuditorMongoDB (@Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
+  public AuditorMongoDB (@NonNull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     this (DEFAULT_COLLECTION_NAME, aCurrentUserIDProvider);
   }
@@ -89,17 +88,17 @@ public class AuditorMongoDB implements IAuditor
    * @param aCurrentUserIDProvider
    *        The current user ID provider. May not be <code>null</code>.
    */
-  public AuditorMongoDB (@Nonnull @Nonempty final String sCollectionName,
-                         @Nonnull final ICurrentUserIDProvider aCurrentUserIDProvider)
+  public AuditorMongoDB (@NonNull @Nonempty final String sCollectionName,
+                         @NonNull final ICurrentUserIDProvider aCurrentUserIDProvider)
   {
     ValueEnforcer.notEmpty (sCollectionName, "CollectionName");
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
     m_aCurrentUserIDProvider = ValueEnforcer.notNull (aCurrentUserIDProvider, "UserIDProvider");
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final IAuditItem aValue)
+  public static Document toBson (@NonNull final IAuditItem aValue)
   {
     return new Document ().append (BSON_DT, TypeConverter.convert (aValue.getDateTime (), Date.class))
                           .append (BSON_USERID, aValue.getUserID ())
@@ -108,9 +107,9 @@ public class AuditorMongoDB implements IAuditor
                           .append (BSON_ACTION, aValue.getAction ());
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static AuditItem toDomain (@Nonnull final Document aDoc)
+  public static AuditItem toDomain (@NonNull final Document aDoc)
   {
     final LocalDateTime aDT = TypeConverter.convert (aDoc.getDate (BSON_DT), LocalDateTime.class);
 
@@ -137,8 +136,8 @@ public class AuditorMongoDB implements IAuditor
                           sAction);
   }
 
-  public void createAuditItem (@Nonnull final EAuditActionType eActionType,
-                               @Nonnull final ESuccess eSuccess,
+  public void createAuditItem (@NonNull final EAuditActionType eActionType,
+                               @NonNull final ESuccess eSuccess,
                                @Nullable final ObjectType aActionObjectType,
                                @Nullable final String sAction,
                                @Nullable final Object... aArgs)
@@ -159,7 +158,7 @@ public class AuditorMongoDB implements IAuditor
       LOGGER.warn ("Dropping audit item, because MongoDB is in non-writable state");
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <IAuditItem> getLastAuditItems (@Nonnegative final int nMaxItems)
   {

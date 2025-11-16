@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +57,6 @@ import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateHelper;
 
-import jakarta.annotation.Nonnull;
-
 public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMLCertificateUpdate.class);
@@ -67,13 +66,13 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 
   private static final String SUBACTION_SMP_UPDATE_CERT = "smpupdatecert";
 
-  public PageSecureSMLCertificateUpdate (@Nonnull @Nonempty final String sID)
+  public PageSecureSMLCertificateUpdate (@NonNull @Nonempty final String sID)
   {
     super (sID, "SML certificate update");
   }
 
   @Override
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     if (SMPMetaManager.getSettings ().getSMLInfo () == null)
     {
@@ -89,8 +88,8 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     return super.isValidToDisplayPage (aWPEC);
   }
 
-  private void _updateSMPCertAtSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                    @Nonnull final FormErrorList aFormErrors)
+  private void _updateSMPCertAtSML (@NonNull final WebPageExecutionContext aWPEC,
+                                    @NonNull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -250,7 +249,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

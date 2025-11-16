@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.exchange;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,6 @@ import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Export Service Groups to XML.
@@ -55,8 +54,8 @@ public final class ServiceGroupExport
    *        <code>true</code> to include Business Cards, <code>false</code> to skip them
    * @return The created XML document. Never <code>null</code>.
    */
-  @Nonnull
-  public static IMicroDocument createExportDataXMLVer10 (@Nonnull final ICommonsList <ISMPServiceGroup> aServiceGroups,
+  @NonNull
+  public static IMicroDocument createExportDataXMLVer10 (@NonNull final ICommonsList <ISMPServiceGroup> aServiceGroups,
                                                          final boolean bIncludeBusinessCards)
   {
     ValueEnforcer.notNull (aServiceGroups, "ServiceGroups");

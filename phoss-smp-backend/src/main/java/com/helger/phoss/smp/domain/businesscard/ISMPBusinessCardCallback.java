@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.businesscard;
 
-import com.helger.base.callback.ICallback;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.base.callback.ICallback;
 
 /**
  * Callback interface for {@link ISMPBusinessCardManager} objects.
@@ -31,7 +31,7 @@ public interface ISMPBusinessCardCallback extends ICallback
    * @param aBusinessCard
    *        The new business card. May not be <code>null</code>.
    */
-  void onSMPBusinessCardCreatedOrUpdated (@Nonnull ISMPBusinessCard aBusinessCard);
+  void onSMPBusinessCardCreatedOrUpdated (@NonNull ISMPBusinessCard aBusinessCard);
 
   /**
    * Invoked after a business card was deleted.
@@ -39,5 +39,5 @@ public interface ISMPBusinessCardCallback extends ICallback
    * @param aBusinessCard
    *        The deleted business card. May not be <code>null</code>.
    */
-  void onSMPBusinessCardDeleted (@Nonnull ISMPBusinessCard aBusinessCard);
+  void onSMPBusinessCardDeleted (@NonNull ISMPBusinessCard aBusinessCard);
 }

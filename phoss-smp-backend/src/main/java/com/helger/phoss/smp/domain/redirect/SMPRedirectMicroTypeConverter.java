@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
@@ -24,9 +27,6 @@ import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPRedirect} from and to XML.
@@ -42,10 +42,10 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
   private static final String ELEMENT_CERTIFICATE = "certificate";
   private static final String ELEMENT_EXTENSION = "extension";
 
-  @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final SMPRedirect aValue,
+  @NonNull
+  public IMicroElement convertToMicroElement (@NonNull final SMPRedirect aValue,
                                               @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+                                              @NonNull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_SERVICE_GROUPD_ID, aValue.getServiceGroupID ());
@@ -63,9 +63,9 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
     return aElement;
   }
 
-  @Nonnull
-  public static SMPRedirect convertToNative (@Nonnull final IMicroElement aElement,
-                                             @Nonnull final ISMPServiceGroupProvider aSGProvider)
+  @NonNull
+  public static SMPRedirect convertToNative (@NonNull final IMicroElement aElement,
+                                             @NonNull final ISMPServiceGroupProvider aSGProvider)
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final String sServiceGroupID = aElement.getAttributeValue (ATTR_SERVICE_GROUPD_ID);
@@ -89,8 +89,8 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                             sExtension);
   }
 
-  @Nonnull
-  public SMPRedirect convertToNative (@Nonnull final IMicroElement aElement)
+  @NonNull
+  public SMPRedirect convertToNative (@NonNull final IMicroElement aElement)
   {
     return convertToNative (aElement, SMPMetaManager.getServiceGroupMgr ());
   }

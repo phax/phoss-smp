@@ -12,13 +12,13 @@ package com.helger.phoss.smp.config;
 
 import java.net.Proxy;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.network.proxy.settings.IProxySettings;
 import com.helger.network.proxy.settings.ProxySettings;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class provides easy access to certain configuration properties using
@@ -35,7 +35,7 @@ public final class SMPHttpConfiguration
   /**
    * @return The configuration file. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   private static IConfigWithFallback _getConfig ()
   {
     return SMPConfigProvider.getConfig ();

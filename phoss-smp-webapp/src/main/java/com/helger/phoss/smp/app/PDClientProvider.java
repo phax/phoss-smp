@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.app;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.io.stream.StreamHelper;
@@ -23,8 +25,6 @@ import com.helger.pd.client.PDClient;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * A singleton that keeps track of the {@link PDClient} creation (Peppol Directory client). It avoid
@@ -45,14 +45,14 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   public PDClientProvider ()
   {}
 
-  @Nonnull
+  @NonNull
   public static PDClientProvider getInstance ()
   {
     return getGlobalSingleton (PDClientProvider.class);
   }
 
   @Override
-  protected void onDestroy (@Nonnull final IScope aScopeInDestruction)
+  protected void onDestroy (@NonNull final IScope aScopeInDestruction)
   {
     m_aRWLock.writeLocked ( () -> {
       StreamHelper.close (m_aPDClient);
@@ -75,7 +75,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   /**
    * @return The {@link PDClient} to be used with the current settings. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public PDClient getPDClient ()
   {
     PDClient ret = m_aRWLock.readLockedGet ( () -> m_aPDClient);

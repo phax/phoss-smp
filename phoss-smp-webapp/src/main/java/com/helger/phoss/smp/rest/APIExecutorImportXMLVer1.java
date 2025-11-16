@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +62,6 @@ import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * REST API to import Service Groups from XML v1
  *
@@ -78,11 +77,11 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorImportXMLVer1.class);
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 

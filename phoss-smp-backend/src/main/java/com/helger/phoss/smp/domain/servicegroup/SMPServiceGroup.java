@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.base.enforce.ValueEnforcer;
@@ -24,9 +27,6 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class represents a single service group.
@@ -52,8 +52,8 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
    *        The original participant identifier. May not be <code>null</code>.
    * @return The new participant identifier with a lower cased value.
    */
-  @Nonnull
-  private static IParticipantIdentifier _createUnifiedParticipantIdentifier (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  @NonNull
+  private static IParticipantIdentifier _createUnifiedParticipantIdentifier (@NonNull final IParticipantIdentifier aParticipantIdentifier)
   {
     ValueEnforcer.notNull (aParticipantIdentifier, "ParticipantIdentifier");
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -66,15 +66,15 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String createSMPServiceGroupID (@Nonnull final IParticipantIdentifier aParticipantIdentifier)
+  public static String createSMPServiceGroupID (@NonNull final IParticipantIdentifier aParticipantIdentifier)
   {
     return _createUnifiedParticipantIdentifier (aParticipantIdentifier).getURIEncoded ();
   }
 
-  public SMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                          @Nonnull final IParticipantIdentifier aParticipantIdentifier,
+  public SMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
+                          @NonNull final IParticipantIdentifier aParticipantIdentifier,
                           @Nullable final String sExtension)
   {
     m_sID = createSMPServiceGroupID (aParticipantIdentifier);
@@ -84,22 +84,22 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     m_aParticipantIdentifier = _createUnifiedParticipantIdentifier (aParticipantIdentifier);
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
     return m_sID;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getOwnerID ()
   {
     return m_sOwnerID;
   }
 
-  @Nonnull
-  public final EChange setOwnerID (@Nonnull @Nonempty final String sOwnerID)
+  @NonNull
+  public final EChange setOwnerID (@NonNull @Nonempty final String sOwnerID)
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
     if (sOwnerID.equals (m_sOwnerID))
@@ -108,14 +108,13 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantIdentifier;
   }
 
-  @Nonnull
-  public com.helger.xsds.peppol.smp1.ServiceGroupType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.@NonNull ServiceGroupType getAsJAXBObjectPeppol ()
   {
     final com.helger.xsds.peppol.smp1.ServiceGroupType ret = new com.helger.xsds.peppol.smp1.ServiceGroupType ();
     // Explicit constructor call is needed here!
@@ -129,8 +128,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     return ret;
   }
 
-  @Nonnull
-  public com.helger.xsds.bdxr.smp1.ServiceGroupType getAsJAXBObjectBDXR1 ()
+  public com.helger.xsds.bdxr.smp1.@NonNull ServiceGroupType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.ServiceGroupType ret = new com.helger.xsds.bdxr.smp1.ServiceGroupType ();
     // Explicit constructor call is needed here!
@@ -144,8 +142,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     return ret;
   }
 
-  @Nonnull
-  public com.helger.xsds.bdxr.smp2.ServiceGroupType getAsJAXBObjectBDXR2 ()
+  public com.helger.xsds.bdxr.smp2.@NonNull ServiceGroupType getAsJAXBObjectBDXR2 ()
   {
     final com.helger.xsds.bdxr.smp2.ServiceGroupType ret = new com.helger.xsds.bdxr.smp2.ServiceGroupType ();
     ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());

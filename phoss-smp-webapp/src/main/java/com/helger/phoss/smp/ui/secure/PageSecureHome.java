@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure;
 import java.util.Locale;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCUL;
@@ -36,20 +38,18 @@ import com.helger.photon.uicore.page.system.BasePageShowChildrenRenderer;
 import com.helger.tree.util.TreeVisitor;
 import com.helger.tree.withid.DefaultTreeItemWithID;
 
-import jakarta.annotation.Nonnull;
-
 public class PageSecureHome extends AbstractSMPWebPage
 {
   private final IMenuTree m_aMenuTree;
 
-  public PageSecureHome (@Nonnull @Nonempty final String sID, @Nonnull final IMenuTree aMenuTree)
+  public PageSecureHome (@NonNull @Nonempty final String sID, @NonNull final IMenuTree aMenuTree)
   {
     super (sID, "Landing Page");
     m_aMenuTree = aMenuTree;
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

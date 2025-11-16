@@ -16,14 +16,14 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.misc.Since;
 import com.helger.annotation.style.PresentForCodeCoverage;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * SMP Flyway configuration
@@ -55,7 +55,7 @@ public final class SMPFlywayConfiguration
   private SMPFlywayConfiguration ()
   {}
 
-  @Nonnull
+  @NonNull
   private static IConfig _getConfig ()
   {
     return SMPConfigProvider.getConfig ();

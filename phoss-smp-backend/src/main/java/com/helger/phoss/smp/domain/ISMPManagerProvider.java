@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -20,9 +23,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * An abstract manager provider interface. This must be implemented for each
@@ -55,31 +55,31 @@ public interface ISMPManagerProvider
    *         this should be TRUE for databases it should be UNDEFINED.
    * @since 5.2.4
    */
-  @Nonnull
+  @NonNull
   ETriState getBackendConnectionEstablishedDefaultState ();
 
   /**
    * @return A new SML information manager. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   ISMLInfoManager createSMLInfoMgr ();
 
   /**
    * @return A new SMP settings manager. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   ISMPSettingsManager createSettingsMgr ();
 
   /**
    * @return A new SMP transport profile manager. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   ISMPTransportProfileManager createTransportProfileMgr ();
 
   /**
    * @return A new SMP service group manager. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   ISMPServiceGroupManager createServiceGroupMgr ();
 
   /**
@@ -87,8 +87,8 @@ public interface ISMPManagerProvider
    *        The identifier factory to be used. May not be <code>null</code>.
    * @return A new SMP redirect manager. May not be <code>null</code>.
    */
-  @Nonnull
-  ISMPRedirectManager createRedirectMgr (@Nonnull IIdentifierFactory aIdentifierFactory);
+  @NonNull
+  ISMPRedirectManager createRedirectMgr (@NonNull IIdentifierFactory aIdentifierFactory);
 
   /**
    * @param aIdentifierFactory
@@ -96,15 +96,15 @@ public interface ISMPManagerProvider
    * @return A new SMP service information manager. May not be
    *         <code>null</code>.
    */
-  @Nonnull
-  ISMPServiceInformationManager createServiceInformationMgr (@Nonnull IIdentifierFactory aIdentifierFactory);
+  @NonNull
+  ISMPServiceInformationManager createServiceInformationMgr (@NonNull IIdentifierFactory aIdentifierFactory);
 
   /**
    * @return A new SMP participant migration manager. May not be
    *         <code>null</code>.
    * @since 5.3.1
    */
-  @Nonnull
+  @NonNull
   ISMPParticipantMigrationManager createParticipantMigrationMgr ();
 
   /**
@@ -115,6 +115,6 @@ public interface ISMPManagerProvider
    * @return A new SMP business card manager. May be <code>null</code>!
    */
   @Nullable
-  ISMPBusinessCardManager createBusinessCardMgr (@Nonnull IIdentifierFactory aIdentifierFactory,
-                                                 @Nonnull ISMPServiceGroupManager aServiceGroupMgr);
+  ISMPBusinessCardManager createBusinessCardMgr (@NonNull IIdentifierFactory aIdentifierFactory,
+                                                 @NonNull ISMPServiceGroupManager aServiceGroupMgr);
 }

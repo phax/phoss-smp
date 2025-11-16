@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
 import com.helger.base.string.StringHelper;
@@ -29,8 +31,6 @@ import com.helger.photon.bootstrap4.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageForm;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Base class for form based pages
@@ -47,14 +47,14 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
   /** Grid spec for identifier values */
   protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = BootstrapGridSpec.create (6, 6, 6, 8, 9);
 
-  protected AbstractSMPWebPageForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  protected AbstractSMPWebPageForm (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
     super (sID, sName);
   }
 
   @Override
-  protected void onInputFormError (@Nonnull final WebPageExecutionContext aWPEC,
-                                   @Nonnull final FormErrorList aFormErrors)
+  protected void onInputFormError (@NonNull final WebPageExecutionContext aWPEC,
+                                   @NonNull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

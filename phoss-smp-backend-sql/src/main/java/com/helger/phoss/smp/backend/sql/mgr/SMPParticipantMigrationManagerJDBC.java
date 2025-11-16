@@ -18,6 +18,9 @@ package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
@@ -42,9 +45,6 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.photon.audit.AuditHelper;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Implementation of {@link ISMPParticipantMigrationManager} for JDBC
  *
@@ -60,13 +60,13 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPParticipantMigrationManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPParticipantMigrationManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
   @Nullable
-  private ISMPParticipantMigration _createParticipantMigration (@Nonnull final SMPParticipantMigration aSMPParticipantMigration)
+  private ISMPParticipantMigration _createParticipantMigration (@NonNull final SMPParticipantMigration aSMPParticipantMigration)
   {
     ValueEnforcer.notNull (aSMPParticipantMigration, "SMPParticipantMigration");
 
@@ -106,8 +106,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   }
 
   @Nullable
-  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                      @Nonnull @Nonempty final String sMigrationKey)
+  public ISMPParticipantMigration createOutboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                      @NonNull @Nonempty final String sMigrationKey)
   {
     final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createOutbound (aParticipantID,
                                                                                                      sMigrationKey);
@@ -115,15 +115,15 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   }
 
   @Nullable
-  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  public ISMPParticipantMigration createInboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                     @NonNull @Nonempty final String sMigrationKey)
   {
     final SMPParticipantMigration aSMPParticipantMigration = SMPParticipantMigration.createInbound (aParticipantID,
                                                                                                     sMigrationKey);
     return _createParticipantMigration (aSMPParticipantMigration);
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
     if (StringHelper.isEmpty (sParticipantMigrationID))
@@ -141,8 +141,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     return EChange.CHANGED;
   }
 
-  @Nonnull
-  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
+  @NonNull
+  public EChange deleteAllParticipantMigrationsOfParticipant (@NonNull final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
@@ -160,9 +160,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
-                                               @Nonnull final EParticipantMigrationState eNewState)
+                                               @NonNull final EParticipantMigrationState eNewState)
   {
     ValueEnforcer.notNull (eNewState, "NewState");
 
@@ -231,8 +231,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   }
 
   @Nullable
-  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
-                                                                          @Nonnull final EParticipantMigrationState eState,
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                          @NonNull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     ValueEnforcer.notNull (eDirection, "Direction");
@@ -258,9 +258,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
                                         aRow.getAsString (2));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  private ICommonsList <ISMPParticipantMigration> _getAllParticipantMigrations (@Nonnull final EParticipantMigrationDirection eDirection,
+  private ICommonsList <ISMPParticipantMigration> _getAllParticipantMigrations (@NonNull final EParticipantMigrationDirection eDirection,
                                                                                 @Nullable final EParticipantMigrationState eState)
   {
     final ICommonsList <ISMPParticipantMigration> ret = new CommonsArrayList <> ();
@@ -306,22 +306,22 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllOutboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     return _getAllParticipantMigrations (EParticipantMigrationDirection.OUTBOUND, eState);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     return _getAllParticipantMigrations (EParticipantMigrationDirection.INBOUND, eState);
   }
 
-  private boolean _containsMigration (@Nonnull final EParticipantMigrationDirection eDirection,
-                                      @Nonnull final EParticipantMigrationState eState,
+  private boolean _containsMigration (@NonNull final EParticipantMigrationDirection eDirection,
+                                      @NonNull final EParticipantMigrationState eState,
                                       @Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null)

@@ -16,6 +16,9 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.base.exception.InitializationException;
 import com.helger.base.state.ETriState;
 import com.helger.base.tostring.ToStringGenerator;
@@ -34,9 +37,6 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
@@ -57,13 +57,13 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   public SMPManagerProviderXML ()
   {}
 
-  @Nonnull
+  @NonNull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {
     return ETriState.TRUE;
   }
 
-  @Nonnull
+  @NonNull
   public ISMLInfoManager createSMLInfoMgr ()
   {
     try
@@ -76,7 +76,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettingsManager createSettingsMgr ()
   {
     try
@@ -89,7 +89,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
+  @NonNull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
     try
@@ -102,7 +102,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
+  @NonNull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
     try
@@ -115,8 +115,8 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPRedirectManager createRedirectMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     try
     {
@@ -128,8 +128,8 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     try
     {
@@ -141,7 +141,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     }
   }
 
-  @Nonnull
+  @NonNull
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     try
@@ -155,8 +155,8 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   }
 
   @Nullable
-  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  public ISMPBusinessCardManager createBusinessCardMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                        @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     try
     {

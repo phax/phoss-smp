@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.mock;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
@@ -22,8 +24,6 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * This {@link ISMPManagerProvider} implementation returns non-<code>null</code>
  * managers that all do nothing. This is only needed to access the identifier
@@ -34,57 +34,57 @@ import jakarta.annotation.Nonnull;
  */
 public final class MockSMPManagerProvider implements ISMPManagerProvider
 {
-  @Nonnull
+  @NonNull
   public ETriState getBackendConnectionEstablishedDefaultState ()
   {
     return ETriState.TRUE;
   }
 
-  @Nonnull
+  @NonNull
   public ISMLInfoManager createSMLInfoMgr ()
   {
     return new MockSMLInfoManager ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettingsManager createSettingsMgr ()
   {
     return new MockSMPSettingsManager ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
     return new MockSMPTransportProfileManager ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
     return new MockSMPServiceGroupManager ();
   }
 
-  @Nonnull
-  public ISMPRedirectManager createRedirectMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPRedirectManager createRedirectMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     return new MockSMPRedirectManager ();
   }
 
-  @Nonnull
-  public ISMPServiceInformationManager createServiceInformationMgr (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     return new MockSMPServiceInformationManager ();
   }
 
-  @Nonnull
+  @NonNull
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     return new MockSMPParticipantMigrationManager ();
   }
 
-  @Nonnull
-  public ISMPBusinessCardManager createBusinessCardMgr (@Nonnull final IIdentifierFactory aIdentifierFactory,
-                                                        @Nonnull final ISMPServiceGroupManager aServiceGroupMgr)
+  @NonNull
+  public ISMPBusinessCardManager createBusinessCardMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                        @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
   {
     return new MockSMPBusinessCardManager ();
   }

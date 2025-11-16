@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +53,6 @@ import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Manager for all {@link SMPBusinessCard} objects.
@@ -86,23 +85,23 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   private final IIdentifierFactory m_aIdentifierFactory;
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerMongoDB (@Nonnull final IIdentifierFactory aIdentifierFactory)
+  public SMPBusinessCardManagerMongoDB (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
     super ("smp-businesscard");
     m_aIdentifierFactory = aIdentifierFactory;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final SMPBusinessCardName aValue)
+  public static Document toBson (@NonNull final SMPBusinessCardName aValue)
   {
     final Document ret = new Document ().append (BSON_NAME, aValue.getName ());
     if (aValue.hasLanguageCode ())
@@ -110,34 +109,34 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPBusinessCardName toBCName (@Nonnull final Document aDoc)
+  public static SMPBusinessCardName toBCName (@NonNull final Document aDoc)
   {
     return new SMPBusinessCardName (aDoc.getString (BSON_NAME), aDoc.getString (BSON_LANGUAGE));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final SMPBusinessCardIdentifier aValue)
+  public static Document toBson (@NonNull final SMPBusinessCardIdentifier aValue)
   {
     return new Document ().append (BSON_ID, aValue.getID ())
                           .append (BSON_SCHEME, aValue.getScheme ())
                           .append (BSON_VALUE, aValue.getValue ());
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPBusinessCardIdentifier toBCIdentifier (@Nonnull final Document aDoc)
+  public static SMPBusinessCardIdentifier toBCIdentifier (@NonNull final Document aDoc)
   {
     return new SMPBusinessCardIdentifier (aDoc.getString (BSON_ID),
                                           aDoc.getString (BSON_SCHEME),
                                           aDoc.getString (BSON_VALUE));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final SMPBusinessCardContact aValue)
+  public static Document toBson (@NonNull final SMPBusinessCardContact aValue)
   {
     final Document ret = new Document ().append (BSON_ID, aValue.getID ());
     if (aValue.hasType ())
@@ -151,9 +150,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPBusinessCardContact toBCContact (@Nonnull final Document aDoc)
+  public static SMPBusinessCardContact toBCContact (@NonNull final Document aDoc)
   {
     return new SMPBusinessCardContact (aDoc.getString (BSON_ID),
                                        aDoc.getString (BSON_TYPE),
@@ -162,9 +161,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
                                        aDoc.getString (BSON_EMAIL));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final SMPBusinessCardEntity aValue)
+  public static Document toBson (@NonNull final SMPBusinessCardEntity aValue)
   {
     final Document ret = new Document ().append (BSON_ID, aValue.getID ());
     // Mandatory fields
@@ -203,9 +202,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPBusinessCardEntity toBCEntity (@Nonnull final Document aDoc)
+  public static SMPBusinessCardEntity toBCEntity (@NonNull final Document aDoc)
   {
     final SMPBusinessCardEntity ret = new SMPBusinessCardEntity (aDoc.getString (BSON_ID));
     final List <Document> aNames = aDoc.getList (BSON_NAMES, Document.class);
@@ -231,9 +230,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPBusinessCard aValue)
+  public static Document toBson (@NonNull final ISMPBusinessCard aValue)
   {
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_SERVICE_GROUP_ID, aValue.getID ());
@@ -245,9 +244,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public SMPBusinessCard toDomain (@Nonnull final Document aDoc)
+  public SMPBusinessCard toDomain (@NonNull final Document aDoc)
   {
     final IParticipantIdentifier aParticipantID = m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
@@ -258,9 +257,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return new SMPBusinessCard (aParticipantID, aEntities);
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPBusinessCard _createSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
+  private ISMPBusinessCard _createSMPBusinessCard (@NonNull final SMPBusinessCard aSMPBusinessCard)
   {
     if (!getCollection ().insertOne (toBson (aSMPBusinessCard)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to insert into MongoDB Collection");
@@ -271,9 +270,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return aSMPBusinessCard;
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPBusinessCard _updateSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
+  private ISMPBusinessCard _updateSMPBusinessCard (@NonNull final SMPBusinessCard aSMPBusinessCard)
   {
     final Document aOldDoc = getCollection ().findOneAndReplace (new Document (BSON_ID, aSMPBusinessCard.getID ()),
                                                                  toBson (aSMPBusinessCard));
@@ -285,9 +284,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return aSMPBusinessCard;
   }
 
-  @Nonnull
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                         @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
+  @NonNull
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
+                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
@@ -324,7 +323,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return aNewBusinessCard;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard)
   {
     if (aSMPBusinessCard == null)
@@ -353,7 +352,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
@@ -362,7 +361,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {

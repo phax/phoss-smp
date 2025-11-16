@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.compare.IComparator;
@@ -18,14 +21,10 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
- * This interface represents a single process information within a service
- * information. A process consists of a process identifier (
- * {@link IProcessIdentifier}) and a list of endpoints ( {@link ISMPEndpoint}).
- * It is contained in an {@link ISMPServiceInformation}.
+ * This interface represents a single process information within a service information. A process
+ * consists of a process identifier ( {@link IProcessIdentifier}) and a list of endpoints (
+ * {@link ISMPEndpoint}). It is contained in an {@link ISMPServiceInformation}.
  *
  * @author Philip Helger
  */
@@ -34,14 +33,14 @@ public interface ISMPProcess extends ISMPHasExtension
   /**
    * @return The process identifier of this process. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IProcessIdentifier getProcessIdentifier ();
 
   /**
-   * @return A copy of the list of all endpoints associated with this process.
-   *         Never <code>null</code> but maybe empty.
+   * @return A copy of the list of all endpoints associated with this process. Never
+   *         <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPEndpoint> getAllEndpoints ();
 
@@ -56,8 +55,8 @@ public interface ISMPProcess extends ISMPHasExtension
    *
    * @param sTransportProfileID
    *        The transport profile ID to search. May be <code>null</code>.
-   * @return <code>null</code> if the passed transport profile is
-   *         <code>null</code> or empty or if no such endpoint exists.
+   * @return <code>null</code> if the passed transport profile is <code>null</code> or empty or if
+   *         no such endpoint exists.
    */
   @Nullable
   ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfileID);
@@ -67,8 +66,8 @@ public interface ISMPProcess extends ISMPHasExtension
    *
    * @param sTransportProfileID
    *        The transport profile ID to be checked. May be <code>null</code>.
-   * @return <code>true</code> if at least one endpoint uses the provided
-   *         transport profile ID, <code>false</code> if not.
+   * @return <code>true</code> if at least one endpoint uses the provided transport profile ID,
+   *         <code>false</code> if not.
    */
   boolean containsAnyEndpointWithTransportProfile (@Nullable String sTransportProfileID);
 
@@ -80,45 +79,38 @@ public interface ISMPProcess extends ISMPHasExtension
    * @throws IllegalArgumentException
    *         If another endpoint with the same transport profile already exists-
    */
-  void addEndpoint (@Nonnull SMPEndpoint aEndpoint);
+  void addEndpoint (@NonNull SMPEndpoint aEndpoint);
 
   /**
-   * Add a new endpoint overwriting any eventually present endpoint with the
-   * same transport profile.
+   * Add a new endpoint overwriting any eventually present endpoint with the same transport profile.
    *
    * @param aEndpoint
    *        The endpoint to be added. May not be <code>null</code>.
    */
-  void setEndpoint (@Nonnull SMPEndpoint aEndpoint);
+  void setEndpoint (@NonNull SMPEndpoint aEndpoint);
 
-  @Nonnull
+  @NonNull
   EChange deleteEndpoint (@Nullable String sTransportProfile);
 
   /**
-   * @return This service information object as a Peppol SMP JAXB object for the
-   *         REST interface. May be <code>null</code> if no endpoint is
-   *         contained.
+   * @return This service information object as a Peppol SMP JAXB object for the REST interface. May
+   *         be <code>null</code> if no endpoint is contained.
    */
-  @Nullable
-  com.helger.xsds.peppol.smp1.ProcessType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.@Nullable ProcessType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP v1 JAXB object for
-   *         the REST interface. May be <code>null</code> if no endpoint is
-   *         contained.
+   * @return This service information object as a BDXR SMP v1 JAXB object for the REST interface.
+   *         May be <code>null</code> if no endpoint is contained.
    */
-  @Nullable
-  com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR1 ();
+  com.helger.xsds.bdxr.smp1.@Nullable ProcessType getAsJAXBObjectBDXR1 ();
 
   /**
-   * @return This service information object as a BDXR SMP v2 JAXB object for
-   *         the REST interface. May be <code>null</code> if no endpoint is
-   *         contained.
+   * @return This service information object as a BDXR SMP v2 JAXB object for the REST interface.
+   *         May be <code>null</code> if no endpoint is contained.
    */
-  @Nullable
-  com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType getAsJAXBObjectBDXR2 ();
+  com.helger.xsds.bdxr.smp2.ac.@Nullable ProcessMetadataType getAsJAXBObjectBDXR2 ();
 
-  @Nonnull
+  @NonNull
   static IComparator <ISMPProcess> comparator ()
   {
     return (aElement1, aElement2) -> aElement1.getProcessIdentifier ().compareTo (aElement2.getProcessIdentifier ());

@@ -12,6 +12,9 @@ package com.helger.phoss.smp.mock;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
@@ -23,9 +26,6 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Mock implementation of {@link ISMPBusinessCardManager}.
  *
@@ -35,7 +35,7 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
 {
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
   {

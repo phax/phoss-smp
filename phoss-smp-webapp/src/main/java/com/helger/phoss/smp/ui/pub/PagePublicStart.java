@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.pub;
 import java.util.Comparator;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.collection.commons.ICommonsList;
@@ -44,7 +46,6 @@ import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -54,14 +55,14 @@ import jakarta.annotation.Nullable;
  */
 public final class PagePublicStart extends AbstractSMPWebPage
 {
-  public PagePublicStart (@Nonnull @Nonempty final String sID)
+  public PagePublicStart (@NonNull @Nonempty final String sID)
   {
     super (sID, "Start page");
   }
 
   @Override
   @Nullable
-  public String getHeaderText (@Nonnull final WebPageExecutionContext aWPEC)
+  public String getHeaderText (@NonNull final WebPageExecutionContext aWPEC)
   {
     return "Managed participants on this SMP";
   }

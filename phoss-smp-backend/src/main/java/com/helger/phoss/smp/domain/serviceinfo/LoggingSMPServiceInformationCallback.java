@@ -10,10 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Logging implementation of {@link ISMPServiceInformationCallback}
@@ -25,7 +24,7 @@ public class LoggingSMPServiceInformationCallback implements ISMPServiceInformat
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPServiceInformationCallback.class);
 
   @Override
-  public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+  public void onSMPServiceInformationCreated (@NonNull final ISMPServiceInformation aServiceInformation)
   {
     LOGGER.info ("Successfully Created ServiceInformation at '" +
                  aServiceInformation.getServiceGroupID () +
@@ -34,7 +33,7 @@ public class LoggingSMPServiceInformationCallback implements ISMPServiceInformat
   }
 
   @Override
-  public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
+  public void onSMPServiceInformationUpdated (@NonNull final ISMPServiceInformation aServiceInformation)
   {
     LOGGER.info ("Successfully Updated ServiceInformation at '" +
                  aServiceInformation.getServiceGroupID () +
@@ -43,7 +42,7 @@ public class LoggingSMPServiceInformationCallback implements ISMPServiceInformat
   }
 
   @Override
-  public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+  public void onSMPServiceInformationDeleted (@NonNull final ISMPServiceInformation aServiceInformation)
   {
     LOGGER.info ("Successfully Deleted ServiceInformation at '" +
                  aServiceInformation.getServiceGroupID () +

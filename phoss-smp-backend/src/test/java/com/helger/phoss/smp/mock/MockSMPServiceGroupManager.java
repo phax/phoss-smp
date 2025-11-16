@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.mock;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
@@ -20,8 +22,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Mock implementation of {@link ISMPServiceGroupManager}.
  *
@@ -31,7 +31,7 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
 {
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {

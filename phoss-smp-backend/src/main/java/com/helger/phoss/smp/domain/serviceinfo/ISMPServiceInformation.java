@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -22,39 +25,34 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
- * This interface represents the main information in a service metadata, if no
- * redirect is present. It consists of a document type identifier (
- * {@link IDocumentTypeIdentifier}) and a list of processes (
- * {@link ISMPProcess}).
+ * This interface represents the main information in a service metadata, if no redirect is present.
+ * It consists of a document type identifier ( {@link IDocumentTypeIdentifier}) and a list of
+ * processes ( {@link ISMPProcess}).
  *
  * @author Philip Helger
  */
 public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String>
 {
   /**
-   * @return The participant ID of the service group to which this service
-   *         information belongs. Never <code>null</code>.
+   * @return The participant ID of the service group to which this service information belongs.
+   *         Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IParticipantIdentifier getServiceGroupParticipantIdentifier ();
 
   /**
-   * @return The ID of the service group to which this service information
-   *         belongs. Never <code>null</code>.
+   * @return The ID of the service group to which this service information belongs. Never
+   *         <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getServiceGroupID ();
 
   /**
-   * @return The document type identifier of this service information. Never
-   *         <code>null</code>.
+   * @return The document type identifier of this service information. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IDocumentTypeIdentifier getDocumentTypeIdentifier ();
 
   /**
@@ -74,16 +72,14 @@ public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String
   ISMPProcess getProcessOfID (@Nullable IProcessIdentifier aProcessID);
 
   /**
-   * @return A copy of the list of all processes associated with this service
-   *         information.
+   * @return A copy of the list of all processes associated with this service information.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPProcess> getAllProcesses ();
 
   /**
-   * @return The overall endpoint count for all processes in this object. Always
-   *         &ge; 0.
+   * @return The overall endpoint count for all processes in this object. Always &ge; 0.
    */
   @Nonnegative
   int getTotalEndpointCount ();
@@ -93,8 +89,8 @@ public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String
    *
    * @param sTransportProfileID
    *        The transport profile ID to be checked. May be <code>null</code>.
-   * @return <code>true</code> if at least one endpoint uses the provided
-   *         transport profile ID, <code>false</code> if not.
+   * @return <code>true</code> if at least one endpoint uses the provided transport profile ID,
+   *         <code>false</code> if not.
    */
   boolean containsAnyEndpointWithTransportProfile (@Nullable String sTransportProfileID);
 
@@ -106,45 +102,39 @@ public interface ISMPServiceInformation extends ISMPHasExtension, IHasID <String
    * @throws IllegalArgumentException
    *         If a process with the same process ID is already registered.
    */
-  void addProcess (@Nonnull SMPProcess aProcess);
+  void addProcess (@NonNull SMPProcess aProcess);
 
   /**
    * Delete the provided process from this object.
    *
    * @param aProcessID
    *        The process ID to be deleted. May be <code>null</code>.
-   * @return {@link EChange#CHANGED} if deletion was successfully,
-   *         {@link EChange#UNCHANGED} otherwise.
+   * @return {@link EChange#CHANGED} if deletion was successfully, {@link EChange#UNCHANGED}
+   *         otherwise.
    * @since 5.0.0
    */
-  @Nonnull
+  @NonNull
   EChange deleteProcess (@Nullable IProcessIdentifier aProcessID);
 
   /**
-   * @return This service information object as a Peppol SMP JAXB object for the
-   *         REST interface. May be <code>null</code> if invalid XML would be
-   *         created.
+   * @return This service information object as a Peppol SMP JAXB object for the REST interface. May
+   *         be <code>null</code> if invalid XML would be created.
    */
-  @Nullable
-  com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.@Nullable ServiceMetadataType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This service information object as a BDXR SMP v1 JAXB object for
-   *         the REST interface. May be <code>null</code> if invalid XML would
-   *         be created.
+   * @return This service information object as a BDXR SMP v1 JAXB object for the REST interface.
+   *         May be <code>null</code> if invalid XML would be created.
    */
-  @Nullable
-  com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ();
+  com.helger.xsds.bdxr.smp1.@Nullable ServiceMetadataType getAsJAXBObjectBDXR1 ();
 
   /**
-   * @return This service information object as a BDXR SMP v2 JAXB object for
-   *         the REST interface. May be <code>null</code> if invalid XML would
-   *         be created.
+   * @return This service information object as a BDXR SMP v2 JAXB object for the REST interface.
+   *         May be <code>null</code> if invalid XML would be created.
    */
-  @Nullable
-  com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ();
+  com.helger.xsds.bdxr.smp2.@Nullable ServiceMetadataType getAsJAXBObjectBDXR2 ();
 
-  @Nonnull
+  @NonNull
   static IComparator <ISMPServiceInformation> comparator ()
   {
     return (aElement1, aElement2) -> {

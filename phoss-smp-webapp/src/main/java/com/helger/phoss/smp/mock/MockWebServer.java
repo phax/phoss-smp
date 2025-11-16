@@ -16,10 +16,10 @@
  */
 package com.helger.phoss.smp.mock;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.photon.jetty.JettyRunner;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * WebServer based on Jetty for standalone SMP server testing. It starts a
@@ -42,7 +42,7 @@ final class MockWebServer
    *
    * @return The Jetty runner
    */
-  @Nonnull
+  @NonNull
   public static JettyRunner startRegularServer ()
   {
     final JettyRunner ret = new JettyRunner ();

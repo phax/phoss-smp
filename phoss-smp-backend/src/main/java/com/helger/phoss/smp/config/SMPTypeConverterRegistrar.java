@@ -10,15 +10,15 @@
  */
 package com.helger.phoss.smp.config;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.typeconvert.ITypeConverterRegistrarSPI;
 import com.helger.typeconvert.ITypeConverterRegistry;
 
-import jakarta.annotation.Nonnull;
-
 @IsSPIImplementation
 public class SMPTypeConverterRegistrar implements ITypeConverterRegistrarSPI
 {
-  public void registerTypeConverter (@Nonnull final ITypeConverterRegistry aRegistry)
+  public void registerTypeConverter (@NonNull final ITypeConverterRegistry aRegistry)
   {}
 }

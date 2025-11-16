@@ -12,10 +12,10 @@ package com.helger.phoss.smp.restapi;
 
 import java.net.URI;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * This interface must be implemented by all real SMP implementations, so that
@@ -29,7 +29,7 @@ public interface ISMPServerAPIDataProvider
   /**
    * @return The URI of the current request. May not be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   URI getCurrentURI ();
 
   /**
@@ -41,8 +41,8 @@ public interface ISMPServerAPIDataProvider
    *        The service group ID. Never <code>null</code>.
    * @return The HREF to show the service group.
    */
-  @Nonnull
-  String getServiceGroupHref (@Nonnull IParticipantIdentifier aServiceGroupID);
+  @NonNull
+  String getServiceGroupHref (@NonNull IParticipantIdentifier aServiceGroupID);
 
   /**
    * Get the service metadata HREF for the passed service group and document
@@ -55,7 +55,7 @@ public interface ISMPServerAPIDataProvider
    *        The document type ID of the participant to query.
    * @return The HREF to the service metadata.
    */
-  @Nonnull
-  String getServiceMetadataReferenceHref (@Nonnull IParticipantIdentifier aServiceGroupID,
-                                          @Nonnull IDocumentTypeIdentifier aDocTypeID);
+  @NonNull
+  String getServiceMetadataReferenceHref (@NonNull IParticipantIdentifier aServiceGroupID,
+                                          @NonNull IDocumentTypeIdentifier aDocTypeID);
 }

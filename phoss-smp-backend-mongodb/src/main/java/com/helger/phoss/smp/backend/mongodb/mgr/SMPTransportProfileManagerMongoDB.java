@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
@@ -34,9 +36,6 @@ import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Implementation of {@link ISMPTransportProfileManager} for MongoDB
@@ -58,18 +57,18 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPTransportProfile aValue)
+  public static Document toBson (@NonNull final ISMPTransportProfile aValue)
   {
     return new Document ().append (BSON_ID, aValue.getID ())
                           .append (BSON_NAME, aValue.getName ())
                           .append (BSON_STATE, aValue.getState ().getID ());
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPTransportProfile toDomain (@Nonnull final Document aDoc)
+  public static SMPTransportProfile toDomain (@NonNull final Document aDoc)
   {
     ESMPTransportProfileState eState = null;
     final String sStateID = aDoc.getString (BSON_STATE);
@@ -85,8 +84,8 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   }
 
   @Nullable
-  public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID,
-                                                         @Nonnull @Nonempty final String sName,
+  public ISMPTransportProfile createSMPTransportProfile (@NonNull @Nonempty final String sID,
+                                                         @NonNull @Nonempty final String sName,
                                                          final boolean bIsDeprecated)
   {
     // Double ID needs to be taken care of
@@ -105,9 +104,9 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     return aSMPTransportProfile;
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID,
-                                            @Nonnull @Nonempty final String sName,
+                                            @NonNull @Nonempty final String sName,
                                             final boolean bIsDeprecated)
   {
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sSMPTransportProfileID),
@@ -125,7 +124,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
     if (StringHelper.isEmpty (sSMPTransportProfileID))
@@ -141,7 +140,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {

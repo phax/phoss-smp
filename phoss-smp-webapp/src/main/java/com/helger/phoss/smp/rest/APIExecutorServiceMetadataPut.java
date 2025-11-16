@@ -18,6 +18,7 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.w3c.dom.Document;
 
 import com.helger.annotation.Nonempty;
@@ -41,16 +42,14 @@ import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.serialize.read.DOMReader;
 
-import jakarta.annotation.Nonnull;
-
 public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
 {
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);

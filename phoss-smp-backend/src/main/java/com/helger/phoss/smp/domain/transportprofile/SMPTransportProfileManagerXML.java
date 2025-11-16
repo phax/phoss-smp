@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.transportprofile;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -24,21 +27,18 @@ import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 public final class SMPTransportProfileManagerXML extends
                                                  AbstractPhotonMapBasedWALDAO <ISMPTransportProfile, SMPTransportProfile>
                                                  implements
                                                  ISMPTransportProfileManager
 {
-  public SMPTransportProfileManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPTransportProfileManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPTransportProfile.class, sFilename);
   }
 
   @Override
-  @Nonnull
+  @NonNull
   protected EChange onInit ()
   {
     // Add the default transport profiles
@@ -48,8 +48,8 @@ public final class SMPTransportProfileManagerXML extends
   }
 
   @Nullable
-  public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID,
-                                                         @Nonnull @Nonempty final String sName,
+  public ISMPTransportProfile createSMPTransportProfile (@NonNull @Nonempty final String sID,
+                                                         @NonNull @Nonempty final String sName,
                                                          final boolean bIsDeprecated)
   {
     // Double ID needs to be taken care of
@@ -68,9 +68,9 @@ public final class SMPTransportProfileManagerXML extends
     return aSMPTransportProfile;
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID,
-                                            @Nonnull @Nonempty final String sName,
+                                            @NonNull @Nonempty final String sName,
                                             final boolean bIsDeprecated)
   {
     final SMPTransportProfile aSMPTransportProfile = getOfID (sSMPTransportProfileID);
@@ -104,7 +104,7 @@ public final class SMPTransportProfileManagerXML extends
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
     if (StringHelper.isEmpty (sSMPTransportProfileID))
@@ -128,7 +128,7 @@ public final class SMPTransportProfileManagerXML extends
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {

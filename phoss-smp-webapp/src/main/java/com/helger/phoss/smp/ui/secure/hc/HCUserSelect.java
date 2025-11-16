@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure.hc;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.name.IHasDisplayName;
 import com.helger.photon.core.form.RequestField;
@@ -26,8 +28,6 @@ import com.helger.photon.security.user.IUser;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 import com.helger.text.compare.ComparatorHelper;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Select box for active SMP users (depending on the backend).
  *
@@ -35,14 +35,14 @@ import jakarta.annotation.Nonnull;
  */
 public class HCUserSelect extends HCExtSelect
 {
-  @Nonnull
+  @NonNull
   @Nonempty
-  public static String getDisplayName (@Nonnull final IUser aUser)
+  public static String getDisplayName (@NonNull final IUser aUser)
   {
     return aUser.getDisplayName ();
   }
 
-  public HCUserSelect (@Nonnull final RequestField aRF, @Nonnull final Locale aDisplayLocale)
+  public HCUserSelect (@NonNull final RequestField aRF, @NonNull final Locale aDisplayLocale)
   {
     super (aRF);
 

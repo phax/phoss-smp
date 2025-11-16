@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -34,9 +37,6 @@ import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.xsds.peppol.smp1.EndpointType;
 import com.helger.xsds.peppol.smp1.ProcessType;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Default implementation of the {@link ISMPProcess} interface.
  *
@@ -48,7 +48,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   private IProcessIdentifier m_aProcessIdentifier;
   private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
 
-  public SMPProcess (@Nonnull final IProcessIdentifier aProcessIdentifier,
+  public SMPProcess (@NonNull final IProcessIdentifier aProcessIdentifier,
                      @Nullable final List <SMPEndpoint> aEndpoints,
                      @Nullable final String sExtension)
   {
@@ -59,13 +59,13 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     getExtensions ().setExtensionAsString (sExtension);
   }
 
-  @Nonnull
+  @NonNull
   public final IProcessIdentifier getProcessIdentifier ()
   {
     return m_aProcessIdentifier;
   }
 
-  public final void setProcessIdentifier (@Nonnull final IProcessIdentifier aProcessIdentifier)
+  public final void setProcessIdentifier (@NonNull final IProcessIdentifier aProcessIdentifier)
   {
     ValueEnforcer.notNull (aProcessIdentifier, "ProcessIdentifier");
     m_aProcessIdentifier = aProcessIdentifier;
@@ -85,7 +85,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return m_aEndpoints.get (sTransportProfile);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPEndpoint> getAllEndpoints ()
   {
@@ -97,7 +97,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return StringHelper.isNotEmpty (sTransportProfileID) && m_aEndpoints.containsKey (sTransportProfileID);
   }
 
-  public final void addEndpoint (@Nonnull final SMPEndpoint aEndpoint)
+  public final void addEndpoint (@NonNull final SMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
@@ -108,21 +108,21 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     m_aEndpoints.put (sTransportProfile, aEndpoint);
   }
 
-  public final void addEndpoints (@Nonnull final Iterable <? extends SMPEndpoint> aEndpoints)
+  public final void addEndpoints (@NonNull final Iterable <? extends SMPEndpoint> aEndpoints)
   {
     ValueEnforcer.notNull (aEndpoints, "Endpoints");
     for (final SMPEndpoint aEndpoint : aEndpoints)
       addEndpoint (aEndpoint);
   }
 
-  public final void setEndpoint (@Nonnull final SMPEndpoint aEndpoint)
+  public final void setEndpoint (@NonNull final SMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
     m_aEndpoints.put (sTransportProfile, aEndpoint);
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteEndpoint (@Nullable final String sTransportProfile)
   {
     if (StringHelper.isEmpty (sTransportProfile))
@@ -130,8 +130,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
   }
 
-  @Nullable
-  public com.helger.xsds.peppol.smp1.ProcessType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.@Nullable ProcessType getAsJAXBObjectPeppol ()
   {
     if (m_aEndpoints.isEmpty ())
     {
@@ -150,8 +149,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return ret;
   }
 
-  @Nullable
-  public com.helger.xsds.bdxr.smp1.ProcessType getAsJAXBObjectBDXR1 ()
+  public com.helger.xsds.bdxr.smp1.@Nullable ProcessType getAsJAXBObjectBDXR1 ()
   {
     if (m_aEndpoints.isEmpty ())
     {
@@ -170,8 +168,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return ret;
   }
 
-  @Nullable
-  public com.helger.xsds.bdxr.smp2.ac.ProcessMetadataType getAsJAXBObjectBDXR2 ()
+  public com.helger.xsds.bdxr.smp2.ac.@Nullable ProcessMetadataType getAsJAXBObjectBDXR2 ()
   {
     if (m_aEndpoints.isEmpty ())
     {
@@ -233,8 +230,8 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
                             .getToString ();
   }
 
-  @Nonnull
-  public static SMPProcess createFromJAXB (@Nonnull final ProcessType aProcess)
+  @NonNull
+  public static SMPProcess createFromJAXB (@NonNull final ProcessType aProcess)
   {
     final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
     for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())

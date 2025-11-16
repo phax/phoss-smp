@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -21,9 +24,6 @@ import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Manager for {@link ISMPRedirect} objects. Redirect objects require a service
@@ -36,7 +36,7 @@ public interface ISMPRedirectManager
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   CallbackList <ISMPRedirectCallback> redirectCallbacks ();
 
@@ -64,10 +64,10 @@ public interface ISMPRedirectManager
    *         persistence failed.
    */
   @Nullable
-  ISMPRedirect createOrUpdateSMPRedirect (@Nonnull IParticipantIdentifier aParticipantID,
-                                          @Nonnull IDocumentTypeIdentifier aDocumentTypeIdentifier,
-                                          @Nonnull @Nonempty String sTargetHref,
-                                          @Nonnull @Nonempty String sSubjectUniqueIdentifier,
+  ISMPRedirect createOrUpdateSMPRedirect (@NonNull IParticipantIdentifier aParticipantID,
+                                          @NonNull IDocumentTypeIdentifier aDocumentTypeIdentifier,
+                                          @NonNull @Nonempty String sTargetHref,
+                                          @NonNull @Nonempty String sSubjectUniqueIdentifier,
                                           @Nullable X509Certificate aCertificate,
                                           @Nullable String sExtension);
 
@@ -78,7 +78,7 @@ public interface ISMPRedirectManager
    *        The SMP redirect to be deleted. May be <code>null</code>.
    * @return {@link EChange#CHANGED} if the deletion was successful
    */
-  @Nonnull
+  @NonNull
   EChange deleteSMPRedirect (@Nullable ISMPRedirect aSMPRedirect);
 
   /**
@@ -88,14 +88,14 @@ public interface ISMPRedirectManager
    *        The service group ID which is about to be deleted.
    * @return {@link EChange#CHANGED} is something was deleted
    */
-  @Nonnull
+  @NonNull
   EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
    * @return All contained SMP redirects. Never <code>null</code> but maybe
    *         empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPRedirect> getAllSMPRedirects ();
 
@@ -107,7 +107,7 @@ public interface ISMPRedirectManager
    * @return All contained SMP redirects for the passed service group. Never
    *         <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPRedirect> getAllSMPRedirectsOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 

@@ -10,13 +10,12 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.CSMPServer;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Logging implementation of {@link ISMPServiceGroupCallback}
@@ -27,7 +26,7 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPServiceGroupCallback.class);
 
-  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
+  public void onSMPServiceGroupCreated (@NonNull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
   {
     LOGGER.info ("Successfully Created ServiceGroup with ID '" +
                  aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
@@ -35,12 +34,12 @@ public class LoggingSMPServiceGroupCallback implements ISMPServiceGroupCallback
                  (bCreateInSML ? "" : CSMPServer.LOG_SUFFIX_NO_SML_INTERACTION));
   }
 
-  public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
+  public void onSMPServiceGroupUpdated (@NonNull final IParticipantIdentifier aParticipantID)
   {
     LOGGER.info ("Successfully Updated ServiceGroup with ID '" + aParticipantID.getURIEncoded () + "'");
   }
 
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID,
+  public void onSMPServiceGroupDeleted (@NonNull final IParticipantIdentifier aParticipantID,
                                         final boolean bDeleteInSML)
   {
     LOGGER.info ("Successfully Deleted ServiceGroup with ID '" +

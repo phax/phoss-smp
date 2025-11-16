@@ -12,11 +12,10 @@ package com.helger.phoss.smp.exception;
 
 import java.net.URI;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Exception to be thrown if there is an ownership mismatch between object. This
@@ -28,12 +27,12 @@ public class SMPUnauthorizedException extends SMPServerException
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUnauthorizedException.class);
 
-  public SMPUnauthorizedException (@Nonnull final String sMessage)
+  public SMPUnauthorizedException (@NonNull final String sMessage)
   {
     this (sMessage, null);
   }
 
-  public SMPUnauthorizedException (@Nonnull final String sMessage, @Nullable final URI aEffectedURI)
+  public SMPUnauthorizedException (@NonNull final String sMessage, @Nullable final URI aEffectedURI)
   {
     super (sMessage + (aEffectedURI == null ? "" : " at " + aEffectedURI));
 

@@ -18,6 +18,8 @@ package com.helger.phoss.smp.backend.xml.mgr;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +44,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Manager for all {@link SMPBusinessCard} objects.
  *
@@ -58,21 +57,21 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPBusinessCardManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPBusinessCardManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPBusinessCard.class, sFilename);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPBusinessCard _createSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
+  private ISMPBusinessCard _createSMPBusinessCard (@NonNull final SMPBusinessCard aSMPBusinessCard)
   {
     m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMPBusinessCard); });
     AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
@@ -81,9 +80,9 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     return aSMPBusinessCard;
   }
 
-  @Nonnull
+  @NonNull
   @IsLocked (ELockType.WRITE)
-  private ISMPBusinessCard _updateSMPBusinessCard (@Nonnull final SMPBusinessCard aSMPBusinessCard)
+  private ISMPBusinessCard _updateSMPBusinessCard (@NonNull final SMPBusinessCard aSMPBusinessCard)
   {
     m_aRWLock.writeLocked ( () -> { internalUpdateItem (aSMPBusinessCard); });
     AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
@@ -93,9 +92,9 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     return aSMPBusinessCard;
   }
 
-  @Nonnull
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                         @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
+  @NonNull
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
+                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
@@ -132,7 +131,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     return aNewBusinessCard;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard)
   {
     if (aSMPBusinessCard == null)
@@ -169,14 +168,14 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     return getAll ();
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {

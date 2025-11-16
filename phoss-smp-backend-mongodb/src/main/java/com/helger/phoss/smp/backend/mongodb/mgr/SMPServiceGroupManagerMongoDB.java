@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +53,6 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Implementation of {@link ISMPServiceGroupManager} for the XML backend.
  *
@@ -75,16 +74,16 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static Document toBson (@Nonnull final ISMPServiceGroup aValue)
+  public static Document toBson (@NonNull final ISMPServiceGroup aValue)
   {
     final Document ret = new Document ().append (BSON_ID, aValue.getID ())
                                         .append (BSON_OWNER_ID, aValue.getOwnerID ())
@@ -94,9 +93,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public static SMPServiceGroup toDomain (@Nonnull final Document aDoc)
+  public static SMPServiceGroup toDomain (@NonNull final Document aDoc)
   {
     final String sOwnerID = aDoc.getString (BSON_OWNER_ID);
     final IParticipantIdentifier aParticipantIdentifier = toParticipantID (aDoc.get (BSON_PARTICIPANT_ID,
@@ -105,9 +104,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
   }
 
-  @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                                                @Nonnull final IParticipantIdentifier aParticipantID,
+  @NonNull
+  public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
+                                                @NonNull final IParticipantIdentifier aParticipantID,
                                                 @Nullable final String sExtension,
                                                 final boolean bCreateInSML) throws SMPServerException
   {
@@ -175,9 +174,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return aSMPServiceGroup;
   }
 
-  @Nonnull
-  public EChange updateSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
-                                        @Nonnull @Nonempty final String sNewOwnerID,
+  @NonNull
+  public EChange updateSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
+                                        @NonNull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sExtension) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -212,8 +211,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return EChange.CHANGED;
   }
 
-  @Nonnull
-  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
+  @NonNull
+  public EChange deleteSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                         final boolean bDeleteInSML) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -281,7 +280,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
@@ -290,7 +289,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllSMPServiceGroupIDs ()
   {
@@ -299,9 +298,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@NonNull final String sOwnerID)
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     getCollection ().find (new Document (BSON_OWNER_ID, sOwnerID)).forEach (x -> ret.add (toDomain (x)));
@@ -309,7 +308,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   }
 
   @Nonnegative
-  public long getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
+  public long getSMPServiceGroupCountOfOwner (@NonNull final String sOwnerID)
   {
     return getCollection ().countDocuments (new Document (BSON_OWNER_ID, sOwnerID));
   }

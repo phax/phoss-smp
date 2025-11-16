@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.string.StringHelper;
@@ -62,7 +64,6 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.url.ISimpleURL;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTransportProfile>
@@ -82,14 +83,14 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     DEFAULT_PROFILE_IDS = new CommonsHashSet <> (DEFAULT_PROFILES, ESMPTransportProfile::getID);
   }
 
-  public PageSecureTransportProfiles (@Nonnull @Nonempty final String sID)
+  public PageSecureTransportProfiles (@NonNull @Nonempty final String sID)
   {
     super (sID, "Transport Profiles");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPTransportProfile, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMPTransportProfile aSelectedObject)
       {
         aForm.addChild (question ("Are you sure you want to delete the transport profile '" +
@@ -98,7 +99,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                     @Nullable final ISMPTransportProfile aSelectedObject)
       {
         final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
@@ -115,8 +116,8 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
     addCustomHandler (ACTION_ENSURE_DEFAULT,
                       new AbstractBootstrapWebPageActionHandler <ISMPTransportProfile, WebPageExecutionContext> (false)
                       {
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
                                                        @Nullable final ISMPTransportProfile aSelectedObject)
                         {
                           final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
@@ -161,7 +162,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   }
 
   @Override
-  protected ISMPTransportProfile getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+  protected ISMPTransportProfile getSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
                                                     @Nullable final String sID)
   {
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
@@ -169,8 +170,8 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   }
 
   @Override
-  protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final EWebPageFormAction eFormAction,
+  protected boolean isActionAllowed (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPTransportProfile aSelectedObject)
   {
     if (eFormAction.isDelete ())
@@ -190,8 +191,8 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPTransportProfile aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPTransportProfile aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -212,12 +213,12 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPTransportProfile aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
 
@@ -252,10 +253,10 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPTransportProfile aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
@@ -299,7 +300,7 @@ public class PageSecureTransportProfiles extends AbstractSMPWebPageForm <ISMPTra
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();

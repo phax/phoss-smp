@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.sql.migration;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,6 @@ import com.helger.photon.security.user.IUserManager;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xml.microdom.util.XMLMapHandler;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * This was introduced in V5.5.2 to work around an issue with plain DBs because in V2, the
  * "smp_secuser" table does not exist yet. Unfortunately this table would be required when creating
@@ -50,7 +49,7 @@ public final class V15__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (V15__MigrateDBUsersToPhotonUsers.class);
 
-  public void migrate (@Nonnull final Context context) throws Exception
+  public void migrate (@NonNull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {

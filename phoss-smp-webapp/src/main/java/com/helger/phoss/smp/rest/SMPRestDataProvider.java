@@ -18,6 +18,8 @@ package com.helger.phoss.smp.rest;
 
 import java.net.URI;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.IHasID;
@@ -37,7 +39,6 @@ import com.helger.servlet.StaticServerInfo;
 import com.helger.servlet.request.RequestHelper;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -79,19 +80,19 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
 
     private final String m_sID;
 
-    EServerNameMode (@Nonnull @Nonempty final String sID)
+    EServerNameMode (@NonNull @Nonempty final String sID)
     {
       m_sID = sID;
     }
 
-    @Nonnull
+    @NonNull
     @Nonempty
     public String getID ()
     {
       return m_sID;
     }
 
-    @Nonnull
+    @NonNull
     public static EServerNameMode getFromIDOrDefault (@Nullable final String sID)
     {
       return EnumHelper.getFromIDOrDefault (EServerNameMode.class, sID, DEFAULT);
@@ -106,7 +107,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   private final IRequestWebScopeWithoutResponse m_aRequestScope;
   private final String m_sQueryPathPrefix;
 
-  public SMPRestDataProvider (@Nonnull final IRequestWebScopeWithoutResponse aRequestScope)
+  public SMPRestDataProvider (@NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
     m_eServerNameMode = EServerNameMode.getFromIDOrDefault (SMPServerConfiguration.getPublicServerURLMode ());
@@ -115,7 +116,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     m_sQueryPathPrefix = SMPServerConfiguration.getRESTType ().getQueryPathPrefix ();
   }
 
-  @Nonnull
+  @NonNull
   private EServerNameMode _getEffectiveServerNameMode ()
   {
     if (m_eServerNameMode == EServerNameMode.STATIC_SERVER_INFO)
@@ -129,7 +130,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     return m_eServerNameMode;
   }
 
-  @Nonnull
+  @NonNull
   private StringBuilder _getXForwardedHeaderBasedHostName ()
   {
     // Try to use as many "X-Forwarded-*" header values as possible. The parts not present will
@@ -162,7 +163,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     return RequestHelper.getFullServerName (sScheme, sHost, nPort);
   }
 
-  @Nonnull
+  @NonNull
   private StringBuilder _getForwardedHeaderBasedHostName ()
   {
     // Get the hops in reverse order, so that the last hop is in front and we can iterate forward
@@ -215,7 +216,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     return RequestHelper.getFullServerName (sScheme, sHost, nPort);
   }
 
-  @Nonnull
+  @NonNull
   public URI getCurrentURI ()
   {
     final String ret = switch (_getEffectiveServerNameMode ())
@@ -239,7 +240,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   /**
    * @return An UriBuilder that contains the full server name, port and context path!
    */
-  @Nonnull
+  @NonNull
   protected String getBaseUriBuilder ()
   {
     final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
@@ -261,15 +262,15 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     return ret;
   }
 
-  @Nonnull
-  public String getServiceGroupHref (@Nonnull final IParticipantIdentifier aServiceGroupID)
+  @NonNull
+  public String getServiceGroupHref (@NonNull final IParticipantIdentifier aServiceGroupID)
   {
     return getBaseUriBuilder () + "/" + m_sQueryPathPrefix + aServiceGroupID.getURIPercentEncoded ();
   }
 
-  @Nonnull
-  public String getServiceMetadataReferenceHref (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                                 @Nonnull final IDocumentTypeIdentifier aDocTypeID)
+  @NonNull
+  public String getServiceMetadataReferenceHref (@NonNull final IParticipantIdentifier aServiceGroupID,
+                                                 @NonNull final IDocumentTypeIdentifier aDocTypeID)
   {
     return getBaseUriBuilder () +
            "/" +

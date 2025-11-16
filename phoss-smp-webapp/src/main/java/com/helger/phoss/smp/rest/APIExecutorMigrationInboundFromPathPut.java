@@ -19,6 +19,7 @@ package com.helger.phoss.smp.rest;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +56,6 @@ import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
 import com.sun.xml.ws.client.ClientTransportException;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * REST API to perform an inbound migration for a participant
  *
@@ -67,11 +66,11 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorMigrationInboundFromPathPut.class);
 
-  public static void migrationInbound (@Nonnull final String sServiceGroupID,
-                                       @Nonnull final String sMigrationKey,
-                                       @Nonnull final String sLogPrefix,
-                                       @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                       @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws SMPServerException,
+  public static void migrationInbound (@NonNull final String sServiceGroupID,
+                                       @NonNull final String sMigrationKey,
+                                       @NonNull final String sLogPrefix,
+                                       @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                                       @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws SMPServerException,
                                                                                               GeneralSecurityException
   {
     LOGGER.info (sLogPrefix +
@@ -218,11 +217,11 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
   }
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 

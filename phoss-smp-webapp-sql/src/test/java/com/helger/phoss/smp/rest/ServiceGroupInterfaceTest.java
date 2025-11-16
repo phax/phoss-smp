@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -48,7 +49,6 @@ import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
-import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
@@ -69,14 +69,14 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
 
   private final ObjectFactory m_aObjFactory = new ObjectFactory ();
 
-  @Nonnull
-  private static Builder _addCredentials (@Nonnull final Builder aBuilder)
+  @NonNull
+  private static Builder _addCredentials (@NonNull final Builder aBuilder)
   {
     // Use default credentials for SQL backend
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
   }
 
-  private static int _testResponseJerseyClient (@Nonnull final Response aResponseMsg,
+  private static int _testResponseJerseyClient (@NonNull final Response aResponseMsg,
                                                 @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");

@@ -13,6 +13,8 @@ package com.helger.phoss.smp.restapi;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -66,9 +68,6 @@ import com.helger.xsds.bdxr.smp1.ServiceMetadataReferenceType;
 import com.helger.xsds.bdxr.smp1.ServiceMetadataType;
 import com.helger.xsds.bdxr.smp1.SignedServiceMetadataType;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * This class implements all the service methods, that must be provided by the OASIS BDXR SMP v1
  * REST service.
@@ -88,7 +87,7 @@ public final class BDXR1ServerAPI
 
   private final ISMPServerAPIDataProvider m_aAPIDataProvider;
 
-  public BDXR1ServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
+  public BDXR1ServerAPI (@NonNull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIDataProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
   }
@@ -100,7 +99,7 @@ public final class BDXR1ServerAPI
     return ret == null ? null : ret.getExtensionsAsJsonString ();
   }
 
-  @Nonnull
+  @NonNull
   public CompleteServiceGroupType getCompleteServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /complete/" + sPathServiceGroupID;
@@ -182,9 +181,9 @@ public final class BDXR1ServerAPI
     }
   }
 
-  @Nonnull
-  public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sPathUserID,
-                                                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  @NonNull
+  public ServiceGroupReferenceListType getServiceGroupReferenceList (@NonNull final String sPathUserID,
+                                                                     @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /list/" + sPathUserID;
     final String sAction = "getServiceGroupReferenceList";
@@ -231,7 +230,7 @@ public final class BDXR1ServerAPI
     }
   }
 
-  @Nonnull
+  @NonNull
   public ServiceGroupType getServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID;
@@ -303,10 +302,10 @@ public final class BDXR1ServerAPI
     }
   }
 
-  public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
-                                @Nonnull final ServiceGroupType aServiceGroup,
+  public void saveServiceGroup (@NonNull final String sPathServiceGroupID,
+                                @NonNull final ServiceGroupType aServiceGroup,
                                 final boolean bCreateInSML,
-                                @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+                                @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "PUT /" +
@@ -374,10 +373,10 @@ public final class BDXR1ServerAPI
     }
   }
 
-  @Nonnull
-  public EChange deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
+  @NonNull
+  public EChange deleteServiceGroup (@NonNull final String sPathServiceGroupID,
                                      final boolean bDeleteInSML,
-                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+                                     @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "DELETE /" +
@@ -418,7 +417,7 @@ public final class BDXR1ServerAPI
   }
 
   @Nullable
-  private static List <ExtensionType> _createHREDeliveryExtension (@Nonnull final IParticipantIdentifier aPathServiceGroupID)
+  private static List <ExtensionType> _createHREDeliveryExtension (@NonNull final IParticipantIdentifier aPathServiceGroupID)
   {
     final String sValue = aPathServiceGroupID.getValue ();
 
@@ -450,9 +449,9 @@ public final class BDXR1ServerAPI
     return new CommonsArrayList <> (aExtension);
   }
 
-  @Nonnull
-  public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                                           @Nonnull final String sPathDocTypeID) throws SMPServerException
+  @NonNull
+  public SignedServiceMetadataType getServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                                           @NonNull final String sPathDocTypeID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "getServiceRegistration";
@@ -549,11 +548,11 @@ public final class BDXR1ServerAPI
     }
   }
 
-  @Nonnull
-  public ESuccess saveServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                           @Nonnull final String sPathDocumentTypeID,
-                                           @Nonnull final ServiceMetadataType aServiceMetadata,
-                                           @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  @NonNull
+  public ESuccess saveServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                           @NonNull final String sPathDocumentTypeID,
+                                           @NonNull final ServiceMetadataType aServiceMetadata,
+                                           @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
@@ -739,9 +738,9 @@ public final class BDXR1ServerAPI
     }
   }
 
-  public void deleteServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                         @Nonnull final String sPathDocTypeID,
-                                         @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                         @NonNull final String sPathDocTypeID,
+                                         @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
@@ -833,8 +832,8 @@ public final class BDXR1ServerAPI
     }
   }
 
-  public void deleteServiceRegistrations (@Nonnull final String sPathServiceGroupID,
-                                          @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistrations (@NonNull final String sPathServiceGroupID,
+                                          @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";
@@ -884,7 +883,7 @@ public final class BDXR1ServerAPI
   /**
    * @return The statistics data with the invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
   {
     return STATS_COUNTER_INVOCATION;
@@ -893,7 +892,7 @@ public final class BDXR1ServerAPI
   /**
    * @return The statistics data with the successful invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
     return STATS_COUNTER_SUCCESS;
@@ -902,7 +901,7 @@ public final class BDXR1ServerAPI
   /**
    * @return The statistics data with the error invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getErrorCounter ()
   {
     return STATS_COUNTER_ERROR;

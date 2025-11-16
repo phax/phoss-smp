@@ -18,6 +18,9 @@ package com.helger.phoss.smp.backend.mongodb.audit;
 
 import java.time.LocalDate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.collection.commons.ICommonsList;
@@ -25,9 +28,6 @@ import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.audit.IAuditor;
 import com.helger.photon.security.login.LoggedInUserManager;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * The MongoDB based implementation of {@link IAuditManager}
@@ -55,13 +55,13 @@ public class AuditManagerMongoDB implements IAuditManager
     return null;
   }
 
-  @Nonnull
+  @NonNull
   public IAuditor getAuditor ()
   {
     return m_aAuditor;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <IAuditItem> getLastAuditItems (@Nonnegative final int nMaxItems)
   {

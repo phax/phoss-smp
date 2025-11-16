@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.pmigration;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.ContainsSoftMigration;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
@@ -19,9 +22,6 @@ import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPParticipantMigration} from and to XML.
@@ -38,10 +38,10 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
   private static final String ATTR_INITIATION_DATETIME = "initdt";
   private static final String ATTR_MIGRATION_KEY = "migkey";
 
-  @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final SMPParticipantMigration aValue,
+  @NonNull
+  public IMicroElement convertToMicroElement (@NonNull final SMPParticipantMigration aValue,
                                               @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+                                              @NonNull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_ID, aValue.getID ());
@@ -55,9 +55,9 @@ public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTy
     return aElement;
   }
 
-  @Nonnull
+  @NonNull
   @ContainsSoftMigration
-  public SMPParticipantMigration convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPParticipantMigration convertToNative (@NonNull final IMicroElement aElement)
   {
     final String sID = aElement.getAttributeValue (ATTR_ID);
 

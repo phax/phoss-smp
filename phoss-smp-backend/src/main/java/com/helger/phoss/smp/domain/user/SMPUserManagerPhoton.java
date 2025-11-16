@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.user;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +28,6 @@ import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * User management sanity methods
@@ -56,8 +55,8 @@ public final class SMPUserManagerPhoton
    * @throws SMPUnauthorizedException
    *         If the password is invalid or if the user is marked as disabled
    */
-  @Nonnull
-  public static IUser validateUserCredentials (@Nonnull final SMPAPICredentials aCredentials) throws SMPUnknownUserException,
+  @NonNull
+  public static IUser validateUserCredentials (@NonNull final SMPAPICredentials aCredentials) throws SMPUnknownUserException,
                                                                                               SMPUnauthorizedException
   {
     ValueEnforcer.notNull (aCredentials, "Credentials");
@@ -131,8 +130,8 @@ public final class SMPUserManagerPhoton
     throw new IllegalStateException ("Unsupported credential method provided!");
   }
 
-  public static void verifyOwnership (@Nonnull final IParticipantIdentifier aServiceGroupID,
-                                      @Nonnull final IUser aCurrentUser) throws SMPNotFoundException,
+  public static void verifyOwnership (@NonNull final IParticipantIdentifier aServiceGroupID,
+                                      @NonNull final IUser aCurrentUser) throws SMPNotFoundException,
                                                                          SMPUnauthorizedException
   {
     // Resolve service group

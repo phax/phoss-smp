@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.redirect;
 
-import com.helger.base.callback.ICallback;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.base.callback.ICallback;
 
 /**
  * Interface for an SMP redirect callback.
@@ -27,7 +27,7 @@ public interface ISMPRedirectCallback extends ICallback
    * @param aRedirect
    *        The created object. Never <code>null</code>.
    */
-  default void onSMPRedirectCreated (@Nonnull final ISMPRedirect aRedirect)
+  default void onSMPRedirectCreated (@NonNull final ISMPRedirect aRedirect)
   {}
 
   /**
@@ -36,7 +36,7 @@ public interface ISMPRedirectCallback extends ICallback
    * @param aRedirect
    *        The updated object. Never <code>null</code>.
    */
-  default void onSMPRedirectUpdated (@Nonnull final ISMPRedirect aRedirect)
+  default void onSMPRedirectUpdated (@NonNull final ISMPRedirect aRedirect)
   {}
 
   /**
@@ -45,6 +45,6 @@ public interface ISMPRedirectCallback extends ICallback
    * @param aRedirect
    *        The ID deleted object. Never <code>null</code>.
    */
-  default void onSMPRedirectDeleted (@Nonnull final ISMPRedirect aRedirect)
+  default void onSMPRedirectDeleted (@NonNull final ISMPRedirect aRedirect)
   {}
 }

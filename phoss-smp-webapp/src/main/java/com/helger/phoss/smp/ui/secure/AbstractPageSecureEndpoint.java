@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +97,6 @@ import com.helger.typeconvert.collection.StringMap;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -132,14 +132,14 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   protected static final String ACTION_DELETE_DOCUMENT_TYPE = "del.doctype";
   protected static final String ACTION_DELETE_PROCESS = "del.process";
 
-  public AbstractPageSecureEndpoint (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  public AbstractPageSecureEndpoint (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
     super (sID, sName);
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMPServiceInformation, WebPageExecutionContext> ()
     {
       @Override
-      protected void showQuery (@Nonnull final WebPageExecutionContext aWPEC,
-                                @Nonnull final BootstrapForm aForm,
+      protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                @NonNull final BootstrapForm aForm,
                                 @Nullable final ISMPServiceInformation aSelectedObject)
       {
         final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
@@ -165,7 +165,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       }
 
       @Override
-      protected void performAction (@Nonnull final WebPageExecutionContext aWPEC,
+      protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
                                     @Nullable final ISMPServiceInformation aSelectedObject)
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -191,9 +191,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                           return true;
                         }
 
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                       @Nonnull final ISMPServiceInformation aSelectedObject)
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
+                                                       @NonNull final ISMPServiceInformation aSelectedObject)
                         {
                           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
                           if (aServiceInfoMgr.deleteSMPServiceInformation (aSelectedObject).isChanged ())
@@ -221,9 +221,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                           return true;
                         }
 
-                        @Nonnull
-                        public EShowList handleAction (@Nonnull final WebPageExecutionContext aWPEC,
-                                                       @Nonnull final ISMPServiceInformation aSelectedObject)
+                        @NonNull
+                        public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
+                                                       @NonNull final ISMPServiceInformation aSelectedObject)
                         {
                           final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
                           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -257,8 +257,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Override
-  @Nonnull
-  protected IValidityIndicator isValidToDisplayPage (@Nonnull final WebPageExecutionContext aWPEC)
+  @NonNull
+  protected IValidityIndicator isValidToDisplayPage (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -288,7 +288,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
   @Override
   @Nullable
-  protected ISMPServiceInformation getSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
+  protected ISMPServiceInformation getSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
                                                       @Nullable final String sID)
   {
     // Important to use the Simple IDF here, in case rules get more strict (as
@@ -307,8 +307,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Override
-  protected boolean isActionAllowed (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final EWebPageFormAction eFormAction,
+  protected boolean isActionAllowed (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final EWebPageFormAction eFormAction,
                                      @Nullable final ISMPServiceInformation aSelectedObject)
   {
     if (eFormAction == EWebPageFormAction.VIEW ||
@@ -353,8 +353,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     return super.isActionAllowed (aWPEC, eFormAction, aSelectedObject);
   }
 
-  @Nonnull
-  protected static StringMap createParamMap (@Nonnull final ISMPServiceInformation aServiceInfo,
+  @NonNull
+  protected static StringMap createParamMap (@NonNull final ISMPServiceInformation aServiceInfo,
                                              @Nullable final ISMPProcess aProcess,
                                              @Nullable final ISMPEndpoint aEndpoint)
   {
@@ -375,10 +375,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Override
-  @Nonnull
-  protected BootstrapButtonToolbar createViewToolbar (@Nonnull final WebPageExecutionContext aWPEC,
+  @NonNull
+  protected BootstrapButtonToolbar createViewToolbar (@NonNull final WebPageExecutionContext aWPEC,
                                                       final boolean bCanGoBack,
-                                                      @Nonnull final ISMPServiceInformation aSelectedObject)
+                                                      @NonNull final ISMPServiceInformation aSelectedObject)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
@@ -404,8 +404,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Override
-  protected void showSelectedObject (@Nonnull final WebPageExecutionContext aWPEC,
-                                     @Nonnull final ISMPServiceInformation aSelectedObject)
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPServiceInformation aSelectedObject)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -512,10 +512,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Override
-  protected void validateAndSaveInputParameters (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPServiceInformation aSelectedObject,
-                                                 @Nonnull final FormErrorList aFormErrors,
-                                                 @Nonnull final EWebPageFormAction eFormAction)
+                                                 @NonNull final FormErrorList aFormErrors,
+                                                 @NonNull final EWebPageFormAction eFormAction)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -732,12 +732,12 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   }
 
   @Override
-  protected void showInputForm (@Nonnull final WebPageExecutionContext aWPEC,
+  protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPServiceInformation aSelectedObject,
-                                @Nonnull final BootstrapForm aForm,
+                                @NonNull final BootstrapForm aForm,
                                 final boolean bFormSubmitted,
-                                @Nonnull final EWebPageFormAction eFormAction,
-                                @Nonnull final FormErrorList aFormErrors)
+                                @NonNull final EWebPageFormAction eFormAction,
+                                @NonNull final FormErrorList aFormErrors)
   {
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

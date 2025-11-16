@@ -12,8 +12,8 @@ package com.helger.phoss.smp.exception;
 
 import java.net.URI;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * HTTP 412 (Precondition Failed) exception wrapper
@@ -31,7 +31,7 @@ public class SMPPreconditionFailedException extends SMPServerException
    * @param aEffectedURI
    *        The URI effected.
    */
-  public SMPPreconditionFailedException (@Nonnull final String sMessage, @Nullable final URI aEffectedURI)
+  public SMPPreconditionFailedException (@NonNull final String sMessage, @Nullable final URI aEffectedURI)
   {
     super ("Precondition failed: " + sMessage + (aEffectedURI == null ? "" : " at '" + aEffectedURI.toString () + "'"));
   }

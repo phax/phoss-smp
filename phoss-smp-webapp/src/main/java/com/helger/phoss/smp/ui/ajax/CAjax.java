@@ -18,6 +18,7 @@ package com.helger.phoss.smp.ui.ajax;
 
 import java.util.function.Predicate;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,6 @@ import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesI18N;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * This class defines the available ajax functions for the public application.
@@ -66,7 +65,7 @@ public final class CAjax
   private CAjax ()
   {}
 
-  public static void init (@Nonnull final IAjaxRegistry aAjaxRegistry)
+  public static void init (@NonNull final IAjaxRegistry aAjaxRegistry)
   {
     aAjaxRegistry.registerFunction (DATATABLES);
     aAjaxRegistry.registerFunction (DATATABLES_I18N);
@@ -74,8 +73,8 @@ public final class CAjax
     LOGGER.info ("Successfully registered the Ajax functions");
   }
 
-  @Nonnull
-  public static AjaxFunctionDeclaration addAjaxWithLogin (@Nonnull final IAjaxExecutor aExecutor)
+  @NonNull
+  public static AjaxFunctionDeclaration addAjaxWithLogin (@NonNull final IAjaxExecutor aExecutor)
   {
     // random name
     final AjaxFunctionDeclaration aFunction = AjaxFunctionDeclaration.builder ()

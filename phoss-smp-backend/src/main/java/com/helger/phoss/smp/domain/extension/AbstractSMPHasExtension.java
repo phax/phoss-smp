@@ -10,13 +10,13 @@
  */
 package com.helger.phoss.smp.domain.extension;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.smpclient.extension.SMPExtensionList;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Abstract implementation class for {@link ISMPHasExtension}. All extensions
@@ -34,7 +34,7 @@ public abstract class AbstractSMPHasExtension implements ISMPHasExtension
   protected AbstractSMPHasExtension ()
   {}
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public final SMPExtensionList getExtensions ()
   {

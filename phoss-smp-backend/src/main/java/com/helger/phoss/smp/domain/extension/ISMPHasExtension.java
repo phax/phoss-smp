@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.extension;
 
-import com.helger.smpclient.extension.SMPExtensionList;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.smpclient.extension.SMPExtensionList;
 
 /**
  * Base interface for objects having an extension (service group, redirect,
@@ -22,6 +22,6 @@ import jakarta.annotation.Nonnull;
  */
 public interface ISMPHasExtension
 {
-  @Nonnull
+  @NonNull
   SMPExtensionList getExtensions ();
 }

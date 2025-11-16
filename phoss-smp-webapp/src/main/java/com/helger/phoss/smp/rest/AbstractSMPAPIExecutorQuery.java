@@ -18,6 +18,8 @@ package com.helger.phoss.smp.rest;
 
 import java.net.URI;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -26,7 +28,6 @@ import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.PeppolNaptrURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
@@ -38,20 +39,20 @@ abstract class AbstractSMPAPIExecutorQuery extends AbstractSMPAPIExecutor
     private SMPQueryParams ()
     {}
 
-    @Nonnull
+    @NonNull
     public URI getSMPHostURI ()
     {
       return m_aSMPHostURI;
     }
 
-    @Nonnull
-    private static ISMPURLProvider _getURLProvider (@Nonnull final ESMPAPIType eAPIType)
+    @NonNull
+    private static ISMPURLProvider _getURLProvider (@NonNull final ESMPAPIType eAPIType)
     {
       return eAPIType == ESMPAPIType.PEPPOL ? PeppolNaptrURLProvider.INSTANCE : BDXLURLProvider.INSTANCE;
     }
 
     @Nullable
-    public static SMPQueryParams create (@Nonnull final ESMPAPIType eAPIType,
+    public static SMPQueryParams create (@NonNull final ESMPAPIType eAPIType,
                                          @Nullable final IParticipantIdentifier aParticipantID)
     {
       final SMPQueryParams ret = new SMPQueryParams ();

@@ -18,6 +18,7 @@ package com.helger.phoss.smp.ui.ajax;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,6 @@ import com.helger.photon.core.login.CLogin;
 import com.helger.photon.security.login.ELoginResult;
 import com.helger.photon.security.login.LoggedInUserManager;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Ajax executor to login a user from public application.
  *
@@ -50,8 +49,8 @@ public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor imple
   private static final Logger LOGGER = LoggerFactory.getLogger (AjaxExecutorPublicLogin.class);
 
   @Override
-  protected void mainHandleRequest (@Nonnull final LayoutExecutionContext aLEC,
-                                    @Nonnull final PhotonUnifiedResponse aAjaxResponse) throws Exception
+  protected void mainHandleRequest (@NonNull final LayoutExecutionContext aLEC,
+                                    @NonNull final PhotonUnifiedResponse aAjaxResponse) throws Exception
   {
     final String sLoginName = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_USERID);
     final String sPassword = aLEC.params ().getAsString (CLogin.REQUEST_ATTR_PASSWORD);

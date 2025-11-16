@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +31,11 @@ import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
 import com.helger.photon.io.WebFileIO;
 import com.helger.web.scope.mgr.WebScoped;
 
-import jakarta.annotation.Nonnull;
-
 public class V14__MigrateSettingsToDB extends BaseJavaMigration
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (V5__MigrateTransportProfilesToDB.class);
 
-  public void migrate (@Nonnull final Context context) throws Exception
+  public void migrate (@NonNull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -31,8 +32,6 @@ import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.serialize.MicroWriter;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Test class for class {@link SMPBusinessCard}
  *
@@ -43,7 +42,7 @@ public final class SMPBusinessCardTest
   @Rule
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
-  private static void _testXMLConversion (@Nonnull final SMPBusinessCard aBC)
+  private static void _testXMLConversion (@NonNull final SMPBusinessCard aBC)
   {
     // Write to XML
     final IMicroElement e = MicroTypeConverter.convertToMicroElement (aBC, "test");

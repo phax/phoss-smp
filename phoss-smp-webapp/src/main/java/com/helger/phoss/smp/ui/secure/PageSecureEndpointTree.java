@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Comparator;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
@@ -54,8 +56,6 @@ import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Class to manage endpoints that belong to a service group. To use this page at least one service
  * group must exist.
@@ -64,13 +64,13 @@ import jakarta.annotation.Nonnull;
  */
 public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
 {
-  public PageSecureEndpointTree (@Nonnull @Nonempty final String sID)
+  public PageSecureEndpointTree (@NonNull @Nonempty final String sID)
   {
     super (sID, "Endpoint Tree");
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();

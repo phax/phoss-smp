@@ -12,6 +12,7 @@ package com.helger.phoss.smp.restapi;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +60,6 @@ import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
 import com.helger.xsds.peppol.smp1.SignedServiceMetadataType;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * This class implements all the service methods, that must be provided by the Peppol REST service.
  *
@@ -79,12 +78,12 @@ public final class SMPServerAPI
 
   private final ISMPServerAPIDataProvider m_aAPIDataProvider;
 
-  public SMPServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
+  public SMPServerAPI (@NonNull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIDataProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
   }
 
-  @Nonnull
+  @NonNull
   public CompleteServiceGroupType getCompleteServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /complete/" + sPathServiceGroupID;
@@ -162,9 +161,9 @@ public final class SMPServerAPI
     }
   }
 
-  @Nonnull
-  public ServiceGroupReferenceListType getServiceGroupReferenceList (@Nonnull final String sPathUserID,
-                                                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  @NonNull
+  public ServiceGroupReferenceListType getServiceGroupReferenceList (@NonNull final String sPathUserID,
+                                                                     @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /list/" + sPathUserID;
     final String sAction = "getServiceGroupReferenceList";
@@ -207,7 +206,7 @@ public final class SMPServerAPI
     }
   }
 
-  @Nonnull
+  @NonNull
   public ServiceGroupType getServiceGroup (final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID;
@@ -278,10 +277,10 @@ public final class SMPServerAPI
     }
   }
 
-  public void saveServiceGroup (@Nonnull final String sPathServiceGroupID,
-                                @Nonnull final ServiceGroupType aServiceGroup,
+  public void saveServiceGroup (@NonNull final String sPathServiceGroupID,
+                                @NonNull final ServiceGroupType aServiceGroup,
                                 final boolean bCreateInSML,
-                                @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+                                @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "PUT /" +
@@ -346,10 +345,10 @@ public final class SMPServerAPI
     }
   }
 
-  @Nonnull
-  public EChange deleteServiceGroup (@Nonnull final String sPathServiceGroupID,
+  @NonNull
+  public EChange deleteServiceGroup (@NonNull final String sPathServiceGroupID,
                                      final boolean bDeleteInSML,
-                                     @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+                                     @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX +
                         "DELETE /" +
@@ -387,9 +386,9 @@ public final class SMPServerAPI
     }
   }
 
-  @Nonnull
-  public SignedServiceMetadataType getServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                                           @Nonnull final String sPathDocTypeID) throws SMPServerException
+  @NonNull
+  public SignedServiceMetadataType getServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                                           @NonNull final String sPathDocTypeID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "getServiceRegistration";
@@ -459,11 +458,11 @@ public final class SMPServerAPI
     }
   }
 
-  @Nonnull
-  public ESuccess saveServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                           @Nonnull final String sPathDocumentTypeID,
-                                           @Nonnull final ServiceMetadataType aServiceMetadata,
-                                           @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  @NonNull
+  public ESuccess saveServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                           @NonNull final String sPathDocumentTypeID,
+                                           @NonNull final ServiceMetadataType aServiceMetadata,
+                                           @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /" + sPathServiceGroupID + "/services/" + sPathDocumentTypeID;
     final String sAction = "saveServiceRegistration";
@@ -647,9 +646,9 @@ public final class SMPServerAPI
     }
   }
 
-  public void deleteServiceRegistration (@Nonnull final String sPathServiceGroupID,
-                                         @Nonnull final String sPathDocTypeID,
-                                         @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistration (@NonNull final String sPathServiceGroupID,
+                                         @NonNull final String sPathDocTypeID,
+                                         @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/" + sPathDocTypeID;
     final String sAction = "deleteServiceRegistration";
@@ -740,8 +739,8 @@ public final class SMPServerAPI
     }
   }
 
-  public void deleteServiceRegistrations (@Nonnull final String sPathServiceGroupID,
-                                          @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  public void deleteServiceRegistrations (@NonNull final String sPathServiceGroupID,
+                                          @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /" + sPathServiceGroupID + "/services/";
     final String sAction = "deleteServiceRegistrations";
@@ -788,7 +787,7 @@ public final class SMPServerAPI
   /**
    * @return The statistics data with the invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
   {
     return STATS_COUNTER_INVOCATION;
@@ -797,7 +796,7 @@ public final class SMPServerAPI
   /**
    * @return The statistics data with the successful invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
     return STATS_COUNTER_SUCCESS;
@@ -806,7 +805,7 @@ public final class SMPServerAPI
   /**
    * @return The statistics data with the error invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getErrorCounter ()
   {
     return STATS_COUNTER_ERROR;

@@ -19,6 +19,8 @@ package com.helger.phoss.smp.app;
 import java.util.List;
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.CodingStyleguideUnaware;
@@ -27,8 +29,6 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.photon.security.CSecurity;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Contains application wide constants.
@@ -91,20 +91,20 @@ public final class CSMP
   private CSMP ()
   {}
 
-  @Nonnull
+  @NonNull
   public static String getApplicationSuffix ()
   {
     return SMPWebAppConfiguration.isTestVersion () ? " [Test version]" : "";
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public static String getApplicationTitle ()
   {
     return APPLICATION_TITLE + getApplicationSuffix ();
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public static String getApplicationTitleAndVersion ()
   {

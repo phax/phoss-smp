@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +51,6 @@ import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Implementation of {@link ISMPServiceGroupManager} for the XML backend.
  *
@@ -65,21 +64,21 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceGroupManagerXML (@Nonnull @Nonempty final String sFilename) throws DAOException
+  public SMPServiceGroupManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceGroup.class, sFilename);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
-  public SMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty final String sOwnerID,
-                                                @Nonnull final IParticipantIdentifier aParticipantID,
+  @NonNull
+  public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
+                                                @NonNull final IParticipantIdentifier aParticipantID,
                                                 @Nullable final String sExtension,
                                                 final boolean bCreateInSML) throws SMPServerException
   {
@@ -152,9 +151,9 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     return aSMPServiceGroup;
   }
 
-  @Nonnull
-  public EChange updateSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
-                                        @Nonnull @Nonempty final String sNewOwnerID,
+  @NonNull
+  public EChange updateSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
+                                        @NonNull @Nonempty final String sNewOwnerID,
                                         @Nullable final String sExtension) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -208,8 +207,8 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     return EChange.CHANGED;
   }
 
-  @Nonnull
-  public EChange deleteSMPServiceGroup (@Nonnull final IParticipantIdentifier aParticipantID,
+  @NonNull
+  public EChange deleteSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                         final boolean bDeleteInSML) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
@@ -331,29 +330,29 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     return getAll ();
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllSMPServiceGroupIDs ()
   {
     return getAllIDs ();
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull final String sOwnerID)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@NonNull final String sOwnerID)
   {
     return getAll (x -> x.getOwnerID ().equals (sOwnerID));
   }
 
   @Nonnegative
-  public long getSMPServiceGroupCountOfOwner (@Nonnull final String sOwnerID)
+  public long getSMPServiceGroupCountOfOwner (@NonNull final String sOwnerID)
   {
     return getCount (x -> x.getOwnerID ().equals (sOwnerID));
   }

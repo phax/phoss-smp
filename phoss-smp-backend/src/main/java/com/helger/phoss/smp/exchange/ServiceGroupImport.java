@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +55,6 @@ import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.xml.microdom.IMicroElement;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Import Service Groups from XML.
  *
@@ -71,23 +70,23 @@ public final class ServiceGroupImport
     private final ICommonsList <ISMPServiceInformation> m_aServiceInfos = new CommonsArrayList <> ();
     private final ICommonsList <ISMPRedirect> m_aRedirects = new CommonsArrayList <> ();
 
-    public void addServiceInfo (@Nonnull final ISMPServiceInformation aServiceInfo)
+    public void addServiceInfo (@NonNull final ISMPServiceInformation aServiceInfo)
     {
       m_aServiceInfos.add (aServiceInfo);
     }
 
-    @Nonnull
+    @NonNull
     public ICommonsIterable <ISMPServiceInformation> getServiceInfo ()
     {
       return m_aServiceInfos;
     }
 
-    public void addRedirect (@Nonnull final ISMPRedirect aRedirect)
+    public void addRedirect (@NonNull final ISMPRedirect aRedirect)
     {
       m_aRedirects.add (aRedirect);
     }
 
-    @Nonnull
+    @NonNull
     public ICommonsIterable <ISMPRedirect> getRedirects ()
     {
       return m_aRedirects;
@@ -100,13 +99,13 @@ public final class ServiceGroupImport
   private ServiceGroupImport ()
   {}
 
-  public static void importXMLVer10 (@Nonnull final IMicroElement eRoot,
+  public static void importXMLVer10 (@NonNull final IMicroElement eRoot,
                                      final boolean bOverwriteExisting,
-                                     @Nonnull final IUser aDefaultOwner,
-                                     @Nonnull final ICommonsSet <String> aAllExistingServiceGroupIDs,
-                                     @Nonnull final ICommonsSet <String> aAllExistingBusinessCardIDs,
-                                     @Nonnull final ICommonsList <ImportActionItem> aActionList,
-                                     @Nonnull final ImportSummary aSummary)
+                                     @NonNull final IUser aDefaultOwner,
+                                     @NonNull final ICommonsSet <String> aAllExistingServiceGroupIDs,
+                                     @NonNull final ICommonsSet <String> aAllExistingBusinessCardIDs,
+                                     @NonNull final ICommonsList <ImportActionItem> aActionList,
+                                     @NonNull final ImportSummary aSummary)
   {
     ValueEnforcer.notNull (eRoot, "Root");
     ValueEnforcer.notNull (aDefaultOwner, "DefaultOwner");

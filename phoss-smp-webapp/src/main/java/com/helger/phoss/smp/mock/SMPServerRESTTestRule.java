@@ -19,6 +19,7 @@ package com.helger.phoss.smp.mock;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,6 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.jetty.JettyRunner;
 import com.helger.servlet.StaticServerInfo;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class SMPServerRESTTestRule extends ExternalResource
@@ -49,8 +49,8 @@ public class SMPServerRESTTestRule extends ExternalResource
   private IConfigWithFallback m_aNewConfig;
   private JettyRunner m_aServer;
 
-  @Nonnull
-  public static MultiConfigurationValueProvider createSMPClientValueProvider (@Nonnull final IReadableResource aRes)
+  @NonNull
+  public static MultiConfigurationValueProvider createSMPClientValueProvider (@NonNull final IReadableResource aRes)
   {
     // Start with default setup
     final MultiConfigurationValueProvider ret = ConfigFactory.createDefaultValueProvider ();
@@ -132,7 +132,7 @@ public class SMPServerRESTTestRule extends ExternalResource
    * @return The full URL with port and context path that is the basis for the running test
    *         instance.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public final String getFullURL ()
   {

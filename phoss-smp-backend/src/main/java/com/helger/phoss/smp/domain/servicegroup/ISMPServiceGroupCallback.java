@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.base.callback.ICallback;
 import com.helger.peppolid.IParticipantIdentifier;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Interface for an SMP service group callback.
@@ -31,7 +31,7 @@ public interface ISMPServiceGroupCallback extends ICallback
    *        <code>true</code> if the service group was also created in the SML,
    *        <code>false</code> if not.
    */
-  void onSMPServiceGroupCreated (@Nonnull ISMPServiceGroup aServiceGroup, boolean bCreateInSML);
+  void onSMPServiceGroupCreated (@NonNull ISMPServiceGroup aServiceGroup, boolean bCreateInSML);
 
   /**
    * Invoked after an SMP service group was updated.
@@ -39,7 +39,7 @@ public interface ISMPServiceGroupCallback extends ICallback
    * @param aParticipantID
    *        The ID of the updated object. Never <code>null</code>.
    */
-  void onSMPServiceGroupUpdated (@Nonnull IParticipantIdentifier aParticipantID);
+  void onSMPServiceGroupUpdated (@NonNull IParticipantIdentifier aParticipantID);
 
   /**
    * Invoked after an SMP service group was deleted.
@@ -50,5 +50,5 @@ public interface ISMPServiceGroupCallback extends ICallback
    *        <code>true</code> if the service group was also deleted in the SML,
    *        <code>false</code> if not.
    */
-  void onSMPServiceGroupDeleted (@Nonnull IParticipantIdentifier aParticipantID, boolean bDeleteInSML);
+  void onSMPServiceGroupDeleted (@NonNull IParticipantIdentifier aParticipantID, boolean bDeleteInSML);
 }

@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.mock;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
@@ -19,9 +22,6 @@ import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Mock implementation of {@link ISMPParticipantMigrationManager}.
  *
@@ -30,32 +30,32 @@ import jakarta.annotation.Nullable;
  */
 final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrationManager
 {
-  public ISMPParticipantMigration createOutboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                      @Nonnull @Nonempty final String sMigrationKey)
+  public ISMPParticipantMigration createOutboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                      @NonNull @Nonempty final String sMigrationKey)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPParticipantMigration createInboundParticipantMigration (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                                     @Nonnull @Nonempty final String sMigrationKey)
+  public ISMPParticipantMigration createInboundParticipantMigration (@NonNull final IParticipantIdentifier aParticipantID,
+                                                                     @NonNull @Nonempty final String sMigrationKey)
   {
     throw new UnsupportedOperationException ();
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteParticipantMigrationOfID (@Nullable final String sParticipantMigrationID)
   {
     throw new UnsupportedOperationException ();
   }
 
-  @Nonnull
-  public EChange deleteAllParticipantMigrationsOfParticipant (@Nonnull final IParticipantIdentifier aParticipantID)
+  @NonNull
+  public EChange deleteAllParticipantMigrationsOfParticipant (@NonNull final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();
   }
 
   public EChange setParticipantMigrationState (@Nullable final String sParticipantMigrationID,
-                                               @Nonnull final EParticipantMigrationState eNewState)
+                                               @NonNull final EParticipantMigrationState eNewState)
   {
     throw new UnsupportedOperationException ();
   }
@@ -65,8 +65,8 @@ final class MockSMPParticipantMigrationManager implements ISMPParticipantMigrati
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@Nonnull final EParticipantMigrationDirection eDirection,
-                                                                          @Nonnull final EParticipantMigrationState eState,
+  public ISMPParticipantMigration getParticipantMigrationOfParticipantID (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                          @NonNull final EParticipantMigrationState eState,
                                                                           @Nullable final IParticipantIdentifier aParticipantID)
   {
     throw new UnsupportedOperationException ();

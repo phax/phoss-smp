@@ -18,6 +18,9 @@ package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -39,9 +42,6 @@ import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.audit.AuditHelper;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Implementation of {@link ISMPTransportProfileManager} for SQL backends.
  *
@@ -56,14 +56,14 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPTransportProfileManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPTransportProfileManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
   @Nullable
-  public ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty final String sID,
-                                                         @Nonnull @Nonempty final String sName,
+  public ISMPTransportProfile createSMPTransportProfile (@NonNull @Nonempty final String sID,
+                                                         @NonNull @Nonempty final String sName,
                                                          final boolean bIsDeprecated)
   {
     final ISMPTransportProfile ret = new SMPTransportProfile (sID,
@@ -97,9 +97,9 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSMPTransportProfile (@Nullable final String sSMPTransportProfileID,
-                                            @Nonnull @Nonempty final String sName,
+                                            @NonNull @Nonempty final String sName,
                                             final boolean bIsDeprecated)
   {
     final MutableLong aUpdated = new MutableLong (-1);
@@ -135,7 +135,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPTransportProfile (@Nullable final String sSMPTransportProfileID)
   {
     if (StringHelper.isEmpty (sSMPTransportProfileID))
@@ -153,7 +153,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     return EChange.CHANGED;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {

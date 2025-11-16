@@ -18,7 +18,7 @@ package com.helger.phoss.smp.backend.sql.domain;
 
 import java.io.Serializable;
 
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a single user within the SMP database.
@@ -30,7 +30,7 @@ public class DBUser implements Serializable
   private final String m_sUserName;
   private final String m_sPassword;
 
-  public DBUser (@Nonnull final String sUserName, @Nonnull final String sPassword)
+  public DBUser (@NonNull final String sUserName, @NonNull final String sPassword)
   {
     m_sUserName = sUserName;
     m_sPassword = sPassword;

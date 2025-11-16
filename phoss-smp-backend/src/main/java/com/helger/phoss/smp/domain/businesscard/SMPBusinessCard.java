@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.businesscard;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
@@ -25,9 +28,6 @@ import com.helger.peppol.businesscard.v3.PD3APIHelper;
 import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * A single business card.
@@ -46,8 +46,8 @@ public class SMPBusinessCard implements ISMPBusinessCard
   private final IParticipantIdentifier m_aParticipantID;
   private final ICommonsList <SMPBusinessCardEntity> m_aEntities;
 
-  public SMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
-                          @Nonnull final Iterable <? extends SMPBusinessCardEntity> aEntities)
+  public SMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
+                          @NonNull final Iterable <? extends SMPBusinessCardEntity> aEntities)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
@@ -57,14 +57,14 @@ public class SMPBusinessCard implements ISMPBusinessCard
     m_aEntities = new CommonsArrayList <> (aEntities);
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {
     return m_sID;
   }
 
-  @Nonnull
+  @NonNull
   public IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantID;
@@ -73,14 +73,14 @@ public class SMPBusinessCard implements ISMPBusinessCard
   /**
    * @return A mutable list with all {@link SMPBusinessCardEntity} objects. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public ICommonsList <SMPBusinessCardEntity> entities ()
   {
     return m_aEntities;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <SMPBusinessCardEntity> getAllEntities ()
   {
@@ -99,7 +99,7 @@ public class SMPBusinessCard implements ISMPBusinessCard
     return m_aEntities.size ();
   }
 
-  @Nonnull
+  @NonNull
   public PD3BusinessCardType getAsJAXBObject ()
   {
     final PD3BusinessCardType ret = new PD3BusinessCardType ();

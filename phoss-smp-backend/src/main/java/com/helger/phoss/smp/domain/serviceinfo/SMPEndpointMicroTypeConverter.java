@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.time.LocalDateTime;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.ContainsSoftMigration;
 import com.helger.base.string.StringParser;
@@ -20,9 +23,6 @@ import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPEndpoint} from and to XML.
@@ -43,10 +43,10 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
   private static final String ATTR_TECHNICAL_INFORMATION_URL = "techinfourl";
   private static final String ELEMENT_EXTENSION = "extension";
 
-  @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final SMPEndpoint aValue,
+  @NonNull
+  public IMicroElement convertToMicroElement (@NonNull final SMPEndpoint aValue,
                                               @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+                                              @NonNull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_TRANSPORT_PROFILE, aValue.getTransportProfile ());
@@ -73,10 +73,10 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     return aElement;
   }
 
-  @Nonnull
+  @NonNull
   @ContainsSoftMigration
 
-  public SMPEndpoint convertToNative (@Nonnull final IMicroElement aElement)
+  public SMPEndpoint convertToNative (@NonNull final IMicroElement aElement)
   {
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);

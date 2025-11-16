@@ -18,6 +18,8 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.cache.regex.RegExHelper;
@@ -35,7 +37,6 @@ import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 abstract class AbstractSMPAPIExecutor implements IAPIExecutor
@@ -75,8 +76,8 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
    * @throws SMPUnauthorizedException
    *         If no BasicAuth HTTP header is present
    */
-  @Nonnull
-  public static SMPAPICredentials getMandatoryAuth (@Nonnull final HttpHeaderMap aHttpHeaders) throws SMPUnauthorizedException
+  @NonNull
+  public static SMPAPICredentials getMandatoryAuth (@NonNull final HttpHeaderMap aHttpHeaders) throws SMPUnauthorizedException
   {
     final ICommonsList <String> aHeaders = aHttpHeaders.getAllHeaderValues (CHttpHeader.AUTHORIZATION);
     if (aHeaders.isEmpty ())
@@ -101,17 +102,17 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
                                         "' is malformed. Contains neither a Bearer Token nor Basic Auth");
   }
 
-  protected abstract void invokeAPI (@Nonnull IAPIDescriptor aAPIDescriptor,
-                                     @Nonnull @Nonempty String sPath,
-                                     @Nonnull Map <String, String> aPathVariables,
-                                     @Nonnull IRequestWebScopeWithoutResponse aRequestScope,
-                                     @Nonnull PhotonUnifiedResponse aUnifiedResponse) throws Exception;
+  protected abstract void invokeAPI (@NonNull IAPIDescriptor aAPIDescriptor,
+                                     @NonNull @Nonempty String sPath,
+                                     @NonNull Map <String, String> aPathVariables,
+                                     @NonNull IRequestWebScopeWithoutResponse aRequestScope,
+                                     @NonNull PhotonUnifiedResponse aUnifiedResponse) throws Exception;
 
-  public final void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                               @Nonnull @Nonempty final String sPath,
-                               @Nonnull final Map <String, String> aPathVariables,
-                               @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                               @Nonnull final UnifiedResponse aUnifiedResponse) throws Exception
+  public final void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                               @NonNull @Nonempty final String sPath,
+                               @NonNull final Map <String, String> aPathVariables,
+                               @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                               @NonNull final UnifiedResponse aUnifiedResponse) throws Exception
   {
     final PhotonUnifiedResponse aPUR = (PhotonUnifiedResponse) aUnifiedResponse;
 

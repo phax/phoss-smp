@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.backend;
 
-import com.helger.annotation.style.IsSPIInterface;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.annotation.style.IsSPIInterface;
 
 /**
  * SPI interface to be implemented by SMP backend modules. They are than
@@ -30,5 +30,5 @@ public interface ISMPBackendRegistrarSPI
    *        The registry to register your backend(s) at. Never <code>null</code>
    *        .
    */
-  void registerSMPBackend (@Nonnull ISMPBackendRegistry aRegistry);
+  void registerSMPBackend (@NonNull ISMPBackendRegistry aRegistry);
 }

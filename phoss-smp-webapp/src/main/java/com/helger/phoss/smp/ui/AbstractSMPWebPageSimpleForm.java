@@ -16,12 +16,12 @@
  */
 package com.helger.phoss.smp.ui;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
 import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageSimpleForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Base class for simple form pages.
@@ -33,7 +33,7 @@ import jakarta.annotation.Nonnull;
 public abstract class AbstractSMPWebPageSimpleForm <DATATYPE extends IHasID <String>> extends
                                                    AbstractBootstrapWebPageSimpleForm <DATATYPE, WebPageExecutionContext>
 {
-  protected AbstractSMPWebPageSimpleForm (@Nonnull @Nonempty final String sID, @Nonnull final String sName)
+  protected AbstractSMPWebPageSimpleForm (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
     super (sID, sName);
   }

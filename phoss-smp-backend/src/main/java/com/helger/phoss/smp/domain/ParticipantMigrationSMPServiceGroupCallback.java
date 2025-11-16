@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +20,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Special {@link ISMPServiceGroupCallback} to delete the participant
@@ -34,20 +33,20 @@ public class ParticipantMigrationSMPServiceGroupCallback implements ISMPServiceG
 
   private final ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
 
-  public ParticipantMigrationSMPServiceGroupCallback (@Nonnull final ISMPParticipantMigrationManager aParticipantMigrationMgr)
+  public ParticipantMigrationSMPServiceGroupCallback (@NonNull final ISMPParticipantMigrationManager aParticipantMigrationMgr)
   {
     ValueEnforcer.notNull (aParticipantMigrationMgr, "ParticipantMigrationMgr");
     m_aParticipantMigrationMgr = aParticipantMigrationMgr;
   }
 
-  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
+  public void onSMPServiceGroupCreated (@NonNull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
   {}
 
-  public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
+  public void onSMPServiceGroupUpdated (@NonNull final IParticipantIdentifier aParticipantID)
   {}
 
   @Override
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID,
+  public void onSMPServiceGroupDeleted (@NonNull final IParticipantIdentifier aParticipantID,
                                         final boolean bDeleteInSML)
   {
     // If service group is deleted, also delete respective participant

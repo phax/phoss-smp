@@ -10,15 +10,15 @@
  */
 package com.helger.phoss.smp.domain.transportprofile;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.smp.ISMPTransportProfile;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Base interface for a manager that handles {@link ISMPTransportProfile}
@@ -43,8 +43,8 @@ public interface ISMPTransportProfileManager
    *         already exists.
    */
   @Nullable
-  ISMPTransportProfile createSMPTransportProfile (@Nonnull @Nonempty String sID,
-                                                  @Nonnull @Nonempty String sName,
+  ISMPTransportProfile createSMPTransportProfile (@NonNull @Nonempty String sID,
+                                                  @NonNull @Nonempty String sName,
                                                   boolean bIsDeprecated);
 
   /**
@@ -61,9 +61,9 @@ public interface ISMPTransportProfileManager
    *        if not
    * @return {@link EChange#CHANGED} if something was changed.
    */
-  @Nonnull
+  @NonNull
   EChange updateSMPTransportProfile (@Nullable String sSMPTransportProfileID,
-                                     @Nonnull @Nonempty String sName,
+                                     @NonNull @Nonempty String sName,
                                      boolean bIsDeprecated);
 
   /**
@@ -74,14 +74,14 @@ public interface ISMPTransportProfileManager
    *        <code>null</code>.
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
-  @Nonnull
+  @NonNull
   EChange deleteSMPTransportProfile (@Nullable String sSMPTransportProfileID);
 
   /**
    * @return An unsorted collection of all contained transport profile. Never
    *         <code>null</code> but maybe empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ();
 

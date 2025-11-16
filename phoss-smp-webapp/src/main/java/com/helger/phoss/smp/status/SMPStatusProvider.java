@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
 
 import org.apache.hc.core5.util.Timeout;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +51,6 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.phoss.smp.settings.ISMPSettings;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * The main class to provide the SMP status content.
  *
@@ -75,7 +74,7 @@ public final class SMPStatusProvider
   private SMPStatusProvider ()
   {}
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public static IJsonObject getDefaultStatusData (final boolean bDisableLongRunningOperations)
   {
@@ -200,7 +199,7 @@ public final class SMPStatusProvider
     return aStatusData;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public static IJsonObject getStatusDisabledData ()
   {

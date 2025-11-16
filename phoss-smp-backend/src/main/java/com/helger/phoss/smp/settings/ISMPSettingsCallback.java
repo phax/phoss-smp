@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.settings;
 
-import com.helger.base.callback.ICallback;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.base.callback.ICallback;
 
 /**
  * Interface for an SMP settings callback.
@@ -27,5 +27,5 @@ public interface ISMPSettingsCallback extends ICallback
    * @param aSettings
    *        The settings object that changed.
    */
-  void onSMPSettingsChanged (@Nonnull ISMPSettings aSettings);
+  void onSMPSettingsChanged (@NonNull ISMPSettings aSettings);
 }

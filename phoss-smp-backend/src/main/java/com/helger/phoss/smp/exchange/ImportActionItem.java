@@ -13,6 +13,9 @@ package com.helger.phoss.smp.exchange;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
@@ -28,9 +31,6 @@ import com.helger.json.JsonObject;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 @Immutable
 public final class ImportActionItem implements IHasErrorLevel
 {
@@ -40,9 +40,9 @@ public final class ImportActionItem implements IHasErrorLevel
   private final String m_sMsg;
   private final Exception m_aLinkedException;
 
-  private ImportActionItem (@Nonnull final EErrorLevel eLevel,
+  private ImportActionItem (@NonNull final EErrorLevel eLevel,
                             @Nullable final String sPI,
-                            @Nonnull @Nonempty final String sMsg,
+                            @NonNull @Nonempty final String sMsg,
                             @Nullable final Exception aLinkedException)
   {
     ValueEnforcer.notNull (eLevel, "Level");
@@ -54,13 +54,13 @@ public final class ImportActionItem implements IHasErrorLevel
     m_aLinkedException = aLinkedException;
   }
 
-  @Nonnull
+  @NonNull
   public LocalDateTime getDateTime ()
   {
     return m_aDT;
   }
 
-  @Nonnull
+  @NonNull
   public EErrorLevel getErrorLevel ()
   {
     return m_eLevel;
@@ -77,7 +77,7 @@ public final class ImportActionItem implements IHasErrorLevel
     return StringHelper.isNotEmpty (m_sPI);
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getMessage ()
   {
@@ -95,9 +95,9 @@ public final class ImportActionItem implements IHasErrorLevel
     return m_aLinkedException != null;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
-  private static String _getErrorLevelName (@Nonnull final IErrorLevel aErrorLevel)
+  private static String _getErrorLevelName (@NonNull final IErrorLevel aErrorLevel)
   {
     if (aErrorLevel.isGE (EErrorLevel.ERROR))
       return "error";
@@ -106,15 +106,15 @@ public final class ImportActionItem implements IHasErrorLevel
     return "info";
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getErrorLevelName ()
   {
     return _getErrorLevelName (m_eLevel);
   }
 
-  @Nonnull
-  public IMicroElement getAsMicroElement (@Nonnull @Nonempty final String sElementName)
+  @NonNull
+  public IMicroElement getAsMicroElement (@NonNull @Nonempty final String sElementName)
   {
     final IMicroElement eAction = new MicroElement (sElementName);
     eAction.setAttribute ("datetime", PDTWebDateHelper.getAsStringXSD (m_aDT));
@@ -126,7 +126,7 @@ public final class ImportActionItem implements IHasErrorLevel
     return eAction;
   }
 
-  @Nonnull
+  @NonNull
   public IJsonObject getAsJsonObject ()
   {
     return new JsonObject ().add ("datetime", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format (m_aDT))
@@ -139,28 +139,28 @@ public final class ImportActionItem implements IHasErrorLevel
                                                                       : null);
   }
 
-  @Nonnull
-  public static ImportActionItem createSuccess (@Nonnull @Nonempty final String sPI,
-                                                @Nonnull @Nonempty final String sMsg)
+  @NonNull
+  public static ImportActionItem createSuccess (@NonNull @Nonempty final String sPI,
+                                                @NonNull @Nonempty final String sMsg)
   {
     return new ImportActionItem (EErrorLevel.SUCCESS, sPI, sMsg, null);
   }
 
-  @Nonnull
-  public static ImportActionItem createInfo (@Nullable final String sPI, @Nonnull @Nonempty final String sMsg)
+  @NonNull
+  public static ImportActionItem createInfo (@Nullable final String sPI, @NonNull @Nonempty final String sMsg)
   {
     return new ImportActionItem (EErrorLevel.INFO, sPI, sMsg, null);
   }
 
-  @Nonnull
-  public static ImportActionItem createWarning (@Nullable final String sPI, @Nonnull @Nonempty final String sMsg)
+  @NonNull
+  public static ImportActionItem createWarning (@Nullable final String sPI, @NonNull @Nonempty final String sMsg)
   {
     return new ImportActionItem (EErrorLevel.WARN, sPI, sMsg, null);
   }
 
-  @Nonnull
+  @NonNull
   public static ImportActionItem createError (@Nullable final String sPI,
-                                              @Nonnull @Nonempty final String sMsg,
+                                              @NonNull @Nonempty final String sMsg,
                                               @Nullable final Exception ex)
   {
     return new ImportActionItem (EErrorLevel.ERROR, sPI, sMsg, ex);

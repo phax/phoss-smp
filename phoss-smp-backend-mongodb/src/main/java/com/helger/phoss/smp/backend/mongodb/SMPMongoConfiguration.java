@@ -16,12 +16,12 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 @Immutable
 public final class SMPMongoConfiguration
@@ -32,7 +32,7 @@ public final class SMPMongoConfiguration
   private SMPMongoConfiguration ()
   {}
 
-  @Nonnull
+  @NonNull
   private static IConfig _getConfig ()
   {
     return SMPConfigProvider.getConfig ();

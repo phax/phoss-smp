@@ -10,12 +10,12 @@
  */
 package com.helger.phoss.smp.settings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Base interface for the SMP settings manager
@@ -27,14 +27,14 @@ public interface ISMPSettingsManager
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   CallbackList <ISMPSettingsCallback> callbacks ();
 
   /**
    * @return The contained settings. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   ISMPSettings getSettings ();
 
   /**
@@ -61,7 +61,7 @@ public interface ISMPSettingsManager
    *        active.
    * @return {@link EChange}
    */
-  @Nonnull
+  @NonNull
   EChange updateSettings (boolean bRESTWritableAPIDisabled,
                           boolean bDirectoryIntegrationEnabled,
                           boolean bDirectoryIntegrationRequired,

@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.rest;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,6 @@ import com.helger.photon.api.InvokableAPIDescriptor;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -49,13 +49,13 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestExceptionMapper.class);
 
-  private static void _logRestException (@Nonnull final String sMsg, @Nonnull final Throwable t)
+  private static void _logRestException (@NonNull final String sMsg, @NonNull final Throwable t)
   {
     _logRestException (sMsg, t, false);
   }
 
-  private static void _logRestException (@Nonnull final String sMsg,
-                                         @Nonnull final Throwable t,
+  private static void _logRestException (@NonNull final String sMsg,
+                                         @NonNull final Throwable t,
                                          final boolean bForceNoStackTrace)
   {
     final boolean bConfiguredToLog = SMPServerConfiguration.isRestLogExceptions ();
@@ -74,7 +74,7 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
                     " (turn on REST exception logging to see all details)");
   }
 
-  private static void _setSimpleTextResponse (@Nonnull final UnifiedResponse aUnifiedResponse,
+  private static void _setSimpleTextResponse (@NonNull final UnifiedResponse aUnifiedResponse,
                                               final int nStatusCode,
                                               @Nullable final String sContent)
   {
@@ -92,11 +92,11 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     }
   }
 
-  @Nonnull
-  public EHandled applyExceptionOnResponse (@Nonnull final InvokableAPIDescriptor aInvokableDescriptor,
-                                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                                            @Nonnull final UnifiedResponse aUnifiedResponse,
-                                            @Nonnull final Throwable aThrowable)
+  @NonNull
+  public EHandled applyExceptionOnResponse (@NonNull final InvokableAPIDescriptor aInvokableDescriptor,
+                                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                                            @NonNull final UnifiedResponse aUnifiedResponse,
+                                            @NonNull final Throwable aThrowable)
   {
     // From specific to general
     if (aThrowable instanceof SMPUnauthorizedException)

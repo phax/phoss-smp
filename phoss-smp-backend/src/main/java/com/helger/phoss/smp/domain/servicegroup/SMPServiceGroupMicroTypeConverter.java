@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import java.util.function.Function;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -21,9 +24,6 @@ import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class is internally used to convert {@link SMPServiceGroup} from and to XML.
@@ -36,10 +36,10 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   private static final String ELEMENT_PARTICIPANT_ID = "participant";
   private static final String ELEMENT_EXTENSION = "extension";
 
-  @Nonnull
-  public IMicroElement convertToMicroElement (@Nonnull final SMPServiceGroup aValue,
+  @NonNull
+  public IMicroElement convertToMicroElement (@NonNull final SMPServiceGroup aValue,
                                               @Nullable final String sNamespaceURI,
-                                              @Nonnull @Nonempty final String sTagName)
+                                              @NonNull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
@@ -52,9 +52,9 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     return aElement;
   }
 
-  @Nonnull
-  public static SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement,
-                                                 @Nonnull final Function <String, IUser> aOwningUserProvider)
+  @NonNull
+  public static SMPServiceGroup convertToNative (@NonNull final IMicroElement aElement,
+                                                 @NonNull final Function <String, IUser> aOwningUserProvider)
   {
     final String sOwnerID = aElement.getAttributeValue (ATTR_OWNER_ID);
     final IUser aOwner = aOwningUserProvider.apply (sOwnerID);
@@ -73,8 +73,8 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     return new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension);
   }
 
-  @Nonnull
-  public SMPServiceGroup convertToNative (@Nonnull final IMicroElement aElement)
+  @NonNull
+  public SMPServiceGroup convertToNative (@NonNull final IMicroElement aElement)
   {
     return convertToNative (aElement, PhotonSecurityManager.getUserMgr ()::getUserOfID);
   }

@@ -11,6 +11,8 @@
 package com.helger.phoss.smp.config;
 
 import org.apache.hc.core5.util.Timeout;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.ThreadSafe;
@@ -21,9 +23,6 @@ import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.security.keystore.EKeyStoreType;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class provides easy access to certain configuration properties using
@@ -101,7 +100,7 @@ public final class SMPServerConfiguration
   /**
    * @return The configuration file. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   private static IConfig _getConfig ()
   {
     return SMPConfigProvider.getConfig ();
@@ -122,7 +121,7 @@ public final class SMPServerConfiguration
    * @return The type to the keystore. This is usually JKS. Property <code>smp.keystore.type</code>.
    * @since 5.0.4
    */
-  @Nonnull
+  @NonNull
   public static EKeyStoreType getKeyStoreType ()
   {
     final String sType = _getConfig ().getAsString (KEY_SMP_KEYSTORE_TYPE);
@@ -172,7 +171,7 @@ public final class SMPServerConfiguration
    * @return The type to the truststore. This is usually JKS. Property
    *         <code>smp.truststore.type</code>.
    */
-  @Nonnull
+  @NonNull
   public static EKeyStoreType getTrustStoreType ()
   {
     final String sType = _getConfig ().getAsString (KEY_SMP_TRUSTSTORE_TYPE);
@@ -235,7 +234,7 @@ public final class SMPServerConfiguration
    * @return The identifier types to be used. Never <code>null</code>. Defaults to
    *         {@link ESMPIdentifierType#PEPPOL}. Property <code>smp.identifiertype</code>.
    */
-  @Nonnull
+  @NonNull
   public static ESMPIdentifierType getIdentifierType ()
   {
     final String sType = _getConfig ().getAsString (KEY_SMP_IDENTIFIER_TYPE);
@@ -246,7 +245,7 @@ public final class SMPServerConfiguration
    * @return The REST type to be used. Never <code>null</code>. Defaults to
    *         {@link ESMPRESTType#PEPPOL}. Property <code>smp.rest.type</code>.
    */
-  @Nonnull
+  @NonNull
   public static ESMPRESTType getRESTType ()
   {
     final String sType = _getConfig ().getAsString (KEY_SMP_REST_TYPE);
@@ -336,7 +335,7 @@ public final class SMPServerConfiguration
    *         {@link #DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE}.
    * @since 5.7.0
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public static String getBDXR2CertificateMimeCode ()
   {
@@ -348,14 +347,14 @@ public final class SMPServerConfiguration
    *         {@link #DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE}.
    * @since 5.7.0
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public static String getBDXR2CertificateTypeCode ()
   {
     return _getConfig ().getAsString (KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE, DEFAULT_SMP_BDXR2_CERTIFICATE_TYPE_CODE);
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public static String getTimeZoneOrDefault ()
   {
@@ -408,7 +407,7 @@ public final class SMPServerConfiguration
    *         {@link #DEFAULT_SML_REQUEST_TIMEOUT} since 5.1.1.
    * @since 6.0.0
    */
-  @Nonnull
+  @NonNull
   public static Timeout getSMLRequestTimeout ()
   {
     final long ret = _getConfig ().getAsLong (KEY_SML_REQUEST_TIMEOUT_MS, -1L);

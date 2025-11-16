@@ -10,9 +10,9 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import com.helger.base.callback.ICallback;
+import org.jspecify.annotations.NonNull;
 
-import jakarta.annotation.Nonnull;
+import com.helger.base.callback.ICallback;
 
 /**
  * Interface for an SMP service information callback.
@@ -28,7 +28,7 @@ public interface ISMPServiceInformationCallback extends ICallback
    * @param aServiceInformation
    *        The created object. Never <code>null</code>.
    */
-  default void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+  default void onSMPServiceInformationCreated (@NonNull final ISMPServiceInformation aServiceInformation)
   {}
 
   /**
@@ -37,7 +37,7 @@ public interface ISMPServiceInformationCallback extends ICallback
    * @param aServiceInformation
    *        The updated object. Never <code>null</code>.
    */
-  default void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
+  default void onSMPServiceInformationUpdated (@NonNull final ISMPServiceInformation aServiceInformation)
   {}
 
   /**
@@ -46,6 +46,6 @@ public interface ISMPServiceInformationCallback extends ICallback
    * @param aServiceInformation
    *        The deleted object. Never <code>null</code>.
    */
-  default void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+  default void onSMPServiceInformationDeleted (@NonNull final ISMPServiceInformation aServiceInformation)
   {}
 }

@@ -10,10 +10,10 @@
  */
 package com.helger.phoss.smp.exchange;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Defines the potential actions, listed in the import summary
@@ -31,12 +31,12 @@ public enum EImportSummaryAction implements IHasID <String>
 
   private final String m_sID;
 
-  EImportSummaryAction (@Nonnull @Nonempty final String sID)
+  EImportSummaryAction (@NonNull @Nonempty final String sID)
   {
     m_sID = sID;
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getID ()
   {

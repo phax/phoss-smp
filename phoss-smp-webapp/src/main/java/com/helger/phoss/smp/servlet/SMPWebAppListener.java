@@ -20,6 +20,7 @@ import java.net.ProxySelector;
 import java.time.OffsetDateTime;
 import java.util.TimeZone;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -85,7 +86,6 @@ import com.helger.smpclient.config.SMPClientConfiguration;
 import com.helger.wsclient.WSHelper;
 import com.helger.xservlet.requesttrack.RequestTrackerSettings;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletContext;
 
@@ -109,34 +109,34 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
   @Override
   @Nullable
-  protected String getInitParameterDebug (@Nonnull final ServletContext aSC)
+  protected String getInitParameterDebug (@NonNull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.getGlobalDebug ();
   }
 
   @Override
   @Nullable
-  protected String getInitParameterProduction (@Nonnull final ServletContext aSC)
+  protected String getInitParameterProduction (@NonNull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.getGlobalProduction ();
   }
 
   @Override
   @Nullable
-  protected String getDataPath (@Nonnull final ServletContext aSC)
+  protected String getDataPath (@NonNull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.getDataPath ();
   }
 
   @Override
-  protected boolean shouldCheckFileAccess (@Nonnull final ServletContext aSC)
+  protected boolean shouldCheckFileAccess (@NonNull final ServletContext aSC)
   {
     return SMPWebAppConfiguration.isCheckFileAccess ();
   }
 
   @Override
   @Nullable
-  protected String getInitParameterServerURL (@Nonnull final ServletContext aSC, final boolean bProductionMode)
+  protected String getInitParameterServerURL (@NonNull final ServletContext aSC, final boolean bProductionMode)
   {
     // This is internally set in "StaticServerInfo" class
     final String sPublicURL = SMPServerConfiguration.getPublicServerURL ();
@@ -308,7 +308,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
-  public void initLocales (@Nonnull final ILocaleManager aLocaleMgr)
+  public void initLocales (@NonNull final ILocaleManager aLocaleMgr)
   {
     aLocaleMgr.registerLocale (CSMPServer.DEFAULT_LOCALE);
     aLocaleMgr.setDefaultLocale (CSMPServer.DEFAULT_LOCALE);
@@ -337,7 +337,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
-  protected void initAjax (@Nonnull final IAjaxRegistry aAjaxRegistry)
+  protected void initAjax (@NonNull final IAjaxRegistry aAjaxRegistry)
   {
     CAjax.init (aAjaxRegistry);
   }
@@ -383,7 +383,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       {
         aBusinessCardMgr.bcCallbacks ().add (new ISMPBusinessCardCallback ()
         {
-          public void onSMPBusinessCardCreatedOrUpdated (@Nonnull final ISMPBusinessCard aBusinessCard)
+          public void onSMPBusinessCardCreatedOrUpdated (@NonNull final ISMPBusinessCard aBusinessCard)
           {
             final ISMPSettings aSettings = SMPMetaManager.getSettings ();
             if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
@@ -395,7 +395,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
             }
           }
 
-          public void onSMPBusinessCardDeleted (@Nonnull final ISMPBusinessCard aBusinessCard)
+          public void onSMPBusinessCardDeleted (@NonNull final ISMPBusinessCard aBusinessCard)
           {
             final ISMPSettings aSettings = SMPMetaManager.getSettings ();
             if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
@@ -421,7 +421,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                       .add (new ISMPServiceInformationCallback ()
                       {
                         @Override
-                        public void onSMPServiceInformationCreated (@Nonnull final ISMPServiceInformation aServiceInformation)
+                        public void onSMPServiceInformationCreated (@NonNull final ISMPServiceInformation aServiceInformation)
                         {
                           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
                           if (aSettings.isDirectoryIntegrationEnabled () &&
@@ -438,13 +438,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                         }
 
                         @Override
-                        public void onSMPServiceInformationUpdated (@Nonnull final ISMPServiceInformation aServiceInformation)
+                        public void onSMPServiceInformationUpdated (@NonNull final ISMPServiceInformation aServiceInformation)
                         {
                           onSMPServiceInformationCreated (aServiceInformation);
                         }
 
                         @Override
-                        public void onSMPServiceInformationDeleted (@Nonnull final ISMPServiceInformation aServiceInformation)
+                        public void onSMPServiceInformationDeleted (@NonNull final ISMPServiceInformation aServiceInformation)
                         {
                           onSMPServiceInformationCreated (aServiceInformation);
                         }
@@ -491,7 +491,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
-  protected void beforeContextDestroyed (@Nonnull final ServletContext aSC)
+  protected void beforeContextDestroyed (@NonNull final ServletContext aSC)
   {
     // Explicitly unregister all proxy setting providers
     for (final IProxySettingsProvider aPSP : m_aProxySettingsProvider)

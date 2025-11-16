@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +50,6 @@ import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.httpclient.SMPHttpClientSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Implementation of the REST API to query a BusinessCard from a remote SMP.
  *
@@ -61,11 +60,11 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetBusinessCard.class);
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[QueryAPI] ";
 

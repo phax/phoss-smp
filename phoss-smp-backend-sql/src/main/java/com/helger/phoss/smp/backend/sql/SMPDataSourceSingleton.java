@@ -18,6 +18,8 @@ package com.helger.phoss.smp.backend.sql;
 
 import java.util.EnumSet;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.io.stream.StreamHelper;
@@ -25,8 +27,6 @@ import com.helger.base.string.StringImplode;
 import com.helger.db.api.EDatabaseSystemType;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * DataSource provider singleton
@@ -60,7 +60,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   /**
    * @return The database system determined from the configuration file. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   public static EDatabaseSystemType getDatabaseType ()
   {
     return DB_TYPE;
@@ -76,14 +76,14 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   public SMPDataSourceSingleton ()
   {}
 
-  @Nonnull
+  @NonNull
   public static SMPDataSourceSingleton getInstance ()
   {
     return getGlobalSingleton (SMPDataSourceSingleton.class);
   }
 
   @Override
-  protected void onBeforeDestroy (@Nonnull final IScope aScopeToBeDestroyed) throws Exception
+  protected void onBeforeDestroy (@NonNull final IScope aScopeToBeDestroyed) throws Exception
   {
     // Close the DataSource provider
     StreamHelper.close (m_aDSP);
@@ -93,7 +93,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
    * @return The singleton DataSource provider to use. Uses the configuration file to determine the
    *         settings.
    */
-  @Nonnull
+  @NonNull
   public SMPDataSourceProvider getDataSourceProvider ()
   {
     return m_aDSP;

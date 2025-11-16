@@ -12,6 +12,9 @@ package com.helger.phoss.smp.mock;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
@@ -26,9 +29,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Mock implementation of {@link ISMPServiceInformationManager}.
  *
@@ -38,14 +38,14 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
 {
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
+  @NonNull
   public ESuccess mergeSMPServiceInformation (final ISMPServiceInformation aServiceInformation)
   {
     return ESuccess.SUCCESS;
@@ -67,12 +67,12 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  public void forEachSMPServiceInformation (@Nonnull final Consumer <? super ISMPServiceInformation> aConsumer)
+  public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
     throw new UnsupportedOperationException ();
   }
 
-  @Nonnull
+  @NonNull
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     // Avoid exceptions in test for system migration
@@ -103,7 +103,7 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPProcess (@Nullable final ISMPServiceInformation aSMPServiceInformation,
                                    @Nullable final ISMPProcess aProcess)
   {

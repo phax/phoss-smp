@@ -18,6 +18,7 @@ package com.helger.phoss.smp.rest;
 
 import java.util.Map;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,15 +43,13 @@ import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardPush.class);
 
-  private static void _pushBusinessCard (@Nonnull final ISMPServerAPIDataProvider aDataProvider,
-                                         @Nonnull final String sServiceGroupID,
-                                         @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  private static void _pushBusinessCard (@NonNull final ISMPServerAPIDataProvider aDataProvider,
+                                         @NonNull final String sServiceGroupID,
+                                         @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = BusinessCardServerAPI.LOG_PREFIX + "POST /businesscard/" + sServiceGroupID + "/push";
     final String sAction = "pushBusinessCard";
@@ -101,11 +100,11 @@ public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
   }
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);

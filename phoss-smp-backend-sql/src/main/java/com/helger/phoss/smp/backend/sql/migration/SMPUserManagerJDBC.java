@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.sql.migration;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,6 @@ import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.domain.DBUser;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * This is only used in the migration.
@@ -56,12 +55,12 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
    */
-  public SMPUserManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPUserManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <DBUser> getAllUsers ()
   {
@@ -74,7 +73,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  public void updateOwnershipsAndKillUsers (@Nonnull final ICommonsMap <String, String> aOldToNewUserNameMap)
+  public void updateOwnershipsAndKillUsers (@NonNull final ICommonsMap <String, String> aOldToNewUserNameMap)
   {
     ValueEnforcer.notNull (aOldToNewUserNameMap, "OldToNewUserNameMap");
 

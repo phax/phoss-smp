@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +57,6 @@ import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
 {
   public static final String PARAM_XML_SCHEMA_VALIDATION = "xmlSchemaValidation";
@@ -66,11 +65,11 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorQueryGetDocTypes.class);
 
   @Override
-  protected void invokeAPI (@Nonnull final IAPIDescriptor aAPIDescriptor,
-                            @Nonnull @Nonempty final String sPath,
-                            @Nonnull final Map <String, String> aPathVariables,
-                            @Nonnull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @Nonnull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[QueryAPI] ";
 

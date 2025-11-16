@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.businesscard;
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
@@ -25,9 +28,6 @@ import com.helger.peppol.businesscard.generic.PDName;
 import com.helger.peppol.businesscard.v3.PD3APIHelper;
 import com.helger.peppol.businesscard.v3.PD3MultilingualNameType;
 import com.helger.text.locale.LocaleHelper;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Generic name.
@@ -43,7 +43,7 @@ public class SMPBusinessCardName implements Serializable
   private final String m_sName;
   private final String m_sLanguageCode;
 
-  public SMPBusinessCardName (@Nonnull @Nonempty final String sName, @Nullable final String sLanguageCode)
+  public SMPBusinessCardName (@NonNull @Nonempty final String sName, @Nullable final String sLanguageCode)
   {
     ValueEnforcer.notEmpty (sName, "Name");
     ValueEnforcer.isTrue (PDName.isValidLanguageCode (sLanguageCode),
@@ -55,7 +55,7 @@ public class SMPBusinessCardName implements Serializable
   /**
    * @return The name. May be <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getName ()
   {
@@ -81,13 +81,13 @@ public class SMPBusinessCardName implements Serializable
     return StringHelper.isEmpty (m_sLanguageCode);
   }
 
-  @Nonnull
+  @NonNull
   public PD3MultilingualNameType getAsJAXBObject ()
   {
     return PD3APIHelper.createName (m_sName, m_sLanguageCode);
   }
 
-  @Nonnull
+  @NonNull
   public IJsonObject getAsJson ()
   {
     final IJsonObject ret = new JsonObject ().add (JSON_TAG_NAME, m_sName);
@@ -123,7 +123,7 @@ public class SMPBusinessCardName implements Serializable
   }
 
   @Nullable
-  public static SMPBusinessCardName createFromJson (@Nonnull final IJsonObject aJson)
+  public static SMPBusinessCardName createFromJson (@NonNull final IJsonObject aJson)
   {
     try
     {

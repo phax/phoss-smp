@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.settings;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
@@ -22,9 +25,6 @@ import com.helger.settings.exchange.xml.SettingsMicroDocumentConverter;
 import com.helger.settings.factory.ISettingsFactory;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.MicroDocument;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * This class manages and persists the SMP settings.<br>
@@ -45,8 +45,8 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   }
 
   @Override
-  @Nonnull
-  protected EChange onRead (@Nonnull final IMicroDocument aDoc)
+  @NonNull
+  protected EChange onRead (@NonNull final IMicroDocument aDoc)
   {
     final SettingsMicroDocumentConverter <Settings> aConverter = new SettingsMicroDocumentConverter <> (ISettingsFactory.newInstance ());
     final ISettings aSettings = aConverter.convertToNative (aDoc.getDocumentElement ());
@@ -55,7 +55,7 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
   }
 
   @Override
-  @Nonnull
+  @NonNull
   protected IMicroDocument createWriteData ()
   {
     final IMicroDocument ret = new MicroDocument ();
@@ -64,20 +64,20 @@ public class SMPSettingsManagerXML extends AbstractPhotonSimpleDAO implements IS
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public final CallbackList <ISMPSettingsCallback> callbacks ()
   {
     return m_aCallbacks;
   }
 
-  @Nonnull
+  @NonNull
   public ISMPSettings getSettings ()
   {
     return m_aSMPSettings;
   }
 
-  @Nonnull
+  @NonNull
   public EChange updateSettings (final boolean bRESTWritableAPIDisabled,
                                  final boolean bDirectoryIntegrationEnabled,
                                  final boolean bDirectoryIntegrationRequired,

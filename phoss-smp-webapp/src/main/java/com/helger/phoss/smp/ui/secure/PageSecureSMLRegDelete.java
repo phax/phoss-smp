@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 
 import javax.net.ssl.SSLSocketFactory;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,21 +46,19 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
-import jakarta.annotation.Nonnull;
-
 public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMLRegDelete.class);
 
   private static final String FIELD_SML_ID = "sml";
 
-  public PageSecureSMLRegDelete (@Nonnull @Nonempty final String sID)
+  public PageSecureSMLRegDelete (@NonNull @Nonempty final String sID)
   {
     super (sID, "Unregister from SML");
   }
 
-  private void _deleteSMPfromSML (@Nonnull final WebPageExecutionContext aWPEC,
-                                  @Nonnull final FormErrorList aFormErrors)
+  private void _deleteSMPfromSML (@NonNull final WebPageExecutionContext aWPEC,
+                                  @NonNull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sSMLID = aWPEC.params ().getAsStringTrimmed (FIELD_SML_ID);
@@ -106,7 +105,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     if (!canShowPage (aWPEC))
       return;

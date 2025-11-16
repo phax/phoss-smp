@@ -18,6 +18,8 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Locale;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.collection.commons.CommonsHashSet;
@@ -53,8 +55,6 @@ import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * Class to manage endpoints that belong to a service group. To use this page at least one service
  * group must exist.
@@ -63,13 +63,13 @@ import jakarta.annotation.Nonnull;
  */
 public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 {
-  public PageSecureEndpointList (@Nonnull @Nonempty final String sID)
+  public PageSecureEndpointList (@NonNull @Nonempty final String sID)
   {
     super (sID, "Endpoint List");
   }
 
   @Override
-  protected void showListOfExistingObjects (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

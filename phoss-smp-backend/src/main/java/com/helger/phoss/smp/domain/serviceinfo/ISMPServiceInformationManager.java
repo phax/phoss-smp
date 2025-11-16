@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.misc.ChangeNextMajorRelease;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -24,9 +27,6 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Manager for {@link ISMPServiceInformation} objects. Service information objects require a service
  * group to be present first.
@@ -38,7 +38,7 @@ public interface ISMPServiceInformationManager
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ();
 
@@ -50,8 +50,8 @@ public interface ISMPServiceInformationManager
    *        The service information object to handle. May not be <code>null</code>.
    * @return {@link ESuccess}
    */
-  @Nonnull
-  ESuccess mergeSMPServiceInformation (@Nonnull ISMPServiceInformation aServiceInformation);
+  @NonNull
+  ESuccess mergeSMPServiceInformation (@NonNull ISMPServiceInformation aServiceInformation);
 
   /**
    * Find the service information matching the passed quadruple of parameters. If one of the
@@ -90,7 +90,7 @@ public interface ISMPServiceInformationManager
    *         deleted from the internal data structures. {@link EChange#UNCHANGED} must be returned
    *         otherwise.
    */
-  @Nonnull
+  @NonNull
   EChange deleteSMPServiceInformation (@Nullable ISMPServiceInformation aSMPServiceInformation);
 
   /**
@@ -103,7 +103,7 @@ public interface ISMPServiceInformationManager
    *         if at least one service information object was deleted. {@link EChange#UNCHANGED} must
    *         be returned otherwise.
    */
-  @Nonnull
+  @NonNull
   EChange deleteAllSMPServiceInformationOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
@@ -118,14 +118,14 @@ public interface ISMPServiceInformationManager
    *         {@link EChange#UNCHANGED} otherwise.
    * @since 5.0.0
    */
-  @Nonnull
+  @NonNull
   EChange deleteSMPProcess (@Nullable ISMPServiceInformation aSMPServiceInformation, @Nullable ISMPProcess aProcess);
 
   /**
    * @return All service information objects in arbitrary order. Never <code>null</code> but maybe
    *         empty.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ();
 
@@ -136,7 +136,7 @@ public interface ISMPServiceInformationManager
    *        The consumer to invoke. May not be <code>null</code>.
    * @since 7.1.5
    */
-  void forEachSMPServiceInformation (@Nonnull Consumer <? super ISMPServiceInformation> aConsumer);
+  void forEachSMPServiceInformation (@NonNull Consumer <? super ISMPServiceInformation> aConsumer);
 
   /**
    * @return The count of all service information objects. Always &ge; 0.
@@ -154,7 +154,7 @@ public interface ISMPServiceInformationManager
    *         group was passed <b>or</b> that no service information objects exist for the provided
    *         service group.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
@@ -171,7 +171,7 @@ public interface ISMPServiceInformationManager
    *         group.
    * @see #getAllSMPDocumentTypesOfServiceGroup(IParticipantIdentifier)
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <IDocumentTypeIdentifier> getAllSMPDocumentTypesOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 

@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.serviceinfo;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.base.enforce.ValueEnforcer;
@@ -27,9 +30,6 @@ import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
-
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 /**
  * Default implementation of the {@link ISMPEndpoint} interface.
@@ -52,7 +52,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
 
-  public SMPEndpoint (@Nonnull @Nonempty final String sTransportProfile,
+  public SMPEndpoint (@NonNull @Nonempty final String sTransportProfile,
                       @Nullable final String sEndpointReference,
                       final boolean bRequireBusinessLevelSignature,
                       @Nullable final String sMinimumAuthenticationLevel,
@@ -77,14 +77,14 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     getExtensions ().setExtensionAsString (sExtension);
   }
 
-  @Nonnull
+  @NonNull
   @Nonempty
   public String getTransportProfile ()
   {
     return m_sTransportProfile;
   }
 
-  public final void setTransportProfile (@Nonnull @Nonempty final String sTransportProfile)
+  public final void setTransportProfile (@NonNull @Nonempty final String sTransportProfile)
   {
     ValueEnforcer.notEmpty (sTransportProfile, "TransportProfile");
     m_sTransportProfile = sTransportProfile;
@@ -188,12 +188,12 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     m_sTechnicalInformationUrl = sTechnicalInformationUrl;
   }
 
-  @Nonnull
-  public com.helger.xsds.peppol.smp1.EndpointType getAsJAXBObjectPeppol ()
+  public com.helger.xsds.peppol.smp1.@NonNull EndpointType getAsJAXBObjectPeppol ()
   {
     final com.helger.xsds.peppol.smp1.EndpointType ret = new com.helger.xsds.peppol.smp1.EndpointType ();
     // EndpointReference element is mandatory
-    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null ? m_sEndpointReference
+    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null
+                                                                                                               ? m_sEndpointReference
                                                                                                                : ""));
     ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
@@ -211,8 +211,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return ret;
   }
 
-  @Nonnull
-  public com.helger.xsds.bdxr.smp1.EndpointType getAsJAXBObjectBDXR1 ()
+  public com.helger.xsds.bdxr.smp1.@NonNull EndpointType getAsJAXBObjectBDXR1 ()
   {
     final com.helger.xsds.bdxr.smp1.EndpointType ret = new com.helger.xsds.bdxr.smp1.EndpointType ();
     // Ensure an empty element is emitted if no endpoint reference is present
@@ -230,8 +229,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return ret;
   }
 
-  @Nonnull
-  public com.helger.xsds.bdxr.smp2.ac.EndpointType getAsJAXBObjectBDXR2 ()
+  public com.helger.xsds.bdxr.smp2.ac.@NonNull EndpointType getAsJAXBObjectBDXR2 ()
   {
     final com.helger.xsds.bdxr.smp2.ac.EndpointType ret = new com.helger.xsds.bdxr.smp2.ac.EndpointType ();
     ret.setSMPExtensions (getExtensions ().getAsBDXR2Extensions ());
@@ -315,8 +313,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                             .getToString ();
   }
 
-  @Nonnull
-  public static SMPEndpoint createFromJAXB (@Nonnull final com.helger.xsds.peppol.smp1.EndpointType aEndpoint)
+  @NonNull
+  public static SMPEndpoint createFromJAXB (final com.helger.xsds.peppol.smp1.@NonNull EndpointType aEndpoint)
   {
     return new SMPEndpoint (aEndpoint.getTransportProfile (),
                             W3CEndpointReferenceHelper.getAddress (aEndpoint.getEndpointReference ()),

@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +20,6 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
-
-import jakarta.annotation.Nonnull;
 
 /**
  * Special {@link ISMPServiceGroupCallback} to delete the business card, if the
@@ -34,20 +33,20 @@ public class BusinessCardSMPServiceGroupCallback implements ISMPServiceGroupCall
 
   private final ISMPBusinessCardManager m_aBusinessCardMgr;
 
-  public BusinessCardSMPServiceGroupCallback (@Nonnull final ISMPBusinessCardManager aBusinessCardMgr)
+  public BusinessCardSMPServiceGroupCallback (@NonNull final ISMPBusinessCardManager aBusinessCardMgr)
   {
     ValueEnforcer.notNull (aBusinessCardMgr, "BusinessCardMgr");
     m_aBusinessCardMgr = aBusinessCardMgr;
   }
 
-  public void onSMPServiceGroupCreated (@Nonnull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
+  public void onSMPServiceGroupCreated (@NonNull final ISMPServiceGroup aServiceGroup, final boolean bCreateInSML)
   {}
 
-  public void onSMPServiceGroupUpdated (@Nonnull final IParticipantIdentifier aParticipantID)
+  public void onSMPServiceGroupUpdated (@NonNull final IParticipantIdentifier aParticipantID)
   {}
 
   @Override
-  public void onSMPServiceGroupDeleted (@Nonnull final IParticipantIdentifier aParticipantID,
+  public void onSMPServiceGroupDeleted (@NonNull final IParticipantIdentifier aParticipantID,
                                         final boolean bDeleteInSML)
   {
     // If service group is deleted, also delete respective business card

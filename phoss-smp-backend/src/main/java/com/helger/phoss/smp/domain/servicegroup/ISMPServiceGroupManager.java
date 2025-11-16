@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
@@ -24,9 +27,6 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * Base interface for a manager for {@link ISMPServiceGroup} objects.
  *
@@ -37,7 +37,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ();
 
@@ -60,9 +60,9 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @throws SMPServerException
    *         In case of error
    */
-  @Nonnull
-  ISMPServiceGroup createSMPServiceGroup (@Nonnull @Nonempty String sOwnerID,
-                                          @Nonnull IParticipantIdentifier aParticipantIdentifier,
+  @NonNull
+  ISMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty String sOwnerID,
+                                          @NonNull IParticipantIdentifier aParticipantIdentifier,
                                           @Nullable String sExtension,
                                           boolean bCreateInSML) throws SMPServerException;
 
@@ -84,14 +84,14 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *         and at least one field was changed, {@link EChange#UNCHANGED}
    *         otherwise.
    */
-  @Nonnull
-  EChange updateSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier,
-                                 @Nonnull @Nonempty String sOwnerID,
+  @NonNull
+  EChange updateSMPServiceGroup (@NonNull IParticipantIdentifier aParticipantIdentifier,
+                                 @NonNull @Nonempty String sOwnerID,
                                  @Nullable String sExtension) throws SMPServerException;
 
-  @Nonnull
-  default EChange updateSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier,
-                                             @Nonnull @Nonempty final String sOwnerID,
+  @NonNull
+  default EChange updateSMPServiceGroupNoEx (@NonNull final IParticipantIdentifier aParticipantIdentifier,
+                                             @NonNull @Nonempty final String sOwnerID,
                                              @Nullable final String sExtension)
   {
     try
@@ -124,8 +124,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @see ISMPServiceInformationManager#deleteAllSMPServiceInformationOfServiceGroup(IParticipantIdentifier)
    * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(IParticipantIdentifier)
    */
-  @Nonnull
-  EChange deleteSMPServiceGroup (@Nonnull IParticipantIdentifier aParticipantIdentifier, boolean bDeleteInSML)
+  @NonNull
+  EChange deleteSMPServiceGroup (@NonNull IParticipantIdentifier aParticipantIdentifier, boolean bDeleteInSML)
                                                                                                                throws SMPServerException;
 
   /**
@@ -142,8 +142,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
    * @see #deleteSMPServiceGroup(IParticipantIdentifier, boolean)
    */
-  @Nonnull
-  default EChange deleteSMPServiceGroupNoEx (@Nonnull final IParticipantIdentifier aParticipantIdentifier,
+  @NonNull
+  default EChange deleteSMPServiceGroupNoEx (@NonNull final IParticipantIdentifier aParticipantIdentifier,
                                              final boolean bDeleteInSML)
   {
     try
@@ -160,7 +160,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return A non-<code>null</code> but maybe empty list of all contained
    *         service groups.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ();
 
@@ -169,7 +169,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *         service group IDs.
    * @since 5.6.0
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   ICommonsSet <String> getAllSMPServiceGroupIDs ();
 
@@ -181,9 +181,9 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return A non-<code>null</code> but maybe empty list of all contained
    *         service groups of the passed owner.
    */
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
-  ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@Nonnull String sOwnerID);
+  ICommonsList <ISMPServiceGroup> getAllSMPServiceGroupsOfOwner (@NonNull String sOwnerID);
 
   /**
    * Get the number of service groups owned by the passed owner.
@@ -193,7 +193,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @return A non-negative count. 0 if the passed owner ID is unknown.
    */
   @Nonnegative
-  long getSMPServiceGroupCountOfOwner (@Nonnull String sOwnerID);
+  long getSMPServiceGroupCountOfOwner (@NonNull String sOwnerID);
 
   /**
    * Check if a service group with the passed participant identifier is

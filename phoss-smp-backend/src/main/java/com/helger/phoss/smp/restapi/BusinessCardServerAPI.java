@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.restapi;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,6 @@ import com.helger.statistics.api.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.statistics.api.IStatisticsHandlerKeyedCounter;
 import com.helger.statistics.impl.StatisticsManager;
 
-import jakarta.annotation.Nonnull;
-
 /**
  * This class implements all the service methods, that must be provided by the
  * BusinessCard REST service - this service is the same for BDXR and SMP.
@@ -58,12 +57,12 @@ public final class BusinessCardServerAPI
 
   private final ISMPServerAPIDataProvider m_aAPIProvider;
 
-  public BusinessCardServerAPI (@Nonnull final ISMPServerAPIDataProvider aDataProvider)
+  public BusinessCardServerAPI (@NonNull final ISMPServerAPIDataProvider aDataProvider)
   {
     m_aAPIProvider = ValueEnforcer.notNull (aDataProvider, "DataProvider");
   }
 
-  @Nonnull
+  @NonNull
   public PD3BusinessCardType getBusinessCard (final String sServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /businesscard/" + sServiceGroupID;
@@ -113,10 +112,10 @@ public final class BusinessCardServerAPI
     }
   }
 
-  @Nonnull
-  public ESuccess createBusinessCard (@Nonnull final String sServiceGroupID,
-                                      @Nonnull final PDBusinessCard aBusinessCard,
-                                      @Nonnull final SMPAPICredentials aCredentials) throws SMPServerException
+  @NonNull
+  public ESuccess createBusinessCard (@NonNull final String sServiceGroupID,
+                                      @NonNull final PDBusinessCard aBusinessCard,
+                                      @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID;
     final String sAction = "createBusinessCard";
@@ -198,7 +197,7 @@ public final class BusinessCardServerAPI
    *         In case of error
    * @since 5.0.2
    */
-  public void deleteBusinessCard (@Nonnull final String sServiceGroupID, @Nonnull final SMPAPICredentials aCredentials)
+  public void deleteBusinessCard (@NonNull final String sServiceGroupID, @NonNull final SMPAPICredentials aCredentials)
                                                                                                                         throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "DELETE /businesscard/" + sServiceGroupID;
@@ -247,7 +246,7 @@ public final class BusinessCardServerAPI
   /**
    * @return The statistics data with the invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getInvocationCounter ()
   {
     return STATS_COUNTER_INVOCATION;
@@ -256,7 +255,7 @@ public final class BusinessCardServerAPI
   /**
    * @return The statistics data with the successful invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getSuccessCounter ()
   {
     return STATS_COUNTER_SUCCESS;
@@ -265,7 +264,7 @@ public final class BusinessCardServerAPI
   /**
    * @return The statistics data with the error invocation counter.
    */
-  @Nonnull
+  @NonNull
   public static IStatisticsHandlerKeyedCounter getErrorCounter ()
   {
     return STATS_COUNTER_ERROR;

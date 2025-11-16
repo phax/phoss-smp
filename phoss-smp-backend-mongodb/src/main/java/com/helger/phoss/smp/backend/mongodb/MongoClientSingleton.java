@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.mongodb;
 
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +28,6 @@ import com.helger.base.string.StringHelper;
 import com.helger.scope.IScope;
 import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 import com.mongodb.client.MongoCollection;
-
-import jakarta.annotation.Nonnull;
 
 public class MongoClientSingleton extends AbstractGlobalWebSingleton
 {
@@ -45,7 +44,7 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   {}
 
   @Override
-  protected void onAfterInstantiation (@Nonnull final IScope aScope)
+  protected void onAfterInstantiation (@NonNull final IScope aScope)
   {
     // Standard configuration file
     final String sConnectionString = SMPMongoConfiguration.getMongoConnectionString ();
@@ -71,13 +70,13 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
     StreamHelper.close (m_aProvider);
   }
 
-  @Nonnull
+  @NonNull
   public static MongoClientSingleton getInstance ()
   {
     return getGlobalSingleton (MongoClientSingleton.class);
   }
 
-  @Nonnull
+  @NonNull
   public static final MongoClientProvider getClientProvider ()
   {
     return getInstance ().m_aProvider;
@@ -96,8 +95,8 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
     }
   }
 
-  @Nonnull
-  public final MongoCollection <Document> getCollection (@Nonnull @Nonempty final String sCollectionName)
+  @NonNull
+  public final MongoCollection <Document> getCollection (@NonNull @Nonempty final String sCollectionName)
   {
     return m_aProvider.getCollection (sCollectionName);
   }

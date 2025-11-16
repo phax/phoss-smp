@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +67,6 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.photon.audit.AuditHelper;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
  * A JDBC based implementation of the {@link ISMPBusinessCardManager} interface.
  *
@@ -90,19 +89,19 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
    *        The supplier for {@link DBExecutor} objects. May not be
    *        <code>null</code>.
    */
-  public SMPBusinessCardManagerJDBC (@Nonnull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPBusinessCardManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
   {
     super (aDBExecSupplier);
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPBusinessCardCallback> bcCallbacks ()
   {
     return m_aCBs;
   }
 
-  @Nonnull
+  @NonNull
   public static IJson getBCIAsJson (@Nullable final List <SMPBusinessCardIdentifier> aIDs)
   {
     final JsonArray ret = new JsonArray ();
@@ -114,7 +113,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public static ICommonsList <SMPBusinessCardIdentifier> getJsonAsBCI (@Nullable final String sJson)
   {
     final ICommonsList <SMPBusinessCardIdentifier> ret = new CommonsArrayList <> ();
@@ -131,13 +130,13 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public static IJson getStringAsJson (@Nullable final Iterable <String> aIDs)
   {
     return new JsonArray ().addAll (aIDs);
   }
 
-  @Nonnull
+  @NonNull
   public static ICommonsList <String> getJsonAsString (@Nullable final String sJson)
   {
     final ICommonsList <String> ret = new CommonsArrayList <> ();
@@ -151,7 +150,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public static IJson getBCCAsJson (@Nullable final Iterable <SMPBusinessCardContact> aIDs)
   {
     final JsonArray ret = new JsonArray ();
@@ -165,7 +164,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   public static ICommonsList <SMPBusinessCardContact> getJsonAsBCC (@Nullable final String sJson)
   {
     final ICommonsList <SMPBusinessCardContact> ret = new CommonsArrayList <> ();
@@ -185,8 +184,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nullable
-  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@Nonnull final IParticipantIdentifier aParticipantID,
-                                                         @Nonnull final Collection <SMPBusinessCardEntity> aEntities)
+  public ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
+                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
@@ -278,7 +277,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return aNewBusinessCard;
   }
 
-  @Nonnull
+  @NonNull
   public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard)
   {
     if (aSMPBusinessCard == null)
@@ -310,8 +309,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return EChange.CHANGED;
   }
 
-  @Nonnull
-  private static EContinue _addNames (@Nonnull final SMPBusinessCardEntity aEntity,
+  @NonNull
+  private static EContinue _addNames (@NonNull final SMPBusinessCardEntity aEntity,
                                       @Nullable final String sName,
                                       @Nullable final String sNames)
   {
@@ -344,7 +343,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return EContinue.CONTINUE;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
@@ -394,7 +393,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
     return ret;
   }
 
-  @Nonnull
+  @NonNull
   @ReturnsMutableCopy
   public ICommonsSet <String> getAllSMPBusinessCardIDs ()
   {

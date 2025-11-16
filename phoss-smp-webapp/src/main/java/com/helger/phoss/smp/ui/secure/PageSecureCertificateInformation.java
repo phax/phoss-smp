@@ -27,6 +27,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.lang.clazz.ClassHelper;
@@ -56,7 +58,6 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -138,8 +139,8 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
      * @param nCerts
      *        Required depth of PKI
      */
-    EPredefinedCA (@Nonnull @Nonempty final String sDisplayName,
-                   @Nonnull @Nonempty final String sIssuer,
+    EPredefinedCA (@NonNull @Nonempty final String sDisplayName,
+                   @NonNull @Nonempty final String sIssuer,
                    @Nonnegative final int nCerts,
                    final boolean bDeprecated)
     {
@@ -149,7 +150,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
       m_bDeprecated = bDeprecated;
     }
 
-    @Nonnull
+    @NonNull
     @Nonempty
     public String getDisplayName ()
     {
@@ -182,13 +183,13 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
   private static final String ACTION_RELOAD_TRUSTSTORE = "reloadtruststore";
   private static final String ACTION_RELOAD_DIRECTORY_CONFIGURATION = "reloadpdconfig";
 
-  public PageSecureCertificateInformation (@Nonnull @Nonempty final String sID)
+  public PageSecureCertificateInformation (@NonNull @Nonempty final String sID)
   {
     super (sID, "Certificate Information");
   }
 
   @Override
-  protected void fillContent (@Nonnull final WebPageExecutionContext aWPEC)
+  protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();

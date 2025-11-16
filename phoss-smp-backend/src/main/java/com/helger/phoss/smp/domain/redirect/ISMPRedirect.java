@@ -12,6 +12,9 @@ package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.IComparator;
 import com.helger.base.id.IHasID;
@@ -19,74 +22,67 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-
 /**
- * This interface represents a single SMP redirect for a certain document type
- * identifier ({@link IDocumentTypeIdentifier}).
+ * This interface represents a single SMP redirect for a certain document type identifier
+ * ({@link IDocumentTypeIdentifier}).
  *
  * @author Philip Helger
  */
 public interface ISMPRedirect extends IHasID <String>, ISMPHasExtension
 {
   /**
-   * The ID of an SMP redirect is usually the combination of service group ID
-   * and document type ID. So this is NOT the same as the service group ID.
+   * The ID of an SMP redirect is usually the combination of service group ID and document type ID.
+   * So this is NOT the same as the service group ID.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getID ();
 
   /**
-   * @return The participant ID of the service group to which this service
-   *         information belongs. Never <code>null</code>.
+   * @return The participant ID of the service group to which this service information belongs.
+   *         Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IParticipantIdentifier getServiceGroupParticipantIdentifier ();
 
   /**
-   * @return The ID of the service group to which this redirect belongs. Never
-   *         <code>null</code>.
+   * @return The ID of the service group to which this redirect belongs. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getServiceGroupID ();
 
   /**
-   * @return The document type identifier of this redirect. Never
-   *         <code>null</code>.
+   * @return The document type identifier of this redirect. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   IDocumentTypeIdentifier getDocumentTypeIdentifier ();
 
   /**
    * @return The destination href of the new SMP. Never <code>null</code>.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getTargetHref ();
 
   /**
-   * @return The subject unique identifier of the target SMPs certificate used
-   *         to sign its resources.
+   * @return The subject unique identifier of the target SMPs certificate used to sign its
+   *         resources.
    */
-  @Nonnull
+  @NonNull
   @Nonempty
   String getSubjectUniqueIdentifier ();
 
   /**
-   * @return The X509 public certificate of the new SMP where the redirect
-   *         points to. This is needed since OASIS BDXR SMP v2. May be
-   *         <code>null</code>.
+   * @return The X509 public certificate of the new SMP where the redirect points to. This is needed
+   *         since OASIS BDXR SMP v2. May be <code>null</code>.
    * @since 5.2.0
    */
   @Nullable
   X509Certificate getCertificate ();
 
   /**
-   * @return <code>true</code> if a redirect certificate is present,
-   *         <code>false</code> if not.
+   * @return <code>true</code> if a redirect certificate is present, <code>false</code> if not.
    * @since 5.2.0
    */
   default boolean hasCertificate ()
@@ -95,27 +91,24 @@ public interface ISMPRedirect extends IHasID <String>, ISMPHasExtension
   }
 
   /**
-   * @return This redirect object as a Peppol SMP JAXB object for the REST
-   *         interface. Never <code>null</code>.
+   * @return This redirect object as a Peppol SMP JAXB object for the REST interface. Never
+   *         <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.peppol.smp1.ServiceMetadataType getAsJAXBObjectPeppol ();
+  com.helger.xsds.peppol.smp1.@NonNull ServiceMetadataType getAsJAXBObjectPeppol ();
 
   /**
-   * @return This redirect object as a BDXR SMP v1 JAXB object for the REST
-   *         interface. Never <code>null</code>.
+   * @return This redirect object as a BDXR SMP v1 JAXB object for the REST interface. Never
+   *         <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.bdxr.smp1.ServiceMetadataType getAsJAXBObjectBDXR1 ();
+  com.helger.xsds.bdxr.smp1.@NonNull ServiceMetadataType getAsJAXBObjectBDXR1 ();
 
   /**
-   * @return This redirect object as a BDXR SMP v2 JAXB object for the REST
-   *         interface. Never <code>null</code>.
+   * @return This redirect object as a BDXR SMP v2 JAXB object for the REST interface. Never
+   *         <code>null</code>.
    */
-  @Nonnull
-  com.helger.xsds.bdxr.smp2.ServiceMetadataType getAsJAXBObjectBDXR2 ();
+  com.helger.xsds.bdxr.smp2.@NonNull ServiceMetadataType getAsJAXBObjectBDXR2 ();
 
-  @Nonnull
+  @NonNull
   static IComparator <ISMPRedirect> comparator ()
   {
     return (aElement1, aElement2) -> {

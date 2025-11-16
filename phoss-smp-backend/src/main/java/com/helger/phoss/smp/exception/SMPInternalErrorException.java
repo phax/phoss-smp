@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
-import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Exception that is thrown to indicate an HTTP 500 error.
@@ -20,12 +20,12 @@ import jakarta.annotation.Nonnull;
  */
 public class SMPInternalErrorException extends SMPServerException
 {
-  public SMPInternalErrorException (@Nonnull final String sMsg)
+  public SMPInternalErrorException (@NonNull final String sMsg)
   {
     super (sMsg);
   }
 
-  public SMPInternalErrorException (@Nonnull final String sMsg, @Nonnull final Throwable aCause)
+  public SMPInternalErrorException (@NonNull final String sMsg, @NonNull final Throwable aCause)
   {
     super (sMsg, aCause);
   }
