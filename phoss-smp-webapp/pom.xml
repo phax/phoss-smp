@@ -99,6 +99,10 @@
       <groupId>com.helger</groupId>
       <artifactId>phoss-directory-client</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.helger.peppol.ui</groupId>
+      <artifactId>peppol-shared-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.sun.xml.ws</groupId>

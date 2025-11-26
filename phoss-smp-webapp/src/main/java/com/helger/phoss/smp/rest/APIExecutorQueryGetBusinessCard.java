@@ -16,13 +16,10 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +29,13 @@ import com.helger.base.CGlobal;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.datetime.helper.PDTFactory;
-import com.helger.httpclient.HttpClientManager;
-import com.helger.httpclient.response.ResponseHandlerByteArray;
 import com.helger.json.IJsonObject;
+import com.helger.peppol.api.rest.PeppolAPIHelper;
 import com.helger.peppol.businesscard.generic.PDBusinessCard;
-import com.helger.peppol.businesscard.helper.PDBusinessCardHelper;
 import com.helger.peppol.sml.ESMPAPIType;
+import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.ui.types.minicallback.MiniCallbackLog;
+import com.helger.peppol.ui.types.smp.SMPQueryParams;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -47,7 +45,6 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
-import com.helger.smpclient.httpclient.SMPHttpClientSettings;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -80,14 +77,20 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
+    final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
 
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
     {
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
-    final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
-    if (aQueryParams == null)
+    final SMPQueryParams aSMPQueryParams = SMPQueryParams.createForSMLOrNull (aSMLInfo,
+                                                                              eAPIType,
+                                                                              aIF,
+                                                                              aParticipantID.getScheme (),
+                                                                              aParticipantID.getValue (),
+                                                                              true);
+    if (aSMPQueryParams == null)
     {
       LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
       aUnifiedResponse.createNotFound ();
@@ -103,44 +106,19 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
                  "' is queried using SMP API '" +
                  eAPIType +
                  "' from '" +
-                 aQueryParams.getSMPHostURI () +
+                 aSMPQueryParams.getSMPHostURI () +
                  "'");
 
-    final SMPHttpClientSettings aHCS = new SMPHttpClientSettings ();
-
-    final String sBCURL = StringHelper.trimEnd (aQueryParams.getSMPHostURI ().toString (), '/') +
-                          "/businesscard/" +
-                          aParticipantID.getURIEncoded ();
-    LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
-
-    byte [] aData;
-    try (final HttpClientManager aHttpClientMgr = HttpClientManager.create (aHCS))
-    {
-      final HttpGet aGet = new HttpGet (sBCURL);
-      aData = aHttpClientMgr.execute (aGet, new ResponseHandlerByteArray ());
-    }
-    catch (final Exception ex)
-    {
-      aData = null;
-    }
+    final PDBusinessCard aBC = PeppolAPIHelper.retrieveBusinessCardParsed (sLogPrefix,
+                                                                           aSMPQueryParams,
+                                                                           hcs -> {},
+                                                                           new MiniCallbackLog (LOGGER, sLogPrefix));
 
     IJsonObject aJson = null;
-    if (aData == null)
+    if (aBC != null)
     {
-      LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
-    }
-    else
-    {
-      final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, (Charset) null);
-      if (aBC == null)
-      {
-        LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
-      }
-      else
-      {
-        // Business Card found
-        aJson = aBC.getAsJson ();
-      }
+      // Business Card found
+      aJson = aBC.getAsJson ();
     }
 
     aSW.stop ();

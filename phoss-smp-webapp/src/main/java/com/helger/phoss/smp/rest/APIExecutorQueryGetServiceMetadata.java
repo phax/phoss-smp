@@ -37,6 +37,8 @@ import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.peppol.sml.ESMPAPIType;
+import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.ui.types.smp.SMPQueryParams;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -123,6 +125,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
 
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
+    final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
 
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
@@ -130,8 +133,13 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
 
-    final SMPQueryParams aQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
-    if (aQueryParams == null)
+    final SMPQueryParams aSMPQueryParams = SMPQueryParams.createForSMLOrNull (aSMLInfo,
+                                                                              eAPIType,
+                                                                              aIF,
+                                                                              aParticipantID.getScheme (),
+                                                                              aParticipantID.getValue (),
+                                                                              true);
+    if (aSMPQueryParams == null)
     {
       LOGGER.error (sLogPrefix + "Failed to perform the SMP lookup");
       aUnifiedResponse.createNotFound ();
@@ -155,7 +163,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
                  "' is queried using SMP API '" +
                  eAPIType +
                  "' from '" +
-                 aQueryParams.getSMPHostURI () +
+                 aSMPQueryParams.getSMPHostURI () +
                  "' for document type '" +
                  aDocTypeID.getURIEncoded () +
                  "'; XSD validation=" +
@@ -168,7 +176,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     {
       case PEPPOL:
       {
-        final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aQueryParams.getSMPHostURI ());
+        final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aSMPQueryParams.getSMPHostURI ());
         aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
         aSMPClient.setVerifySignature (bVerifySignature);
 
@@ -182,7 +190,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       }
       case OASIS_BDXR_V1:
       {
-        final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aQueryParams.getSMPHostURI ());
+        final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aSMPQueryParams.getSMPHostURI ());
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR1Client.setVerifySignature (bVerifySignature);
 
@@ -196,7 +204,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       }
       case OASIS_BDXR_V2:
       {
-        final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aQueryParams.getSMPHostURI ());
+        final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aSMPQueryParams.getSMPHostURI ());
         aBDXR2Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR2Client.setVerifySignature (bVerifySignature);
 

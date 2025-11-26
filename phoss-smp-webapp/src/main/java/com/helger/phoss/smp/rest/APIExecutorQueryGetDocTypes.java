@@ -16,12 +16,10 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +29,19 @@ import com.helger.base.CGlobal;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.collection.commons.CommonsTreeMap;
+import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.collection.commons.ICommonsSortedMap;
 import com.helger.datetime.helper.PDTFactory;
-import com.helger.httpclient.HttpClientManager;
-import com.helger.httpclient.response.ResponseHandlerByteArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
+import com.helger.peppol.api.rest.PeppolAPIHelper;
 import com.helger.peppol.businesscard.generic.PDBusinessCard;
-import com.helger.peppol.businesscard.helper.PDBusinessCardHelper;
 import com.helger.peppol.sml.ESMPAPIType;
-import com.helger.peppolid.CIdentifier;
+import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.ui.types.minicallback.MiniCallbackLog;
+import com.helger.peppol.ui.types.smp.ISMPClientCreationCallback;
+import com.helger.peppol.ui.types.smp.ISMPExtensionsCallback;
+import com.helger.peppol.ui.types.smp.SMPQueryParams;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -50,11 +51,7 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
-import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
-import com.helger.smpclient.bdxr2.BDXR2ClientReadOnly;
-import com.helger.smpclient.httpclient.SMPHttpClientSettings;
 import com.helger.smpclient.json.SMPJsonResponse;
-import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
@@ -84,12 +81,18 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     }
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
+    final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
 
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
-    final SMPQueryParams aSMPQueryParams = SMPQueryParams.create (eAPIType, aParticipantID);
+    final SMPQueryParams aSMPQueryParams = SMPQueryParams.createForSMLOrNull (aSMLInfo,
+                                                                              eAPIType,
+                                                                              aIF,
+                                                                              aParticipantID.getScheme (),
+                                                                              aParticipantID.getValue (),
+                                                                              true);
     if (aSMPQueryParams == null)
     {
       LOGGER.error (sLogPrefix + "Participant ID '" + sPathServiceGroupID + "' is not registered in the DNS");
@@ -116,124 +119,38 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
                  "; signature verification=" +
                  bVerifySignature);
 
-    ICommonsSortedMap <String, String> aSGHrefs = null;
-    switch (eAPIType)
-    {
-      case PEPPOL:
-      {
-        final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aSMPQueryParams.getSMPHostURI ());
-        aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
-        aSMPClient.setVerifySignature (bVerifySignature);
+    final ICommonsOrderedMap <String, String> aOrigSGHrefs = PeppolAPIHelper.retrieveAllDocumentTypes (sLogPrefix,
+                                                                                                       aSMPQueryParams,
+                                                                                                       hcs -> {},
+                                                                                                       bXMLSchemaValidation,
+                                                                                                       bVerifySignature,
+                                                                                                       ISMPClientCreationCallback.IGNORE,
+                                                                                                       sHref -> LOGGER.warn (sLogPrefix +
+                                                                                                                             "The ServiceGroup list contains the duplicate URL '" +
+                                                                                                                             sHref +
+                                                                                                                             "'"),
+                                                                                                       m -> {},
+                                                                                                       ISMPExtensionsCallback.IGNORE);
 
-        // Get all HRefs and sort them by decoded URL
-        final var aSG = aSMPClient.getServiceGroupOrNull (aParticipantID);
-        // Map from cleaned URL to original URL
-        if (aSG != null && aSG.getServiceMetadataReferenceCollection () != null)
-        {
-          aSGHrefs = new CommonsTreeMap <> ();
-          for (final var aSMR : aSG.getServiceMetadataReferenceCollection ().getServiceMetadataReference ())
-          {
-            // Decoded href is important for unification
-            final String sHref = CIdentifier.createPercentDecoded (aSMR.getHref ());
-            if (aSGHrefs.put (sHref, aSMR.getHref ()) != null)
-              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
-          }
-        }
-        break;
-      }
-      case OASIS_BDXR_V1:
-      {
-        aSGHrefs = new CommonsTreeMap <> ();
-        final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aSMPQueryParams.getSMPHostURI ());
-        aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
-        aBDXR1Client.setVerifySignature (bVerifySignature);
-
-        // Get all HRefs and sort them by decoded URL
-        final var aSG = aBDXR1Client.getServiceGroupOrNull (aParticipantID);
-        // Map from cleaned URL to original URL
-        if (aSG != null && aSG.getServiceMetadataReferenceCollection () != null)
-        {
-          aSGHrefs = new CommonsTreeMap <> ();
-          for (final var aSMR : aSG.getServiceMetadataReferenceCollection ().getServiceMetadataReference ())
-          {
-            // Decoded href is important for unification
-            final String sHref = CIdentifier.createPercentDecoded (aSMR.getHref ());
-            if (aSGHrefs.put (sHref, aSMR.getHref ()) != null)
-              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
-          }
-        }
-        break;
-      }
-      case OASIS_BDXR_V2:
-      {
-        aSGHrefs = new CommonsTreeMap <> ();
-        final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aSMPQueryParams.getSMPHostURI ());
-        aBDXR2Client.setXMLSchemaValidation (bXMLSchemaValidation);
-        aBDXR2Client.setVerifySignature (bVerifySignature);
-
-        // Get all HRefs and sort them by decoded URL
-        final var aSG = aBDXR2Client.getServiceGroupOrNull (aParticipantID);
-        // Map from cleaned URL to original URL
-        if (aSG != null && aSG.hasServiceReferenceEntries ())
-        {
-          aSGHrefs = new CommonsTreeMap <> ();
-          for (final var aSR : aSG.getServiceReference ())
-          {
-            // Decoded href is important for unification
-            final String sSrcID = CIdentifier.getURIEncodedBDXR2 (aSR.getID ().getSchemeID (),
-                                                                  aSR.getID ().getValue ());
-            final String sHref = CIdentifier.createPercentDecoded (sSrcID);
-            if (aSGHrefs.put (sHref, sSrcID) != null)
-              LOGGER.warn (sLogPrefix + "The ServiceGroup list contains the duplicate URL '" + sHref + "'");
-          }
-        }
-        break;
-      }
-    }
     IJsonObject aJson = null;
-    if (aSGHrefs != null)
+    if (aOrigSGHrefs != null)
     {
+      final ICommonsSortedMap <String, String> aSGHrefs = new CommonsTreeMap <> (aOrigSGHrefs);
       aJson = SMPJsonResponse.convert (eAPIType, aParticipantID, aSGHrefs, aIF);
     }
 
     if (bQueryBusinessCard)
     {
-      final SMPHttpClientSettings aHCS = new SMPHttpClientSettings ();
-
-      final String sBCURL = StringHelper.trimEnd (aSMPQueryParams.getSMPHostURI ().toString (), '/') +
-                            "/businesscard/" +
-                            aParticipantID.getURIEncoded ();
-      LOGGER.info (sLogPrefix + "Querying BC from '" + sBCURL + "'");
-
-      byte [] aData;
-      try (final HttpClientManager aHttpClientMgr = HttpClientManager.create (aHCS))
+      final PDBusinessCard aBC = PeppolAPIHelper.retrieveBusinessCardParsed (sLogPrefix,
+                                                                             aSMPQueryParams,
+                                                                             hcs -> {},
+                                                                             new MiniCallbackLog (LOGGER, sLogPrefix));
+      if (aBC != null)
       {
-        final HttpGet aGet = new HttpGet (sBCURL);
-        aData = aHttpClientMgr.execute (aGet, new ResponseHandlerByteArray ());
-      }
-      catch (final Exception ex)
-      {
-        aData = null;
-      }
-
-      if (aData == null)
-      {
-        LOGGER.warn (sLogPrefix + "No Business Card is available for that participant.");
-      }
-      else
-      {
-        final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aData, StandardCharsets.UTF_8);
-        if (aBC == null)
-        {
-          LOGGER.error (sLogPrefix + "Failed to parse BC:\n" + new String (aData, StandardCharsets.UTF_8));
-        }
-        else
-        {
-          // Business Card found
-          if (aJson == null)
-            aJson = new JsonObject ();
-          aJson.add (PARAM_BUSINESS_CARD, aBC.getAsJson ());
-        }
+        // Business Card found
+        if (aJson == null)
+          aJson = new JsonObject ();
+        aJson.add (PARAM_BUSINESS_CARD, aBC.getAsJson ());
       }
     }
 
