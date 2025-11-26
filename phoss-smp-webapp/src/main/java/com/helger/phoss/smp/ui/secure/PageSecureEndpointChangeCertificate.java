@@ -51,6 +51,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.ui.CertificateUI;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -62,7 +63,6 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
@@ -259,20 +259,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       return ret;
     }
 
-    final OffsetDateTime aNowLDT = PDTFactory.getCurrentOffsetDateTime ();
-    final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aEndpointCert.getNotBefore ());
-    final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aEndpointCert.getNotAfter ());
-
-    final HCNodeList ret = new HCNodeList ();
-    ret.addChild (new HCDiv ().addChild ("Issuer: " + SMPCommonUI.getCertIssuer (aEndpointCert)));
-    ret.addChild (new HCDiv ().addChild ("Subject: " + SMPCommonUI.getCertSubject (aEndpointCert)));
-    ret.addChild (new HCDiv ().addChild ("Serial number: " + SMPCommonUI.getCertSerialNumber (aEndpointCert)));
-    ret.addChild (new HCDiv ().addChild ("Not before: ")
-                              .addChild (SMPCommonUI.getNodeCertNotBefore (aNotBefore, aNowLDT, aDisplayLocale)));
-    ret.addChild (new HCDiv ().addChild ("Not after: ")
-                              .addChild (SMPCommonUI.getNodeCertNotAfter (aNotAfter, aNowLDT, aDisplayLocale)));
-
-    return ret;
+    final OffsetDateTime aNowODT = PDTFactory.getCurrentOffsetDateTime ();
+    return CertificateUI.createCertificateDetailsTable (null, aEndpointCert, aNowODT, aDisplayLocale);
   }
 
   @NonNull

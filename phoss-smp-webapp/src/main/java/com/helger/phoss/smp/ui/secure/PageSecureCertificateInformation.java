@@ -41,6 +41,7 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.pd.client.PDClientConfiguration;
+import com.helger.peppol.ui.CertificateUI;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -98,19 +99,24 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                           3,
                           false),
     // TOOP Pilot PKI
-    TOOP_PILOT_SMP ("TOOP Pilot CA", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
+    @Deprecated (forRemoval = false)
+    TOOP_PILOT_SMP("TOOP Pilot CA", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
 
     // DE4A PKIs
-    DE4A_TEST ("DE4A Test CA",
-               "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE",
-               4,
-               true),
-    DE4A_TELSEC1 ("DE4A Telesec CA [1]",
-                  "CN=TeleSec Business CA 1,OU=T-Systems Trust Center,O=T-Systems International GmbH,C=DE",
-                  3,
-                  true),
-    DE4A_TELSEC2 ("DE4A Telesec CA [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, true),
-    DE4A_COMMISSIGN_2 ("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true),
+    @Deprecated (forRemoval = false)
+    DE4A_TEST("DE4A Test CA",
+              "E=CEF-EDELIVERY-SUPPORT@ec.europa.eu,CN=DE4A_TEST_SMP_CA,OU=CEF,O=DE4A,ST=Brussels-Capital,C=BE",
+              4,
+              true),
+    @Deprecated (forRemoval = false)
+    DE4A_TELSEC1("DE4A Telesec CA [1]",
+                 "CN=TeleSec Business CA 1,OU=T-Systems Trust Center,O=T-Systems International GmbH,C=DE",
+                 3,
+                 true),
+    @Deprecated (forRemoval = false)
+    DE4A_TELSEC2("DE4A Telesec CA [2]", "CN=TeleSec Business CA 21,O=Deutsche Telekom Security GmbH,C=DE", 3, true),
+    @Deprecated (forRemoval = false)
+    DE4A_COMMISSIGN_2("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true),
 
     // DBNA
     DBNA_PRODUCTION ("DBNA Production CA",
@@ -124,7 +130,11 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     DBNA_PILOT ("DBNA Pilot CA",
                 "CN=DBNAlliance Demo Intermediate Pilot,O=Digital Business Network Alliance,STREET=3 River Way Suite 920,PostalCode=77056,L=Houston,ST=Texas,C=US",
                 3,
-                false),;
+                false),
+
+    // HR eDelivery
+    HR_EDELIVERY_DEMO ("HR eDelivery Demo CA", "CN=Fina Demo CA 2020,O=Financijska agencija,C=HR", 1, false),
+    HR_EDELIVERY_PRODUCTION ("HR eDelivery Production CA", "CN=Fina RDC 2020,O=Financijska agencija,C=HR", 1, false),;
 
     private final String m_sDisplayName;
     private final String m_sIssuer;
@@ -317,9 +327,8 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                                          SMPServerConfiguration.getKeyStoreKeyAlias () +
                                                                                          "' was successfully loaded.")));
 
-          if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
+          if (aChain.length > 0 && aChain[0] instanceof final X509Certificate aHead)
           {
-            final X509Certificate aHead = (X509Certificate) aChain[0];
             final String sIssuer = aHead.getIssuerX500Principal ().getName ();
             final EPredefinedCA eCert = EPredefinedCA.getFromIssuerOrNull (sIssuer);
             if (eCert != null)
@@ -351,13 +360,12 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           final HCOL aOL = new HCOL ();
           for (final Certificate aCert : aChain)
           {
-            if (aCert instanceof X509Certificate)
+            if (aCert instanceof final X509Certificate aX509Cert)
             {
-              final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                             aX509Cert,
-                                                                                             aNowDT,
-                                                                                             aDisplayLocale);
+              final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
+                                                                                               aX509Cert,
+                                                                                               aNowDT,
+                                                                                               aDisplayLocale);
               aOL.addItem (aCertDetails);
             }
             else
@@ -400,13 +408,12 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
           for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
           {
             final Certificate aCert = aTrustStore.getCertificate (sAlias);
-            if (aCert instanceof X509Certificate)
+            if (aCert instanceof final X509Certificate aX509Cert)
             {
-              final X509Certificate aX509Cert = (X509Certificate) aCert;
-              final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                             aX509Cert,
-                                                                                             aNowDT,
-                                                                                             aDisplayLocale);
+              final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
+                                                                                               aX509Cert,
+                                                                                               aNowDT,
+                                                                                               aDisplayLocale);
               aOL.addItem (aCertDetails);
             }
             else
@@ -469,9 +476,8 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                                                                                                                                         sAlias +
                                                                                                                                         "' was successfully loaded.")));
 
-            if (aChain.length > 0 && aChain[0] instanceof X509Certificate)
+            if (aChain.length > 0 && aChain[0] instanceof final X509Certificate aHead)
             {
-              final X509Certificate aHead = (X509Certificate) aChain[0];
               final String sIssuer = aHead.getIssuerX500Principal ().getName ();
               final EPredefinedCA eCert = EPredefinedCA.getFromIssuerOrNull (sIssuer);
               if (eCert != null)
@@ -502,13 +508,12 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             final HCOL aUL = new HCOL ();
             for (final Certificate aCert : aChain)
             {
-              if (aCert instanceof X509Certificate)
+              if (aCert instanceof final X509Certificate aX509Cert)
               {
-                final X509Certificate aX509Cert = (X509Certificate) aCert;
-                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                               aX509Cert,
-                                                                                               aNowDT,
-                                                                                               aDisplayLocale);
+                final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
+                                                                                                 aX509Cert,
+                                                                                                 aNowDT,
+                                                                                                 aDisplayLocale);
                 aUL.addItem (aCertDetails);
               }
               else
@@ -553,13 +558,12 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
             for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
             {
               final Certificate aCert = aTrustStore.getCertificate (sAlias);
-              if (aCert instanceof X509Certificate)
+              if (aCert instanceof final X509Certificate aX509Cert)
               {
-                final X509Certificate aX509Cert = (X509Certificate) aCert;
-                final BootstrapTable aCertDetails = SMPCommonUI.createCertificateDetailsTable (sAlias,
-                                                                                               aX509Cert,
-                                                                                               aNowDT,
-                                                                                               aDisplayLocale);
+                final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
+                                                                                                 aX509Cert,
+                                                                                                 aNowDT,
+                                                                                                 aDisplayLocale);
                 aOL.addItem (aCertDetails);
               }
               else

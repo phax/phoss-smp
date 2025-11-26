@@ -44,6 +44,8 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppol.ui.CertificateUI;
+import com.helger.peppol.ui.PeppolUI;
 import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -68,7 +70,6 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
-import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
@@ -429,7 +430,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       try
       {
         final IPeppolDocumentTypeIdentifierParts aParts = PeppolDocumentTypeIdentifierParts.extractFromIdentifier (aDocumentTypeID);
-        aCtrl.addChild (SMPCommonUI.getDocumentTypeIDDetails (aParts));
+        aCtrl.addChild (PeppolUI.getDocumentTypeIDDetails (aParts));
       }
       catch (final IllegalArgumentException ex)
       {
@@ -481,11 +482,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
                                                    .setCtrl (aEndpointCert == null ? strong (
                                                                                              "!!!FAILED TO INTERPRETE!!!")
-                                                                                   : SMPCommonUI.createCertificateDetailsTable (null,
-                                                                                                                                aEndpointCert,
-                                                                                                                                aNowDT,
-                                                                                                                                aDisplayLocale)
-                                                                                                .setResponsive (true)));
+                                                                                   : CertificateUI.createCertificateDetailsTable (null,
+                                                                                                                                  aEndpointCert,
+                                                                                                                                  aNowDT,
+                                                                                                                                  aDisplayLocale)));
     }
     if (aSelectedEndpoint.hasServiceDescription ())
     {
@@ -919,7 +919,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                                                        : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the endpoint. If present it must be valid " +
                                                                (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
-                                                                                                              : "JSON or XML") +
+                                                                                                          : "JSON or XML") +
                                                                " content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }

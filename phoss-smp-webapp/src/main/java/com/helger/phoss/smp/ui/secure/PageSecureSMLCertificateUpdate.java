@@ -39,6 +39,7 @@ import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.BDMSLClient;
+import com.helger.peppol.ui.CertificateUI;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -201,7 +202,6 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 
         final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
         final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aMigrationPublicCert.getNotBefore ());
-        final OffsetDateTime aNotAfter = PDTFactory.createOffsetDateTime (aMigrationPublicCert.getNotAfter ());
 
         final LocalDate aEffectiveMigrationDate = aMigrationDate != null ? aMigrationDate : aNotBefore.toLocalDate ();
         final String sMsg = "Successfully prepared migration of SMP certificate at SML '" +
@@ -213,16 +213,10 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         LOGGER.info (sMsg);
 
         aNodeList.addChild (success ().addChild (div (sMsg))
-                                      .addChild (div ("Issuer: " + SMPCommonUI.getCertIssuer (aMigrationPublicCert)))
-                                      .addChild (div ("Subject: " + SMPCommonUI.getCertSubject (aMigrationPublicCert)))
-                                      .addChild (div ("Serial number: " +
-                                                      SMPCommonUI.getCertSerialNumber (aMigrationPublicCert)))
-                                      .addChild (div ("Not before: ").addChild (SMPCommonUI.getNodeCertNotBefore (aNotBefore,
-                                                                                                                  aNowDT,
-                                                                                                                  aDisplayLocale)))
-                                      .addChild (div ("Not after: ").addChild (SMPCommonUI.getNodeCertNotAfter (aNotAfter,
-                                                                                                                aNowDT,
-                                                                                                                aDisplayLocale))));
+                                      .addChild (CertificateUI.createCertificateDetailsTable (null,
+                                                                                              aMigrationPublicCert,
+                                                                                              aNowDT,
+                                                                                              aDisplayLocale)));
 
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update-cert",
                                            aSMLInfo.getManagementServiceURL (),
