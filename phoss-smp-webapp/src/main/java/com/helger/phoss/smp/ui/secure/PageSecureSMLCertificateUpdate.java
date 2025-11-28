@@ -251,7 +251,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 
     if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
     {
-      aNodeList.addChild (warn (AbstractPageSecureSMLReg.HR_EXT_WARNING));
+      aNodeList.addChild (warn (HR_EXT_WARNING));
     }
 
     aNodeList.addChild (info ().addChildren (div ("Prepare the update of your SMP certificate in the future."),

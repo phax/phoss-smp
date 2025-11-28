@@ -47,6 +47,8 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
   /** Grid spec for identifier values */
   protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = BootstrapGridSpec.create (6, 6, 6, 8, 9);
 
+  protected static final String HR_EXT_WARNING = AbstractSMPWebPage.HR_EXT_WARNING;
+
   protected AbstractSMPWebPageForm (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
     super (sID, sName);

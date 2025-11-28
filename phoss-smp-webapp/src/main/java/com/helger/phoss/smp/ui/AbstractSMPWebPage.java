@@ -29,6 +29,8 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
  */
 public abstract class AbstractSMPWebPage extends AbstractBootstrapWebPage <WebPageExecutionContext>
 {
+  protected static final String HR_EXT_WARNING = "This SMP is configured to run in HR eDelivery Extension Mode. The Croatian AMS (=SML) does not seem to offer the necessary server interface. So don't wonder if you receive weird error messages.";
+
   protected AbstractSMPWebPage (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
     super (sID, sName);

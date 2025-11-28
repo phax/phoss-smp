@@ -487,6 +487,11 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
+    if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+    {
+      aNodeList.addChild (warn (HR_EXT_WARNING));
+    }
+
     {
       final HCOL aOL = new HCOL ();
       aOL.addItem ("The migration was initiated by another SMP, and the SML must have been informed about the upcoming migration");
