@@ -566,7 +566,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                      : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid " +
                                                                (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
-                                                                                                              : "JSON or XML") +
+                                                                                                          : "JSON or XML") +
                                                                " content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
@@ -786,6 +786,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             new HCTextNode (" "),
                             createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
                             new HCTextNode (" "),
+                            // TODO check if server prefix is correct
                             new HCA (LinkHelper.getURLWithServerAndContext (eRESTType.getQueryPathPrefix () +
                                                                             aCurObject.getParticipantIdentifier ()
                                                                                       .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
@@ -795,6 +796,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       if (eRESTType.isCompleteServiceGroupSupported ())
       {
         // This is implementation specific, but not contained for BDXR2
+        // TODO check if server prefix is correct
         aActions.addChildren (new HCTextNode (" "),
                               new HCA (LinkHelper.getURLWithServerAndContext (eRESTType.getQueryPathPrefix () +
                                                                               "complete/" +
