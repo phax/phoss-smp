@@ -23,6 +23,8 @@ import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.callback.Context;
 import org.flywaydb.core.api.callback.Event;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.api.logging.LogFactory;
+import org.flywaydb.core.api.logging.LogLevel;
 import org.flywaydb.core.api.resolver.ResolvedMigration;
 import org.flywaydb.core.internal.info.MigrationInfoImpl;
 import org.flywaydb.core.internal.jdbc.DriverDataSource;
@@ -163,9 +165,21 @@ final class FlywayMigrator
     // If no schema is specified, schema create should also be disabled
     aFlywayConfig.createSchemas (SMPJDBCConfiguration.isJdbcSchemaCreate ());
 
+    // Enable for more verbosity
+    if (false)
+      LogFactory.setLogLevel (LogLevel.DEBUG);
+
     final Flyway aFlyway = aFlywayConfig.load ();
     if (false)
       aFlyway.validate ();
+
+    // In case of a failed migration only
+    if (false)
+    {
+      aFlyway.info ();
+      aFlyway.repair ();
+    }
+
     aFlyway.migrate ();
 
     LOGGER.info ("Finished running Flyway");
