@@ -51,7 +51,10 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
+import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
+import com.helger.smpclient.bdxr2.BDXR2ClientReadOnly;
 import com.helger.smpclient.json.SMPJsonResponse;
+import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQuery
@@ -119,12 +122,30 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
                  "; signature verification=" +
                  bVerifySignature);
 
+    final ISMPClientCreationCallback aSmpCcc = new ISMPClientCreationCallback ()
+    {
+      public void onPeppolSMPClient (@NonNull final SMPClientReadOnly aSMPClient)
+      {}
+
+      public void onBDXR1Client (@NonNull final BDXRClientReadOnly aSMPClient)
+      {
+        if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+        {
+          // Disable server hostname check for Croatia
+          aSMPClient.httpClientSettings ().setHostnameVerifierVerifyAll ();
+        }
+      }
+
+      public void onBDXR2Client (@NonNull final BDXR2ClientReadOnly aSMPClient)
+      {}
+    };
+
     final ICommonsOrderedMap <String, String> aOrigSGHrefs = PeppolAPIHelper.retrieveAllDocumentTypes (sLogPrefix,
                                                                                                        aSMPQueryParams,
                                                                                                        hcs -> {},
                                                                                                        bXMLSchemaValidation,
                                                                                                        bVerifySignature,
-                                                                                                       ISMPClientCreationCallback.IGNORE,
+                                                                                                       aSmpCcc,
                                                                                                        sHref -> LOGGER.warn (sLogPrefix +
                                                                                                                              "The ServiceGroup list contains the duplicate URL '" +
                                                                                                                              sHref +

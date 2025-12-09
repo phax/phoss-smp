@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.rest;
 
+import java.security.GeneralSecurityException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -38,6 +39,7 @@ import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.ui.types.PeppolUITypes;
 import com.helger.peppol.ui.types.smp.SMPQueryParams;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -177,8 +179,18 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       case PEPPOL:
       {
         final SMPClientReadOnly aSMPClient = new SMPClientReadOnly (aSMPQueryParams.getSMPHostURI ());
+        aSMPClient.setSecureValidation (PeppolUITypes.DEFAULT_SMP_USE_SECURE_VALIDATION);
         aSMPClient.setXMLSchemaValidation (bXMLSchemaValidation);
         aSMPClient.setVerifySignature (bVerifySignature);
+        if (aSMPQueryParams.isTrustAllCertificates ())
+          try
+          {
+            aSMPClient.httpClientSettings ().setSSLContextTrustAll ();
+          }
+          catch (final GeneralSecurityException ex)
+          {
+            // Ignore
+          }
 
         final var aSSM = aSMPClient.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSSM != null)
@@ -191,8 +203,23 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       case OASIS_BDXR_V1:
       {
         final BDXRClientReadOnly aBDXR1Client = new BDXRClientReadOnly (aSMPQueryParams.getSMPHostURI ());
+        aBDXR1Client.setSecureValidation (PeppolUITypes.DEFAULT_SMP_USE_SECURE_VALIDATION);
         aBDXR1Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR1Client.setVerifySignature (bVerifySignature);
+        if (aSMPQueryParams.isTrustAllCertificates ())
+          try
+          {
+            aBDXR1Client.httpClientSettings ().setSSLContextTrustAll ();
+          }
+          catch (final GeneralSecurityException ex)
+          {
+            // Ignore
+          }
+        if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
+        {
+          // Disable server hostname check for Croatia
+          aBDXR1Client.httpClientSettings ().setHostnameVerifierVerifyAll ();
+        }
 
         final var aSSM = aBDXR1Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSSM != null)
@@ -205,8 +232,18 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       case OASIS_BDXR_V2:
       {
         final BDXR2ClientReadOnly aBDXR2Client = new BDXR2ClientReadOnly (aSMPQueryParams.getSMPHostURI ());
+        aBDXR2Client.setSecureValidation (PeppolUITypes.DEFAULT_SMP_USE_SECURE_VALIDATION);
         aBDXR2Client.setXMLSchemaValidation (bXMLSchemaValidation);
         aBDXR2Client.setVerifySignature (bVerifySignature);
+        if (aSMPQueryParams.isTrustAllCertificates ())
+          try
+          {
+            aBDXR2Client.httpClientSettings ().setSSLContextTrustAll ();
+          }
+          catch (final GeneralSecurityException ex)
+          {
+            // Ignore
+          }
 
         final var aSM = aBDXR2Client.getServiceMetadataOrNull (aParticipantID, aDocTypeID);
         if (aSM != null)
