@@ -15,4 +15,18 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_service_metadata_red MODIFY (redirectionUrl clob NOT NULL);
+-- Cannot directly MODIFY VARCHAR2(256) to CLOB in Oracle
+-- Use this safe 4-step process
+
+-- Step 1: Add temporary CLOB column
+ALTER TABLE smp_service_metadata_red ADD (TEMP_CLOB CLOB);
+
+-- Step 2: Copy data (VARCHAR2 converts automatically to CLOB)
+UPDATE smp_service_metadata_red SET TEMP_CLOB = redirectionUrl;
+COMMIT;
+
+-- Step 3: Drop original column
+ALTER TABLE smp_service_metadata_red DROP COLUMN redirectionUrl;
+
+-- Step 4: Rename new column to original name
+ALTER TABLE smp_service_metadata_red RENAME COLUMN TEMP_CLOB TO redirectionUrl;

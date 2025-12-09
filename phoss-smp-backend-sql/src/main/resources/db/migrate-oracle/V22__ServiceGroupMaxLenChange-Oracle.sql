@@ -16,9 +16,9 @@
 --
 
 -- Change type from "varchar(50)" to "varchar(135)"
-ALTER TABLE smp_service_group        ALTER COLUMN businessIdentifier TYPE varchar(135);
-ALTER TABLE smp_service_metadata     ALTER COLUMN businessIdentifier TYPE varchar(135);
-ALTER TABLE smp_process              ALTER COLUMN businessIdentifier TYPE varchar(135);
-ALTER TABLE smp_endpoint             ALTER COLUMN businessIdentifier TYPE varchar(135);
-ALTER TABLE smp_ownership            ALTER COLUMN businessIdentifier TYPE varchar(135);
-ALTER TABLE smp_service_metadata_red ALTER COLUMN businessIdentifier TYPE varchar(135);
+ALTER TABLE smp_service_group        MODIFY (businessIdentifier varchar(135));
+ALTER TABLE smp_service_metadata     MODIFY (businessIdentifier varchar(135));
+ALTER TABLE smp_process              MODIFY (businessIdentifier varchar(135));
+ALTER TABLE smp_endpoint             MODIFY (businessIdentifier varchar(135));
+ALTER TABLE smp_ownership            MODIFY (businessIdentifier varchar(135));
+ALTER TABLE smp_service_metadata_red MODIFY (businessIdentifier varchar(135));
