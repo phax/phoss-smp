@@ -27,6 +27,7 @@ services:
       MYSQL_DATABASE: smp
       MYSQL_USER: smp
       MYSQL_PASSWORD: smp
+      MYSQL_NATIVE_PASSWORD_PLUGIN: yes
     ports:
       - "3306:3306"
 
