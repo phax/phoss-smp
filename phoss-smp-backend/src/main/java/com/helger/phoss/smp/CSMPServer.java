@@ -31,8 +31,12 @@ public final class CSMPServer
 {
   public static final Locale DEFAULT_LOCALE = LocaleCache.getInstance ().getLocale ("en", "US");
 
-  /** A regular expression pattern to validate the SMP ID. */
-  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-]+";
+  /**
+   * A regular expression pattern to validate the SMP ID.<br>
+   * Update 8.0.9: allow "." as for "smptest.intercenter.it". But not at the start or the end and
+   * not more then one consecutive dot.
+   */
+  public static final String PATTERN_SMP_ID = "[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*";
 
   /** A regular expression pattern to validate HR OIBs. */
   public static final String PATTERN_HR_OIB = "[0-9]{11}";

@@ -27,10 +27,33 @@ public final class CSMPServerTest
   @Test
   public void testSMPIDPattern () throws Exception
   {
-    for (final String s : new String [] { "a", "aaaa", "1234", "a123", "-", "a-b", "-1" })
-      assertTrue (RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
-    for (final String s : new String [] { "", "_", "_aaaa", ".1", "", "-aaaaa.", "ä", "1ä" })
-      assertFalse (RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
+    for (final String s : new String [] { "a",
+                                          "aaaa",
+                                          "1234",
+                                          "a123",
+                                          "-",
+                                          "a-b",
+                                          "-1",
+                                          "smptest.intercenter.it",
+                                          "smp.bla",
+                                          "a.b",
+                                          "a.b.c.d.e.f.g" })
+      assertTrue ("Pattern: '" + s + "'", RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
+    for (final String s : new String [] { "",
+                                          "_",
+                                          "_aaaa",
+                                          ".1",
+                                          "",
+                                          "-aaaaa.",
+                                          "ä",
+                                          "1ä",
+                                          ".smp",
+                                          ".smp.",
+                                          "smp.",
+                                          "a..b",
+                                          "a.b.",
+                                          "a.b.c..d.e.f" })
+      assertFalse ("Pattern: '" + s + "'", RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
   }
 
   @Test
