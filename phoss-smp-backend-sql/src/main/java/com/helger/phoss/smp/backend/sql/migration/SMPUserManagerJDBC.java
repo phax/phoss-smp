@@ -49,15 +49,24 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerJDBC.class);
 
+  private final String m_sTableNameU;
+  private final String m_sTableNameO;
+
   /**
    * Constructor
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPUserManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPUserManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                             @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableNameU = sTableNamePrefix + "smp_user";
+    m_sTableNameO = sTableNamePrefix + "smp_ownership";
   }
 
   @NonNull
@@ -66,7 +75,8 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
   {
     final ICommonsList <DBUser> ret = new CommonsArrayList <> ();
     // Plaintext password....
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM smp_user");
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT username, password FROM " +
+                                                                          m_sTableNameU);
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
         ret.add (new DBUser (aRow.getAsString (0), aRow.getAsString (1)));
@@ -86,10 +96,10 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
         switch (eDBType)
         {
           case MYSQL:
-            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP FOREIGN KEY FK_smp_ownership_username");
+            aExecutor.executeStatement ("ALTER TABLE " + m_sTableNameO + " DROP FOREIGN KEY FK_smp_ownership_username");
             break;
           case POSTGRESQL:
-            aExecutor.executeStatement ("ALTER TABLE smp_ownership DROP CONSTRAINT FK_smp_ownership_username");
+            aExecutor.executeStatement ("ALTER TABLE " + m_sTableNameO + " DROP CONSTRAINT FK_smp_ownership_username");
             break;
           case ORACLE:
           case DB2:
@@ -109,18 +119,18 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
       {
         final String sOld = aEntry.getKey ();
         final String sNew = aEntry.getValue ();
-        aExecutor.insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE username=?",
+        aExecutor.insertOrUpdateOrDelete ("UPDATE " + m_sTableNameO + " SET username=? WHERE username=?",
                                           new ConstantPreparedStatementDataProvider (sNew, sOld));
       }
 
       // Delete the table
       try
       {
-        aExecutor.executeStatement ("DROP TABLE smp_user");
+        aExecutor.executeStatement ("DROP TABLE " + m_sTableNameU);
       }
       catch (final RuntimeException ex)
       {
-        LOGGER.warn ("Error in droping table smp_user", ex);
+        LOGGER.warn ("Error in droping table " + m_sTableNameU, ex);
       }
     });
   }

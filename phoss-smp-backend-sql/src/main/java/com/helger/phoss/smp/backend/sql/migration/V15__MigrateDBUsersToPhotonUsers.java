@@ -57,7 +57,8 @@ public final class V15__MigrateDBUsersToPhotonUsers extends BaseJavaMigration
       final EDatabaseSystemType eDBType = SMPDataSourceSingleton.getDatabaseType ();
 
       // Old JDBC user manager
-      final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (SMPDBExecutor::new);
+      final SMPUserManagerJDBC aSQLUserMgr = new SMPUserManagerJDBC (SMPDBExecutor::new,
+                                                                     SMPDBExecutor.TABLE_NAME_PREFIX);
       final ICommonsList <DBUser> aSQLUsers = aSQLUserMgr.getAllUsers ();
       LOGGER.info ("Found " + aSQLUsers.size () + " DB user to migrate");
 
