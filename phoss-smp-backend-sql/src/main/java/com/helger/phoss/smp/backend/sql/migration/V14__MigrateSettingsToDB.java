@@ -48,7 +48,8 @@ public class V14__MigrateSettingsToDB extends BaseJavaMigration
         final SMPSettingsManagerXML aMgrXML = new SMPSettingsManagerXML (sFilename);
         final ISMPSettings aSettings = aMgrXML.getSettings ();
 
-        final SMPSettingsManagerJDBC aMgrNew = new SMPSettingsManagerJDBC (SMPDBExecutor::new);
+        final SMPSettingsManagerJDBC aMgrNew = new SMPSettingsManagerJDBC (SMPDBExecutor::new,
+                                                                           SMPDBExecutor.TABLE_NAME_PREFIX);
         if (aMgrNew.updateSettings (aSettings.isRESTWritableAPIDisabled (),
                                     aSettings.isDirectoryIntegrationEnabled (),
                                     aSettings.isDirectoryIntegrationRequired (),
@@ -56,8 +57,7 @@ public class V14__MigrateSettingsToDB extends BaseJavaMigration
                                     aSettings.getDirectoryHostName (),
                                     aSettings.isSMLEnabled (),
                                     aSettings.isSMLRequired (),
-                                    aSettings.getSMLInfoID ())
-                   .isUnchanged ())
+                                    aSettings.getSMLInfoID ()).isUnchanged ())
           throw new IllegalStateException ("Failed to migrate SMP settings to DB");
 
         // Rename to avoid later inconsistencies

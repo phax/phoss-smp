@@ -54,15 +54,22 @@ import com.helger.photon.audit.AuditHelper;
 public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManager implements
                                                 ISMPParticipantMigrationManager
 {
+  private final String m_sTableName;
+
   /**
    * Constructor
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPParticipantMigrationManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPParticipantMigrationManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                                             @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableName = sTableNamePrefix + "smp_pmigration";
   }
 
   @Nullable
@@ -73,7 +80,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
-      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_pmigration (id, direction, state, pid, initdt, migkey)" +
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                                              m_sTableName +
+                                                              " (id, direction, state, pid, initdt, migkey)" +
                                                               " VALUES (?, ?, ?, ?, ?, ?)",
                                                               new ConstantPreparedStatementDataProvider (aSMPParticipantMigration.getID (),
                                                                                                          aSMPParticipantMigration.getDirection ()
@@ -129,7 +138,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (StringHelper.isEmpty (sParticipantMigrationID))
       return EChange.UNCHANGED;
 
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_pmigration" + " WHERE id=?",
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " + m_sTableName + " WHERE id=?",
                                                                  new ConstantPreparedStatementDataProvider (sParticipantMigrationID));
     if (nDeleted == 0)
     {
@@ -146,7 +155,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
 
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_pmigration" + " WHERE pid=?",
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " + m_sTableName + " WHERE pid=?",
                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getURIEncoded ()));
     if (nDeleted == 0)
     {
@@ -170,7 +179,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Update existing
-      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_pmigration SET state=? WHERE id=?",
+      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " + m_sTableName + " SET state=? WHERE id=?",
                                                               new ConstantPreparedStatementDataProvider (eNewState.getID (),
                                                                                                          sParticipantMigrationID));
       aUpdated.set (nUpdated);
@@ -211,7 +220,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT direction, state, pid, initdt, migkey FROM smp_pmigration WHERE id=?",
+    newExecutor ().querySingle ("SELECT direction, state, pid, initdt, migkey FROM " + m_sTableName + " WHERE id=?",
                                 new ConstantPreparedStatementDataProvider (sID),
                                 aDBResult::set);
     if (aDBResult.isNotSet ())
@@ -241,7 +250,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT id, initdt, migkey FROM smp_pmigration WHERE direction=? AND state=? AND pid=?",
+    newExecutor ().querySingle ("SELECT id, initdt, migkey FROM " +
+                                m_sTableName +
+                                " WHERE direction=? AND state=? AND pid=?",
                                 new ConstantPreparedStatementDataProvider (eDirection.getID (),
                                                                            eState.getID (),
                                                                            aParticipantID.getURIEncoded ()),
@@ -268,7 +279,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (eState == null)
     {
       // Use all states
-      aDBResult = newExecutor ().queryAll ("SELECT id, state, pid, initdt, migkey FROM smp_pmigration WHERE direction=?",
+      aDBResult = newExecutor ().queryAll ("SELECT id, state, pid, initdt, migkey FROM " +
+                                           m_sTableName +
+                                           " WHERE direction=?",
                                            new ConstantPreparedStatementDataProvider (eDirection.getID ()));
       if (aDBResult != null)
         for (final DBResultRow aRow : aDBResult)
@@ -287,7 +300,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     else
     {
       // Use specific state
-      aDBResult = newExecutor ().queryAll ("SELECT id, pid, initdt, migkey FROM smp_pmigration WHERE direction=? AND state=?",
+      aDBResult = newExecutor ().queryAll ("SELECT id, pid, initdt, migkey FROM " +
+                                           m_sTableName +
+                                           " WHERE direction=? AND state=?",
                                            new ConstantPreparedStatementDataProvider (eDirection.getID (),
                                                                                       eState.getID ()));
       if (aDBResult != null)
@@ -327,7 +342,9 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (aParticipantID == null)
       return false;
 
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_pmigration WHERE direction=? AND state=? AND pid=?",
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
+                                      m_sTableName +
+                                      " WHERE direction=? AND state=? AND pid=?",
                                       new ConstantPreparedStatementDataProvider (eDirection.getID (),
                                                                                  eState.getID (),
                                                                                  aParticipantID.getURIEncoded ())) > 0;

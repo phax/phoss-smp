@@ -110,19 +110,20 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @NonNull
   public ISMPSettingsManager createSettingsMgr ()
   {
-    return new SMPSettingsManagerJDBC (SMPDBExecutor::new);
+    return new SMPSettingsManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @NonNull
   public ISMPTransportProfileManager createTransportProfileMgr ()
   {
-    return new SMPTransportProfileManagerJDBC (SMPDBExecutor::new);
+    return new SMPTransportProfileManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @NonNull
   public ISMPServiceGroupManager createServiceGroupMgr ()
   {
-    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new);
+    final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new,
+                                                                           SMPDBExecutor.TABLE_NAME_PREFIX);
     // Enable cache by default
     ret.setCacheEnabled (SMPJDBCConfiguration.isJdbcServiceGroupCacheEnabled ());
     return ret;
@@ -131,26 +132,26 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @NonNull
   public ISMPRedirectManager createRedirectMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
-    return new SMPRedirectManagerJDBC (SMPDBExecutor::new);
+    return new SMPRedirectManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @NonNull
   public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
-    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new);
+    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @NonNull
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
-    return new SMPParticipantMigrationManagerJDBC (SMPDBExecutor::new);
+    return new SMPParticipantMigrationManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @Nullable
   public ISMPBusinessCardManager createBusinessCardMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
                                                         @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
   {
-    return new SMPBusinessCardManagerJDBC (SMPDBExecutor::new);
+    return new SMPBusinessCardManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @Override

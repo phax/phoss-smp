@@ -43,6 +43,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
@@ -62,6 +63,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   private static final String SML_ENABLED = "sml-enabled";
   private static final String SML_INFO_ID = "smlinfo-id";
 
+  private final String m_sTableName;
   private final CallbackList <ISMPSettingsCallback> m_aCallbacks = new CallbackList <> ();
 
   /**
@@ -69,10 +71,15 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPSettingsManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPSettingsManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                                 @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableName = sTableNamePrefix + "smp_settings";
   }
 
   @NonNull
@@ -82,15 +89,17 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     return m_aCallbacks;
   }
 
-  static void setSettingsValueInDB (@NonNull final DBExecutor aExecutor,
-                                    @NonNull @Nonempty final String sKey,
-                                    @Nullable final String sValue)
+  public static void setSettingsValueInDB (@NonNull final DBExecutor aExecutor,
+                                           @NonNull @Nonempty final String sKey,
+                                           @Nullable final String sValue)
   {
     ValueEnforcer.notNull (aExecutor, "Executor");
     ValueEnforcer.notEmpty (sKey, "Key");
 
     // update
-    final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_settings SET value=? WHERE id=?",
+    final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                            SMPDBExecutor.TABLE_NAME_PREFIX +
+                                                            "smp_settings SET value=? WHERE id=?",
                                                             new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sValue,
                                                                                                                                          500),
                                                                                                        DBValueHelper.getTrimmedToLength (sKey,
@@ -98,7 +107,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     if (nUpdated == 0)
     {
       // Create
-      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_settings (id, value) VALUES (?, ?)",
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                                              SMPDBExecutor.TABLE_NAME_PREFIX +
+                                                              "smp_settings (id, value) VALUES (?, ?)",
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sKey,
                                                                                                                                            45),
                                                                                                          DBValueHelper.getTrimmedToLength (sValue,
@@ -130,7 +141,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
   public ICommonsMap <String, String> getAllSettingsValuesFromDB ()
   {
     final ICommonsMap <String, String> ret = new CommonsHashMap <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, value FROM smp_settings");
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, value FROM " + m_sTableName);
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
         ret.put (aRow.getAsString (0), aRow.getAsString (1));
@@ -144,7 +155,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    aExecutor.querySingle ("SELECT value FROM smp_settings WHERE id=?",
+    aExecutor.querySingle ("SELECT value FROM " + SMPDBExecutor.TABLE_NAME_PREFIX + "smp_settings WHERE id=?",
                            new ConstantPreparedStatementDataProvider (sKey),
                            aDBResult::set);
     if (aDBResult.isNotSet ())

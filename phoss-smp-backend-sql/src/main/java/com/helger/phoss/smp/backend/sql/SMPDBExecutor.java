@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.sql;
 
 import java.util.function.Function;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,14 +33,15 @@ import com.helger.db.jdbc.executor.DBExecutor;
  */
 public final class SMPDBExecutor extends DBExecutor
 {
-  public static final Function <String, String> TABLE_NAME_CUSTOMIZER;
+  public static final @NonNull String TABLE_NAME_PREFIX;
+  public static final @NonNull Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
-    final String sTableNamePrefix = DBSystemHelper.getTableNamePrefix (SMPDataSourceSingleton.getDatabaseType (),
-                                                                       SMPJDBCConfiguration.getJdbcSchema ());
-    if (sTableNamePrefix.length () > 0)
+    TABLE_NAME_PREFIX = DBSystemHelper.getTableNamePrefix (SMPDataSourceSingleton.getDatabaseType (),
+                                                           SMPJDBCConfiguration.getJdbcSchema ());
+    if (TABLE_NAME_PREFIX.length () > 0)
     {
-      final String sRealPrefix = sTableNamePrefix + "smp_";
+      final String sRealPrefix = TABLE_NAME_PREFIX + "smp_";
       TABLE_NAME_CUSTOMIZER = x -> sRealPrefix + x;
     }
     else

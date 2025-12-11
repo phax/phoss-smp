@@ -61,6 +61,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerJDBC.class);
 
+  private final String m_sTableName;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
   /**
@@ -68,10 +69,15 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPRedirectManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPRedirectManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                                 @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableName = sTableNamePrefix + "smp_service_metadata_red";
   }
 
   @NonNull
@@ -104,7 +110,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       if (aDBRedirect == null)
       {
         // Create new
-        final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata_red (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                                                m_sTableName +
+                                                                " (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                                                                 new ConstantPreparedStatementDataProvider (aParticipantIdentifier.getScheme (),
                                                                                                            aParticipantIdentifier.getValue (),
                                                                                                            aDocTypeID.getScheme (),
@@ -120,7 +128,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       else
       {
         // Update existing
-        final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_metadata_red" +
+        final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                                m_sTableName +
                                                                 " SET redirectionUrl=?, certificateUID=?, certificate=?, extension=?" +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (sRedirectUrl,
@@ -187,7 +196,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final IParticipantIdentifier aParticipantID = aSMPRedirect.getServiceGroupParticipantIdentifier ();
     final IDocumentTypeIdentifier aDocTypeID = aSMPRedirect.getDocumentTypeIdentifier ();
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_red" +
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " +
+                                                                 m_sTableName +
                                                                  " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                             aParticipantID.getValue (),
@@ -217,7 +227,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     final ICommonsList <ISMPRedirect> aDeletedRedirects = getAllSMPRedirectsOfServiceGroup (aParticipantID);
 
     // Now delete
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata_red" +
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " +
+                                                                 m_sTableName +
                                                                  " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                                  new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                             aParticipantID.getValue ()));
@@ -255,7 +266,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                          " FROM smp_service_metadata_red");
+                                                                          " FROM " +
+                                                                          m_sTableName);
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
@@ -281,7 +293,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     if (aParticipantID != null)
     {
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                            " FROM smp_service_metadata_red" +
+                                                                            " FROM " +
+                                                                            m_sTableName +
                                                                             " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                                        aParticipantID.getValue ()));
@@ -303,7 +316,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   @Nonnegative
   public long getSMPRedirectCount ()
   {
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_metadata_red");
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableName);
   }
 
   @Nullable
@@ -317,7 +330,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
     newExecutor ().querySingle ("SELECT redirectionUrl, certificateUID, certificate, extension" +
-                                " FROM smp_service_metadata_red" +
+                                " FROM " +
+                                m_sTableName +
                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                            aParticipantID.getValue (),

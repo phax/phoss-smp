@@ -75,7 +75,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerJDBC.class);
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
-
+  private final String m_sTableNameSG;
+  private final String m_sTableNameO;
   private ExpiringMap <String, SMPServiceGroup> m_aCache;
 
   /**
@@ -83,10 +84,16 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPServiceGroupManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPServiceGroupManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                                     @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableNameSG = sTableNamePrefix + "smp_service_group";
+    m_sTableNameO = sTableNamePrefix + "smp_ownership";
   }
 
   public boolean isCacheEnabled ()
@@ -154,13 +161,17 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       }
 
       // Did not exist. Create it.
-      if (aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_group (businessIdentifierScheme, businessIdentifier, extension) VALUES (?, ?, ?)",
+      if (aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                            m_sTableNameSG +
+                                            " (businessIdentifierScheme, businessIdentifier, extension) VALUES (?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                        aParticipantID.getValue (),
                                                                                        sExtension)) > 0)
       {
         aCreatedSGDB.set (true);
-        aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_ownership (businessIdentifierScheme, businessIdentifier, username) VALUES (?, ?, ?)",
+        aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                          m_sTableNameO +
+                                          " (businessIdentifierScheme, businessIdentifier, username) VALUES (?, ?, ?)",
                                           new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                      aParticipantID.getValue (),
                                                                                      sOwnerID));
@@ -246,7 +257,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       if (!EqualsHelper.equals (sNewOwnerID, aDBServiceGroup.getOwnerID ()))
       {
         // Update ownership
-        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_ownership SET username=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                              m_sTableNameO +
+                                                              " SET username=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (sNewOwnerID,
                                                                                                          aDBServiceGroup.getParticipantIdentifier ()
                                                                                                                         .getScheme (),
@@ -260,7 +273,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       if (!EqualsHelper.equals (sNewExtension, aDBServiceGroup.getExtensions ().getExtensionsAsJsonString ()))
       {
         // Update extension
-        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_service_group SET extension=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                              m_sTableNameSG +
+                                                              " SET extension=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (sNewExtension,
                                                                                                          aDBServiceGroup.getParticipantIdentifier ()
                                                                                                                         .getScheme (),
@@ -334,7 +349,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
         aDeletedServiceGroupInSML.set (true);
       }
 
-      final long nCount = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_service_group" +
+      final long nCount = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                            m_sTableNameSG +
                                                             " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                        aParticipantID.getValue ()));
@@ -397,7 +413,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("getAllSMPServiceGroups()");
 
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username" +
-                                                                          " FROM smp_service_group sg, smp_ownership so" +
+                                                                          " FROM " +
+                                                                          m_sTableNameSG +
+                                                                          " sg, " +
+                                                                          m_sTableNameO +
+                                                                          " so" +
                                                                           " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
@@ -417,7 +437,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("getAllSMPServiceGroupIDs()");
 
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier" +
-                                                                          " FROM smp_service_group sg");
+                                                                          " FROM " +
+                                                                          m_sTableNameSG +
+                                                                          " sg");
 
     final ICommonsSet <String> ret = new CommonsHashSet <> ();
     if (aDBResult != null)
@@ -434,7 +456,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension" +
-                                                                          " FROM smp_service_group sg, smp_ownership so" +
+                                                                          " FROM " +
+                                                                          m_sTableNameSG +
+                                                                          " sg, " +
+                                                                          m_sTableNameO +
+                                                                          " so" +
                                                                           " WHERE so.username=?" +
                                                                           " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
                                                                           new ConstantPreparedStatementDataProvider (sOwnerID));
@@ -455,7 +481,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       LOGGER.debug ("getSMPServiceGroupCountOfOwner(" + sOwnerID + ")");
 
     return newExecutor ().queryCount ("SELECT COUNT(sg.businessIdentifier)" +
-                                      " FROM smp_service_group sg, smp_ownership so" +
+                                      " FROM " +
+                                      m_sTableNameSG +
+                                      " sg, " +
+                                      m_sTableNameO +
+                                      " so" +
                                       " WHERE so.username=?" +
                                       " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
                                       new ConstantPreparedStatementDataProvider (sOwnerID));
@@ -480,7 +510,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     // Not in cache
     final Wrapper <DBResultRow> aResult = new Wrapper <> ();
     newExecutor ().querySingle ("SELECT sg.extension, so.username" +
-                                " FROM smp_service_group sg, smp_ownership so" +
+                                " FROM " +
+                                m_sTableNameSG +
+                                " sg, " +
+                                m_sTableNameO +
+                                " so" +
                                 " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
                                 " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
@@ -510,7 +544,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return true;
 
     return 1 ==
-           newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_group" +
+           newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
+                                      m_sTableNameSG +
                                       " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                       new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                  aParticipantID.getValue ()));
@@ -522,6 +557,6 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupCount()");
 
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_group");
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableNameSG);
   }
 }

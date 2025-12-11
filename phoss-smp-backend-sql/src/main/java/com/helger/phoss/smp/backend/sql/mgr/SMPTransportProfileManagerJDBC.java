@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.numeric.mutable.MutableLong;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
@@ -50,15 +51,22 @@ import com.helger.photon.audit.AuditHelper;
  */
 public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager implements ISMPTransportProfileManager
 {
+  private final String m_sTableName;
+
   /**
    * Constructor
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPTransportProfileManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPTransportProfileManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                                         @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableName = sTableNamePrefix + "smp_tprofile";
   }
 
   @Nullable
@@ -73,7 +81,9 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Create new
-      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_tprofile (id, name, deprecated) VALUES (?, ?, ?)",
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                                              m_sTableName +
+                                                              " (id, name, deprecated) VALUES (?, ?, ?)",
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (ret.getID (),
                                                                                                                                            45),
                                                                                                          ret.getName (),
@@ -106,7 +116,9 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Update existing
-      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE smp_tprofile SET name=?, deprecated=? WHERE id=?",
+      final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                              m_sTableName +
+                                                              " SET name=?, deprecated=? WHERE id=?",
                                                               new ConstantPreparedStatementDataProvider (sName,
                                                                                                          Boolean.valueOf (bIsDeprecated),
                                                                                                          sSMPTransportProfileID));
@@ -141,7 +153,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     if (StringHelper.isEmpty (sSMPTransportProfileID))
       return EChange.UNCHANGED;
 
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM smp_tprofile WHERE id=?",
+    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " + m_sTableName + " WHERE id=?",
                                                                  new ConstantPreparedStatementDataProvider (sSMPTransportProfileID));
     if (nDeleted == 0)
     {
@@ -158,7 +170,8 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
   public ICommonsList <ISMPTransportProfile> getAllSMPTransportProfiles ()
   {
     final ICommonsList <ISMPTransportProfile> ret = new CommonsArrayList <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, name, deprecated FROM smp_tprofile");
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, name, deprecated FROM " +
+                                                                          m_sTableName);
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
       {
@@ -177,7 +190,7 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT name, deprecated FROM smp_tprofile WHERE id=?",
+    newExecutor ().querySingle ("SELECT name, deprecated FROM " + m_sTableName + " WHERE id=?",
                                 new ConstantPreparedStatementDataProvider (sID),
                                 aDBResult::set);
     if (aDBResult.isNotSet ())
@@ -195,13 +208,13 @@ public class SMPTransportProfileManagerJDBC extends AbstractJDBCEnabledManager i
     if (StringHelper.isEmpty (sID))
       return false;
 
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_tprofile WHERE id=?",
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableName + " WHERE id=?",
                                       new ConstantPreparedStatementDataProvider (sID)) > 0;
   }
 
   @Nonnegative
   public long getSMPTransportProfileCount ()
   {
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_tprofile");
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableName);
   }
 }

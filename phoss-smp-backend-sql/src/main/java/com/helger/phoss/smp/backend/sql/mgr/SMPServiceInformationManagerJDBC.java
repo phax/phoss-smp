@@ -100,6 +100,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     }
   }
 
+  private final String m_sTableNameSM;
+  private final String m_sTableNameP;
+  private final String m_sTableNameE;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
   /**
@@ -107,10 +110,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
    *
    * @param aDBExecSupplier
    *        The supplier for {@link DBExecutor} objects. May not be <code>null</code>.
+   * @param sTableNamePrefix
+   *        The table name prefix to be used. May not be <code>null</code>.
    */
-  public SMPServiceInformationManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier)
+  public SMPServiceInformationManagerJDBC (@NonNull final Supplier <? extends DBExecutor> aDBExecSupplier,
+                                           @NonNull final String sTableNamePrefix)
   {
     super (aDBExecSupplier);
+    ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableNameSM = sTableNamePrefix + "smp_service_metadata";
+    m_sTableNameP = sTableNamePrefix + "smp_process";
+    m_sTableNameE = sTableNamePrefix + "smp_endpoint";
   }
 
   @NonNull
@@ -137,7 +147,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
 
-      aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_service_metadata (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension) VALUES (?, ?, ?, ?, ?)",
+      aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                        m_sTableNameSM +
+                                        " (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension) VALUES (?, ?, ?, ?, ?)",
                                         new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                    aPID.getValue (),
                                                                                    aDocTypeID.getScheme (),
@@ -148,7 +160,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       for (final ISMPProcess aProcess : aSMPServiceInformation.getAllProcesses ())
       {
         final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
-        aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_process (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier, extension) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                          m_sTableNameP +
+                                          " (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier, extension) VALUES (?, ?, ?, ?, ?, ?, ?)",
                                           new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                      aPID.getValue (),
                                                                                      aDocTypeID.getScheme (),
@@ -160,7 +174,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         // Insert new endpoints
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
-          aExecutor.insertOrUpdateOrDelete ("INSERT INTO smp_endpoint (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier," +
+          aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                            m_sTableNameE +
+                                            " (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier," +
                                             " certificate, endpointReference, minimumAuthenticationLevel, requireBusinessLevelSignature, serviceActivationDate, serviceDescription, serviceExpirationDate, technicalContactUrl, technicalInformationUrl, transportProfile," +
                                             " extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aPID.getScheme (),
@@ -243,19 +259,22 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
-      final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
+      final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                              m_sTableNameE +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                          aPID.getValue (),
                                                                                                          aDocTypeID.getScheme (),
                                                                                                          aDocTypeID.getValue ()));
-      final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_process" +
+      final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                                m_sTableNameP +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                            aPID.getValue (),
                                                                                                            aDocTypeID.getScheme (),
                                                                                                            aDocTypeID.getValue ()));
-      final long nCountSM = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata" +
+      final long nCountSM = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                              m_sTableNameSM +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                          aPID.getValue (),
@@ -302,15 +321,18 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       // get the old ones first
       aAllDeleted.set (getAllSMPServiceInformationOfServiceGroup (aParticipantID));
 
-      final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
+      final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                              m_sTableNameE +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                          aParticipantID.getValue ()));
-      final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_process" +
+      final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                                m_sTableNameP +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                            aParticipantID.getValue ()));
-      final long nCountSM = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_service_metadata" +
+      final long nCountSM = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                              m_sTableNameSM +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                          aParticipantID.getValue ()));
@@ -346,7 +368,8 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
-      final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_endpoint" +
+      final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                              m_sTableNameE +
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=? AND processIdentifierType=? AND processIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                          aPID.getValue (),
@@ -354,7 +377,8 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                          aDocTypeID.getValue (),
                                                                                                          aProcessID.getScheme (),
                                                                                                          aProcessID.getValue ()));
-      final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM smp_process" +
+      final long nCountProc = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                                m_sTableNameP +
                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=? AND processIdentifierType=? AND processIdentifier=?",
                                                                 new ConstantPreparedStatementDataProvider (aPID.getScheme (),
                                                                                                            aPID.getValue (),
@@ -386,11 +410,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                          " FROM smp_service_metadata sm" +
-                                                                          " INNER JOIN smp_process sp" +
+                                                                          " FROM " +
+                                                                          m_sTableNameSM +
+                                                                          " sm" +
+                                                                          " INNER JOIN " +
+                                                                          m_sTableNameP +
+                                                                          " sp" +
                                                                           "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
                                                                           "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                          " INNER JOIN smp_endpoint se" +
+                                                                          " INNER JOIN " +
+                                                                          m_sTableNameE +
+                                                                          " se" +
                                                                           "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                           "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                           "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier");
@@ -459,7 +489,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   @Nonnegative
   public long getSMPServiceInformationCount ()
   {
-    return newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_service_metadata");
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableNameSM);
   }
 
   @NonNull
@@ -474,11 +504,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                             "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                             "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                             "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                            " FROM smp_service_metadata sm" +
-                                                                            " INNER JOIN smp_process sp" +
+                                                                            " FROM " +
+                                                                            m_sTableNameSM +
+                                                                            " sm" +
+                                                                            " INNER JOIN " +
+                                                                            m_sTableNameP +
+                                                                            " sp" +
                                                                             "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
                                                                             "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                            " INNER JOIN smp_endpoint se" +
+                                                                            " INNER JOIN " +
+                                                                            m_sTableNameE +
+                                                                            " se" +
                                                                             "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                             "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                             "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
@@ -546,7 +582,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (aParticipantID != null)
     {
       final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier" +
-                                                                            " FROM smp_service_metadata sm" +
+                                                                            " FROM " +
+                                                                            m_sTableNameSM +
+                                                                            " sm" +
                                                                             " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
                                                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                                        aParticipantID.getValue ()));
@@ -571,11 +609,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                          " FROM smp_service_metadata sm" +
-                                                                          " INNER JOIN smp_process sp" +
+                                                                          " FROM " +
+                                                                          m_sTableNameSM +
+                                                                          " sm" +
+                                                                          " INNER JOIN " +
+                                                                          m_sTableNameP +
+                                                                          " sp" +
                                                                           "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
                                                                           "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                          " INNER JOIN smp_endpoint se" +
+                                                                          " INNER JOIN " +
+                                                                          m_sTableNameE +
+                                                                          " se" +
                                                                           "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                           "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
                                                                           "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
@@ -629,7 +673,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (StringHelper.isEmpty (sTransportProfileID))
       return false;
 
-    final long nCount = newExecutor ().queryCount ("SELECT COUNT(*) FROM smp_endpoint WHERE transportProfile=?",
+    final long nCount = newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
+                                                   m_sTableNameE +
+                                                   " WHERE transportProfile=?",
                                                    new ConstantPreparedStatementDataProvider (sTransportProfileID));
     return nCount > 0;
   }

@@ -58,11 +58,14 @@ public final class V5__MigrateTransportProfilesToDB extends BaseJavaMigration
 
         if (aTransportProfiles.isNotEmpty ())
         {
-          final SMPTransportProfileManagerJDBC aMgrNew = new SMPTransportProfileManagerJDBC (SMPDBExecutor::new);
+          final SMPTransportProfileManagerJDBC aMgrNew = new SMPTransportProfileManagerJDBC (SMPDBExecutor::new,
+                                                                                             SMPDBExecutor.TABLE_NAME_PREFIX);
           for (final ISMPTransportProfile aTransportProfile : aTransportProfiles)
             if (aMgrNew.createSMPTransportProfile (aTransportProfile.getID (),
                                                    aTransportProfile.getName (),
-                                                   aTransportProfile.getState () == ESMPTransportProfileState.DEPRECATED) == null)
+                                                   aTransportProfile.getState () ==
+                                                                                 ESMPTransportProfileState.DEPRECATED) ==
+                null)
               LOGGER.error ("Failed to migrate " + aTransportProfile + " to DB");
         }
 
