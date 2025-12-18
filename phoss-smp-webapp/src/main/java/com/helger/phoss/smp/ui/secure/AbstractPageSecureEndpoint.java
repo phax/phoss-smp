@@ -809,7 +809,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     }
 
     {
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel (new HCFormLabel ("EndpointReference",
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel (new HCFormLabel ("Endpoint Reference",
                                                                                bIsPeppolMode ? ELabelType.MANDATORY
                                                                                              : ELabelType.OPTIONAL))
                                                    .setCtrl (new HCEdit (new RequestField (FIELD_ENDPOINT_REFERENCE,
