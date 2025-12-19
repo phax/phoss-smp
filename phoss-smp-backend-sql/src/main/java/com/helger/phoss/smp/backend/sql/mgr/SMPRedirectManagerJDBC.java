@@ -49,6 +49,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 
 /**
@@ -274,7 +275,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       {
         final IParticipantIdentifier aParticipantID = new SimpleParticipantIdentifier (aRow.getAsString (0),
                                                                                        aRow.getAsString (1));
-        final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aRow.getAsString (6));
+        final X509Certificate aCertificate = new CertificateDecodeHelper ().source (aRow.getAsString (6))
+                                                                           .pemEncoded (true)
+                                                                           .getDecodedOrNull ();
         ret.add (new SMPRedirect (aParticipantID,
                                   new SimpleDocumentTypeIdentifier (aRow.getAsString (2), aRow.getAsString (3)),
                                   aRow.getAsString (4),
@@ -301,7 +304,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       if (aDBResult != null)
         for (final DBResultRow aRow : aDBResult)
         {
-          final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aRow.getAsString (4));
+          final X509Certificate aCertificate = new CertificateDecodeHelper ().source (aRow.getAsString (4))
+                                                                             .pemEncoded (true)
+                                                                             .getDecodedOrNull ();
           ret.add (new SMPRedirect (aParticipantID,
                                     new SimpleDocumentTypeIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                     aRow.getAsString (2),
@@ -342,7 +347,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       return null;
 
     final DBResultRow aRow = aDBResult.get ();
-    final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (aRow.getAsString (2));
+    final X509Certificate aCertificate = new CertificateDecodeHelper ().source (aRow.getAsString (2))
+                                                                       .pemEncoded (true)
+                                                                       .getDecodedOrNull ();
     return new SMPRedirect (aParticipantID,
                             aDocTypeID,
                             aRow.getAsString (0),

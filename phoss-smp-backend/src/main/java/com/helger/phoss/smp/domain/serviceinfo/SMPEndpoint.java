@@ -26,6 +26,7 @@ import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
@@ -244,7 +245,9 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
       ret.setActivationDate (m_aServiceActivationDT.toLocalDate ());
     if (m_aServiceExpirationDT != null)
       ret.setExpirationDate (m_aServiceExpirationDT.toLocalDate ());
-    final X509Certificate aX509Cert = CertificateHelper.convertStringToCertficateOrNull (m_sCertificate);
+    final X509Certificate aX509Cert = new CertificateDecodeHelper ().source (m_sCertificate)
+                                                                    .pemEncoded (true)
+                                                                    .getDecodedOrNull ();
     if (aX509Cert != null)
     {
       final com.helger.xsds.bdxr.smp2.ac.CertificateType aCert = new com.helger.xsds.bdxr.smp2.ac.CertificateType ();

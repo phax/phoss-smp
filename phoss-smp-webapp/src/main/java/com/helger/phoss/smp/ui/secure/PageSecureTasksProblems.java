@@ -21,7 +21,6 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -75,6 +74,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.LoadedKey;
@@ -613,15 +613,9 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
         // Check all AP certificates at the end
         for (final var e : aCertCache.iterateAll ())
         {
-          X509Certificate aX509Cert = null;
-          try
-          {
-            aX509Cert = CertificateHelper.convertStringToCertficate (e.getKey ());
-          }
-          catch (final CertificateException ex)
-          {
-            // Ignore
-          }
+          final X509Certificate aX509Cert = new CertificateDecodeHelper ().source (e.getKey ())
+                                                                          .pemEncoded (true)
+                                                                          .getDecodedOrNull ();
 
           final String sErrorPrefix = "The X.509 endpoint certificate #" +
                                       e.getValue ().m_nIndex +

@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -92,7 +91,7 @@ import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uicore.page.handler.IWebPageActionHandler;
-import com.helger.security.certificate.CertificateHelper;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.xml.microdom.IMicroDocument;
@@ -478,7 +477,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     }
     if (aSelectedEndpoint.hasCertificate ())
     {
-      final X509Certificate aEndpointCert = CertificateHelper.convertStringToCertficateOrNull (aSelectedEndpoint.getCertificate ());
+      final X509Certificate aEndpointCert = new CertificateDecodeHelper ().source (aSelectedEndpoint.getCertificate ())
+                                                                          .pemEncoded (true)
+                                                                          .getDecodedOrNull ();
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate")
                                                    .setCtrl (aEndpointCert == null ? strong (
                                                                                              "!!!FAILED TO INTERPRETE!!!")
@@ -642,15 +643,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
     else
     {
-      X509Certificate aCert = null;
-      try
-      {
-        aCert = CertificateHelper.convertStringToCertficate (sCertificate);
-      }
-      catch (final CertificateException ex)
-      {
-        // Fall through
-      }
+      final X509Certificate aCert = new CertificateDecodeHelper ().source (sCertificate)
+                                                                  .pemEncoded (true)
+                                                                  .getDecodedOrNull ();
       if (aCert == null)
         aFormErrors.addFieldError (FIELD_CERTIFICATE,
                                    "The provided certificate string is not a valid X509 certificate!");

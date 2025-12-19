@@ -82,6 +82,7 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.text.ReadOnlyMultilingualText;
 import com.helger.url.ISimpleURL;
@@ -225,7 +226,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     X509Certificate aEndpointCert = null;
     try
     {
-      aEndpointCert = CertificateHelper.convertStringToCertficate (sCert);
+      aEndpointCert = new CertificateDecodeHelper ().source (sCert).pemEncoded (true).getDecodedOrThrow ();
     }
     catch (final Exception ex)
     {
@@ -237,22 +238,17 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   @NonNull
   private static IHCNode _getCertificateDisplay (@Nullable final String sCert, @NonNull final Locale aDisplayLocale)
   {
-    X509Certificate aEndpointCert = null;
-    try
-    {
-      aEndpointCert = CertificateHelper.convertStringToCertficate (sCert);
-    }
-    catch (final Exception ex)
-    {
-      // Ignore
-    }
+    final X509Certificate aEndpointCert = new CertificateDecodeHelper ().source (sCert)
+                                                                        .pemEncoded (true)
+                                                                        .getDecodedOrNull ();
     if (aEndpointCert == null)
     {
       final int nDisplayLen = 20;
-      final String sCertPart = (sCert.length () > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert);
+      final int nCertLen = StringHelper.getLength (sCert);
+      final String sCertPart = nCertLen > nDisplayLen ? sCert.substring (0, 20) + "..." : sCert;
       final HCDiv ret = new HCDiv ().addChild ("Invalid certificate")
-                                    .addChild (sCert.length () > nDisplayLen ? " starting with: " : ": ");
-      if (sCertPart.length () > 0)
+                                    .addChild (nCertLen > nDisplayLen ? " starting with: " : ": ");
+      if (nCertLen > 0)
         ret.addChild (new HCCode ().addChild (sCertPart));
       else
         ret.addChild (new HCEM ().addChild ("empty"));

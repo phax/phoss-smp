@@ -44,6 +44,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
@@ -107,7 +108,9 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     // The ID itself is derived from ServiceGroupID and DocTypeID
     final IParticipantIdentifier aParticipantIdentifier = aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
-    final X509Certificate aCert = CertificateHelper.convertStringToCertficateOrNull (aDoc.getString (BSON_TARGET_CERTIFICATE));
+    final X509Certificate aCert = new CertificateDecodeHelper ().source (aDoc.getString (BSON_TARGET_CERTIFICATE))
+                                                                .pemEncoded (true)
+                                                                .getDecodedOrNull ();
     return new SMPRedirect (aParticipantIdentifier,
                             aDocTypeID,
                             aDoc.getString (BSON_TARGET_HREF),

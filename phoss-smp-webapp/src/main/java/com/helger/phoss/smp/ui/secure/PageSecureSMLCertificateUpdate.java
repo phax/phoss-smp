@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -56,6 +55,7 @@ import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 
 public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
@@ -117,18 +117,14 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     }
     else
     {
-      try
-      {
-        aMigrationPublicCert = CertificateHelper.convertStringToCertficate (sMigrationPublicCert);
-      }
-      catch (final CertificateException ex)
-      {
-        // Fall through
-      }
-
+      aMigrationPublicCert = new CertificateDecodeHelper ().source (sMigrationPublicCert)
+                                                           .pemEncoded (true)
+                                                           .getDecodedOrNull ();
       if (aMigrationPublicCert == null)
+      {
         aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
                                    "The provided public certificate cannot be parsed as a X.509 certificate.");
+      }
       else
       {
         try
@@ -146,15 +142,19 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         }
 
         if (!sMigrationPublicCert.startsWith (CertificateHelper.BEGIN_CERTIFICATE))
+        {
           aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
                                      "The provided public certificate value must start with '" +
                                                            CertificateHelper.BEGIN_CERTIFICATE +
                                                            "' (without the quotes)");
+        }
         if (!sMigrationPublicCert.endsWith (CertificateHelper.END_CERTIFICATE))
+        {
           aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
                                      "The provided public certificate value must end with '" +
                                                            CertificateHelper.END_CERTIFICATE +
                                                            "' (without the quotes)");
+        }
       }
     }
 

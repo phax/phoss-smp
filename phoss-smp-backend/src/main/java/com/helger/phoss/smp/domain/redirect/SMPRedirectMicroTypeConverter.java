@@ -21,6 +21,7 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupProvider;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
@@ -77,8 +78,10 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                                                 SimpleDocumentTypeIdentifier.class);
     final String sTargetHref = aElement.getAttributeValue (ATTR_TARGET_HREF);
     final String sSubjectUniqueIdentifier = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE_SUID);
-    final X509Certificate aCertificate = CertificateHelper.convertStringToCertficateOrNull (MicroHelper.getChildTextContentTrimmed (aElement,
-                                                                                                                                    ELEMENT_CERTIFICATE));
+    final X509Certificate aCertificate = new CertificateDecodeHelper ().source (MicroHelper.getChildTextContentTrimmed (aElement,
+                                                                                                                        ELEMENT_CERTIFICATE))
+                                                                       .pemEncoded (true)
+                                                                       .getDecodedOrNull ();
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
     return new SMPRedirect (aServiceGroup.getParticipantIdentifier (),
