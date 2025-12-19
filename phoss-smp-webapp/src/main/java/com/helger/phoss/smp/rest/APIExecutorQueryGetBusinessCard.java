@@ -78,6 +78,11 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
     final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
+    if (aSMLInfo == null)
+    {
+      throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page",
+                                                aDataProvider.getCurrentURI ());
+    }
 
     final IParticipantIdentifier aParticipantID = aIF.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
