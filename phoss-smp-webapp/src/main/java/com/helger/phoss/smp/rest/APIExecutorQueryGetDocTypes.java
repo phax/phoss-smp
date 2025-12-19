@@ -115,18 +115,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
-    LOGGER.info (sLogPrefix +
-                 "Document types of '" +
-                 aParticipantID.getURIEncoded () +
-                 "' are queried using SMP API '" +
-                 eAPIType +
-                 "' from '" +
-                 aSMPQueryParams.getSMPHostURI () +
-                 "'; XSD validation=" +
-                 bXMLSchemaValidation +
-                 "; signature verification=" +
-                 bVerifySignature);
-
     final ISMPClientCreationCallback aSmpCcc = new ISMPClientCreationCallback ()
     {
       public void onPeppolSMPClient (@NonNull final SMPClientReadOnly aSMPClient)
@@ -145,6 +133,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       {}
     };
 
+    // Main querying
     final ICommonsOrderedMap <String, String> aOrigSGHrefs = PeppolAPIHelper.retrieveAllDocumentTypes (sLogPrefix,
                                                                                                        aSMPQueryParams,
                                                                                                        hcs -> {},
@@ -167,6 +156,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
 
     if (bQueryBusinessCard)
     {
+      // Retrieve Business Card as well
       final PDBusinessCard aBC = PeppolAPIHelper.retrieveBusinessCardParsed (sLogPrefix,
                                                                              aSMPQueryParams,
                                                                              hcs -> {},
