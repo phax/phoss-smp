@@ -105,15 +105,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
-    LOGGER.info (sLogPrefix +
-                 "BusinessCard of '" +
-                 aParticipantID.getURIEncoded () +
-                 "' is queried using SMP API '" +
-                 eAPIType +
-                 "' from '" +
-                 aSMPQueryParams.getSMPHostURI () +
-                 "'");
-
+    // Main querying
     final PDBusinessCard aBC = PeppolAPIHelper.retrieveBusinessCardParsed (sLogPrefix,
                                                                            aSMPQueryParams,
                                                                            hcs -> {},
