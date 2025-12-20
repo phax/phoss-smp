@@ -25,8 +25,10 @@ import com.helger.base.id.IHasID;
 import com.helger.base.string.StringHelper;
 import com.helger.diagnostics.error.IError;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.phoss.smp.ui.secure.hc.HCButtonToolbarSticky;
 import com.helger.photon.bootstrap4.alert.BootstrapBox;
 import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
+import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageForm;
 import com.helger.photon.core.form.FormErrorList;
@@ -68,5 +70,26 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
         final EBootstrapAlertType eType = aError.isError () ? EBootstrapAlertType.DANGER : EBootstrapAlertType.WARNING;
         aNodeList.addChild (new BootstrapBox (eType).addChild (aError.getAsString (aDisplayLocale)));
       }
+  }
+
+  @Override
+  @NonNull
+  protected BootstrapButtonToolbar createNewCreateToolbar (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    return new HCButtonToolbarSticky (aWPEC);
+  }
+
+  @Override
+  @NonNull
+  protected BootstrapButtonToolbar createNewEditToolbar (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    return new HCButtonToolbarSticky (aWPEC);
+  }
+
+  @Override
+  @NonNull
+  protected BootstrapButtonToolbar createNewViewToolbar (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    return new HCButtonToolbarSticky (aWPEC);
   }
 }

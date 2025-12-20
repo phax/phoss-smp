@@ -260,6 +260,7 @@ public final class SMPRendererPublic
                                                         final boolean bShowAuthor)
   {
     final BootstrapContainer aContainer = new BootstrapContainer ().setID (CLayout.LAYOUT_AREAID_FOOTER)
+                                                                   .addClass (CBootstrapCSS.BG_LIGHT)
                                                                    .setFluid (true);
     if (bShowApplicationName)
     {

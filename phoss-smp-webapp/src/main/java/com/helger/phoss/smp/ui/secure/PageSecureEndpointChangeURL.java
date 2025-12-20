@@ -339,7 +339,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
-      aForm.setLeft (-1, 12, -1, -1, 3);
+      aForm.setLeft (-1, 12, -1, -1, 2);
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
 
