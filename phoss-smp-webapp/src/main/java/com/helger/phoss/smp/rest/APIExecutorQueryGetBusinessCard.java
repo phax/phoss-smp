@@ -28,13 +28,14 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.CGlobal;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
+import com.helger.base.wrapper.Wrapper;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.json.IJsonObject;
 import com.helger.peppol.api.rest.PeppolAPIHelper;
 import com.helger.peppol.businesscard.generic.PDBusinessCard;
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.peppol.ui.types.minicallback.MiniCallbackLog;
+import com.helger.peppol.ui.types.feedbackcb.FeedbackCallbackLog;
 import com.helger.peppol.ui.types.smp.SMPQueryParams;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -106,10 +107,12 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
     final StopWatch aSW = StopWatch.createdStarted ();
 
     // Main querying
+    final Wrapper <Exception> aBCExceptionWrapper = new Wrapper <> ();
     final PDBusinessCard aBC = PeppolAPIHelper.retrieveBusinessCardParsed (sLogPrefix,
                                                                            aSMPQueryParams,
                                                                            hcs -> {},
-                                                                           new MiniCallbackLog (LOGGER, sLogPrefix));
+                                                                           new FeedbackCallbackLog (LOGGER, sLogPrefix),
+                                                                           aBCExceptionWrapper::set);
 
     IJsonObject aJson = null;
     if (aBC != null)
@@ -122,7 +125,13 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
 
     if (aJson == null)
     {
-      LOGGER.error (sLogPrefix + "Failed to perform the BusinessCard SMP lookup");
+      final Exception aBCException = aBCExceptionWrapper.get ();
+      LOGGER.error (sLogPrefix +
+                    "Failed to perform the BusinessCard SMP lookup" +
+                    (aBCException == null ? "" : ". Technical details: " +
+                                                 aBCException.getClass ().getName () +
+                                                 " - " +
+                                                 aBCException.getMessage ()));
       aUnifiedResponse.createNotFound ();
     }
     else

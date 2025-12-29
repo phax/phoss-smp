@@ -28,6 +28,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.CGlobal;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
+import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsTreeMap;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.collection.commons.ICommonsSortedMap;
@@ -38,7 +39,7 @@ import com.helger.peppol.api.rest.PeppolAPIHelper;
 import com.helger.peppol.businesscard.generic.PDBusinessCard;
 import com.helger.peppol.sml.ESMPAPIType;
 import com.helger.peppol.sml.ISMLInfo;
-import com.helger.peppol.ui.types.minicallback.MiniCallbackLog;
+import com.helger.peppol.ui.types.feedbackcb.FeedbackCallbackLog;
 import com.helger.peppol.ui.types.smp.ISMPClientCreationCallback;
 import com.helger.peppol.ui.types.smp.ISMPExtensionsCallback;
 import com.helger.peppol.ui.types.smp.SMPQueryParams;
@@ -53,6 +54,7 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.BDXRClientReadOnly;
 import com.helger.smpclient.bdxr2.BDXR2ClientReadOnly;
+import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.json.SMPJsonResponse;
 import com.helger.smpclient.peppol.SMPClientReadOnly;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -134,6 +136,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     };
 
     // Main querying
+    final Wrapper <SMPClientException> aExceptionWrapper = new Wrapper <> ();
     final ICommonsOrderedMap <String, String> aOrigSGHrefs = PeppolAPIHelper.retrieveAllDocumentTypes (sLogPrefix,
                                                                                                        aSMPQueryParams,
                                                                                                        hcs -> {},
@@ -145,7 +148,8 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
                                                                                                                              sHref +
                                                                                                                              "'"),
                                                                                                        m -> {},
-                                                                                                       ISMPExtensionsCallback.IGNORE);
+                                                                                                       ISMPExtensionsCallback.IGNORE,
+                                                                                                       aExceptionWrapper::set);
 
     IJsonObject aJson = null;
     if (aOrigSGHrefs != null)
@@ -157,10 +161,13 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     if (bQueryBusinessCard)
     {
       // Retrieve Business Card as well
+      final Wrapper <Exception> aBCExceptionWrapper = new Wrapper <> ();
       final PDBusinessCard aBC = PeppolAPIHelper.retrieveBusinessCardParsed (sLogPrefix,
                                                                              aSMPQueryParams,
                                                                              hcs -> {},
-                                                                             new MiniCallbackLog (LOGGER, sLogPrefix));
+                                                                             new FeedbackCallbackLog (LOGGER,
+                                                                                                      sLogPrefix),
+                                                                             aBCExceptionWrapper::set);
       if (aBC != null)
       {
         // Business Card found

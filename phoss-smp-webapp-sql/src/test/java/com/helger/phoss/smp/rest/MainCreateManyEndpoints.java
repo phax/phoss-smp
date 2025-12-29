@@ -74,6 +74,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("deprecation")
   public static void main (final String [] args)
   {
     final String sServerBasePath = "http://localhost:90";

@@ -53,8 +53,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Create one million endpoints. Run this AFTER
- * {@link MainCreateManyServiceGroups}.
+ * Create one million endpoints. Run this AFTER {@link MainCreateManyServiceGroups}.
  *
  * @author Philip Helger
  */
@@ -72,6 +71,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
+  @SuppressWarnings ("deprecation")
   public static void main (final String [] args) throws Throwable
   {
     final String sServerBasePath = "http://localhost:90";

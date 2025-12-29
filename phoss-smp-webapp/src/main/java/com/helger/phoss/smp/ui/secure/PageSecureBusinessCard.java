@@ -58,6 +58,7 @@ import com.helger.html.jscode.JSAnonymousFunction;
 import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSParam;
+import com.helger.pd.client.IPDClientExceptionCallback;
 import com.helger.pd.client.PDClient;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -356,6 +357,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                           }
                           else
                           {
+                            final HCNodeList aExceptionDetails = new HCNodeList ();
+                            final IPDClientExceptionCallback aOriginalCallback = aPDClient.getExceptionHandler ();
+                            final IPDClientExceptionCallback aExCallback = (aExParticipantID, sContext, aException) -> {
+                              aOriginalCallback.onException (aExParticipantID, sContext, aException);
+                              aExceptionDetails.addChild (SMPCommonUI.getTechnicalDetailsUI (aException));
+                            };
+                            aPDClient.setExceptionHandler (aExCallback);
+
                             final ESuccess eSuccess = aPDClient.addServiceGroupToIndex (aParticipantID);
                             if (eSuccess.isSuccess ())
                             {
