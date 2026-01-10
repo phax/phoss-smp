@@ -140,7 +140,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Simply delete the old one
-      final EChange eDeleted = _deleteSMPServiceInformationNoCallback (aSMPServiceInformation);
+      final EChange eDeleted = _deleteSMPServiceInformationNoCallback (aExecutor, aSMPServiceInformation);
       aUpdated.set (eDeleted.isChanged ());
 
       // Insert new processes
@@ -252,10 +252,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   }
 
   @NonNull
-  private EChange _deleteSMPServiceInformationNoCallback (@NonNull final ISMPServiceInformation aSMPServiceInformation)
+  private EChange _deleteSMPServiceInformationNoCallback (@NonNull final DBExecutor aExecutor,
+                                                          @NonNull final ISMPServiceInformation aSMPServiceInformation)
   {
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (-1));
-    final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
@@ -294,7 +294,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       return EChange.UNCHANGED;
 
     // Main deletion
-    if (_deleteSMPServiceInformationNoCallback (aSMPServiceInformation).isUnchanged ())
+    if (_deleteSMPServiceInformationNoCallback (newExecutor (), aSMPServiceInformation).isUnchanged ())
     {
       AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT, "no-such-id", aSMPServiceInformation.getID ());
       return EChange.UNCHANGED;
@@ -319,7 +319,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // get the old ones first
-      aAllDeleted.set (getAllSMPServiceInformationOfServiceGroup (aParticipantID));
+      aAllDeleted.set (_getAllSMPServiceInformationOfServiceGroup (aExecutor, aParticipantID));
 
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
                                                               m_sTableNameE +
@@ -494,33 +494,34 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
   @NonNull
   @ReturnsMutableCopy
-  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
+  private ICommonsList <ISMPServiceInformation> _getAllSMPServiceInformationOfServiceGroup (@NonNull final DBExecutor aExecutor,
+                                                                                            @Nullable final IParticipantIdentifier aParticipantID)
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     if (aParticipantID != null)
     {
-      final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
-                                                                            "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                            "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
-                                                                            "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
-                                                                            "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                            " FROM " +
-                                                                            m_sTableNameSM +
-                                                                            " sm" +
-                                                                            " INNER JOIN " +
-                                                                            m_sTableNameP +
-                                                                            " sp" +
-                                                                            "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
-                                                                            "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                            " INNER JOIN " +
-                                                                            m_sTableNameE +
-                                                                            " se" +
-                                                                            "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
-                                                                            "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
-                                                                            "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
-                                                                            " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
-                                                                            new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                                       aParticipantID.getValue ()));
+      final ICommonsList <DBResultRow> aDBResult = aExecutor.queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
+                                                                       "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
+                                                                       "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                       "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                                                                       "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
+                                                                       " FROM " +
+                                                                       m_sTableNameSM +
+                                                                       " sm" +
+                                                                       " INNER JOIN " +
+                                                                       m_sTableNameP +
+                                                                       " sp" +
+                                                                       "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
+                                                                       "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
+                                                                       " INNER JOIN " +
+                                                                       m_sTableNameE +
+                                                                       " se" +
+                                                                       "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
+                                                                       "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
+                                                                       "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier" +
+                                                                       " WHERE sm.businessIdentifierScheme=? AND sm.businessIdentifier=?",
+                                                                       new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                                  aParticipantID.getValue ()));
       if (aDBResult != null)
       {
         final ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>> aGrouping = new CommonsHashMap <> ();
@@ -572,6 +573,13 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       }
     }
     return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformationOfServiceGroup (@Nullable final IParticipantIdentifier aParticipantID)
+  {
+    return _getAllSMPServiceInformationOfServiceGroup (newExecutor (), aParticipantID);
   }
 
   @NonNull

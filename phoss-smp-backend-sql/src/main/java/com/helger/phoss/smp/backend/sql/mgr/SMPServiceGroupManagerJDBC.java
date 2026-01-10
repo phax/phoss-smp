@@ -146,7 +146,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Check if the passed service group ID is already in use
-      final SMPServiceGroup aDBServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+      final SMPServiceGroup aDBServiceGroup = _getSMPServiceGroupOfID (aExecutor, aParticipantID);
       if (aDBServiceGroup != null)
         throw new IllegalStateException ("The service group with ID " +
                                          aParticipantID.getURIEncoded () +
@@ -248,7 +248,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Check if the passed service group ID is already in use
-      final SMPServiceGroup aDBServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+      final SMPServiceGroup aDBServiceGroup = _getSMPServiceGroupOfID (aExecutor, aParticipantID);
       if (aDBServiceGroup == null)
         throw new SMPNotFoundException ("The service group with ID " +
                                         aParticipantID.getURIEncoded () +
@@ -335,7 +335,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       // Check if the passed service group ID is already in use
-      final SMPServiceGroup aDBServiceGroup = getSMPServiceGroupOfID (aParticipantID);
+      final SMPServiceGroup aDBServiceGroup = _getSMPServiceGroupOfID (aExecutor, aParticipantID);
       if (aDBServiceGroup == null)
         throw new SMPNotFoundException ("The service group with ID " +
                                         aParticipantID.getURIEncoded () +
@@ -492,7 +492,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   }
 
   @Nullable
-  public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantID)
+  private SMPServiceGroup _getSMPServiceGroupOfID (@NonNull final DBExecutor aDBExecutor,
+                                                   @Nullable final IParticipantIdentifier aParticipantID)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupOfID(" +
@@ -509,17 +510,17 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     // Not in cache
     final Wrapper <DBResultRow> aResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT sg.extension, so.username" +
-                                " FROM " +
-                                m_sTableNameSG +
-                                " sg, " +
-                                m_sTableNameO +
-                                " so" +
-                                " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
-                                " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
-                                new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                           aParticipantID.getValue ()),
-                                aResult::set);
+    aDBExecutor.querySingle ("SELECT sg.extension, so.username" +
+                             " FROM " +
+                             m_sTableNameSG +
+                             " sg, " +
+                             m_sTableNameO +
+                             " so" +
+                             " WHERE sg.businessIdentifierScheme=? AND sg.businessIdentifier=?" +
+                             " AND so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier",
+                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                        aParticipantID.getValue ()),
+                             aResult::set);
     if (aResult.isNotSet ())
       return null;
 
@@ -527,6 +528,12 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (m_aCache != null)
       m_aCache.put (aParticipantID.getURIEncoded (), ret);
     return ret;
+  }
+
+  @Nullable
+  public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantID)
+  {
+    return _getSMPServiceGroupOfID (newExecutor (), aParticipantID);
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)

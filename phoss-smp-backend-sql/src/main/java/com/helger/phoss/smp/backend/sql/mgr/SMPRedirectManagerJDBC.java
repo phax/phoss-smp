@@ -103,7 +103,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
-      final ISMPRedirect aDBRedirect = getSMPRedirectOfServiceGroupAndDocumentType (aParticipantIdentifier, aDocTypeID);
+      final ISMPRedirect aDBRedirect = _getSMPRedirectOfServiceGroupAndDocumentType (aExecutor,
+                                                                                     aParticipantIdentifier,
+                                                                                     aDocTypeID);
 
       final String sCertificate = aCertificate == null ? null : CertificateHelper.getPEMEncodedCertificate (
                                                                                                             aCertificate);
@@ -325,8 +327,9 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   }
 
   @Nullable
-  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantID,
-                                                                   @Nullable final IDocumentTypeIdentifier aDocTypeID)
+  private ISMPRedirect _getSMPRedirectOfServiceGroupAndDocumentType (@NonNull final DBExecutor aDBExecutor,
+                                                                     @Nullable final IParticipantIdentifier aParticipantID,
+                                                                     @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
     if (aParticipantID == null)
       return null;
@@ -334,15 +337,15 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT redirectionUrl, certificateUID, certificate, extension" +
-                                " FROM " +
-                                m_sTableName +
-                                " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
-                                new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                           aParticipantID.getValue (),
-                                                                           aDocTypeID.getScheme (),
-                                                                           aDocTypeID.getValue ()),
-                                aDBResult::set);
+    aDBExecutor.querySingle ("SELECT redirectionUrl, certificateUID, certificate, extension" +
+                             " FROM " +
+                             m_sTableName +
+                             " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
+                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                        aParticipantID.getValue (),
+                                                                        aDocTypeID.getScheme (),
+                                                                        aDocTypeID.getValue ()),
+                             aDBResult::set);
     if (aDBResult.isNotSet ())
       return null;
 
@@ -356,5 +359,12 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                             aRow.getAsString (1),
                             aCertificate,
                             aRow.getAsString (3));
+  }
+
+  @Nullable
+  public ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable final IParticipantIdentifier aParticipantID,
+                                                                   @Nullable final IDocumentTypeIdentifier aDocTypeID)
+  {
+    return _getSMPRedirectOfServiceGroupAndDocumentType (newExecutor (), aParticipantID, aDocTypeID);
   }
 }
