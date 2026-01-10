@@ -98,9 +98,8 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V30,
 
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V20,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_CREDIT_NOTE_UBL_V20,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_CII_V202 })
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V30,
+                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_CII_V30 })
 
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
