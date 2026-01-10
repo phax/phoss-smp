@@ -68,7 +68,7 @@
 
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
-    <flyway.version>11.20.0</flyway.version>
+    <flyway.version>11.20.1</flyway.version>
     <log4j.version>2.25.3</log4j.version>
     <mongodb.version>5.6.2</mongodb.version>
     <protobuf.version>4.33.2</protobuf.version>
