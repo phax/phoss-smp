@@ -16,9 +16,14 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.time.Duration;
+
+import org.apache.commons.pool2.impl.BaseObjectPoolConfig;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.misc.Since;
 import com.helger.annotation.style.PresentForCodeCoverage;
@@ -68,6 +73,28 @@ public final class SMPJDBCConfiguration
 
   private static final String CONFIG_SMP_STATUS_SQL_ENABLED = "smp.status.sql.enabled";
   private static final boolean DEFAULT_SMP_STATUS_SQL_ENABLED = true;
+
+  @Since ("8.0.11")
+  private static final String CONFIG_JDBC_POOLING_MAX_CONNECTIONS = "jdbc.pooling.max-connections";
+  private static final int DEFAULT_JDBC_POOLING_MAX_CONNECTIONS = GenericObjectPoolConfig.DEFAULT_MAX_TOTAL;
+
+  @Since ("8.0.11")
+  private static final String CONFIG_JDBC_POOLING_MAX_WAIT_MILLIS = "jdbc.pooling.max-wait.millis";
+  private static final long DEFAULT_JDBC_POOLING_MAX_WAIT_MILLIS = true ? Duration.ofSeconds (10).toMillis ()
+                                                                        : BaseObjectPoolConfig.DEFAULT_MAX_WAIT.toMillis ();
+
+  @Since ("8.0.11")
+  private static final String CONFIG_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS = "jdbc.pooling.between-evictions-runs.millis";
+  private static final long DEFAULT_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS.toMillis ();
+
+  @Since ("8.0.11")
+  private static final String CONFIG_JDBC_POOLING_MIN_EVICTABLE_IDLE_MILLIS = "jdbc.pooling.min-evictable-idle.millis";
+  private static final long DEFAULT_JDBC_POOLING_MIN_EVICTABLE_IDLE_MILLIS = BaseObjectPoolConfig.DEFAULT_MIN_EVICTABLE_IDLE_DURATION.toMillis ();
+
+  @Since ("8.0.11")
+  private static final String CONFIG_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS = "jdbc.pooling.remove-abandoned-timeout.millis";
+  // Should be AbandonedConfig.DEFAULT_REMOVE_ABANDONED_TIMEOUT_DURATION (see POOL-430)
+  private static final long DEFAULT_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS = Duration.ofMinutes (5).toMillis ();
 
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration INSTANCE = new SMPJDBCConfiguration ();
@@ -158,5 +185,64 @@ public final class SMPJDBCConfiguration
   public static boolean isStatusEnabled ()
   {
     return _getConfig ().getAsBoolean (CONFIG_SMP_STATUS_SQL_ENABLED, DEFAULT_SMP_STATUS_SQL_ENABLED);
+  }
+
+  /**
+   * @return The maximum number of active connections that can be allocated from this pool at the
+   *         same time, or negative for no limit. Default is 8.
+   * @since 8.0.11
+   */
+  @CheckForSigned
+  public static int getJdbcPoolingMaxConnections ()
+  {
+    return _getConfig ().getAsInt (CONFIG_JDBC_POOLING_MAX_CONNECTIONS, DEFAULT_JDBC_POOLING_MAX_CONNECTIONS);
+  }
+
+  /**
+   * @return The maximum number of milliseconds that the pool will wait (when there are no available
+   *         connections) for a connection to be returned before throwing an exception, or -1 to
+   *         wait indefinitely. Default is 10 seconds.
+   * @since 8.0.11
+   */
+  @CheckForSigned
+  public static long getJdbcPoolingMaxWaitMillis ()
+  {
+    return _getConfig ().getAsLong (CONFIG_JDBC_POOLING_MAX_WAIT_MILLIS, DEFAULT_JDBC_POOLING_MAX_WAIT_MILLIS);
+  }
+
+  /**
+   * @return The number of milliseconds to sleep between runs of the idle object evictor thread.
+   *         When non-positive, no idle object evictor thread will be run. Default is -1.
+   * @since 8.0.11
+   */
+  @CheckForSigned
+  public static long getJdbcPoolingBetweenEvictionRunsMillis ()
+  {
+    return _getConfig ().getAsLong (CONFIG_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS,
+                                    DEFAULT_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS);
+  }
+
+  /**
+   * @return The minimum amount of milliseconds an object may sit idle in the pool before it is
+   *         eligible for eviction by the idle object evictor (if any). Default is 30 minutes.
+   * @since 8.0.11
+   */
+  @CheckForSigned
+  public static long getJdbcPoolingMinEvictableIdleMillis ()
+  {
+    return _getConfig ().getAsLong (CONFIG_JDBC_POOLING_MIN_EVICTABLE_IDLE_MILLIS,
+                                    DEFAULT_JDBC_POOLING_MIN_EVICTABLE_IDLE_MILLIS);
+  }
+
+  /**
+   * @return Timeout in milliseconds before an abandoned connection can be removed. Default is 5
+   *         minutes.
+   * @since 8.0.11
+   */
+  @CheckForSigned
+  public static long getJdbcPoolingRemoveAbandonedTimeoutMillis ()
+  {
+    return _getConfig ().getAsLong (CONFIG_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS,
+                                    DEFAULT_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS);
   }
 }

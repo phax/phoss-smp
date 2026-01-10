@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.sql;
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Duration;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.jspecify.annotations.NonNull;
@@ -28,8 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.db.jdbc.IHasDataSource;
 
 /**
- * The main data source provider, only instantiated from
- * {@link SMPDataSourceSingleton}.
+ * The main data source provider, only instantiated from {@link SMPDataSourceSingleton}.
  *
  * @author Philip Helger
  */
@@ -56,6 +56,20 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
     // settings
     m_aDataSource.setDefaultAutoCommit (Boolean.FALSE);
     m_aDataSource.setPoolPreparedStatements (true);
+
+    // Pooling configuration (since 8.0.11)
+    final int nMaxConnections = SMPJDBCConfiguration.getJdbcPoolingMaxConnections ();
+    m_aDataSource.setMaxTotal (nMaxConnections);
+    m_aDataSource.setMaxWait (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMaxWaitMillis ()));
+    m_aDataSource.setInitialSize (Math.min (4, nMaxConnections));
+    m_aDataSource.setMinIdle (Math.min (4, nMaxConnections));
+    m_aDataSource.setMaxIdle (nMaxConnections);
+    m_aDataSource.setTestOnBorrow (false);
+    m_aDataSource.setTestWhileIdle (true);
+    m_aDataSource.setDurationBetweenEvictionRuns (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingBetweenEvictionRunsMillis ()));
+    m_aDataSource.setMinEvictableIdle (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMinEvictableIdleMillis ()));
+    m_aDataSource.setRemoveAbandonedOnBorrow (true);
+    m_aDataSource.setRemoveAbandonedTimeout (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingRemoveAbandonedTimeoutMillis ()));
 
     LOGGER.info ("Created new DataSource " + m_aDataSource);
   }

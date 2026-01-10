@@ -17,7 +17,7 @@
 package com.helger.phoss.smp.sql.status;
 
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.time.Duration;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.jspecify.annotations.NonNull;
@@ -30,7 +30,6 @@ import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.db.api.jdbc.JDBCHelper;
 import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
-import com.helger.db.jdbc.executor.DBNoConnectionException;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
@@ -49,14 +48,6 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
   private static boolean _isDBConnectionPossible ()
   {
     final BasicDataSource aDS = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDataSource ();
-    try
-    {
-      aDS.setLoginTimeout (1);
-    }
-    catch (final SQLException | UnsupportedOperationException ex)
-    {
-      // Not possible on BasicDataSource
-    }
 
     // Note: maxReconnects setting for MySQL makes no difference
     final IHasConnection aCP = new ConnectionFromDataSource (aDS);
@@ -71,15 +62,14 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
       // Okay, connection was established
       return true;
     }
-    catch (final DBNoConnectionException ex)
+    catch (final Exception ex)
     {
       return false;
     }
     finally
     {
       // Close connection again (if necessary)
-      if (aConnection != null && aCP.shouldCloseConnection ())
-        JDBCHelper.close (aConnection);
+      JDBCHelper.close (aConnection);
     }
   }
 
@@ -91,6 +81,18 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
     {
       // Since 5.3.0-RC5
       ret.put ("smp.sql.target-database", SMPJDBCConfiguration.getTargetDatabaseType ());
+
+      // All smp.sql.pooling since 8.0.11
+      ret.put ("smp.sql.pooling.max-connections",
+               Integer.valueOf (SMPJDBCConfiguration.getJdbcPoolingMaxConnections ()));
+      ret.put ("smp.sql.pooling.max-wait.duration",
+               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMaxWaitMillis ()).toString ());
+      ret.put ("smp.sql.pooling.between-evictions-runs.duration",
+               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingBetweenEvictionRunsMillis ()).toString ());
+      ret.put ("smp.sql.pooling.min-evictable-idle",
+               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMinEvictableIdleMillis ()).toString ());
+      ret.put ("smp.sql.pooling.remove-abandoned-timeout",
+               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingRemoveAbandonedTimeoutMillis ()).toString ());
 
       if (!bDisableLongRunningOperations)
       {
