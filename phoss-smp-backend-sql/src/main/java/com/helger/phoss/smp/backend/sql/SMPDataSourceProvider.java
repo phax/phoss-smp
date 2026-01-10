@@ -59,6 +59,10 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
 
     // Pooling configuration (since 8.0.11)
     final int nMaxConnections = SMPJDBCConfiguration.getJdbcPoolingMaxConnections ();
+    if (nMaxConnections >= 1 && nMaxConnections < 4)
+      LOGGER.warn ("The configuration property value " +
+                   nMaxConnections +
+                   " for the 'JDBC pooling maximum connection count' seems to be very small. Consider increasing it for higher throughput.");
     m_aDataSource.setMaxTotal (nMaxConnections);
     m_aDataSource.setMaxWait (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMaxWaitMillis ()));
     m_aDataSource.setInitialSize (Math.min (4, nMaxConnections));
