@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.exception.InitializationException;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
@@ -46,64 +47,77 @@ public final class SMPSecurity
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
     final IRoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
+    int nErrorCount = 0;
 
     // Standard users
     if (!aUserMgr.containsWithID (CSMP.USER_ADMINISTRATOR_ID))
     {
       final boolean bDisabled = false;
-      aUserMgr.createPredefinedUser (CSMP.USER_ADMINISTRATOR_ID,
-                                     CSMP.USER_ADMINISTRATOR_LOGINNAME,
-                                     CSMP.USER_ADMINISTRATOR_EMAIL,
-                                     CSMP.USER_ADMINISTRATOR_PASSWORD,
-                                     CSMP.USER_ADMINISTRATOR_FIRSTNAME,
-                                     CSMP.USER_ADMINISTRATOR_LASTNAME,
-                                     CSMP.USER_ADMINISTRATOR_DESCRIPTION,
-                                     CSMP.USER_ADMINISTRATOR_LOCALE,
-                                     CSMP.USER_ADMINISTRATOR_CUSTOMATTRS,
-                                     bDisabled);
+      if (aUserMgr.createPredefinedUser (CSMP.USER_ADMINISTRATOR_ID,
+                                         CSMP.USER_ADMINISTRATOR_LOGINNAME,
+                                         CSMP.USER_ADMINISTRATOR_EMAIL,
+                                         CSMP.USER_ADMINISTRATOR_PASSWORD,
+                                         CSMP.USER_ADMINISTRATOR_FIRSTNAME,
+                                         CSMP.USER_ADMINISTRATOR_LASTNAME,
+                                         CSMP.USER_ADMINISTRATOR_DESCRIPTION,
+                                         CSMP.USER_ADMINISTRATOR_LOCALE,
+                                         CSMP.USER_ADMINISTRATOR_CUSTOMATTRS,
+                                         bDisabled) == null)
+        nErrorCount++;
     }
 
     // Create all roles
     if (!aRoleMgr.containsWithID (CSMP.ROLE_CONFIG_ID))
-      aRoleMgr.createPredefinedRole (CSMP.ROLE_CONFIG_ID,
-                                     CSMP.ROLE_CONFIG_NAME,
-                                     CSMP.ROLE_CONFIG_DESCRIPTION,
-                                     CSMP.ROLE_CONFIG_CUSTOMATTRS);
+      if (aRoleMgr.createPredefinedRole (CSMP.ROLE_CONFIG_ID,
+                                         CSMP.ROLE_CONFIG_NAME,
+                                         CSMP.ROLE_CONFIG_DESCRIPTION,
+                                         CSMP.ROLE_CONFIG_CUSTOMATTRS) == null)
+        nErrorCount++;
 
     if (!aRoleMgr.containsWithID (CSMP.ROLE_WRITABLERESTAPI_ID))
-      aRoleMgr.createPredefinedRole (CSMP.ROLE_WRITABLERESTAPI_ID,
-                                     CSMP.ROLE_WRITABLERESTAPI_NAME,
-                                     CSMP.ROLE_WRITABLERESTAPI_DESCRIPTION,
-                                     CSMP.ROLE_WRITABLERESTAPI_CUSTOMATTRS);
+      if (aRoleMgr.createPredefinedRole (CSMP.ROLE_WRITABLERESTAPI_ID,
+                                         CSMP.ROLE_WRITABLERESTAPI_NAME,
+                                         CSMP.ROLE_WRITABLERESTAPI_DESCRIPTION,
+                                         CSMP.ROLE_WRITABLERESTAPI_CUSTOMATTRS) == null)
+        nErrorCount++;
 
     // User group Administrators
     if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_ADMINISTRATORS_ID))
     {
-      aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID,
-                                               CSMP.USERGROUP_ADMINISTRATORS_NAME,
-                                               CSMP.USERGROUP_ADMINISTRATORS_DESCRIPTION,
-                                               CSMP.USERGROUP_ADMINISTRATORS_CUSTOMATTRS);
-      // Assign administrator user to administrators user group
-      aUserGroupMgr.assignUserToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.USER_ADMINISTRATOR_ID);
+      if (aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID,
+                                                   CSMP.USERGROUP_ADMINISTRATORS_NAME,
+                                                   CSMP.USERGROUP_ADMINISTRATORS_DESCRIPTION,
+                                                   CSMP.USERGROUP_ADMINISTRATORS_CUSTOMATTRS) == null)
+        nErrorCount++;
+      else
+      {
+        // Assign administrator user to administrators user group
+        aUserGroupMgr.assignUserToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.USER_ADMINISTRATOR_ID);
+      }
     }
     aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.ROLE_CONFIG_ID);
     aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_ADMINISTRATORS_ID, CSMP.ROLE_WRITABLERESTAPI_ID);
 
     // User group for Config users
     if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_CONFIG_ID))
-      aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_CONFIG_ID,
-                                               CSMP.USERGROUP_CONFIG_NAME,
-                                               CSMP.USERGROUP_CONFIG_DESCRIPTION,
-                                               CSMP.USERGROUP_CONFIG_CUSTOMATTRS);
+      if (aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_CONFIG_ID,
+                                                   CSMP.USERGROUP_CONFIG_NAME,
+                                                   CSMP.USERGROUP_CONFIG_DESCRIPTION,
+                                                   CSMP.USERGROUP_CONFIG_CUSTOMATTRS) == null)
+        nErrorCount++;
     aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_CONFIG_ID, CSMP.ROLE_CONFIG_ID);
 
     // User group for Writable REST API users
     if (!aUserGroupMgr.containsWithID (CSMP.USERGROUP_WRITABLERESTAPI_ID))
-      aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_WRITABLERESTAPI_ID,
-                                               CSMP.USERGROUP_WRITABLERESTAPI_NAME,
-                                               CSMP.USERGROUP_WRITABLERESTAPI_DESCRIPTION,
-                                               CSMP.USERGROUP_WRITABLERESTAPI_CUSTOMATTRS);
+      if (aUserGroupMgr.createPredefinedUserGroup (CSMP.USERGROUP_WRITABLERESTAPI_ID,
+                                                   CSMP.USERGROUP_WRITABLERESTAPI_NAME,
+                                                   CSMP.USERGROUP_WRITABLERESTAPI_DESCRIPTION,
+                                                   CSMP.USERGROUP_WRITABLERESTAPI_CUSTOMATTRS) == null)
+        nErrorCount++;
     aUserGroupMgr.assignRoleToUserGroup (CSMP.USERGROUP_WRITABLERESTAPI_ID, CSMP.ROLE_WRITABLERESTAPI_ID);
+
+    if (nErrorCount > 0)
+      throw new InitializationException ("Failed to init SMP Security with " + nErrorCount + " errors");
 
     // New login logs out old user
     LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
