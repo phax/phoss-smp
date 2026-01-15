@@ -68,9 +68,23 @@ public final class SMPDataSourceProvider implements IHasDataSource, Closeable
     m_aDataSource.setInitialSize (Math.min (4, nMaxConnections));
     m_aDataSource.setMinIdle (Math.min (4, nMaxConnections));
     m_aDataSource.setMaxIdle (nMaxConnections);
-    m_aDataSource.setTestOnBorrow (false);
-    m_aDataSource.setTestWhileIdle (true);
-    m_aDataSource.setDurationBetweenEvictionRuns (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingBetweenEvictionRunsMillis ()));
+
+    final boolean bTestOnBorrow = SMPJDBCConfiguration.isJdbcPoolingTestOnBorrow ();
+    m_aDataSource.setTestOnBorrow (bTestOnBorrow);
+
+    final long nMillisBetweenEvicationRuns = SMPJDBCConfiguration.getJdbcPoolingBetweenEvictionRunsMillis ();
+    if (nMillisBetweenEvicationRuns > 0)
+    {
+      // Makes no sense otherwise
+      m_aDataSource.setTestWhileIdle (true);
+      m_aDataSource.setDurationBetweenEvictionRuns (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingBetweenEvictionRunsMillis ()));
+    }
+    else
+    {
+      if (!bTestOnBorrow)
+        LOGGER.warn ("Both 'test on borrow' and 'test while idle' are disabled. This could lead to connection issues.");
+    }
+
     m_aDataSource.setMinEvictableIdle (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMinEvictableIdleMillis ()));
     m_aDataSource.setRemoveAbandonedOnBorrow (true);
     m_aDataSource.setRemoveAbandonedTimeout (Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingRemoveAbandonedTimeoutMillis ()));

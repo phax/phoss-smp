@@ -85,7 +85,9 @@ public final class SMPJDBCConfiguration
 
   @Since ("8.0.11")
   private static final String CONFIG_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS = "jdbc.pooling.between-evictions-runs.millis";
-  private static final long DEFAULT_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS.toMillis ();
+  private static final long DEFAULT_JDBC_POOLING_BETWEEN_EVICTION_RUNS_MILLIS = true ? Duration.ofMinutes (5)
+                                                                                               .toMillis ()
+                                                                                     : BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS.toMillis ();
 
   @Since ("8.0.11")
   private static final String CONFIG_JDBC_POOLING_MIN_EVICTABLE_IDLE_MILLIS = "jdbc.pooling.min-evictable-idle.millis";
@@ -95,6 +97,10 @@ public final class SMPJDBCConfiguration
   private static final String CONFIG_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS = "jdbc.pooling.remove-abandoned-timeout.millis";
   // Should be AbandonedConfig.DEFAULT_REMOVE_ABANDONED_TIMEOUT_DURATION (see POOL-430)
   private static final long DEFAULT_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS = Duration.ofMinutes (5).toMillis ();
+
+  @Since ("8.0.12")
+  private static final String CONFIG_JDBC_POOLING_TEST_ON_BORROW = "jdbc.pooling.test-on-borrow";
+  private static final boolean DEFAULT_JDBC_POOLING_TEST_ON_BORROW = false;
 
   @PresentForCodeCoverage
   private static final SMPJDBCConfiguration INSTANCE = new SMPJDBCConfiguration ();
@@ -212,7 +218,7 @@ public final class SMPJDBCConfiguration
 
   /**
    * @return The number of milliseconds to sleep between runs of the idle object evictor thread.
-   *         When non-positive, no idle object evictor thread will be run. Default is -1.
+   *         When non-positive, no idle object evictor thread will be run. Default is 5 minutes.
    * @since 8.0.11
    */
   @CheckForSigned
@@ -244,5 +250,14 @@ public final class SMPJDBCConfiguration
   {
     return _getConfig ().getAsLong (CONFIG_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS,
                                     DEFAULT_JDBC_POOLING_REMOVE_ABANDONED_TIMEOUT_MILLIS);
+  }
+
+  /**
+   * @return Whether or not the pool will validate objects before they are borrowed from the pool.
+   * @since 8.0.12
+   */
+  public static boolean isJdbcPoolingTestOnBorrow ()
+  {
+    return _getConfig ().getAsBoolean (CONFIG_JDBC_POOLING_TEST_ON_BORROW, DEFAULT_JDBC_POOLING_TEST_ON_BORROW);
   }
 }
