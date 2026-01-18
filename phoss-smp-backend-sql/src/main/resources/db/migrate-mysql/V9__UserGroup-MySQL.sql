@@ -28,5 +28,5 @@ CREATE TABLE `smp_secusergroup` (
   `description`    text,
   `userids`        text,
   `roleids`        text,
- PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP User Groups';

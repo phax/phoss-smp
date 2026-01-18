@@ -37,5 +37,5 @@ CREATE TABLE `smp_secuser` (
   `logincount`     integer,
   `failedlogins`   integer,
   `disabled`       tinyint(1)   NOT NULL,
- PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP Users';

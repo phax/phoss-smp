@@ -18,5 +18,5 @@
 CREATE TABLE `smp_settings` (
   `id`    varchar(45)  NOT NULL,
   `value` varchar(500),
- PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP Settings';
