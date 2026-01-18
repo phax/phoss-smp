@@ -86,9 +86,9 @@ final class FlywayMigrator
         if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {
           final MigrationInfo aMI = aContext.getMigrationInfo ();
-          if (aMI instanceof MigrationInfoImpl)
+          if (aMI instanceof final MigrationInfoImpl aMII)
           {
-            final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
+            final ResolvedMigration aRM = aMII.getResolvedMigration ();
             if (aRM != null)
               LOGGER.info ("  Performed migration: " + aRM);
           }
@@ -102,9 +102,9 @@ final class FlywayMigrator
         if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {
           final MigrationInfo aMI = aContext.getMigrationInfo ();
-          if (aMI instanceof MigrationInfoImpl)
+          if (aMI instanceof final MigrationInfoImpl aMII)
           {
-            final ResolvedMigration aRM = ((MigrationInfoImpl) aMI).getResolvedMigration ();
+            final ResolvedMigration aRM = aMII.getResolvedMigration ();
             // Version 6 establishes the audit table - so don't audit anything
             // before that version
             if (aRM != null && aRM.getVersion ().isAtLeast ("7"))
