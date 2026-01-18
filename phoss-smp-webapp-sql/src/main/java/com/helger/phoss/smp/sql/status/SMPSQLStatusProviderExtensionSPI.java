@@ -93,6 +93,8 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
                Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMinEvictableIdleMillis ()).toString ());
       ret.put ("smp.sql.pooling.remove-abandoned-timeout",
                Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingRemoveAbandonedTimeoutMillis ()).toString ());
+      // since 8.0.12
+      ret.put ("smp.sql.pooling.test-on-borrow", Boolean.toString (SMPJDBCConfiguration.isJdbcPoolingTestOnBorrow ()));
 
       if (!bDisableLongRunningOperations)
       {
