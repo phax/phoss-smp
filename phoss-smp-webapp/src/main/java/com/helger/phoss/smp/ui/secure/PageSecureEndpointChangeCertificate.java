@@ -55,7 +55,6 @@ import com.helger.peppol.ui.CertificateUI;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
@@ -274,23 +273,22 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
     final ICommonsMap <String, ICommonsList <ISMPEndpoint>> aEndpointsGroupedPerURL = new CommonsHashMap <> ();
-    final ICommonsMap <String, ICommonsSet <ISMPServiceGroup>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
+    final ICommonsMap <String, ICommonsSet <String>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
     final MutableInt aTotalEndpointCount = new MutableInt (0);
     aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
       // Service Group needs to be resolved in here
-      final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aSI.getServiceGroupParticipantIdentifier ());
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
           final String sUnifiedCertificate = _getUnifiedCert (aEndpoint.getCertificate ());
           aEndpointsGroupedPerURL.computeIfAbsent (sUnifiedCertificate, k -> new CommonsArrayList <> ())
                                  .add (aEndpoint);
-          aServiceGroupsGroupedPerURL.computeIfAbsent (sUnifiedCertificate, k -> new CommonsHashSet <> ()).add (aSG);
+          aServiceGroupsGroupedPerURL.computeIfAbsent (sUnifiedCertificate, k -> new CommonsHashSet <> ())
+                                     .add (aSI.getServiceGroupID ());
           aTotalEndpointCount.inc ();
         }
     });
@@ -356,7 +354,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         }
       }
 
-      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldUnifiedCert);
+      final ICommonsSet <String> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldUnifiedCert);
       final int nSGCount = CollectionHelper.getSize (aServiceGroups);
       final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldUnifiedCert));
       aNodeList.addChild (info ("The selected old certificate is currently used in " +
