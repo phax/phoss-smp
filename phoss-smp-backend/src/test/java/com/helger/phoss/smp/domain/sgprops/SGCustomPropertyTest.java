@@ -34,12 +34,12 @@ public final class SGCustomPropertyTest
 {
   private void _testJsonConversion (@NonNull final SGCustomProperty aCP)
   {
-    final IJsonObject aJson = aCP.getAsJsonObject ();
+    final IJsonObject aJson = aCP.getAsJson ();
     assertNotNull (aJson);
     final SGCustomProperty aCP2 = SGCustomProperty.fromJson (aJson);
     assertNotNull (aCP2);
     TestHelper.testDefaultImplementationWithEqualContentObject (aCP, aCP2);
-    assertEquals (aJson, aCP2.getAsJsonObject ());
+    assertEquals (aJson, aCP2.getAsJson ());
   }
 
   @Test
