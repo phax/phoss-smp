@@ -52,6 +52,7 @@ import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -234,12 +235,11 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     boolean bShowList = true;
 
     final ICommonsMap <String, ICommonsList <ISMPEndpoint>> aEndpointsGroupedPerURL = new CommonsHashMap <> ();
-    final ICommonsMap <String, ICommonsSet <ISMPServiceGroup>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
+    final ICommonsMap <String, ICommonsSet <IParticipantIdentifier>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
     final MutableInt aTotalEndpointCount = new MutableInt (0);
     final MutableInt aTotalEndpointCountWithURL = new MutableInt (0);
     aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
       // Service Group needs to be resolved in here
-      final ISMPServiceGroup aSG = aServiceGroupMgr.getSMPServiceGroupOfID (aSI.getServiceGroupParticipantIdentifier ());
       for (final ISMPProcess aProcess : aSI.getAllProcesses ())
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
@@ -249,7 +249,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
             aEndpointsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (), k -> new CommonsArrayList <> ())
                                    .add (aEndpoint);
             aServiceGroupsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (),
-                                                         k -> new CommonsHashSet <> ()).add (aSG);
+                                                         k -> new CommonsHashSet <> ())
+                                       .add (aSI.getServiceGroupParticipantIdentifier ());
             aTotalEndpointCountWithURL.inc ();
           }
         }
@@ -322,7 +323,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         }
       }
 
-      final ICommonsSet <ISMPServiceGroup> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldURL);
+      final ICommonsSet <IParticipantIdentifier> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldURL);
       final int nSGCount = CollectionHelper.getSize (aServiceGroups);
       final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldURL));
       aNodeList.addChild (info ("The selected old URL '" +
@@ -349,8 +350,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         final HCSelect aSGSelect = new HCSelect (new RequestField (FIELD_SERVICE_GROUP));
         aSGSelect.addOption (SERVICE_GROUP_ALL, "All affected Service Groups");
         if (aServiceGroups != null)
-          for (final ISMPServiceGroup aSG : aServiceGroups.getSorted (ISMPServiceGroup.comparator ()))
-            aSGSelect.addOption (aSG.getID (), aSG.getParticipantIdentifier ().getURIEncoded ());
+          for (final IParticipantIdentifier aPI : aServiceGroups.getSorted (IParticipantIdentifier.comparator ()))
+            aSGSelect.addOption (SMPServiceGroup.createSMPServiceGroupID (aPI), aPI.getURIEncoded ());
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service group")
                                                      .setCtrl (aSGSelect)
                                                      .setHelpText ("If a specific service group is selected, the URL change will only happen in the endpoints of the selected service group. Othwerwise the endpoint is changed in ALL service groups with matching endpoints.")
