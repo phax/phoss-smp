@@ -18,8 +18,10 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.name.IHasName;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.cache.regex.RegExHelper;
+import com.helger.json.IHasJson;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
 
@@ -30,7 +32,7 @@ import com.helger.json.JsonObject;
  * @since 8.1.0
  */
 @Immutable
-public final class SGCustomProperty
+public final class SGCustomProperty implements IHasName, IHasJson
 {
   public static final int NAME_MAX_LEN = 256;
   public static final int VALUE_MAX_LEN = 256;
@@ -135,12 +137,12 @@ public final class SGCustomProperty
 
   @NonNull
   @ReturnsMutableObject
-  public IJsonObject getAsJsonObject ()
+  public IJsonObject getAsJson ()
   {
     return new JsonObject ().add ("type", m_eType.getID ()).add ("name", m_sName).add ("value", m_sValue);
   }
 
-  @Nullable
+  @NonNull
   public static SGCustomProperty fromJson (@NonNull final IJsonObject aJson)
   {
     final String sType = aJson.getAsString ("type");

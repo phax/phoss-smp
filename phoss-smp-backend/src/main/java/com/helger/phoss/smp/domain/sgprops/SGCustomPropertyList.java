@@ -1,0 +1,96 @@
+package com.helger.phoss.smp.domain.sgprops;
+
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+import com.helger.annotation.Nonnegative;
+import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.iface.IHasSize;
+import com.helger.base.state.EChange;
+import com.helger.collection.commons.CommonsLinkedHashMap;
+import com.helger.collection.commons.ICommonsOrderedMap;
+import com.helger.json.IHasJson;
+import com.helger.json.IJsonArray;
+import com.helger.json.IJsonObject;
+import com.helger.json.JsonArray;
+
+/**
+ * This represents a managed list of {@link SGCustomProperty}. The order is undefined but the name
+ * uniqueness is verified. Names are case sensitive.
+ * 
+ * @author Philip Helger
+ * @since 8.1.0
+ */
+@NotThreadSafe
+public class SGCustomPropertyList implements IHasJson, IHasSize
+{
+  private final ICommonsOrderedMap <String, SGCustomProperty> m_aList = new CommonsLinkedHashMap <> ();
+
+  public SGCustomPropertyList ()
+  {}
+
+  @NonNull
+  public EChange add (@NonNull final SGCustomProperty aCustomProperty)
+  {
+    ValueEnforcer.notNull (aCustomProperty, "CustomProperty");
+
+    final String sName = aCustomProperty.getName ();
+    if (m_aList.containsKey (sName))
+      return EChange.UNCHANGED;
+    m_aList.put (sName, aCustomProperty);
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange remove (@Nullable final String sName)
+  {
+    if (!SGCustomProperty.isValidName (sName))
+      return EChange.UNCHANGED;
+    return EChange.valueOf (m_aList.remove (sName) != null);
+  }
+
+  public void iterate (@NonNull final Consumer <? super SGCustomProperty> aConsumer)
+  {
+    ValueEnforcer.notNull (aConsumer, "Consumer");
+    m_aList.forEachValue (aConsumer);
+  }
+
+  public void iterate (@Nullable final Predicate <? super SGCustomProperty> aFilter,
+                       @NonNull final Consumer <? super SGCustomProperty> aConsumer)
+  {
+    ValueEnforcer.notNull (aConsumer, "Consumer");
+    m_aList.forEachValue (aFilter, aConsumer);
+  }
+
+  @Nonnegative
+  public int size ()
+  {
+    return m_aList.size ();
+  }
+
+  public boolean isEmpty ()
+  {
+    return m_aList.isEmpty ();
+  }
+
+  @NonNull
+  public IJsonArray getAsJson ()
+  {
+    return new JsonArray ().addAllMapped (m_aList.values (), SGCustomProperty::getAsJson);
+  }
+
+  @NonNull
+  @ReturnsMutableObject
+  public static SGCustomPropertyList fromJson (@NonNull final IJsonArray aJson)
+  {
+    final SGCustomPropertyList ret = new SGCustomPropertyList ();
+    for (final IJsonObject aObj : aJson.iteratorObjects ())
+      ret.add (SGCustomProperty.fromJson (aObj));
+    return ret;
+  }
+}
