@@ -68,10 +68,10 @@
 
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
-    <flyway.version>11.20.1</flyway.version>
+    <flyway.version>11.20.2</flyway.version>
     <log4j.version>2.25.3</log4j.version>
     <mongodb.version>5.6.2</mongodb.version>
-    <protobuf.version>4.33.2</protobuf.version>
+    <protobuf.version>4.33.4</protobuf.version>
     <ph-db.version>8.1.1</ph-db.version>
   </properties>
   
@@ -153,7 +153,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>2.20.1</version>
+        <version>2.21.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
