@@ -141,7 +141,7 @@ public final class SMPRendererSecure
       if (aSettings.isSMLRequired ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
-                                   .addChild (" SML connection is NOT configured. ")
+                                   .addChild (" SML connection is NOT enabled. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
         aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
       }
@@ -152,7 +152,7 @@ public final class SMPRendererSecure
       if (aSettings.isDirectoryIntegrationEnabled ())
       {
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.YES.getAsNode ())
-                                   .addChild (" Directory support is configured."));
+                                   .addChild (" Directory support is enabled."));
         if (StringHelper.isEmpty (aSettings.getDirectoryHostName ()))
         {
           aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
@@ -165,7 +165,7 @@ public final class SMPRendererSecure
       {
         // Warn only if Directory is needed
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
-                                   .addChild (" Directory support is NOT configured. ")
+                                   .addChild (" Directory support is NOT enabled. ")
                                    .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
         aBox.setTypeIfWorse (EBootstrapAlertType.WARNING);
       }
