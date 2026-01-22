@@ -16,13 +16,29 @@
  */
 package com.helger.phoss.smp.rest;
 
+import org.jspecify.annotations.NonNull;
+
+import com.helger.base.string.StringHelper;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
+import com.helger.peppolid.factory.PeppolIdentifierFactory;
+import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.photon.security.CSecurity;
 
 abstract class AbstractCreateMany
 {
   protected static final int START_INDEX = 0;
-  protected static final int PARTICIPANTS = 100;
+  protected static final int PARTICIPANT_COUNT = 20_000;
+
+  protected static final String SERVER_BASE_PATH = true ? "https://temp-smp-test.falco-app.be/" : "http://localhost:90";
   protected static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                   CSecurity.USER_ADMINISTRATOR_PASSWORD);
+  protected static final int PARALLEL_ACTIONS = 8;
+
+  @NonNull
+  protected static final PeppolParticipantIdentifier createPID (final int nIndex)
+  {
+    return PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
+                                                                                          StringHelper.getLeadingZero (nIndex,
+                                                                                                                       7));
+  }
 }

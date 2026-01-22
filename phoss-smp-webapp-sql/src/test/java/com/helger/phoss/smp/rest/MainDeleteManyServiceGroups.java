@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.rest;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -24,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.array.ArrayHelper;
+import com.helger.base.concurrent.ExecutorServiceHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.http.CHttpHeader;
-import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
@@ -57,35 +59,40 @@ public final class MainDeleteManyServiceGroups extends AbstractCreateMany
 
   public static void main (final String [] args)
   {
-    final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
     aRule.before ();
     try
     {
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
+      final ExecutorService es = Executors.newFixedThreadPool (PARALLEL_ACTIONS);
+
+      for (int i = START_INDEX; i < START_INDEX + PARTICIPANT_COUNT; ++i)
       {
-        final StopWatch aSW = StopWatch.createdStarted ();
-        final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
-                                                                                                                               StringHelper.getLeadingZero (i,
-                                                                                                                                                            7));
-        final String sPI = aPI.getURIEncoded ();
+        final int idx = i;
+        es.submit ( () -> {
+          final StopWatch aSW = StopWatch.createdStarted ();
+          final PeppolParticipantIdentifier aPI = createPID (idx);
+          final String sPI = aPI.getURIEncoded ();
 
-        try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
-        {
-          // Delete old
-          final Response aResponseMsg = ClientBuilder.newClient ()
-                                                     .target (sServerBasePath)
-                                                     .path (sPI)
-                                                     .request ()
-                                                     .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                     .delete ();
-          _testResponseJerseyClient (aResponseMsg, 200);
-        }
+          try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
+          {
+            // Delete old
+            final Response aResponseMsg = ClientBuilder.newClient ()
+                                                       .target (SERVER_BASE_PATH)
+                                                       .path (sPI)
+                                                       .request ()
+                                                       .header (CHttpHeader.AUTHORIZATION,
+                                                                CREDENTIALS.getRequestValue ())
+                                                       .delete ();
+            _testResponseJerseyClient (aResponseMsg, 200);
+          }
 
-        aSW.stop ();
-        LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+          aSW.stop ();
+          LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+        });
       }
+
+      ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (es);
       aSWOverall.stop ();
       LOGGER.info ("Overall process took " + aSWOverall.getMillis () + " ms or " + aSWOverall.getDuration ());
     }

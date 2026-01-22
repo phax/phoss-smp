@@ -31,7 +31,6 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.http.CHttpHeader;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
@@ -76,7 +75,6 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
 
   public static void main (final String [] args)
   {
-    final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
     aRule.before ();
     try
@@ -84,7 +82,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       final ObjectFactory aObjFactory = new ObjectFactory ();
 
-      final ExecutorService es = Executors.newFixedThreadPool (4);
+      final ExecutorService es = Executors.newFixedThreadPool (PARALLEL_ACTIONS);
 
       // 12 endpoints per Service Group
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
@@ -93,11 +91,11 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
                                                                                                      // EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V20,
                                                                                                      // EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V20,
                                                                                                      // EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V202,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V30,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V30,
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V30,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_UBL_V30,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_CREDIT_NOTE_UBL_V30,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_INVOICE_CII_V30,
 
-                                                                                                     EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V30,
+                                                                                                     // EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_UBL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.XRECHNUNG_EXTENSION_INVOICE_CII_V30 })
 
       {
@@ -111,14 +109,12 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
                                                  EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ()
                                                                                           .getValue ());
 
-        for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
+        for (int i = START_INDEX; i < START_INDEX + PARTICIPANT_COUNT; ++i)
         {
           final int idx = i;
           es.submit ( () -> {
             final StopWatch aSW = StopWatch.createdStarted ();
-            final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
-                                                                                                                                   StringHelper.getLeadingZero (idx,
-                                                                                                                                                                7));
+            final PeppolParticipantIdentifier aPI = createPID (idx);
             final String sPI = aPI.getURIEncoded ();
 
             final ServiceMetadataType aSM = new ServiceMetadataType ();
@@ -131,7 +127,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
               aProcess.setProcessIdentifier (aProcID);
               final ServiceEndpointList aSEL = new ServiceEndpointList ();
               final EndpointType aEndpoint = new EndpointType ();
-              aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
+              aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.peppol.ap/as4"));
               aEndpoint.setRequireBusinessLevelSignature (false);
               aEndpoint.setCertificate ("blacert");
               aEndpoint.setServiceDescription ("Unit test service");
@@ -149,7 +145,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
               // Delete old - don't care about the result
               if (false)
                 ClientBuilder.newClient ()
-                             .target (sServerBasePath)
+                             .target (SERVER_BASE_PATH)
                              .path (sPI)
                              .path ("services")
                              .path (sDT)
@@ -159,7 +155,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
 
               // Create a new
               try (final Response aResponseMsg = ClientBuilder.newClient ()
-                                                              .target (sServerBasePath)
+                                                              .target (SERVER_BASE_PATH)
                                                               .path (sPI)
                                                               .path ("services")
                                                               .path (sDT)

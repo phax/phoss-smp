@@ -30,7 +30,6 @@ import com.helger.base.concurrent.ExecutorServiceHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.http.CHttpHeader;
-import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.web.scope.mgr.WebScoped;
@@ -62,10 +61,8 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
       throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
-  @SuppressWarnings ("resource")
   public static void main (final String [] args)
   {
-    final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
     aRule.before ();
     try
@@ -73,16 +70,14 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
       final ObjectFactory aObjFactory = new ObjectFactory ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
 
-      final ExecutorService es = Executors.newFixedThreadPool (2);
+      final ExecutorService es = Executors.newFixedThreadPool (PARALLEL_ACTIONS);
 
-      for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
+      for (int i = START_INDEX; i < START_INDEX + PARTICIPANT_COUNT; ++i)
       {
         final int idx = i;
         es.submit ( () -> {
           final StopWatch aSW = StopWatch.createdStarted ();
-          final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
-                                                                                                                                 StringHelper.getLeadingZero (idx,
-                                                                                                                                                              7));
+          final PeppolParticipantIdentifier aPI = createPID (idx);
           final String sPI = aPI.getURIEncoded ();
 
           final ServiceGroupType aSG = new ServiceGroupType ();
@@ -94,7 +89,7 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
             // Delete old - don't care about the result
             if (false)
               ClientBuilder.newClient ()
-                           .target (sServerBasePath)
+                           .target (SERVER_BASE_PATH)
                            .path (sPI)
                            .request ()
                            .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
@@ -102,7 +97,7 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
 
             // Create a new
             final Response aResponseMsg = ClientBuilder.newClient ()
-                                                       .target (sServerBasePath)
+                                                       .target (SERVER_BASE_PATH)
                                                        .path (sPI)
                                                        .request ()
                                                        .header (CHttpHeader.AUTHORIZATION,
