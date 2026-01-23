@@ -256,6 +256,8 @@ public final class ServiceGroupImport
         aLoggerWarn.accept (sServiceGroupID, "Ignoring already existing Service Group");
       }
       ++nSGIndex;
+      if ((nSGIndex % 1_000) == 0)
+        LOGGER.info ("  Imported " + nSGIndex + " Service Groups so far");
     }
 
     // Now read the business cards
@@ -278,6 +280,7 @@ public final class ServiceGroupImport
           // Service group not found
           aLoggerError.accept ("Business Card at index " + nBCIndex + " contains an invalid/unknown Service Group!");
         }
+
         if (aBusinessCard == null)
         {
           aLoggerError.accept ("Failed to read Business Card at index " + nBCIndex);
@@ -297,18 +300,19 @@ public final class ServiceGroupImport
             if (bIsBusinessCardContained)
             {
               // BCs are deleted when the SGs are deleted
-              if (!aDeleteServiceGroups.containsKey (sBusinessCardID))
-                aDeleteBusinessCards.put (sBusinessCardID, aBusinessCard);
+              aDeleteBusinessCards.putIfAbsent (sBusinessCardID, aBusinessCard);
             }
             aLoggerSuccess.accept (sBusinessCardID,
                                    "Will " + (bIsBusinessCardContained ? "overwrite" : "import") + " Business Card");
           }
           else
           {
-            aLoggerWarn.accept (sBusinessCardID, "Ignoring already existing Business Card");
+            aLoggerWarn.accept (sBusinessCardID, "Ignoring already existing Business Card at index " + nBCIndex);
           }
         }
         ++nBCIndex;
+        if ((nBCIndex % 1_000) == 0)
+          LOGGER.info ("  Imported " + nBCIndex + " Business Groups so far");
       }
     }
 
@@ -372,14 +376,14 @@ public final class ServiceGroupImport
           ISMPServiceGroup aNewServiceGroup = null;
           try
           {
-            final boolean bIsOverwrite = aDeleteServiceGroups.containsKey (sServiceGroupID);
-
             // Create in SML only for newly created entries
+            // If the SG was deleted before, it was also only deleted locally and not in SML
+            final boolean bCreateInSML = !aDeleteServiceGroups.containsKey (sServiceGroupID);
             aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
                                                                        aImportServiceGroup.getParticipantIdentifier (),
                                                                        aImportServiceGroup.getExtensions ()
                                                                                           .getExtensionsAsJsonString (),
-                                                                       !bIsOverwrite);
+                                                                       bCreateInSML);
             aLoggerSuccess.accept (sServiceGroupID, "Successfully created Service Group");
             aSummary.onSuccess (EImportSummaryAction.CREATE_SG);
           }
@@ -458,7 +462,8 @@ public final class ServiceGroupImport
 
           try
           {
-            if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard).isChanged ())
+            // No need to sync to the directory, because the update comes later anyway
+            if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard, false).isChanged ())
             {
               aLoggerSuccess.accept (sServiceGroupID, "Successfully deleted Business Card");
               aSummary.onSuccess (EImportSummaryAction.DELETE_BC);
@@ -489,8 +494,10 @@ public final class ServiceGroupImport
 
           try
           {
+            // Always sync to the Directory after the creation
             if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getParticipantIdentifier (),
-                                                                aImportBusinessCard.getAllEntities ()) != null)
+                                                                aImportBusinessCard.getAllEntities (),
+                                                                true) != null)
             {
               aLoggerSuccess.accept (sBusinessCardID, "Successfully created Business Card");
               aSummary.onSuccess (EImportSummaryAction.CREATE_BC);
