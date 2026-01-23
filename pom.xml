@@ -134,7 +134,7 @@
       <dependency>
         <groupId>com.helger.peppol.ui</groupId>
         <artifactId>peppol-shared-ui-parent-pom</artifactId>
-        <version>0.9.10</version>
+        <version>0.9.11</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
