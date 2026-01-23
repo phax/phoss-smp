@@ -94,7 +94,8 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
 
   @NonNull
   public ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
-                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities)
+                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities,
+                                                         final boolean bSyncToDirectory)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
@@ -126,13 +127,14 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard, bSyncToDirectory));
 
     return aNewBusinessCard;
   }
 
   @NonNull
-  public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard)
+  public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard,
+                                        final boolean bSyncToDirectory)
   {
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
@@ -160,7 +162,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPBusinessCard successful");

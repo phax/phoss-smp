@@ -30,14 +30,20 @@ public interface ISMPBusinessCardCallback extends ICallback
    *
    * @param aBusinessCard
    *        The new business card. May not be <code>null</code>.
+   * @param bSyncToDirectory
+   *        <code>true</code> to synchronize the change to the remote directory, <code>false</code>
+   *        to disable it
    */
-  void onSMPBusinessCardCreatedOrUpdated (@NonNull ISMPBusinessCard aBusinessCard);
+  void onSMPBusinessCardCreatedOrUpdated (@NonNull ISMPBusinessCard aBusinessCard, boolean bSyncToDirectory);
 
   /**
    * Invoked after a business card was deleted.
    *
    * @param aBusinessCard
    *        The deleted business card. May not be <code>null</code>.
+   * @param bSyncToDirectory
+   *        <code>true</code> to synchronize the change to the remote directory, <code>false</code>
+   *        to disable it
    */
-  void onSMPBusinessCardDeleted (@NonNull ISMPBusinessCard aBusinessCard);
+  void onSMPBusinessCardDeleted (@NonNull ISMPBusinessCard aBusinessCard, boolean bSyncToDirectory);
 }

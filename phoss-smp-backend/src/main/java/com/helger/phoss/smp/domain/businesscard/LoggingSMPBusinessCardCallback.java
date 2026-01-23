@@ -24,14 +24,15 @@ public class LoggingSMPBusinessCardCallback implements ISMPBusinessCardCallback
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (LoggingSMPBusinessCardCallback.class);
 
-  public void onSMPBusinessCardCreatedOrUpdated (@NonNull final ISMPBusinessCard aBusinessCard)
+  public void onSMPBusinessCardCreatedOrUpdated (@NonNull final ISMPBusinessCard aBusinessCard,
+                                                 final boolean bSyncToDirectory)
   {
     LOGGER.info ("Successfully Created/Updated BusinessCard with ID '" +
                  aBusinessCard.getParticipantIdentifier ().getURIEncoded () +
                  "'");
   }
 
-  public void onSMPBusinessCardDeleted (@NonNull final ISMPBusinessCard aBusinessCard)
+  public void onSMPBusinessCardDeleted (@NonNull final ISMPBusinessCard aBusinessCard, final boolean bSyncToDirectory)
   {
     LOGGER.info ("Successfully Deleted BusinessCard with ID '" +
                  aBusinessCard.getParticipantIdentifier ().getURIEncoded () +

@@ -22,8 +22,8 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 
 /**
- * Special {@link ISMPServiceGroupCallback} to delete the business card, if the
- * service group is deleted.
+ * Special {@link ISMPServiceGroupCallback} to delete the business card, if the service group is
+ * deleted.
  *
  * @author Philip Helger
  */
@@ -52,7 +52,7 @@ public class BusinessCardSMPServiceGroupCallback implements ISMPServiceGroupCall
     // If service group is deleted, also delete respective business card
     final ISMPBusinessCard aBusinessCard = m_aBusinessCardMgr.getSMPBusinessCardOfID (aParticipantID);
     if (aBusinessCard != null)
-      m_aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+      m_aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard, true);
     else
       if (LOGGER.isDebugEnabled ())
         LOGGER.warn ("Found no BusinessCard for participant ID '" + aParticipantID.getURIEncoded () + "'");

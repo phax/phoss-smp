@@ -25,8 +25,8 @@ import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
 
 /**
- * Manager for {@link ISMPBusinessCard} objects. Business card objects require a
- * service group to be present first.
+ * Manager for {@link ISMPBusinessCard} objects. Business card objects require a service group to be
+ * present first.
  * <p>
  * The files in this package are licensed under Apache 2.0 license
  * </p>
@@ -36,8 +36,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 public interface ISMPBusinessCardManager
 {
   /**
-   * @return The callbacks for the business card manager. Never
-   *         <code>null</code>.
+   * @return The callbacks for the business card manager. Never <code>null</code>.
    * @since 5.0.4
    */
   @NonNull
@@ -48,38 +47,41 @@ public interface ISMPBusinessCardManager
    * Create or update a business card for a service group.
    *
    * @param aParticipantID
-   *        Participant ID the business card belongs to. May not be
-   *        <code>null</code>.
+   *        Participant ID the business card belongs to. May not be <code>null</code>.
    * @param aEntities
    *        The entities for this business card. May not be <code>null</code>.
-   * @return The new or updated {@link ISMPBusinessCard}. <code>null</code> if
-   *         persistence failed.
+   * @param bSyncToDirectory
+   *        <code>true</code> to synchronize the change to the remote directory, <code>false</code>
+   *        to disable it
+   * @return The new or updated {@link ISMPBusinessCard}. <code>null</code> if persistence failed.
    */
   @Nullable
   ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
-                                                  @NonNull Collection <SMPBusinessCardEntity> aEntities);
+                                                  @NonNull Collection <SMPBusinessCardEntity> aEntities,
+                                                  boolean bSyncToDirectory);
 
   /**
    * Delete the passed SMP business card.
    *
    * @param aSMPBusinessCard
    *        The SMP redirect to be deleted. May be <code>null</code>.
+   * @param bSyncToDirectory
+   *        <code>true</code> to synchronize the change to the remote directory, <code>false</code>
+   *        to disable it
    * @return {@link EChange#CHANGED} if the deletion was successful
    */
   @NonNull
-  EChange deleteSMPBusinessCard (@Nullable ISMPBusinessCard aSMPBusinessCard);
+  EChange deleteSMPBusinessCard (@Nullable ISMPBusinessCard aSMPBusinessCard, boolean bSyncToDirectory);
 
   /**
-   * @return All contained SMP business cards. Never <code>null</code> but maybe
-   *         empty.
+   * @return All contained SMP business cards. Never <code>null</code> but maybe empty.
    */
   @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ();
 
   /**
-   * @return All contained SMP business card IDs. Never <code>null</code> but
-   *         maybe empty.
+   * @return All contained SMP business card IDs. Never <code>null</code> but maybe empty.
    * @since 5.6.0
    */
   @NonNull
@@ -91,8 +93,7 @@ public interface ISMPBusinessCardManager
    *
    * @param aID
    *        The ID to check. May be <code>null</code>.
-   * @return <code>true</code> if a business card is contained,
-   *         <code>false</code> if not.
+   * @return <code>true</code> if a business card is contained, <code>false</code> if not.
    * @since 7.1.5
    */
   boolean containsSMPBusinessCardOfID (@Nullable IParticipantIdentifier aID);
@@ -102,8 +103,7 @@ public interface ISMPBusinessCardManager
    *
    * @param aID
    *        The ID to use. May be <code>null</code>.
-   * @return The contained business card or <code>null</code> if none is
-   *         assigned.
+   * @return The contained business card or <code>null</code> if none is assigned.
    */
   @Nullable
   ISMPBusinessCard getSMPBusinessCardOfID (@Nullable IParticipantIdentifier aID);
