@@ -186,10 +186,10 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   {
     // Created with: https://www.asciiart.eu/text-to-ascii-art
     LOGGER.info ("       _                     ____  __  __ ____  ");
-    LOGGER.info (" _ __ | |__   ___  ___ ___  / ___||  \\/  |  _ \\");
+    LOGGER.info (" _ __ | |__   ___  ___ ___  / ___||  \\/  |  _ \\ ");
     LOGGER.info ("| '_ \\| '_ \\ / _ \\/ __/ __| \\___ \\| |\\/| | |_) |");
-    LOGGER.info ("| |_) | | | | (_) \\__ \\__ \\  ___) | |  | |  __/");
-    LOGGER.info ("| .__/|_| |_|\\___/|___/___/ |____/|_|  |_|_|");
+    LOGGER.info ("| |_) | | | | (_) \\__ \\__ \\  ___) | |  | |  __/ ");
+    LOGGER.info ("| .__/|_| |_|\\___/|___/___/ |____/|_|  |_|_|    ");
     // Ensure version is always right aligned
     // Use 20 chars to also cater for "SNAPSHOT" versions
     final String sSpaces = StringHelper.getRepeated (' ', Math.max (20 - CSMPServer.getVersionNumber ().length (), 0));
