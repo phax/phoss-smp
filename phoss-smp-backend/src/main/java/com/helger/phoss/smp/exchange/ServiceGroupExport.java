@@ -75,8 +75,12 @@ public final class ServiceGroupExport
     final ICommonsList <ISMPServiceGroup> aSortedServiceGroups = aServiceGroups.getSorted (ISMPServiceGroup.comparator ());
 
     // Add all service groups
+    int nCount = 0;
     for (final ISMPServiceGroup aServiceGroup : aSortedServiceGroups)
     {
+      if ((++nCount % 1_000) == 0)
+        LOGGER.info ("  Now at " + nCount + " of " + aServiceGroups.size ());
+
       final IMicroElement eServiceGroup = eRoot.addChild (MicroTypeConverter.convertToMicroElement (aServiceGroup,
                                                                                                     CSMPExchange.ELEMENT_SERVICEGROUP));
 
@@ -99,6 +103,8 @@ public final class ServiceGroupExport
     // Add Business cards only if PD integration is enabled
     if (bIncludeBusinessCards)
     {
+      LOGGER.info ("  Now exporting business groups");
+
       // Add all business cards
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       for (final ISMPServiceGroup aServiceGroup : aSortedServiceGroups)
