@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -153,6 +154,25 @@ public final class ServiceGroupImport
     final ICommonsOrderedMap <ISMPServiceGroup, InternalImportData> aImportServiceGroups = new CommonsLinkedHashMap <> ();
     final ICommonsMap <String, ISMPServiceGroup> aDeleteServiceGroups = new CommonsHashMap <> ();
 
+    // Use a separate cache to avoid unnecessary amount of DB calls for users
+    final ICommonsMap <String, IUser> aOwnerCache = new CommonsHashMap <> ();
+    final Function <String, IUser> aUserResolverViaMgr = sUserID -> {
+      // This might be a DB access
+      IUser aOwner = aUserMgr.getUserOfID (sUserID);
+      if (aOwner == null)
+      {
+        // Select the default owner if an unknown user is contained
+        aOwner = aDefaultOwner;
+        LOGGER.warn ("Failed to resolve stored owner '" +
+                     sUserID +
+                     "' - using default owner '" +
+                     aDefaultOwner.getID () +
+                     "'");
+      }
+      // If the user is deleted, but existing - keep the deleted user
+      return aOwner;
+    };
+
     // First read all service groups as they are dependents of the
     // business cards
     int nSGIndex = 0;
@@ -162,21 +182,9 @@ public final class ServiceGroupImport
       final ISMPServiceGroup aServiceGroup;
       try
       {
-        aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup, x -> {
-          IUser aOwner = aUserMgr.getUserOfID (x);
-          if (aOwner == null)
-          {
-            // Select the default owner if an unknown user is contained
-            aOwner = aDefaultOwner;
-            LOGGER.warn ("Failed to resolve stored owner '" +
-                         x +
-                         "' - using default owner '" +
-                         aDefaultOwner.getID () +
-                         "'");
-          }
-          // If the user is deleted, but existing - keep the deleted user
-          return aOwner;
-        });
+        aServiceGroup = SMPServiceGroupMicroTypeConverter.convertToNative (eServiceGroup,
+                                                                           sUserID -> aOwnerCache.computeIfAbsent (sUserID,
+                                                                                                                   aUserResolverViaMgr));
       }
       catch (final RuntimeException ex)
       {
