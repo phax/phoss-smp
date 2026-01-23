@@ -90,12 +90,83 @@ import jakarta.annotation.Nullable;
 import jakarta.servlet.ServletContext;
 
 /**
- * Special SMP web app listener. This is the entry point for application startup.
+ * Special SMP web application listener. This is the entry point for application startup.
  *
  * @author Philip Helger
  */
 public class SMPWebAppListener extends WebAppListenerBootstrap
 {
+  private static final class SMPBusinessCardAutoUpdateCallback implements ISMPBusinessCardCallback
+  {
+    public void onSMPBusinessCardCreatedOrUpdated (@NonNull final ISMPBusinessCard aBusinessCard)
+    {
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+      {
+        // Notify PD server: add
+        PDClientProvider.getInstance ()
+                        .getPDClient ()
+                        .addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
+      }
+    }
+
+    public void onSMPBusinessCardDeleted (@NonNull final ISMPBusinessCard aBusinessCard)
+    {
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+      {
+        // Notify PD server: delete
+        final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
+
+        // "Add" before "delete" to make sure it works
+        // This will update the ownership in the Directory, in case a
+        // certificate change happened since the last time
+        aPDClient.addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
+
+        // This is the actual delete call
+        aPDClient.deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
+      }
+    }
+  }
+
+  private static final class SMPServiceInformationDirectoryAutoUpdateCallback implements ISMPServiceInformationCallback
+  {
+    private final ISMPBusinessCardManager m_aBusinessCardMgr;
+
+    private SMPServiceInformationDirectoryAutoUpdateCallback (final ISMPBusinessCardManager aBusinessCardMgr)
+    {
+      m_aBusinessCardMgr = aBusinessCardMgr;
+    }
+
+    @Override
+    public void onSMPServiceInformationCreated (@NonNull final ISMPServiceInformation aServiceInformation)
+    {
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+      {
+        // Only if a business card is present
+        final IParticipantIdentifier aPID = aServiceInformation.getServiceGroupParticipantIdentifier ();
+        if (m_aBusinessCardMgr.containsSMPBusinessCardOfID (aPID))
+        {
+          // Notify PD server: update
+          PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aPID);
+        }
+      }
+    }
+
+    @Override
+    public void onSMPServiceInformationUpdated (@NonNull final ISMPServiceInformation aServiceInformation)
+    {
+      onSMPServiceInformationCreated (aServiceInformation);
+    }
+
+    @Override
+    public void onSMPServiceInformationDeleted (@NonNull final ISMPServiceInformation aServiceInformation)
+    {
+      onSMPServiceInformationCreated (aServiceInformation);
+    }
+  }
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppListener.class);
   private static OffsetDateTime s_aStartupDateTime;
 
@@ -397,74 +468,13 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr != null)
       {
-        aBusinessCardMgr.bcCallbacks ().add (new ISMPBusinessCardCallback ()
-        {
-          public void onSMPBusinessCardCreatedOrUpdated (@NonNull final ISMPBusinessCard aBusinessCard)
-          {
-            final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-            if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-            {
-              // Notify PD server: add
-              PDClientProvider.getInstance ()
-                              .getPDClient ()
-                              .addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
-            }
-          }
-
-          public void onSMPBusinessCardDeleted (@NonNull final ISMPBusinessCard aBusinessCard)
-          {
-            final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-            if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
-            {
-              // Notify PD server: delete
-              final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
-
-              // "Add" before "delete" to make sure it works
-              // This will update the ownership in the Directory, in case a
-              // certificate change happened since the last time
-              aPDClient.addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
-
-              // This is the actual delete call
-              aPDClient.deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
-            }
-          }
-        });
+        aBusinessCardMgr.bcCallbacks ().add (new SMPBusinessCardAutoUpdateCallback ());
 
         // If a service information is create, updated or deleted, also update
         // Business Card at PD
         SMPMetaManager.getServiceInformationMgr ()
                       .serviceInformationCallbacks ()
-                      .add (new ISMPServiceInformationCallback ()
-                      {
-                        @Override
-                        public void onSMPServiceInformationCreated (@NonNull final ISMPServiceInformation aServiceInformation)
-                        {
-                          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-                          if (aSettings.isDirectoryIntegrationEnabled () &&
-                              aSettings.isDirectoryIntegrationAutoUpdate ())
-                          {
-                            // Only if a business card is present
-                            final IParticipantIdentifier aPID = aServiceInformation.getServiceGroupParticipantIdentifier ();
-                            if (aBusinessCardMgr.containsSMPBusinessCardOfID (aPID))
-                            {
-                              // Notify PD server: update
-                              PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aPID);
-                            }
-                          }
-                        }
-
-                        @Override
-                        public void onSMPServiceInformationUpdated (@NonNull final ISMPServiceInformation aServiceInformation)
-                        {
-                          onSMPServiceInformationCreated (aServiceInformation);
-                        }
-
-                        @Override
-                        public void onSMPServiceInformationDeleted (@NonNull final ISMPServiceInformation aServiceInformation)
-                        {
-                          onSMPServiceInformationCreated (aServiceInformation);
-                        }
-                      });
+                      .add (new SMPServiceInformationDirectoryAutoUpdateCallback (aBusinessCardMgr));
       }
     }
 
