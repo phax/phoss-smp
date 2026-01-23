@@ -286,7 +286,8 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
 
   @NonNull
   public ISMPBusinessCard createOrUpdateSMPBusinessCard (@NonNull final IParticipantIdentifier aParticipantID,
-                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities)
+                                                         @NonNull final Collection <SMPBusinessCardEntity> aEntities,
+                                                         final boolean bSyncToDirectory)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aEntities, "Entities");
@@ -318,13 +319,14 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardCreatedOrUpdated (aNewBusinessCard, bSyncToDirectory));
 
     return aNewBusinessCard;
   }
 
   @NonNull
-  public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard)
+  public EChange deleteSMPBusinessCard (@Nullable final ISMPBusinessCard aSMPBusinessCard,
+                                        final boolean bSyncToDirectory)
   {
     if (aSMPBusinessCard == null)
       return EChange.UNCHANGED;
@@ -340,7 +342,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     }
 
     // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard));
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
 
     AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),

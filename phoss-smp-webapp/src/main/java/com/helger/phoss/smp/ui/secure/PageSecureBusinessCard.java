@@ -316,7 +316,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                     @Nullable final ISMPBusinessCard aSelectedObject)
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-        if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject).isChanged ())
+        if (aBusinessCardMgr.deleteSMPBusinessCard (aSelectedObject, true).isChanged ())
         {
           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
           aWPEC.postRedirectGetInternal (success ("The selected Business Card was successfully deleted!" +
@@ -776,8 +776,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                         .getFirstOrNull ()
                                         .getName ()
                                         .compareToIgnoreCase (o2.names ().getFirstOrNull ().getName ()));
-      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aSMPEntities) !=
-          null)
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (),
+                                                          aSMPEntities,
+                                                          true) != null)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         aWPEC.postRedirectGetInternal (success ("The Business Card for Service Group '" +

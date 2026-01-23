@@ -43,12 +43,13 @@ final class MockSMPBusinessCardManager implements ISMPBusinessCardManager
   }
 
   public ISMPBusinessCard createOrUpdateSMPBusinessCard (final IParticipantIdentifier aParticipantID,
-                                                         final Collection <SMPBusinessCardEntity> aEntities)
+                                                         final Collection <SMPBusinessCardEntity> aEntities,
+                                                         final boolean bSyncToDirectory)
   {
     throw new UnsupportedOperationException ();
   }
 
-  public EChange deleteSMPBusinessCard (final ISMPBusinessCard aSMPBusinessCard)
+  public EChange deleteSMPBusinessCard (final ISMPBusinessCard aSMPBusinessCard, final boolean bSyncToDirectory)
   {
     throw new UnsupportedOperationException ();
   }

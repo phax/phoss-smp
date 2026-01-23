@@ -39,8 +39,8 @@ import com.helger.statistics.api.IStatisticsHandlerKeyedCounter;
 import com.helger.statistics.impl.StatisticsManager;
 
 /**
- * This class implements all the service methods, that must be provided by the
- * BusinessCard REST service - this service is the same for BDXR and SMP.
+ * This class implements all the service methods, that must be provided by the BusinessCard REST
+ * service - this service is the same for BDXR and SMP.
  *
  * @author Philip Helger
  */
@@ -168,7 +168,8 @@ public final class BusinessCardServerAPI
       final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
       for (final PDBusinessEntity aEntity : aBusinessCard.businessEntities ())
         aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
-      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aEntities) == null)
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aEntities, true) ==
+          null)
       {
         LOGGER.warn (sLog + " ERROR");
         STATS_COUNTER_ERROR.increment (sAction);
@@ -230,7 +231,7 @@ public final class BusinessCardServerAPI
         throw new SMPNotFoundException ("No Business Card assigned to Service Group '" + sServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
-      aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard);
+      aBusinessCardMgr.deleteSMPBusinessCard (aBusinessCard, true);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
