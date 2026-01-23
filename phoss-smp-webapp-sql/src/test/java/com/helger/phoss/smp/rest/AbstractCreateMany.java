@@ -29,7 +29,7 @@ abstract class AbstractCreateMany
   protected static final int START_INDEX = 0;
   protected static final int PARTICIPANT_COUNT = 20_000;
 
-  protected static final String SERVER_BASE_PATH = true ? "https://temp-smp-test.falco-app.be/" : "http://localhost:90";
+  protected static final String SERVER_BASE_PATH = "http://localhost:90";
   protected static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
                                                                                                   CSecurity.USER_ADMINISTRATOR_PASSWORD);
   protected static final int PARALLEL_ACTIONS = 8;
