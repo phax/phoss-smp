@@ -109,6 +109,13 @@ public final class SGCustomProperty implements IHasName, IHasJson
     return !m_sValue.isEmpty ();
   }
 
+  @NonNull
+  @ReturnsMutableObject
+  public IJsonObject getAsJson ()
+  {
+    return new JsonObject ().add ("type", m_eType.getID ()).add ("name", m_sName).add ("value", m_sValue);
+  }
+
   @Override
   public boolean equals (final Object o)
   {
@@ -136,10 +143,15 @@ public final class SGCustomProperty implements IHasName, IHasJson
   }
 
   @NonNull
-  @ReturnsMutableObject
-  public IJsonObject getAsJson ()
+  public static SGCustomProperty createPrivate (@NonNull @Nonempty final String sName, @NonNull final String sValue)
   {
-    return new JsonObject ().add ("type", m_eType.getID ()).add ("name", m_sName).add ("value", m_sValue);
+    return new SGCustomProperty (ESGCustomPropertyType.PRIVATE, sName, sValue);
+  }
+
+  @NonNull
+  public static SGCustomProperty createPublic (@NonNull @Nonempty final String sName, @NonNull final String sValue)
+  {
+    return new SGCustomProperty (ESGCustomPropertyType.PUBLIC, sName, sValue);
   }
 
   @NonNull
