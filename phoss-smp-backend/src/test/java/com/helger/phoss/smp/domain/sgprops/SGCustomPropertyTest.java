@@ -45,7 +45,7 @@ public final class SGCustomPropertyTest
   @Test
   public void testBasic ()
   {
-    SGCustomProperty aCP = new SGCustomProperty (ESGCustomPropertyType.PRIVATE, "name", "value");
+    SGCustomProperty aCP = SGCustomProperty.createPrivate ("name", "value");
     assertSame (ESGCustomPropertyType.PRIVATE, aCP.getType ());
     assertTrue (aCP.isPrivate ());
     assertEquals ("name", aCP.getName ());
@@ -54,7 +54,7 @@ public final class SGCustomPropertyTest
     XMLTestHelper.testMicroTypeConversion (aCP);
     _testJsonConversion (aCP);
 
-    aCP = new SGCustomProperty (ESGCustomPropertyType.PUBLIC, "name2", "");
+    aCP = SGCustomProperty.createPublic ("name2", "");
     assertSame (ESGCustomPropertyType.PUBLIC, aCP.getType ());
     assertTrue (aCP.isPublic ());
     assertEquals ("name2", aCP.getName ());

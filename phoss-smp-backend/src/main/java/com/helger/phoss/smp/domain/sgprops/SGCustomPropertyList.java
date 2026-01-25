@@ -10,8 +10,10 @@ import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.iface.IHasSize;
 import com.helger.base.state.EChange;
+import com.helger.base.tostring.ToStringGenerator;
 import com.helger.collection.commons.CommonsLinkedHashMap;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.json.IHasJson;
@@ -33,6 +35,13 @@ public class SGCustomPropertyList implements IHasJson, IHasSize
 
   public SGCustomPropertyList ()
   {}
+
+  public SGCustomPropertyList (@Nullable final SGCustomProperty @Nullable... aProperties)
+  {
+    if (aProperties != null)
+      for (final var aProp : aProperties)
+        add (aProp);
+  }
 
   @NonNull
   public EChange add (@NonNull final SGCustomProperty aCustomProperty)
@@ -82,6 +91,29 @@ public class SGCustomPropertyList implements IHasJson, IHasSize
   public IJsonArray getAsJson ()
   {
     return new JsonArray ().addAllMapped (m_aList.values (), SGCustomProperty::getAsJson);
+  }
+
+  @Override
+  public boolean equals (final Object o)
+  {
+    if (o == this)
+      return true;
+    if (!getClass ().equals (o.getClass ()))
+      return false;
+    final SGCustomPropertyList rhs = (SGCustomPropertyList) o;
+    return m_aList.equals (rhs.m_aList);
+  }
+
+  @Override
+  public int hashCode ()
+  {
+    return new HashCodeGenerator (this).append (m_aList).getHashCode ();
+  }
+
+  @Override
+  public String toString ()
+  {
+    return new ToStringGenerator (null).append ("List", m_aList).getToString ();
   }
 
   @NonNull
