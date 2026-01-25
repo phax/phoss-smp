@@ -41,6 +41,15 @@ public final class SGCustomProperty implements IHasName, IHasJson
   private @NonNull @Nonempty final String m_sName;
   private @NonNull @Nonempty final String m_sValue;
 
+  /**
+   * Check if the provided property name is valid or not. Valid names have a length between 1 and
+   * 256 and must only contain alpha numeric characters, dot, minus or underscore.
+   * 
+   * @param s
+   *        The String to check
+   * @return <code>true</code> if the name is valid, <code>false</code> if not.
+   * @see #isValidValue(String)
+   */
   public static boolean isValidName (@Nullable final String s)
   {
     if (s == null)
@@ -51,6 +60,15 @@ public final class SGCustomProperty implements IHasName, IHasJson
     return RegExHelper.stringMatchesPattern ("[a-zA-Z0-9\\.\\-_]{1," + NAME_MAX_LEN + "}", s);
   }
 
+  /**
+   * Check if the provided property value is valid or not. Valid names have a length between 0 and
+   * 256 and may contain any character.
+   * 
+   * @param s
+   *        The String to check
+   * @return <code>true</code> if the value is valid, <code>false</code> if not.
+   * @see #isValidName(String)
+   */
   public static boolean isValidValue (@Nullable final String s)
   {
     if (s == null)
@@ -68,8 +86,10 @@ public final class SGCustomProperty implements IHasName, IHasJson
                            @NonNull final String sValue)
   {
     ValueEnforcer.notNull (eType, "Type");
-    ValueEnforcer.isTrue (isValidName (sName), () -> "Name '" + sName + "' is invalid");
-    ValueEnforcer.isTrue (isValidValue (sValue), () -> "Value '" + sValue + "' is invalid");
+    if (!isValidName (sName))
+      throw new IllegalArgumentException ("Name '" + sName + "' is invalid");
+    if (!isValidValue (sValue))
+      throw new IllegalArgumentException ("Value '" + sValue + "' is invalid");
     m_eType = eType;
     m_sName = sName;
     m_sValue = sValue;
