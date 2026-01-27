@@ -65,6 +65,11 @@ public class SGCustomPropertyList implements IHasJson, IHasSize
     return EChange.CHANGED;
   }
 
+  public boolean containsName (@Nullable final String sName)
+  {
+    return sName != null && m_aList.containsKey (sName);
+  }
+
   @NonNull
   public EChange remove (@Nullable final String sName)
   {
@@ -95,6 +100,11 @@ public class SGCustomPropertyList implements IHasJson, IHasSize
   public boolean isEmpty ()
   {
     return m_aList.isEmpty ();
+  }
+
+  public boolean isNotEmpty ()
+  {
+    return m_aList.isNotEmpty ();
   }
 
   @NonNull
