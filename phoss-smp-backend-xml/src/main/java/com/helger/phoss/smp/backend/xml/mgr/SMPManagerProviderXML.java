@@ -26,6 +26,7 @@ import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.spf.ISMPSPF4PeppolPolicyManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -53,6 +54,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
   public static final String SMP_PARTICIPANT_MIGRATION_XML = "smp-participant-migration.xml";
   public static final String SMP_BUSINESS_CARD_XML = "smp-business-card.xml";
+  public static final String SMP_SPF_POLICY_XML = "smp-spf-policy.xml";
 
   public SMPManagerProviderXML ()
   {}
@@ -161,6 +163,20 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     try
     {
       return new SMPBusinessCardManagerXML (SMP_BUSINESS_CARD_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new InitializationException (ex.getMessage (), ex);
+    }
+  }
+
+  @Nullable
+  public ISMPSPF4PeppolPolicyManager createSPFPolicyMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                         @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
+  {
+    try
+    {
+      return new SMPSPF4PeppolPolicyManagerXML (SMP_SPF_POLICY_XML);
     }
     catch (final DAOException ex)
     {
