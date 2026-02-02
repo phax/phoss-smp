@@ -194,7 +194,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       try
       {
         final InetAddress aLocalHost = InetAddress.getLocalHost ();
-        sDefaultLogicalAddress = "http://" + aLocalHost.getCanonicalHostName ();
+        sDefaultLogicalAddress = "https://" + aLocalHost.getCanonicalHostName ();
       }
       catch (final UnknownHostException ex)
       {
@@ -219,7 +219,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
                                                    .setHelpText (HELPTEXT_SMP_ID));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                    .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
-                                                                                           sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. http://smp.example.org"))
+                                                                                           sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. https://smp.example.org"))
                                                    .setHelpText (TextFormatter.getFormattedText (HELPTEXT_LOGICAL_ADDRESS,
                                                                                                  sDefaultLogicalAddress))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_LOGICAL_ADDRESS)));
