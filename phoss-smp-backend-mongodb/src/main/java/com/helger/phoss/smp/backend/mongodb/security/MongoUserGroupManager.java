@@ -2,207 +2,245 @@ package com.helger.phoss.smp.backend.mongodb.security;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.callback.CallbackList;
+import com.helger.base.id.IHasID;
 import com.helger.base.state.EChange;
+import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.usergroup.IUserGroup;
 import com.helger.photon.security.usergroup.IUserGroupManager;
 import com.helger.photon.security.usergroup.IUserGroupModificationCallback;
-import com.mongodb.client.MongoCollection;
+import com.helger.photon.security.usergroup.UserGroup;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
-public class MongoUserGroupManager implements IUserGroupManager
+public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> implements IUserGroupManager
 {
   public static final String GROUP_COLLECTION_NAME = "user-groups";
 
-  private final MongoCollection <Document> m_groups;
+  private static final String BSON_USER_GROUP_NAME = "name";
+  private static final String BSON_USER_GROUP_DESCRIPTION = "description";
+  private static final String BSON_USER_GROUP_ROLES = "userIDs";
+  private static final String BSON_USER_GROUP_USERS = "roleIDs";
+
   private final IUserManager m_aUserMgr;
   private final IRoleManager m_aRoleMgr;
 
+  private final CallbackList <IUserGroupModificationCallback> m_aCallbacks = new CallbackList <> ();
+
   public MongoUserGroupManager (IUserManager m_aUserMgr, IRoleManager m_aRoleMgr)
   {
+    super (GROUP_COLLECTION_NAME);
     this.m_aUserMgr = m_aUserMgr;
     this.m_aRoleMgr = m_aRoleMgr;
-    this.m_groups = MongoClientSingleton.getInstance ().getCollection (GROUP_COLLECTION_NAME);
   }
 
   @Override
   public @NonNull IUserManager getUserManager ()
   {
-    return null;
+    return m_aUserMgr;
   }
 
   @Override
   public @NonNull IRoleManager getRoleManager ()
   {
-    return null;
+    return m_aRoleMgr;
   }
 
   @Override
   public void createDefaultsForTest ()
   {
-
+    //ignored for now
   }
 
   @Override
   public @NonNull CallbackList <IUserGroupModificationCallback> userGroupModificationCallbacks ()
   {
-    return null;
+    return m_aCallbacks;
   }
 
   @Override
   public @Nullable IUserGroup createNewUserGroup (@NonNull @Nonempty String sName, @Nullable String sDescription, @Nullable Map <String, String> aCustomAttrs)
   {
-    return null;
+    final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
+    return internalCreateNewUserGroup (aUserGroup, false);
   }
 
   @Override
   public @Nullable IUserGroup createPredefinedUserGroup (@NonNull @Nonempty String sID, @NonNull @Nonempty String sName, @Nullable String sDescription, @Nullable Map <String, String> aCustomAttrs)
   {
-    return null;
+    final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
+    return internalCreateNewUserGroup (aUserGroup, true);
   }
+
+  protected UserGroup internalCreateNewUserGroup (@NonNull final UserGroup aUserGroup, final boolean bPredefined)
+  {
+    getCollection ().insertOne (toBson (aUserGroup));
+    m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, bPredefined));
+    return aUserGroup;
+  }
+
 
   @Override
   public @NonNull EChange deleteUserGroup (@Nullable String sUserGroupID)
   {
-    return null;
+    return deleteEntity (sUserGroupID);
   }
 
   @Override
   public @NonNull EChange undeleteUserGroup (@Nullable String sUserGroupID)
   {
-    return null;
+    return undeleteEntity (sUserGroupID);
   }
 
   @Override
   public @Nullable IUserGroup getUserGroupOfID (@Nullable String sUserGroupID)
   {
-    return null;
+    return findById (sUserGroupID);
   }
 
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllActiveUserGroups ()
   {
-    return null;
+    return getAllActive ();
   }
 
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllDeletedUserGroups ()
   {
-    return null;
+    return getAllDeleted ();
   }
 
   @Override
   public @NonNull EChange renameUserGroup (@Nullable String sUserGroupID, @NonNull @Nonempty String sNewName)
   {
-    return null;
+    EChange eChange = genericUpdate (sUserGroupID, Updates.set (BSON_USER_GROUP_NAME, sNewName), true);
+
+    if (eChange.isChanged ())
+    {
+      m_aCallbacks.forEach (aCB -> aCB.onUserGroupRenamed (sUserGroupID));
+    }
+
+    return eChange;
   }
 
   @Override
-  public @NonNull EChange setUserGroupData (@Nullable String sUserGroupID, @NonNull @Nonempty String sNewName, @Nullable String sNewDescription, @Nullable Map <String, String> aNewCustomAttrs)
+  public @NonNull EChange setUserGroupData (@Nullable String sUserGroupID,
+                                            @NonNull @Nonempty String sNewName,
+                                            @Nullable String sNewDescription,
+                                            @Nullable Map <String, String> aNewCustomAttrs)
   {
-    return null;
+    return genericUpdate (sUserGroupID, Updates.combine (
+                                                          Updates.set (BSON_USER_GROUP_NAME, sNewName),
+                                                          Updates.set (BSON_USER_GROUP_DESCRIPTION, sNewDescription),
+                                                          Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs)),
+                               true);
   }
 
   @Override
   public @NonNull EChange assignUserToUserGroup (@Nullable String sUserGroupID, @NonNull @Nonempty String sUserID)
   {
-    return null;
+    return genericUpdate (sUserGroupID, Updates.push (BSON_USER_GROUP_USERS, sUserID), true);
   }
 
   @Override
   public @NonNull EChange unassignUserFromUserGroup (@Nullable String sUserGroupID, @Nullable String sUserID)
   {
-    return null;
+    return genericUpdate (sUserGroupID, Updates.pull (BSON_USER_GROUP_USERS, sUserID), true);
   }
 
   @Override
   public @NonNull EChange unassignUserFromAllUserGroups (@Nullable String sUserID)
   {
-    return null;
+    return getCollection ().updateMany (new Document (), addLastModToUpdate (Updates.pull (BSON_USER_GROUP_USERS, sUserID)))
+                               .getMatchedCount () > 0 ? EChange.CHANGED : EChange.UNCHANGED;
   }
 
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllUserGroupsWithAssignedUser (@Nullable String sUserID)
   {
-    return null;
+    ICommonsList <IUserGroup> aList = new CommonsArrayList <> ();
+    getCollection ().find (Filters.eq (BSON_USER_GROUP_USERS, sUserID)).forEach (document -> aList.add (toEntity (document)));
+    return aList;
   }
 
   @Override
   public @NonNull ICommonsList <String> getAllUserGroupIDsWithAssignedUser (@Nullable String sUserID)
   {
-    return null;
+    return getAllUserGroupsWithAssignedUser (sUserID).getAllMapped (IHasID::getID);
   }
 
   @Override
   public @NonNull EChange assignRoleToUserGroup (@Nullable String sUserGroupID, @NonNull @Nonempty String sRoleID)
   {
-    return null;
+    return genericUpdate (sUserGroupID, Updates.push (BSON_USER_GROUP_ROLES, sRoleID), true);
   }
 
   @Override
   public @NonNull EChange unassignRoleFromUserGroup (@Nullable String sUserGroupID, @Nullable String sRoleID)
   {
-    return null;
+    return genericUpdate (sUserGroupID, Updates.pull (BSON_USER_GROUP_ROLES, sRoleID), true);
   }
 
   @Override
   public @NonNull EChange unassignRoleFromAllUserGroups (@Nullable String sRoleID)
   {
-    return null;
+    return getCollection ().updateMany (new Document (), addLastModToUpdate (Updates.pull (BSON_USER_GROUP_ROLES, sRoleID)))
+                               .getMatchedCount () > 0 ? EChange.CHANGED : EChange.UNCHANGED;
   }
 
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllUserGroupsWithAssignedRole (@Nullable String sRoleID)
   {
-    return null;
+    ICommonsList <IUserGroup> aList = new CommonsArrayList <> ();
+    getCollection ().find (Filters.eq (BSON_USER_GROUP_ROLES, sRoleID)).forEach (document -> aList.add (toEntity (document)));
+    return aList;
   }
 
   @Override
   public @NonNull ICommonsList <String> getAllUserGroupIDsWithAssignedRole (@Nullable String sRoleID)
   {
-    return null;
+    return getAllUserGroupsWithAssignedRole (sRoleID).getAllMapped (IHasID::getID);
   }
 
   @Override
   public boolean containsUserGroupWithAssignedRole (@Nullable String sRoleID)
   {
-    return false;
+    return getCollection ().countDocuments (Filters.eq (BSON_USER_GROUP_ROLES, sRoleID)) > 0;
   }
 
   @Override
   public boolean containsAnyUserGroupWithAssignedUserAndRole (@Nullable String sUserID, @Nullable String sRoleID)
   {
-    return false;
+    return getCollection ().countDocuments (Filters.and (
+                               Filters.eq (BSON_USER_GROUP_USERS, sUserID),
+                               Filters.eq (BSON_USER_GROUP_ROLES, sRoleID)
+    )) > 0;
   }
 
   @Override
-  public @NonNull <T> ICommonsList <T> getNone ()
+  protected @NonNull Document toBson (@NonNull IUserGroup aUserGroup)
   {
-    return null;
+    return getDefaultBusinessDocument (aUserGroup)
+                               .append (BSON_USER_GROUP_NAME, aUserGroup.getName ())
+                               .append (BSON_USER_GROUP_DESCRIPTION, aUserGroup.getDescription ())
+                               .append (BSON_USER_GROUP_ROLES, aUserGroup.getAllContainedRoleIDs ())
+                               .append (BSON_USER_GROUP_USERS, aUserGroup.getAllContainedUserIDs ());
   }
 
   @Override
-  public @NonNull ICommonsList <IUserGroup> getAll ()
+  protected @NonNull IUserGroup toEntity (@NonNull Document aDoc)
   {
-    return null;
+    return new UserGroup (populateStubObject (aDoc),
+                               aDoc.get (BSON_USER_GROUP_NAME, String.class),
+                               aDoc.get (BSON_USER_GROUP_DESCRIPTION, String.class)
+    );
   }
 
-  @Override
-  public boolean containsWithID (@Nullable String sID)
-  {
-    return false;
-  }
-
-  @Override
-  public boolean containsAllIDs (@Nullable Iterable <String> aIDs)
-  {
-    return false;
-  }
 }
