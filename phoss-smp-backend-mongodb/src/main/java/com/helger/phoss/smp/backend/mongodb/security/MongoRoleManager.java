@@ -69,8 +69,9 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
   @Override
   public @NonNull EChange deleteRole (@Nullable String sRoleID)
   {
-    return deleteEntity (sRoleID);
+    return deleteEntity (sRoleID, () -> m_aCallbacks.forEach (aCB -> aCB.onRoleDeleted (sRoleID)));
   }
+
 
   @Override
   public @Nullable IRole getRoleOfID (@Nullable String sRoleID)
@@ -81,11 +82,15 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
   @Override
   public @NonNull EChange renameRole (@Nullable String sRoleID, @NonNull @Nonempty String sNewName)
   {
-    return genericUpdate (sRoleID, Updates.set (BSON_ROLE_NAME, sNewName), true);
+    return genericUpdate (sRoleID, Updates.set (BSON_ROLE_NAME, sNewName), true,
+                               () -> m_aCallbacks.forEach (aCB -> aCB.onRoleRenamed (sRoleID)));
   }
 
   @Override
-  public @NonNull EChange setRoleData (@Nullable String sRoleID, @NonNull @Nonempty String sNewName, @Nullable String sNewDescription, @Nullable Map <String, String> aNewCustomAttrs)
+  public @NonNull EChange setRoleData (@Nullable String sRoleID,
+                                       @NonNull @Nonempty String sNewName,
+                                       @Nullable String sNewDescription,
+                                       @Nullable Map <String, String> aNewCustomAttrs)
   {
     Bson update = Updates.combine (
                                Updates.set (BSON_ROLE_NAME, sNewName),
@@ -93,7 +98,7 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
                                Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs)
     );
 
-    return genericUpdate (sRoleID, update, true);
+    return genericUpdate (sRoleID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onRoleUpdated (sRoleID)));
   }
 
   @NonNull
@@ -112,8 +117,8 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
   protected IRole toEntity (@NonNull Document aDoc)
   {
     return new Role (populateStubObject (aDoc),
-                               aDoc.get (BSON_ROLE_NAME, String.class),
-                               aDoc.get (BSON_ROLE_DESCRIPTION, String.class)
+                               aDoc.getString (BSON_ROLE_NAME),
+                               aDoc.getString (BSON_ROLE_DESCRIPTION)
     );
   }
 

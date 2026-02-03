@@ -73,17 +73,24 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return Filters.eq (BSON_ID, new ObjectId (sId));
   }
 
-  protected @NonNull EChange genericUpdate (@Nullable String sDocumentID, Bson update, boolean setLastMod)
+  protected @NonNull EChange genericUpdate (@Nullable String sDocumentID, Bson update, boolean setLastMod, @Nullable Runnable updateCallback)
   {
     if (StringHelper.isEmpty (sDocumentID))
       return EChange.UNCHANGED;
 
-    UpdateResult updateResult = getCollection ().updateOne (whereId (sDocumentID), setLastMod ? addLastModToUpdate(update) : update);
+    EChange hasChanged = getCollection ().updateOne (whereId (sDocumentID), setLastMod ? addLastModToUpdate (update) : update)
+                               .getMatchedCount () > 0 ?  EChange.CHANGED : EChange.UNCHANGED;
 
-    return updateResult.getMatchedCount () == 1 ? EChange.CHANGED : EChange.UNCHANGED;
+    if (hasChanged.isChanged () && updateCallback != null)
+    {
+      updateCallback.run ();
+    }
+
+    return hasChanged;
   }
 
-  protected Bson addLastModToUpdate(Bson update) {
+  protected Bson addLastModToUpdate (Bson update)
+  {
     return Updates.combine (
                                update,
                                Updates.set (BSON_LAST_MOD_TIME, LocalDateTime.now ()),
@@ -91,16 +98,16 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     );
   }
 
-  public @NonNull EChange deleteEntity (@Nullable String sEntityId)
+  public @NonNull EChange deleteEntity (@Nullable String sEntityId, Runnable deleteCallback)
   {
     return genericUpdate (sEntityId, Updates.combine (Updates.set (BSON_DELETED_TIME, LocalDateTime.now ()),
-                               Updates.set (BSON_DELETED_USER_ID, BusinessObjectHelper.getUserIDOrFallback ())), false);
+                               Updates.set (BSON_DELETED_USER_ID, BusinessObjectHelper.getUserIDOrFallback ())), false, deleteCallback);
   }
 
   public @NonNull EChange undeleteEntity (@Nullable String sEntityId)
   {
     return genericUpdate (sEntityId, Updates.combine (Updates.set (BSON_DELETED_TIME, null),
-                               Updates.set (BSON_DELETED_USER_ID, null)), false);
+                               Updates.set (BSON_DELETED_USER_ID, null)), false, null);
   }
 
   public @Nullable T findById (@Nullable String sID)
@@ -114,6 +121,17 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
 
     return toEntity (aDocument);
   }
+
+//  public @Nullable T findBy(Bson filter) {
+//    if (filter == null)
+//      return null;
+//
+//    Document aDocument = getCollection ().find (filter).first ();
+//    if (aDocument == null)
+//      return null;
+//
+//    return toEntity (aDocument);
+//  }
 
   @Override
   @ReturnsMutableCopy
