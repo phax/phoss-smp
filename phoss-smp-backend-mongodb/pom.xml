@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>8.0.13-SNAPSHOT</version>
+    <version>8.0.13</version>
   </parent>
   <artifactId>phoss-smp-backend-mongodb</artifactId>
   <packaging>bundle</packaging>
