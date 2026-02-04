@@ -19,6 +19,8 @@ package com.helger.phoss.smp.ui.secure;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
@@ -72,6 +74,7 @@ import com.helger.xml.serialize.read.SAXReaderSettings;
  */
 public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureServiceGroupImport.class);
   private static final String FIELD_IMPORT_FILE = "importfile";
   private static final String FIELD_OVERWRITE_EXISTING = "overwriteexisting";
   private static final String FIELD_DEFAULT_OWNER = "defaultowner";
@@ -117,6 +120,8 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
 
       if (aFormErrors.isEmpty ())
       {
+        LOGGER.info ("Reading uploaded XML file");
+
         final SAXReaderSettings aSRS = new SAXReaderSettings ();
         final IMicroDocument aDoc = MicroReader.readMicroXML (aImportFile, aSRS);
         if (aDoc == null || aDoc.getDocumentElement () == null)
