@@ -6,6 +6,7 @@ import com.helger.base.id.IHasID;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.usergroup.IUserGroup;
@@ -55,6 +56,34 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
     return m_aRoleMgr;
   }
 
+
+  @Override
+  protected @NonNull Document toBson (@NonNull IUserGroup aUserGroup)
+  {
+    return getDefaultBusinessDocument (aUserGroup)
+                               .append (BSON_USER_GROUP_NAME, aUserGroup.getName ())
+                               .append (BSON_USER_GROUP_DESCRIPTION, aUserGroup.getDescription ())
+                               .append (BSON_USER_GROUP_ROLES, aUserGroup.getAllContainedRoleIDs ())
+                               .append (BSON_USER_GROUP_USERS, aUserGroup.getAllContainedUserIDs ());
+  }
+
+  @Override
+  protected @NonNull IUserGroup toEntity (@NonNull Document aDoc)
+  {
+    UserGroup userGroup = new UserGroup (populateStubObject (aDoc),
+                               aDoc.getString (BSON_USER_GROUP_NAME),
+                               aDoc.getString (BSON_USER_GROUP_DESCRIPTION)
+    );
+
+    List <String> roles = aDoc.getList (BSON_USER_GROUP_ROLES, String.class);
+    userGroup.assignRoles (roles);
+
+    List <String> users = aDoc.getList (BSON_USER_GROUP_USERS, String.class);
+    userGroup.assignUsers (users);
+
+    return userGroup;
+  }
+
   @Override
   public void createDefaultsForTest ()
   {
@@ -83,9 +112,22 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
 
   protected UserGroup internalCreateNewUserGroup (@NonNull final UserGroup aUserGroup, final boolean bPredefined)
   {
-    getCollection ().insertOne (toBson (aUserGroup));
-    m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, bPredefined));
-    return aUserGroup;
+    try
+    {
+      getCollection ().insertOne (toBson (aUserGroup));
+      m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, bPredefined));
+      return aUserGroup;
+    } catch (Exception e)
+    {
+      AuditHelper.onAuditCreateFailure (UserGroup.OT,
+                                 aUserGroup.getID (),
+                                 aUserGroup.getName (),
+                                 aUserGroup.getDescription (),
+                                 aUserGroup.attrs (),
+                                 bPredefined ? "predefined" : "custom",
+                                 "database-error");
+    }
+    return null;
   }
 
 
@@ -98,7 +140,7 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   @Override
   public @NonNull EChange undeleteUserGroup (@Nullable String sUserGroupID)
   {
-    return undeleteEntity (sUserGroupID);
+    return undeleteEntity (sUserGroupID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserGroupUndeleted (sUserGroupID)));
   }
 
   @Override
@@ -159,7 +201,8 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   public @NonNull EChange unassignUserFromAllUserGroups (@Nullable String sUserID)
   {
     UpdateResult updateResult = getCollection ().updateMany (new Document (), addLastModToUpdate (Updates.pull (BSON_USER_GROUP_USERS, sUserID)));
-    if(updateResult.getMatchedCount () > 0){
+    if (updateResult.getMatchedCount () > 0)
+    {
       m_aCallbacks.forEach (aCB -> aCB.onUserGroupUserAssignment (null, sUserID, false)); //not supported in mongodb
       return EChange.CHANGED;
     }
@@ -228,33 +271,6 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
                                Filters.eq (BSON_USER_GROUP_USERS, sUserID),
                                Filters.eq (BSON_USER_GROUP_ROLES, sRoleID)
     )) > 0;
-  }
-
-  @Override
-  protected @NonNull Document toBson (@NonNull IUserGroup aUserGroup)
-  {
-    return getDefaultBusinessDocument (aUserGroup)
-                               .append (BSON_USER_GROUP_NAME, aUserGroup.getName ())
-                               .append (BSON_USER_GROUP_DESCRIPTION, aUserGroup.getDescription ())
-                               .append (BSON_USER_GROUP_ROLES, aUserGroup.getAllContainedRoleIDs ())
-                               .append (BSON_USER_GROUP_USERS, aUserGroup.getAllContainedUserIDs ());
-  }
-
-  @Override
-  protected @NonNull IUserGroup toEntity (@NonNull Document aDoc)
-  {
-    UserGroup userGroup = new UserGroup (populateStubObject (aDoc),
-                               aDoc.getString (BSON_USER_GROUP_NAME),
-                               aDoc.getString (BSON_USER_GROUP_DESCRIPTION)
-    );
-
-    List <String> roles = aDoc.getList (BSON_USER_GROUP_ROLES, String.class);
-    userGroup.assignRoles (roles);
-
-    List <String> users = aDoc.getList (BSON_USER_GROUP_USERS, String.class);
-    userGroup.assignUsers (users);
-
-    return userGroup;
   }
 
 }

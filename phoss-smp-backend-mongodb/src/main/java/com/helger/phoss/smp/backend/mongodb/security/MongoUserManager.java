@@ -68,7 +68,7 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                                .append (BSON_USER_LAST_NAME, aUser.getLastName ())
                                .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
                                .append (BSON_USER_PREFERRED_LOCALE, aUser.getDesiredLocale ().toLanguageTag ())
-                               .append (BSON_USER_LAST_LOGIN, aUser.getLastLoginDateTime ())
+                               .append (BSON_USER_LAST_LOGIN, convertLocalDateTimeToDate (aUser.getLastLoginDateTime ()))
                                .append (BSON_USER_LOGIN_COUNT, aUser.getLoginCount ())
                                .append (BSON_USER_FAILED_LOGIN_COUNT, aUser.getConsecutiveFailedLoginCount ())
                                .append (BSON_USER_DISABLED, aUser.isDisabled ());
@@ -91,7 +91,7 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                                aDoc.getString (BSON_USER_LAST_NAME),
                                aDoc.getString (BSON_USER_DESCRIPTION),
                                Locale.forLanguageTag (aDoc.getString (BSON_USER_PREFERRED_LOCALE)),
-                               aDoc.get (BSON_USER_LAST_LOGIN, LocalDateTime.class),
+                               convertDatenToLocalDateTime (aDoc.getDate (BSON_USER_LAST_LOGIN)),
                                aDoc.getInteger (BSON_USER_LOGIN_COUNT),
                                aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT),
                                aDoc.getBoolean (BSON_USER_DISABLED)
@@ -172,9 +172,27 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
 
   protected User internalCreateNewUser (@NonNull final User aUser, final boolean bPredefined)
   {
-    getCollection ().insertOne (toBson (aUser));
-    m_aCallbacks.forEach (aCB -> aCB.onUserCreated (aUser, bPredefined));
-    return aUser;
+    try
+    {
+      getCollection ().insertOne (toBson (aUser));
+      m_aCallbacks.forEach (aCB -> aCB.onUserCreated (aUser, bPredefined));
+      return aUser;
+    } catch (Exception e)
+    {
+      AuditHelper.onAuditCreateFailure (User.OT,
+                                 aUser.getID (),
+                                 aUser.getLoginName (),
+                                 aUser.getEmailAddress (),
+                                 aUser.getFirstName (),
+                                 aUser.getLastName (),
+                                 aUser.getDescription (),
+                                 aUser.getDesiredLocale (),
+                                 aUser.attrs (),
+                                 Boolean.valueOf (aUser.isDisabled ()),
+                                 bPredefined ? "predefined" : "custom",
+                                 "database-error");
+    }
+    return null;
   }
 
   @Override
@@ -308,44 +326,49 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                                Updates.set (BSON_USER_PASSWORD_HASH, userDefaultPasswordHash.getPasswordHashValue ())
     );
 
-    return genericUpdate (sUserID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    return genericUpdate (sUserID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserPasswordChanged (sUserID)));
   }
 
   @Override
   public @NonNull EChange updateUserLastLogin (@Nullable String sUserID)
   {
-    return genericUpdate (sUserID,  Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()), true, ()
-                               -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    return genericUpdate (sUserID, Updates.combine (
+                               Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
+                               Updates.inc (BSON_USER_LOGIN_COUNT, 1),
+                               Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, 0)
+    ), true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 
   @Override
   public @NonNull EChange updateUserLastFailedLogin (@Nullable String sUserID)
   {
-    //todo
-    return null;
+    return genericUpdate (sUserID, Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, 1), true, ()
+                               -> m_aCallbacks.forEach (aCB -> aCB.onUserLastFailedLoginUpdated (sUserID)));
   }
 
   @Override
   public @NonNull EChange deleteUser (@Nullable String sUserID)
   {
-    return null;
+    return deleteEntity (sUserID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserDeleted (sUserID)));
   }
 
   @Override
   public @NonNull EChange undeleteUser (@Nullable String sUserID)
   {
-    return null;
+    return undeleteEntity (sUserID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUndeleted (sUserID)));
   }
 
   @Override
   public @NonNull EChange disableUser (@Nullable String sUserID)
   {
-    return null;
+    return genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, true), true, ()
+                               -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 
   @Override
   public @NonNull EChange enableUser (@Nullable String sUserID)
   {
-    return null;
+    return genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, false), true, ()
+                               -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 }

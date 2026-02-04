@@ -71,7 +71,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   @NonNull
   protected Bson whereId (String sId)
   {
-    return Filters.eq (BSON_ID, new ObjectId (sId));
+    return Filters.eq (BSON_ID, sId);
   }
 
   protected @NonNull EChange genericUpdate (@Nullable String sDocumentID, Bson update, boolean setLastMod, @Nullable Runnable updateCallback)
@@ -105,10 +105,10 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
                                Updates.set (BSON_DELETED_USER_ID, BusinessObjectHelper.getUserIDOrFallback ())), false, deleteCallback);
   }
 
-  public @NonNull EChange undeleteEntity (@Nullable String sEntityId)
+  public @NonNull EChange undeleteEntity (@Nullable String sEntityId, Runnable deleteCallback)
   {
     return genericUpdate (sEntityId, Updates.combine (Updates.set (BSON_DELETED_TIME, null),
-                               Updates.set (BSON_DELETED_USER_ID, null)), false, null);
+                               Updates.set (BSON_DELETED_USER_ID, null)), false, deleteCallback);
   }
 
   public @Nullable T findById (@Nullable String sID)
@@ -172,11 +172,11 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
 
   protected static Document getDefaultBusinessDocument (IBusinessObject aBusinessObject)
   {
-    return new Document ().append (BSON_CREATION_TIME, localDateTimeToDate (aBusinessObject.getCreationDateTime ()))
+    return new Document ().append (BSON_CREATION_TIME, convertLocalDateTimeToDate (aBusinessObject.getCreationDateTime ()))
                                .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
-                               .append (BSON_LAST_MOD_TIME, localDateTimeToDate (aBusinessObject.getLastModificationDateTime ()))
+                               .append (BSON_LAST_MOD_TIME, convertLocalDateTimeToDate (aBusinessObject.getLastModificationDateTime ()))
                                .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
-                               .append (BSON_DELETED_TIME, localDateTimeToDate (aBusinessObject.getDeletionDateTime ()))
+                               .append (BSON_DELETED_TIME, convertLocalDateTimeToDate (aBusinessObject.getDeletionDateTime ()))
                                .append (BSON_DELETED_USER_ID, aBusinessObject.getDeletionUserID ())
                                .append (BSON_ATTRIBUTES, aBusinessObject.attrs ()); //auto cast to Map<String, String>
   }
@@ -205,7 +205,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return aDate.toInstant ().atZone (ZoneId.systemDefault ()).toLocalDateTime ();
   }
 
-  protected static Date localDateTimeToDate (LocalDateTime localDateTime)
+  protected static Date convertLocalDateTimeToDate (LocalDateTime localDateTime)
   {
     if (localDateTime == null)
     {

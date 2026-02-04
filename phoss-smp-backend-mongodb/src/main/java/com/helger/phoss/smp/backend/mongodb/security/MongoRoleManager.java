@@ -4,6 +4,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.object.StubObject;
 import com.helger.photon.security.role.IRole;
 import com.helger.photon.security.role.IRoleManager;
@@ -30,6 +31,29 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
   {
     super (ROLE_COLLECTION_NAME);
   }
+
+
+  @NonNull
+  @Override
+  @ReturnsMutableCopy
+  protected Document toBson (@NonNull final IRole aRole)
+  {
+    return getDefaultBusinessDocument (aRole)
+                               .append (BSON_ROLE_NAME, aRole.getName ())
+                               .append (BSON_ROLE_DESCRIPTION, aRole.getDescription ());
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  protected IRole toEntity (@NonNull Document aDoc)
+  {
+    return new Role (populateStubObject (aDoc),
+                               aDoc.getString (BSON_ROLE_NAME),
+                               aDoc.getString (BSON_ROLE_DESCRIPTION)
+    );
+  }
+
 
   @Override
   public void createDefaultsForTest ()
@@ -61,9 +85,21 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
 
   protected Role internalCreateNewRole (@NonNull final Role aRole, final boolean bPredefined)
   {
-    getCollection ().insertOne (toBson (aRole));
-    m_aCallbacks.forEach (aCB -> aCB.onRoleCreated (aRole, bPredefined));
-    return aRole;
+    try
+    {
+      getCollection ().insertOne (toBson (aRole));
+      m_aCallbacks.forEach (aCB -> aCB.onRoleCreated (aRole, bPredefined));
+      return aRole;
+    } catch (Exception e)
+    {
+      AuditHelper.onAuditCreateFailure (Role.OT,
+                                 aRole.getID (),
+                                 aRole.getName (),
+                                 aRole.getDescription (),
+                                 bPredefined ? "predefined" : "custom",
+                                 "database-error");
+    }
+    return null;
   }
 
   @Override
@@ -99,27 +135,6 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
     );
 
     return genericUpdate (sRoleID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onRoleUpdated (sRoleID)));
-  }
-
-  @NonNull
-  @Override
-  @ReturnsMutableCopy
-  protected Document toBson (@NonNull final IRole aRole)
-  {
-    return getDefaultBusinessDocument (aRole)
-                               .append (BSON_ROLE_NAME, aRole.getName ())
-                               .append (BSON_ROLE_DESCRIPTION, aRole.getDescription ());
-  }
-
-  @NonNull
-  @ReturnsMutableCopy
-  @Override
-  protected IRole toEntity (@NonNull Document aDoc)
-  {
-    return new Role (populateStubObject (aDoc),
-                               aDoc.getString (BSON_ROLE_NAME),
-                               aDoc.getString (BSON_ROLE_DESCRIPTION)
-    );
   }
 
 }
