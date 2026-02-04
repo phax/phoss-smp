@@ -15,7 +15,6 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -23,6 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -79,7 +80,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
       return EChange.UNCHANGED;
 
     EChange hasChanged = getCollection ().updateOne (whereId (sDocumentID), setLastMod ? addLastModToUpdate (update) : update)
-                               .getMatchedCount () > 0 ?  EChange.CHANGED : EChange.UNCHANGED;
+                               .getMatchedCount () > 0 ? EChange.CHANGED : EChange.UNCHANGED;
 
     if (hasChanged.isChanged () && updateCallback != null)
     {
@@ -121,17 +122,6 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
 
     return toEntity (aDocument);
   }
-
-//  public @Nullable T findBy(Bson filter) {
-//    if (filter == null)
-//      return null;
-//
-//    Document aDocument = getCollection ().find (filter).first ();
-//    if (aDocument == null)
-//      return null;
-//
-//    return toEntity (aDocument);
-//  }
 
   @Override
   @ReturnsMutableCopy
@@ -182,11 +172,11 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
 
   protected static Document getDefaultBusinessDocument (IBusinessObject aBusinessObject)
   {
-    return new Document ().append (BSON_CREATION_TIME, aBusinessObject.getCreationDateTime ())
+    return new Document ().append (BSON_CREATION_TIME, localDateTimeToDate (aBusinessObject.getCreationDateTime ()))
                                .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
-                               .append (BSON_LAST_MOD_TIME, aBusinessObject.getLastModificationDateTime ())
+                               .append (BSON_LAST_MOD_TIME, localDateTimeToDate (aBusinessObject.getLastModificationDateTime ()))
                                .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
-                               .append (BSON_DELETED_TIME, aBusinessObject.getDeletionDateTime ())
+                               .append (BSON_DELETED_TIME, localDateTimeToDate (aBusinessObject.getDeletionDateTime ()))
                                .append (BSON_DELETED_USER_ID, aBusinessObject.getDeletionUserID ())
                                .append (BSON_ATTRIBUTES, aBusinessObject.attrs ()); //auto cast to Map<String, String>
   }
@@ -195,15 +185,33 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   protected static StubObject populateStubObject (Document aDocument)
   {
     return new StubObject (
-                               aDocument.get (BSON_ID, String.class),
-                               aDocument.get (BSON_CREATION_TIME, LocalDateTime.class),
-                               aDocument.get (BSON_CREATION_USER_ID, String.class),
-                               aDocument.get (BSON_LAST_MOD_TIME, LocalDateTime.class),
-                               aDocument.get (BSON_LAST_MOD_USER_ID, String.class),
-                               aDocument.get (BSON_DELETED_TIME, LocalDateTime.class),
-                               aDocument.get (BSON_DELETED_USER_ID, String.class),
+                               aDocument.getObjectId (BSON_ID).toString (),
+                               convertDatenToLocalDateTime (aDocument.getDate (BSON_CREATION_TIME)),
+                               aDocument.getString (BSON_CREATION_USER_ID),
+                               convertDatenToLocalDateTime (aDocument.getDate (BSON_LAST_MOD_TIME)),
+                               aDocument.getString (BSON_LAST_MOD_USER_ID),
+                               convertDatenToLocalDateTime (aDocument.getDate (BSON_DELETED_TIME)),
+                               aDocument.getString (BSON_DELETED_USER_ID),
                                readAttrs (aDocument)
     );
+  }
+
+  protected static LocalDateTime convertDatenToLocalDateTime (Date aDate)
+  {
+    if (aDate == null)
+    {
+      return null;
+    }
+    return aDate.toInstant ().atZone (ZoneId.systemDefault ()).toLocalDateTime ();
+  }
+
+  protected static Date localDateTimeToDate (LocalDateTime localDateTime)
+  {
+    if (localDateTime == null)
+    {
+      return null;
+    }
+    return Date.from (localDateTime.atZone (ZoneId.systemDefault ()).toInstant ());
   }
 
 
