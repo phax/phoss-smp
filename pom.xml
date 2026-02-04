@@ -25,7 +25,7 @@
     <version>3.0.3</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>8.0.13-SNAPSHOT</version>
+  <version>8.0.14-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
@@ -70,7 +70,7 @@
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>12.0.0</flyway.version>
     <log4j.version>2.25.3</log4j.version>
-    <mongodb.version>5.6.2</mongodb.version>
+    <mongodb.version>5.6.3</mongodb.version>
     <protobuf.version>4.33.5</protobuf.version>
     <ph-db.version>8.1.1</ph-db.version>
   </properties>
@@ -150,6 +150,7 @@
         <artifactId>woodstox-core</artifactId>
         <version>7.1.0</version>
       </dependency>
+      <!-- Used by Flyway -->
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>

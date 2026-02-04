@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>8.0.13-SNAPSHOT</version>
+    <version>8.0.14-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-webapp-xml</artifactId>
   <packaging>war</packaging>
