@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2015-2025 Philip Helger and contributors
+    Copyright (C) 2015-2026 Philip Helger and contributors
     philip[at]helger[dot]com
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,10 +68,10 @@
 
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
-    <flyway.version>11.20.3</flyway.version>
+    <flyway.version>12.0.0</flyway.version>
     <log4j.version>2.25.3</log4j.version>
     <mongodb.version>5.6.2</mongodb.version>
-    <protobuf.version>4.33.4</protobuf.version>
+    <protobuf.version>4.33.5</protobuf.version>
     <ph-db.version>8.1.1</ph-db.version>
   </properties>
   
@@ -127,7 +127,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>12.3.7</version>
+        <version>12.3.8</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -382,7 +382,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New certificate")
                                                    .setCtrl (new HCTextArea (new RequestField (FIELD_NEW_CERTIFICATE,
                                                                                                sOldUnifiedCert)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
-                                                   .setHelpText ("The new certificate that is used instead")
+                                                   .setHelpText ("The new certificate that is used instead (use PEM encoding)")
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_NEW_CERTIFICATE)));
 
       final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));

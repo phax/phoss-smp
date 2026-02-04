@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -16,7 +16,6 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.ThreadSafe;
-import com.helger.base.string.StringHelper;
 import com.helger.config.IConfig;
 import com.helger.mime.EMimeContentType;
 import com.helger.peppolid.factory.ESMPIdentifierType;
@@ -380,12 +379,7 @@ public final class SMPServerConfiguration
   @Nullable
   public static String getSMLSMPHostname ()
   {
-    String ret = _getConfig ().getAsString (KEY_SML_SMP_HOSTNAME);
-
-    // Ensure prefix
-    if (StringHelper.isNotEmpty (ret) && !ret.startsWith ("http://"))
-      ret = "http://" + ret;
-    return ret;
+    return _getConfig ().getAsString (KEY_SML_SMP_HOSTNAME);
   }
 
   /**
