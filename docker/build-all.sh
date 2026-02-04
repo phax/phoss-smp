@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-version=8.0.12
+version=8.0.13
 
 echo Docker login
 docker login --username phelger
