@@ -5,7 +5,6 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
-import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.password.GlobalPasswordSettings;
@@ -33,6 +32,7 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
 
   private static final String BSON_USER_LOGIN_NAME = "loginName";
   private static final String BSON_USER_EMAIL = "email";
+  private static final String BSON_USER_PASSWORD = "password";
   private static final String BSON_USER_PASSWORD_ALGO = "algo";
   private static final String BSON_USER_PASSWORD_SALT = "salt";
   private static final String BSON_USER_PASSWORD_HASH = "hash";
@@ -57,12 +57,9 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
   @Override
   protected @NonNull Document toBson (@NonNull IUser aUser)
   {
-    PasswordHash passwordHash = aUser.getPasswordHash ();
     return getDefaultBusinessDocument (aUser)
                                .append (BSON_USER_LOGIN_NAME, aUser.getLoginName ())
-                               .append (BSON_USER_PASSWORD_ALGO, passwordHash.getAlgorithmName ())
-                               .append (BSON_USER_PASSWORD_SALT, passwordHash.getSaltAsString ())
-                               .append (BSON_USER_PASSWORD_HASH, passwordHash.getPasswordHashValue ())
+                               .append (BSON_USER_PASSWORD, passwordHashToDocument (aUser.getPasswordHash ()))
                                .append (BSON_USER_EMAIL, aUser.getEmailAddress ())
                                .append (BSON_USER_FIRST_NAME, aUser.getFirstName ())
                                .append (BSON_USER_LAST_NAME, aUser.getLastName ())
@@ -74,19 +71,20 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                                .append (BSON_USER_DISABLED, aUser.isDisabled ());
   }
 
+  private Document passwordHashToDocument (@NonNull PasswordHash passwordHash)
+  {
+    return new Document ().append (BSON_USER_PASSWORD_ALGO, passwordHash.getAlgorithmName ())
+                               .append (BSON_USER_PASSWORD_SALT, passwordHash.getSaltAsString ())
+                               .append (BSON_USER_PASSWORD_HASH, passwordHash.getPasswordHashValue ());
+  }
+
   @Override
   protected @NonNull IUser toEntity (@NonNull Document aDoc)
   {
-
-    PasswordHash passwordHash = new PasswordHash (
-                               aDoc.getString (BSON_USER_PASSWORD_ALGO),
-                               PasswordSalt.createFromStringMaybe (aDoc.getString (BSON_USER_PASSWORD_SALT)),
-                               aDoc.getString (BSON_USER_PASSWORD_HASH)
-    );
     return new User (populateStubObject (aDoc),
                                aDoc.getString (BSON_USER_LOGIN_NAME),
                                aDoc.getString (BSON_USER_EMAIL),
-                               passwordHash,
+                               documentToPasswordHash (aDoc.get (BSON_USER_PASSWORD, Document.class)),
                                aDoc.getString (BSON_USER_FIRST_NAME),
                                aDoc.getString (BSON_USER_LAST_NAME),
                                aDoc.getString (BSON_USER_DESCRIPTION),
@@ -98,6 +96,16 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     );
 
 
+  }
+
+  private @NonNull PasswordHash documentToPasswordHash (Document aDoc)
+  {
+    ValueEnforcer.notNull (aDoc, "aDoc");
+    return new PasswordHash (
+                               aDoc.getString (BSON_USER_PASSWORD_ALGO),
+                               PasswordSalt.createFromStringMaybe (aDoc.getString (BSON_USER_PASSWORD_SALT)),
+                               aDoc.getString (BSON_USER_PASSWORD_HASH)
+    );
   }
 
   @Override
@@ -246,17 +254,10 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
 
   private static final Bson ACTIVE_FILTER = Filters.and (Filters.eq (BSON_USER_DISABLED, false), Filters.eq (BSON_DELETED_TIME, null));
 
-  private @NonNull ICommonsList <IUser> filterToList (Bson filter)
-  {
-    ICommonsList <IUser> out = new CommonsArrayList <> ();
-    getCollection ().find (filter).forEach (document -> out.add (toEntity (document)));
-    return out;
-  }
-
   @Override
   public @NonNull ICommonsList <IUser> getAllActiveUsers ()
   {
-    return filterToList (ACTIVE_FILTER);
+    return findInternal (ACTIVE_FILTER);
   }
 
   @Override
@@ -268,19 +269,19 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
   @Override
   public @NonNull ICommonsList <IUser> getAllDisabledUsers ()
   {
-    return filterToList (Filters.and (Filters.eq (BSON_USER_DISABLED, true), Filters.eq (BSON_DELETED_TIME, null)));
+    return findInternal (Filters.and (Filters.eq (BSON_USER_DISABLED, true), Filters.eq (BSON_DELETED_TIME, null)));
   }
 
   @Override
   public @NonNull ICommonsList <IUser> getAllNotDeletedUsers ()
   {
-    return filterToList (Filters.eq (BSON_DELETED_TIME, null));
+    return findInternal (Filters.eq (BSON_DELETED_TIME, null));
   }
 
   @Override
   public @NonNull ICommonsList <IUser> getAllDeletedUsers ()
   {
-    return filterToList (Filters.ne (BSON_DELETED_TIME, null));
+    return findInternal (Filters.ne (BSON_DELETED_TIME, null));
   }
 
   @Override
@@ -321,9 +322,9 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     PasswordHash userDefaultPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (), sNewPlainTextPassword);
 
     Bson update = Updates.combine (
-                               Updates.set (BSON_USER_PASSWORD_ALGO, userDefaultPasswordHash.getAlgorithmName ()),
-                               Updates.set (BSON_USER_PASSWORD_SALT, userDefaultPasswordHash.getSaltAsString ()),
-                               Updates.set (BSON_USER_PASSWORD_HASH, userDefaultPasswordHash.getPasswordHashValue ())
+                               Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_ALGO, userDefaultPasswordHash.getAlgorithmName ()),
+                               Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_SALT, userDefaultPasswordHash.getSaltAsString ()),
+                               Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_HASH, userDefaultPasswordHash.getPasswordHashValue ())
     );
 
     return genericUpdate (sUserID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserPasswordChanged (sUserID)));

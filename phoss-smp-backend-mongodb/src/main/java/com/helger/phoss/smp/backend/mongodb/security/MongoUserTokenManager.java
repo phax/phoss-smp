@@ -4,7 +4,6 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
-import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.token.accesstoken.AccessToken;
@@ -214,9 +213,7 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   @Override
   public @NonNull ICommonsList <IUserToken> getAllActiveUserTokens ()
   {
-    ICommonsList <IUserToken> out = new CommonsArrayList <> ();
-    getCollection ().find (Filters.eq (BSON_DELETED_TIME, null)).forEach (document -> out.add (toEntity (document)));
-    return out;
+    return getAllActive ();
   }
 
   @Override

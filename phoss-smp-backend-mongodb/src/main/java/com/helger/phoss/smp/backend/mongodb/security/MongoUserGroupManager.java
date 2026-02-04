@@ -4,7 +4,6 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.id.IHasID;
 import com.helger.base.state.EChange;
-import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.role.IRoleManager;
@@ -212,9 +211,7 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllUserGroupsWithAssignedUser (@Nullable String sUserID)
   {
-    ICommonsList <IUserGroup> aList = new CommonsArrayList <> ();
-    getCollection ().find (Filters.eq (BSON_USER_GROUP_USERS, sUserID)).forEach (document -> aList.add (toEntity (document)));
-    return aList;
+    return findInternal (Filters.eq (BSON_USER_GROUP_USERS, sUserID));
   }
 
   @Override
@@ -247,9 +244,7 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllUserGroupsWithAssignedRole (@Nullable String sRoleID)
   {
-    ICommonsList <IUserGroup> aList = new CommonsArrayList <> ();
-    getCollection ().find (Filters.eq (BSON_USER_GROUP_ROLES, sRoleID)).forEach (document -> aList.add (toEntity (document)));
-    return aList;
+    return findInternal (Filters.eq (BSON_USER_GROUP_ROLES, sRoleID));
   }
 
   @Override

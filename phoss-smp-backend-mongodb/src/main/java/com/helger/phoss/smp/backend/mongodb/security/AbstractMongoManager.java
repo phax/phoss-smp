@@ -140,7 +140,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return findInternal (Filters.ne (BSON_DELETED_TIME, null)); //get all documents where deleted is not null
   }
 
-  private @NonNull ICommonsList <T> findInternal (@Nullable Bson filter)
+  protected @NonNull ICommonsList <T> findInternal (@Nullable Bson filter)
   {
     final ICommonsList <T> ret = new CommonsArrayList <> ();
     getCollection ().find (filter).forEach (document -> ret.add (toEntity (document)));
@@ -172,7 +172,8 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
 
   protected static Document getDefaultBusinessDocument (IBusinessObject aBusinessObject)
   {
-    return new Document ().append (BSON_CREATION_TIME, convertLocalDateTimeToDate (aBusinessObject.getCreationDateTime ()))
+    return new Document ().append (BSON_ID, aBusinessObject.getID ())
+                               .append (BSON_CREATION_TIME, convertLocalDateTimeToDate (aBusinessObject.getCreationDateTime ()))
                                .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
                                .append (BSON_LAST_MOD_TIME, convertLocalDateTimeToDate (aBusinessObject.getLastModificationDateTime ()))
                                .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
@@ -185,7 +186,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   protected static StubObject populateStubObject (Document aDocument)
   {
     return new StubObject (
-                               aDocument.getObjectId (BSON_ID).toString (),
+                               aDocument.getString (BSON_ID),
                                convertDatenToLocalDateTime (aDocument.getDate (BSON_CREATION_TIME)),
                                aDocument.getString (BSON_CREATION_USER_ID),
                                convertDatenToLocalDateTime (aDocument.getDate (BSON_LAST_MOD_TIME)),
