@@ -341,15 +341,15 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
       return EChange.UNCHANGED;
     }
 
-    // Invoke generic callbacks
-    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPBusinessCard successful");
 
     AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("deleteSMPBusinessCard successful");
+    // Invoke generic callbacks
+    m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
 
     return EChange.CHANGED;
   }

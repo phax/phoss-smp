@@ -315,6 +315,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
+
     return EChange.CHANGED;
   }
 
