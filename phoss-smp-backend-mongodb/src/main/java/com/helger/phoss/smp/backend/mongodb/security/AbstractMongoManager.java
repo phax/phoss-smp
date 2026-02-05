@@ -1,7 +1,10 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.id.IHasID;
+import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.base.id.factory.IStringIDFactory;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
@@ -23,15 +26,24 @@ import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractMongoManager <T extends IHasID <String>> implements IPhotonManager <T>
 {
+  static
+  {
+    //we have entities that do not use a custom id, so we provide a id factory
+    GlobalIDFactory.setPersistentStringIDFactory (new IStringIDFactory ()
+    {
+      @Override
+      public @NonNull String getNewID ()
+      {
+        return UUID.randomUUID ().toString ();
+      }
+    });
+  }
 
   protected static final String BSON_ID = "_id";
 
@@ -127,7 +139,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   @ReturnsMutableCopy
   public @NonNull ICommonsList <T> getAll ()
   {
-    return findInternal (null); //do not filter
+    return findInternal (new Document ()); //do not filter
   }
 
   protected @NonNull ICommonsList <T> getAllActive ()
@@ -140,7 +152,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return findInternal (Filters.ne (BSON_DELETED_TIME, null)); //get all documents where deleted is not null
   }
 
-  protected @NonNull ICommonsList <T> findInternal (@Nullable Bson filter)
+  protected @NonNull ICommonsList <T> findInternal (@NonNull Bson filter)
   {
     final ICommonsList <T> ret = new CommonsArrayList <> ();
     getCollection ().find (filter).forEach (document -> ret.add (toEntity (document)));
@@ -168,6 +180,12 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     long countDocuments = getCollection ().countDocuments (Filters.in (BSON_ID, aObjectIds)); //uses $in
 
     return aObjectIds.size () == countDocuments;
+  }
+
+  @VisibleForTesting
+  void deleteAll ()
+  {
+    getCollection ().drop ();
   }
 
   protected static Document getDefaultBusinessDocument (IBusinessObject aBusinessObject)
