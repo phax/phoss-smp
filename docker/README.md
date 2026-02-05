@@ -79,7 +79,7 @@ Alternatively the full paths of the configuration properties can also be provide
 
 #### For v6.x and onwards
 
-```
+```shell
 -e "CONFIG_FILE=/config/application.properties"
 ```
 
@@ -116,7 +116,7 @@ Use an existing binary release, with the XML backend.
 
 To build, run and stop the SMP image with XML backend use the following command:
 
-```
+```shell
 docker build --pull -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml --build-arg SMP_VERSION=8.0.13 .
 docker run -d --name phoss-smp-release-binary-xml -p 8888:8080 phoss-smp-release-binary-xml
 docker stop phoss-smp-release-binary-xml
@@ -132,7 +132,7 @@ Use an existing binary release, with the SQL backend.
 
 To build the SMP image with SQL backend use the following command:
 
-```
+```shell
 docker build --pull -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql --build-arg SMP_VERSION=8.0.13 .
 docker run -d --name phoss-smp-release-binary-sql -p 8888:8080 phoss-smp-release-binary-sql
 docker stop phoss-smp-release-binary-sql
@@ -149,7 +149,7 @@ Use an existing binary release, with the MongoDB backend.
 
 To build the SMP image with MongoDB backend use the following command:
 
-```
+```shell
 docker build --pull -t phoss-smp-release-binary-mongodb -f Dockerfile-release-binary-mongodb --build-arg SMP_VERSION=8.0.13 .
 docker run -d --name phoss-smp-release-binary-mongodb -p 8888:8080 phoss-smp-release-binary-mongodb
 docker stop phoss-smp-release-binary-mongodb
@@ -163,7 +163,7 @@ Open `http://localhost:8888` in your browser.
 
 Build the SMP from GitHub source with the XML backend using the tag of the last release.
 
-```
+```shell
 docker build --pull -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml --build-arg SMP_VERSION=8.0.13 .
 docker run -d --name phoss-smp-release-from-source-xml -p 8888:8080 phoss-smp-release-from-source-xml
 docker stop phoss-smp-release-from-source-xml
@@ -173,33 +173,33 @@ docker rm phoss-smp-release-from-source-xml
 It exposes port 8888 where Tomcat is running successfully.
 Open `http://localhost:8888` in your browser.
 
-### Latest snapshot version from source, MongoDB backend
+### Latest snapshot version from git source, MongoDB backend
 
 Build the SMP from GitHub source with the MongoDB backend using the HEAD version of the master branch (SNAPSHOT version).
 
-```
+```shell
 docker build --pull -t phoss-smp-snapshot-from-source-mongodb -f Dockerfile-snapshot-from-source-mongodb .
 docker run -d --name phoss-smp-snapshot-from-source-mongodb -p 8888:8080 phoss-smp-snapshot-from-source-mongodb
 docker stop phoss-smp-snapshot-from-source-mongodb
 docker rm phoss-smp-snapshot-from-source-mongodb
 ```
 
-### Latest snapshot version from source, SQL backend
+### Latest snapshot version from git source, SQL backend
 
 Build the SMP from GitHub source with the SQL backend using the HEAD version of the master branch (SNAPSHOT version).
 
-```
+```shell
 docker build --pull -t phoss-smp-snapshot-from-source-sql -f Dockerfile-snapshot-from-source-sql .
 docker run -d --name phoss-smp-snapshot-from-source-sql -p 8888:8080 phoss-smp-snapshot-from-source-sql
 docker stop phoss-smp-snapshot-from-source-sql
 docker rm phoss-smp-snapshot-from-source-sql
 ```
 
-### Latest snapshot version from source, XML Backend
+### Latest snapshot version from git source, XML Backend
 
 Build the SMP from GitHub source with the XML backend using the HEAD version of the master branch (SNAPSHOT version).
 
-```
+```shell
 docker build --pull -t phoss-smp-snapshot-from-source-xml -f Dockerfile-snapshot-from-source-xml .
 docker run -d --name phoss-smp-snapshot-from-source-xml -p 8888:8080 phoss-smp-snapshot-from-source-xml
 docker stop phoss-smp-snapshot-from-source-xml
@@ -209,11 +209,23 @@ docker rm phoss-smp-snapshot-from-source-xml
 It exposes port 8888 where Tomcat is running successfully.
 Open `http://localhost:8888` in your browser.
 
+
+### Latest snapshot version from local source, SQL backend
+
+Build the SMP from local source with the SQL backend (SNAPSHOT version). Mind the ".." context!
+
+```shell
+docker build --pull -t phoss-smp-snapshot-from-local-source-sql -f Dockerfile-snapshot-from-local-source-sql ..
+docker run -d --name phoss-smp-snapshot-from-local-source-sql -p 8888:8080 phoss-smp-snapshot-from-local-source-sql
+docker stop phoss-smp-snapshot-from-local-source-sql
+docker rm phoss-smp-snapshot-from-local-source-sql
+```
+
 ### Version change
 
 To change the version build of binary release versions you can specify the version on the commandline when building:
 
-```
+```shell
 docker build --build-arg SMP_VERSION=8.0.13 -t phoss-smp-release-binary-xml-8.0.13 -f Dockerfile-release-binary-xml .
 ```
 
@@ -239,7 +251,7 @@ To open a shell in the docker image use `docker exec -it phoss-smp-snapshot-from
 
 Once a new version is available the image needs to be build and pushed to Docker hub:
 
-```
+```shell
 docker login
 docker tag phoss-smp-release-binary-xml-x.y.z phelger/smp:x.y.z
 docker push phelger/smp:x.y.z

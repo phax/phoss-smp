@@ -17,4 +17,5 @@
     limitations under the License.
 
 -->
-<Context antiJARLocking="true" path="/" />
+<Context>
+</Context>
