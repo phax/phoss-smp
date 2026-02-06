@@ -237,6 +237,6 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   @Override
   public boolean isAccessTokenUsed (@Nullable String sTokenString)
   {
-    return getUserTokenOfTokenString (sTokenString) == null;
+    return getUserTokenOfTokenString (sTokenString) != null;
   }
 }

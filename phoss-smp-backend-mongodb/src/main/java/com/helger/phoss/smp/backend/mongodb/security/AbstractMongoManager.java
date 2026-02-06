@@ -32,17 +32,23 @@ import java.util.stream.StreamSupport;
 
 public abstract class AbstractMongoManager <T extends IHasID <String>> implements IPhotonManager <T>
 {
+
+  private static final IStringIDFactory DEFAULT_PERSISTENT_STRING_FACTORY = new IStringIDFactory ()
+  {
+    @Override
+    public @NonNull String getNewID ()
+    {
+      return UUID.randomUUID ().toString ();
+    }
+  };
+
   static
   {
     //we have entities that do not use a custom id, so we provide a id factory
-    GlobalIDFactory.setPersistentStringIDFactory (new IStringIDFactory ()
+    if (GlobalIDFactory.getPersistentStringIDFactory () != DEFAULT_PERSISTENT_STRING_FACTORY)
     {
-      @Override
-      public @NonNull String getNewID ()
-      {
-        return UUID.randomUUID ().toString ();
-      }
-    });
+      GlobalIDFactory.setPersistentStringIDFactory (DEFAULT_PERSISTENT_STRING_FACTORY);
+    }
   }
 
   protected static final String BSON_ID = "_id";

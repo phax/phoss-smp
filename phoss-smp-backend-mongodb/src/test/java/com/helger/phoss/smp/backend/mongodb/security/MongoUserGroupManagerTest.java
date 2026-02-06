@@ -24,11 +24,14 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
 
     Assert.assertEquals (newUserGroup, mongoUserGroupManager.getUserGroupOfID (userGroupID));
 
-    mongoUserGroupManager.setUserGroupData (userGroupID,"test user", "group for tests", Map.of ("foo1", "bar1"));
+    mongoUserGroupManager.setUserGroupData (userGroupID, "test user", "group for tests", Map.of ("foo1", "bar1"));
     IUserGroup updated = mongoUserGroupManager.getUserGroupOfID (userGroupID);
     Assert.assertEquals ("test user", updated.getName ());
     Assert.assertEquals ("group for tests", updated.getDescription ());
     Assert.assertEquals ("bar1", updated.attrs ().get ("foo1"));
+
+    mongoUserGroupManager.renameUserGroup (userGroupID, "newName");
+    Assert.assertEquals ("newName", mongoUserGroupManager.getUserGroupOfID (userGroupID).getName ());
 
     String userId = UUID.randomUUID ().toString ();
 
@@ -37,7 +40,7 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
     Assert.assertFalse (mongoUserGroupManager.isUserAssignedToUserGroup (userGroupID, "another uuid"));
 
     IUserGroup anotherGroup = mongoUserGroupManager.createNewUserGroup ("group2", null, null);
-    String anotherGroupUserGroupID = newUserGroup.getID ();
+    String anotherGroupUserGroupID = anotherGroup.getID ();
     mongoUserGroupManager.assignUserToUserGroup (anotherGroupUserGroupID, userId);
 
     ICommonsList <String> allUserGroupIDsWithAssignedUser = mongoUserGroupManager.getAllUserGroupIDsWithAssignedUser (userId);
@@ -63,6 +66,25 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
     mongoUserGroupManager.unassignRoleFromAllUserGroups (roleUUID);
     Assert.assertFalse (mongoUserGroupManager.containsAnyUserGroupWithAssignedUserAndRole (userId, roleUUID));
     Assert.assertTrue (mongoUserGroupManager.getAllUserGroupIDsWithAssignedRole (roleUUID).isEmpty ());
+
+    Assert.assertEquals (2, mongoUserGroupManager.getAll ().size ());
+    Assert.assertEquals (2, mongoUserGroupManager.getAllActiveUserGroups ().size ());
+    Assert.assertEquals (0, mongoUserGroupManager.getAllDeletedUserGroups ().size ());
+
+    mongoUserGroupManager.deleteUserGroup (anotherGroupUserGroupID);
+    Assert.assertEquals (2, mongoUserGroupManager.getAll ().size ());
+    Assert.assertEquals (1, mongoUserGroupManager.getAllActiveUserGroups ().size ());
+    Assert.assertEquals (1, mongoUserGroupManager.getAllDeletedUserGroups ().size ());
+
+    mongoUserGroupManager.undeleteUserGroup (anotherGroupUserGroupID);
+    Assert.assertEquals (2, mongoUserGroupManager.getAll ().size ());
+    Assert.assertEquals (2, mongoUserGroupManager.getAllActiveUserGroups ().size ());
+    Assert.assertEquals (0, mongoUserGroupManager.getAllDeletedUserGroups ().size ());
+
+    mongoUserGroupManager.assignRoleToUserGroup (anotherGroupUserGroupID, roleUUID);
+    Assert.assertTrue (mongoUserGroupManager.containsUserGroupWithAssignedRole (roleUUID));
+    mongoUserGroupManager.unassignRoleFromUserGroup (anotherGroupUserGroupID, roleUUID);
+    Assert.assertFalse (mongoUserGroupManager.containsUserGroupWithAssignedRole (roleUUID));
 
   }
 

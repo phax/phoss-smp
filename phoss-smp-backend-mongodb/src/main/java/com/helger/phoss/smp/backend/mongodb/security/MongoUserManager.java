@@ -336,7 +336,7 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     return genericUpdate (sUserID, Updates.combine (
                                Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
                                Updates.inc (BSON_USER_LOGIN_COUNT, 1),
-                               Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, 0)
+                               Updates.set (BSON_USER_FAILED_LOGIN_COUNT, 0)
     ), true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 
