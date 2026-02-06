@@ -20,6 +20,7 @@ import com.helger.annotation.misc.ContainsSoftMigration;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
+import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 
@@ -31,12 +32,12 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
  */
 public final class SMPParticipantMigrationMicroTypeConverter implements IMicroTypeConverter <SMPParticipantMigration>
 {
-  private static final String ATTR_ID = "id";
-  private static final String ATTR_DIRECTION = "direction";
-  private static final String ATTR_STATE = "state";
+  private static final MicroQName ATTR_ID = new MicroQName ("id");
+  private static final MicroQName ATTR_DIRECTION = new MicroQName ("direction");
+  private static final MicroQName ATTR_STATE = new MicroQName ("state");
   private static final String ELEMENT_PARTICIPANT_IDENTIFIER = "participant";
-  private static final String ATTR_INITIATION_DATETIME = "initdt";
-  private static final String ATTR_MIGRATION_KEY = "migkey";
+  private static final MicroQName ATTR_INITIATION_DATETIME = new MicroQName ("initdt");
+  private static final MicroQName ATTR_MIGRATION_KEY = new MicroQName ("migkey");
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPParticipantMigration aValue,
