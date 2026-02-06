@@ -1,58 +1,41 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
-import com.helger.annotation.style.ReturnsMutableCopy;
-import com.helger.annotation.style.VisibleForTesting;
-import com.helger.base.id.IHasID;
-import com.helger.base.id.factory.GlobalIDFactory;
-import com.helger.base.id.factory.IStringIDFactory;
-import com.helger.base.state.EChange;
-import com.helger.base.string.StringHelper;
-import com.helger.collection.commons.CommonsArrayList;
-import com.helger.collection.commons.ICommonsList;
-import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
-import com.helger.photon.io.mgr.IPhotonManager;
-import com.helger.photon.security.object.BusinessObjectHelper;
-import com.helger.photon.security.object.StubObject;
-import com.helger.tenancy.IBusinessObject;
-import com.mongodb.WriteConcern;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.id.IHasID;
+import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.datetime.helper.PDTFactory;
+import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.photon.io.mgr.IPhotonManager;
+import com.helger.photon.security.object.BusinessObjectHelper;
+import com.helger.photon.security.object.StubObject;
+import com.helger.tenancy.IBusinessObject;
+import com.helger.typeconvert.impl.TypeConverter;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
 public abstract class AbstractMongoManager <T extends IHasID <String>> implements IPhotonManager <T>
 {
-
-  private static final IStringIDFactory DEFAULT_PERSISTENT_STRING_FACTORY = new IStringIDFactory ()
-  {
-    @Override
-    public @NonNull String getNewID ()
-    {
-      return UUID.randomUUID ().toString ();
-    }
-  };
-
-  static
-  {
-    //we have entities that do not use a custom id, so we provide a id factory
-    if (GlobalIDFactory.getPersistentStringIDFactory () != DEFAULT_PERSISTENT_STRING_FACTORY)
-    {
-      GlobalIDFactory.setPersistentStringIDFactory (DEFAULT_PERSISTENT_STRING_FACTORY);
-    }
-  }
-
-  protected static final String BSON_ID = "_id";
-
+  protected static final String BSON_ID = "id";
   protected static final String BSON_CREATION_TIME = "creationdt";
   protected static final String BSON_CREATION_USER_ID = "creationuserid";
   protected static final String BSON_LAST_MOD_TIME = "lastmoddt";
@@ -61,18 +44,21 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   protected static final String BSON_DELETED_USER_ID = "deleteuserid";
   protected static final String BSON_ATTRIBUTES = "attrs";
 
-  private final MongoCollection <Document> m_collection;
+  private final String m_sCollectionName;
+  private final MongoCollection <Document> m_aCollection;
 
-  protected AbstractMongoManager (String sCollectionName)
+  protected AbstractMongoManager (final String sCollectionName)
   {
-    this.m_collection = MongoClientSingleton.getInstance ()
-                               .getCollection (sCollectionName)
-                               .withWriteConcern (WriteConcern.MAJORITY.withJournal (true));
+    ValueEnforcer.notNull (sCollectionName, "CollectionName");
+    m_sCollectionName = sCollectionName;
+    m_aCollection = MongoClientSingleton.getInstance ()
+                                        .getCollection (sCollectionName)
+                                        .withWriteConcern (WriteConcern.MAJORITY.withJournal (Boolean.TRUE));
   }
 
-  protected abstract @NonNull Document toBson (@NonNull T pojo);
+  protected abstract @NonNull Document toBson (@NonNull T aPojo);
 
-  protected abstract @NonNull T toEntity (@NonNull Document document);
+  protected abstract @NonNull T toEntity (@NonNull Document aBson);
 
   @Override
   public @NonNull <T1> ICommonsList <T1> getNone ()
@@ -80,85 +66,96 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return new CommonsArrayList <> ();
   }
 
+  /**
+   * @return The name of the collection as provided in the constructor. Neither <code>null</code>
+   *         nor empty.
+   */
   @NonNull
-  protected MongoCollection <Document> getCollection ()
+  @Nonempty
+  public final String getCollectionName ()
   {
-    return m_collection;
+    return m_sCollectionName;
   }
 
   @NonNull
-  protected Bson whereId (String sId)
+  protected final MongoCollection <Document> getCollection ()
+  {
+    return m_aCollection;
+  }
+
+  @NonNull
+  private Bson _whereId (final String sId)
   {
     return Filters.eq (BSON_ID, sId);
   }
 
-  protected @NonNull EChange genericUpdate (@Nullable String sDocumentID, Bson update, boolean setLastMod, @Nullable Runnable updateCallback)
+  @NonNull
+  protected final Bson addLastModToUpdate (@NonNull final Bson aBson)
+  {
+    return Updates.combine (aBson,
+                            Updates.set (BSON_LAST_MOD_TIME, PDTFactory.getCurrentLocalDateTime ()),
+                            Updates.set (BSON_LAST_MOD_USER_ID, BusinessObjectHelper.getUserIDOrFallback ()));
+  }
+
+  @NonNull
+  protected EChange genericUpdate (@Nullable final String sDocumentID,
+                                   @NonNull final Bson aUpdate,
+                                   final boolean bUpdateLastModification,
+                                   @Nullable final Runnable aCallback)
   {
     if (StringHelper.isEmpty (sDocumentID))
       return EChange.UNCHANGED;
 
-    EChange hasChanged = getCollection ().updateOne (whereId (sDocumentID), setLastMod ? addLastModToUpdate (update) : update)
-                               .getMatchedCount () > 0 ? EChange.CHANGED : EChange.UNCHANGED;
+    final long nMatchCount = getCollection ().updateOne (_whereId (sDocumentID),
+                                                         bUpdateLastModification ? addLastModToUpdate (aUpdate)
+                                                                                 : aUpdate).getMatchedCount ();
 
-    if (hasChanged.isChanged () && updateCallback != null)
-    {
-      updateCallback.run ();
-    }
+    final EChange eChange = EChange.valueOf (nMatchCount > 0);
+    if (eChange.isChanged () && aCallback != null)
+      aCallback.run ();
 
-    return hasChanged;
+    return eChange;
   }
 
-  protected Bson addLastModToUpdate (Bson update)
+  @NonNull
+  public EChange deleteEntity (@Nullable final String sEntityId, @Nullable final Runnable aCallback)
   {
-    return Updates.combine (
-                               update,
-                               Updates.set (BSON_LAST_MOD_TIME, LocalDateTime.now ()),
-                               Updates.set (BSON_LAST_MOD_USER_ID, BusinessObjectHelper.getUserIDOrFallback ())
-    );
+    return genericUpdate (sEntityId,
+                          Updates.combine (Updates.set (BSON_DELETED_TIME, PDTFactory.getCurrentLocalDateTime ()),
+                                           Updates.set (BSON_DELETED_USER_ID,
+                                                        BusinessObjectHelper.getUserIDOrFallback ())),
+                          false,
+                          aCallback);
   }
 
-  public @NonNull EChange deleteEntity (@Nullable String sEntityId, Runnable deleteCallback)
+  @NonNull
+  public EChange undeleteEntity (@Nullable final String sEntityId, @Nullable final Runnable aCallback)
   {
-    return genericUpdate (sEntityId, Updates.combine (Updates.set (BSON_DELETED_TIME, LocalDateTime.now ()),
-                               Updates.set (BSON_DELETED_USER_ID, BusinessObjectHelper.getUserIDOrFallback ())), false, deleteCallback);
+    return genericUpdate (sEntityId,
+                          Updates.combine (Updates.set (BSON_DELETED_TIME, null),
+                                           Updates.set (BSON_DELETED_USER_ID, null)),
+                          false,
+                          aCallback);
   }
 
-  public @NonNull EChange undeleteEntity (@Nullable String sEntityId, Runnable deleteCallback)
+  protected @Nullable T findFirst (@NonNull final Bson filter)
   {
-    return genericUpdate (sEntityId, Updates.combine (Updates.set (BSON_DELETED_TIME, null),
-                               Updates.set (BSON_DELETED_USER_ID, null)), false, deleteCallback);
-  }
-
-  public @Nullable T findById (@Nullable String sID)
-  {
-    if (StringHelper.isEmpty (sID))
-      return null;
-
-    Document aDocument = getCollection ().find (whereId (sID)).first ();
+    final Document aDocument = getCollection ().find (filter).first ();
     if (aDocument == null)
       return null;
 
     return toEntity (aDocument);
   }
 
-  @Override
-  @ReturnsMutableCopy
-  public @NonNull ICommonsList <T> getAll ()
+  public @Nullable T findByID (@Nullable final String sID)
   {
-    return findInternal (new Document ()); //do not filter
+    if (StringHelper.isEmpty (sID))
+      return null;
+
+    return findFirst (_whereId (sID));
   }
 
-  protected @NonNull ICommonsList <T> getAllActive ()
-  {
-    return findInternal (Filters.eq (BSON_DELETED_TIME, null)); //get all documents where deleted is null
-  }
-
-  protected @NonNull ICommonsList <T> getAllDeleted ()
-  {
-    return findInternal (Filters.ne (BSON_DELETED_TIME, null)); //get all documents where deleted is not null
-  }
-
-  protected @NonNull ICommonsList <T> findInternal (@NonNull Bson filter)
+  protected @NonNull ICommonsList <@NonNull T> findAll (@NonNull final Bson filter)
   {
     final ICommonsList <T> ret = new CommonsArrayList <> ();
     getCollection ().find (filter).forEach (document -> ret.add (toEntity (document)));
@@ -166,89 +163,87 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   }
 
   @Override
-  public boolean containsWithID (@Nullable String sID)
+  @ReturnsMutableCopy
+  public @NonNull ICommonsList <@NonNull T> getAll ()
+  {
+    // do not filter
+    return findAll (new Document ());
+  }
+
+  protected @NonNull ICommonsList <@NonNull T> getAllActive ()
+  {
+    // get all documents where deleted is null
+    return findAll (Filters.eq (BSON_DELETED_TIME, null));
+  }
+
+  protected @NonNull ICommonsList <@NonNull T> getAllDeleted ()
+  {
+    // get all documents where deleted is not null
+    return findAll (Filters.ne (BSON_DELETED_TIME, null));
+  }
+
+  @Override
+  public boolean containsWithID (@Nullable final String sID)
   {
     if (StringHelper.isEmpty (sID))
       return false;
 
-    return getCollection ().countDocuments (whereId (sID)) > 0;
+    return getCollection ().find (_whereId (sID)).first () != null;
   }
 
   @Override
-  public boolean containsAllIDs (@Nullable Iterable <String> aIDs)
+  public boolean containsAllIDs (@Nullable final Iterable <String> aIDs)
   {
     if (aIDs == null)
       return true;
 
-    Set <ObjectId> aObjectIds = StreamSupport.stream (aIDs.spliterator (), false)
-                               .map (ObjectId::new).collect (Collectors.toSet ());
+    final Set <ObjectId> aObjectIds = new CommonsHashSet <> (aIDs, ObjectId::new);
 
-    long countDocuments = getCollection ().countDocuments (Filters.in (BSON_ID, aObjectIds)); //uses $in
+    // uses $in
+    final long nFoundDocuments = getCollection ().countDocuments (Filters.in (BSON_ID, aObjectIds));
 
-    return aObjectIds.size () == countDocuments;
+    return aObjectIds.size () == nFoundDocuments;
   }
 
-  @VisibleForTesting
-  void deleteAll ()
-  {
-    getCollection ().drop ();
-  }
-
-  protected static Document getDefaultBusinessDocument (IBusinessObject aBusinessObject)
+  @NonNull
+  protected static Document getDefaultBusinessDocument (@NonNull final IBusinessObject aBusinessObject)
   {
     return new Document ().append (BSON_ID, aBusinessObject.getID ())
-                               .append (BSON_CREATION_TIME, convertLocalDateTimeToDate (aBusinessObject.getCreationDateTime ()))
-                               .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
-                               .append (BSON_LAST_MOD_TIME, convertLocalDateTimeToDate (aBusinessObject.getLastModificationDateTime ()))
-                               .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
-                               .append (BSON_DELETED_TIME, convertLocalDateTimeToDate (aBusinessObject.getDeletionDateTime ()))
-                               .append (BSON_DELETED_USER_ID, aBusinessObject.getDeletionUserID ())
-                               .append (BSON_ATTRIBUTES, aBusinessObject.attrs ()); //auto cast to Map<String, String>
+                          .append (BSON_CREATION_TIME,
+                                   TypeConverter.convert (aBusinessObject.getCreationDateTime (), Date.class))
+                          .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
+                          .append (BSON_LAST_MOD_TIME,
+                                   TypeConverter.convert (aBusinessObject.getLastModificationDateTime (), Date.class))
+                          .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
+                          .append (BSON_DELETED_TIME,
+                                   TypeConverter.convert (aBusinessObject.getDeletionDateTime (), Date.class))
+                          .append (BSON_DELETED_USER_ID, aBusinessObject.getDeletionUserID ())
+                          // auto cast to Map<String, String>
+                          .append (BSON_ATTRIBUTES, aBusinessObject.attrs ());
   }
 
-
-  protected static StubObject populateStubObject (Document aDocument)
+  @Nullable
+  private static Map <String, String> _readAttrs (final Document aDocument)
   {
-    return new StubObject (
-                               aDocument.getString (BSON_ID),
-                               convertDatenToLocalDateTime (aDocument.getDate (BSON_CREATION_TIME)),
-                               aDocument.getString (BSON_CREATION_USER_ID),
-                               convertDatenToLocalDateTime (aDocument.getDate (BSON_LAST_MOD_TIME)),
-                               aDocument.getString (BSON_LAST_MOD_USER_ID),
-                               convertDatenToLocalDateTime (aDocument.getDate (BSON_DELETED_TIME)),
-                               aDocument.getString (BSON_DELETED_USER_ID),
-                               readAttrs (aDocument)
-    );
-  }
-
-  protected static LocalDateTime convertDatenToLocalDateTime (Date aDate)
-  {
-    if (aDate == null)
-    {
-      return null;
-    }
-    return aDate.toInstant ().atZone (ZoneId.systemDefault ()).toLocalDateTime ();
-  }
-
-  protected static Date convertLocalDateTimeToDate (LocalDateTime localDateTime)
-  {
-    if (localDateTime == null)
-    {
-      return null;
-    }
-    return Date.from (localDateTime.atZone (ZoneId.systemDefault ()).toInstant ());
-  }
-
-
-  private static Map <String, String> readAttrs (Document aDocument)
-  {
-    Document attrs = aDocument.get (BSON_ATTRIBUTES, Document.class);
-    if (attrs == null || attrs.isEmpty ())
+    final Document aAttrs = aDocument.get (BSON_ATTRIBUTES, Document.class);
+    if (aAttrs == null || aAttrs.isEmpty ())
       return null;
 
-    Map <String, String> out = new HashMap <> (attrs.size ());
-    attrs.forEach ((key, value) -> out.put (key, String.valueOf (value)));
+    final Map <String, String> out = new HashMap <> (aAttrs.size ());
+    aAttrs.forEach ( (key, value) -> out.put (key, String.valueOf (value)));
     return out;
   }
 
+  @NonNull
+  protected static StubObject populateStubObject (@NonNull final Document aDocument)
+  {
+    return new StubObject (aDocument.getString (BSON_ID),
+                           TypeConverter.convert (aDocument.getDate (BSON_CREATION_TIME), LocalDateTime.class),
+                           aDocument.getString (BSON_CREATION_USER_ID),
+                           TypeConverter.convert (aDocument.getDate (BSON_LAST_MOD_TIME), LocalDateTime.class),
+                           aDocument.getString (BSON_LAST_MOD_USER_ID),
+                           TypeConverter.convert (aDocument.getDate (BSON_DELETED_TIME), LocalDateTime.class),
+                           aDocument.getString (BSON_DELETED_USER_ID),
+                           _readAttrs (aDocument));
+  }
 }

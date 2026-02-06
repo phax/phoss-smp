@@ -1,12 +1,13 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
-import com.helger.base.state.EChange;
-import com.helger.photon.security.role.IRole;
-import com.helger.photon.security.role.Role;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Map;
+import com.helger.base.state.EChange;
+import com.helger.photon.security.role.IRole;
+import com.helger.photon.security.role.Role;
 
 public class MongoRoleManagerTest extends MongoBaseTest
 {
@@ -16,30 +17,30 @@ public class MongoRoleManagerTest extends MongoBaseTest
   @Test
   public void testRoleManagerCrud ()
   {
-    mongoRoleManager.deleteAll ();
+    mongoRoleManager.getCollection ().drop ();
 
-    IRole newRole = mongoRoleManager.createNewRole ("name", "descritpion", Map.of ("foo", "bar"));
-    String id = newRole.getID ();
+    final IRole newRole = mongoRoleManager.createNewRole ("name", "descritpion", Map.of ("foo", "bar"));
+    final String id = newRole.getID ();
 
     Assert.assertTrue (mongoRoleManager.containsWithID (id));
 
-    IRole roleOfID = mongoRoleManager.getRoleOfID (id);
+    final IRole roleOfID = mongoRoleManager.getRoleOfID (id);
 
     Assert.assertEquals (newRole, roleOfID);
 
     mongoRoleManager.renameRole (id, "renamed");
-    IRole renamed = mongoRoleManager.getRoleOfID (id);
+    final IRole renamed = mongoRoleManager.getRoleOfID (id);
     Assert.assertEquals ("renamed", renamed.getName ());
 
-    IRole getFromAll = mongoRoleManager.getAll ().get (0);
+    final IRole getFromAll = mongoRoleManager.getAll ().get (0);
     Assert.assertEquals (renamed, getFromAll);
 
     Assert.assertEquals (1, mongoRoleManager.getAllActive ().size ());
 
-    EChange eChange = mongoRoleManager.setRoleData (id, "newName", null, null);
+    final EChange eChange = mongoRoleManager.setRoleData (id, "newName", null, null);
     Assert.assertEquals (EChange.CHANGED, eChange);
 
-    Role updated = (Role) mongoRoleManager.getRoleOfID (id);
+    final Role updated = (Role) mongoRoleManager.getRoleOfID (id);
 
     Assert.assertEquals ("newName", updated.getName ());
     Assert.assertNull (updated.getDescription ());

@@ -1,5 +1,15 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import com.helger.annotation.Nonempty;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
@@ -14,20 +24,12 @@ import com.helger.photon.security.user.IUserModificationCallback;
 import com.helger.photon.security.user.User;
 import com.helger.security.password.hash.PasswordHash;
 import com.helger.security.password.salt.PasswordSalt;
+import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
-import java.time.LocalDateTime;
-import java.util.Locale;
-import java.util.Map;
 
 public class MongoUserManager extends AbstractMongoManager <IUser> implements IUserManager
 {
-
   public static final String USER_COLLECTION_NAME = "users";
 
   private static final String BSON_USER_LOGIN_NAME = "loginName";
@@ -45,6 +47,8 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
   private static final String BSON_USER_FAILED_LOGIN_COUNT = "failedLoginCount";
   private static final String BSON_USER_DISABLED = "disabled";
 
+  private static final Bson ACTIVE_FILTER = Filters.and (Filters.eq (BSON_USER_DISABLED, Boolean.FALSE),
+                                                         Filters.eq (BSON_DELETED_TIME, null));
 
   private final CallbackList <IUserModificationCallback> m_aCallbacks = new CallbackList <> ();
 
@@ -53,65 +57,63 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     super (USER_COLLECTION_NAME);
   }
 
-
-  @Override
-  protected @NonNull Document toBson (@NonNull IUser aUser)
-  {
-    return getDefaultBusinessDocument (aUser)
-                               .append (BSON_USER_LOGIN_NAME, aUser.getLoginName ())
-                               .append (BSON_USER_PASSWORD, passwordHashToDocument (aUser.getPasswordHash ()))
-                               .append (BSON_USER_EMAIL, aUser.getEmailAddress ())
-                               .append (BSON_USER_FIRST_NAME, aUser.getFirstName ())
-                               .append (BSON_USER_LAST_NAME, aUser.getLastName ())
-                               .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
-                               .append (BSON_USER_PREFERRED_LOCALE, aUser.getDesiredLocale ().toLanguageTag ())
-                               .append (BSON_USER_LAST_LOGIN, convertLocalDateTimeToDate (aUser.getLastLoginDateTime ()))
-                               .append (BSON_USER_LOGIN_COUNT, aUser.getLoginCount ())
-                               .append (BSON_USER_FAILED_LOGIN_COUNT, aUser.getConsecutiveFailedLoginCount ())
-                               .append (BSON_USER_DISABLED, aUser.isDisabled ());
-  }
-
-  private Document passwordHashToDocument (@NonNull PasswordHash passwordHash)
+  @NonNull
+  private Document _passwordHashToDocument (@NonNull final PasswordHash passwordHash)
   {
     return new Document ().append (BSON_USER_PASSWORD_ALGO, passwordHash.getAlgorithmName ())
-                               .append (BSON_USER_PASSWORD_SALT, passwordHash.getSaltAsString ())
-                               .append (BSON_USER_PASSWORD_HASH, passwordHash.getPasswordHashValue ());
+                          .append (BSON_USER_PASSWORD_SALT, passwordHash.getSaltAsString ())
+                          .append (BSON_USER_PASSWORD_HASH, passwordHash.getPasswordHashValue ());
   }
 
   @Override
-  protected @NonNull IUser toEntity (@NonNull Document aDoc)
+  protected @NonNull Document toBson (@NonNull final IUser aUser)
   {
-    return new User (populateStubObject (aDoc),
-                               aDoc.getString (BSON_USER_LOGIN_NAME),
-                               aDoc.getString (BSON_USER_EMAIL),
-                               documentToPasswordHash (aDoc.get (BSON_USER_PASSWORD, Document.class)),
-                               aDoc.getString (BSON_USER_FIRST_NAME),
-                               aDoc.getString (BSON_USER_LAST_NAME),
-                               aDoc.getString (BSON_USER_DESCRIPTION),
-                               Locale.forLanguageTag (aDoc.getString (BSON_USER_PREFERRED_LOCALE)),
-                               convertDatenToLocalDateTime (aDoc.getDate (BSON_USER_LAST_LOGIN)),
-                               aDoc.getInteger (BSON_USER_LOGIN_COUNT),
-                               aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT),
-                               aDoc.getBoolean (BSON_USER_DISABLED)
-    );
-
-
+    return getDefaultBusinessDocument (aUser).append (BSON_USER_LOGIN_NAME, aUser.getLoginName ())
+                                             .append (BSON_USER_PASSWORD,
+                                                      _passwordHashToDocument (aUser.getPasswordHash ()))
+                                             .append (BSON_USER_EMAIL, aUser.getEmailAddress ())
+                                             .append (BSON_USER_FIRST_NAME, aUser.getFirstName ())
+                                             .append (BSON_USER_LAST_NAME, aUser.getLastName ())
+                                             .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
+                                             .append (BSON_USER_PREFERRED_LOCALE,
+                                                      aUser.getDesiredLocale ().toLanguageTag ())
+                                             .append (BSON_USER_LAST_LOGIN,
+                                                      TypeConverter.convert (aUser.getLastLoginDateTime (), Date.class))
+                                             .append (BSON_USER_LOGIN_COUNT, Integer.valueOf (aUser.getLoginCount ()))
+                                             .append (BSON_USER_FAILED_LOGIN_COUNT,
+                                                      Integer.valueOf (aUser.getConsecutiveFailedLoginCount ()))
+                                             .append (BSON_USER_DISABLED, Boolean.valueOf (aUser.isDisabled ()));
   }
 
-  private @NonNull PasswordHash documentToPasswordHash (Document aDoc)
+  @Override
+  protected @NonNull IUser toEntity (@NonNull final Document aDoc)
+  {
+    return new User (populateStubObject (aDoc),
+                     aDoc.getString (BSON_USER_LOGIN_NAME),
+                     aDoc.getString (BSON_USER_EMAIL),
+                     documentToPasswordHash (aDoc.get (BSON_USER_PASSWORD, Document.class)),
+                     aDoc.getString (BSON_USER_FIRST_NAME),
+                     aDoc.getString (BSON_USER_LAST_NAME),
+                     aDoc.getString (BSON_USER_DESCRIPTION),
+                     Locale.forLanguageTag (aDoc.getString (BSON_USER_PREFERRED_LOCALE)),
+                     TypeConverter.convert (aDoc.getDate (BSON_USER_LAST_LOGIN), LocalDateTime.class),
+                     aDoc.getInteger (BSON_USER_LOGIN_COUNT).intValue (),
+                     aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT).intValue (),
+                     aDoc.getBoolean (BSON_USER_DISABLED).booleanValue ());
+  }
+
+  private @NonNull PasswordHash documentToPasswordHash (final Document aDoc)
   {
     ValueEnforcer.notNull (aDoc, "aDoc");
-    return new PasswordHash (
-                               aDoc.getString (BSON_USER_PASSWORD_ALGO),
-                               PasswordSalt.createFromStringMaybe (aDoc.getString (BSON_USER_PASSWORD_SALT)),
-                               aDoc.getString (BSON_USER_PASSWORD_HASH)
-    );
+    return new PasswordHash (aDoc.getString (BSON_USER_PASSWORD_ALGO),
+                             PasswordSalt.createFromStringMaybe (aDoc.getString (BSON_USER_PASSWORD_SALT)),
+                             aDoc.getString (BSON_USER_PASSWORD_HASH));
   }
 
   @Override
   public void createDefaultsForTest ()
   {
-    //ignored for now
+    // ignored for now
   }
 
   @Override
@@ -120,16 +122,39 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     return m_aCallbacks;
   }
 
+  @NonNull
+  private User _internalCreateNewUser (@NonNull final User aUser, final boolean bPredefined)
+  {
+    if (!getCollection ().insertOne (toBson (aUser)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+
+    AuditHelper.onAuditCreateSuccess (User.OT,
+                                      aUser.getID (),
+                                      aUser.getLoginName (),
+                                      aUser.getEmailAddress (),
+                                      aUser.getFirstName (),
+                                      aUser.getLastName (),
+                                      aUser.getDescription (),
+                                      aUser.getDesiredLocale (),
+                                      aUser.attrs (),
+                                      Boolean.valueOf (aUser.isDisabled ()),
+                                      bPredefined ? "predefined" : "custom",
+                                      "database-error");
+
+    m_aCallbacks.forEach (aCB -> aCB.onUserCreated (aUser, bPredefined));
+    return aUser;
+  }
+
   @Override
-  public @Nullable IUser createNewUser (@NonNull @Nonempty String sLoginName,
-                                        @Nullable String sEmailAddress,
-                                        @NonNull String sPlainTextPassword,
-                                        @Nullable String sFirstName,
-                                        @Nullable String sLastName,
-                                        @Nullable String sDescription,
-                                        @Nullable Locale aDesiredLocale,
-                                        @Nullable Map <String, String> aCustomAttrs,
-                                        boolean bDisabled)
+  public @Nullable IUser createNewUser (@NonNull @Nonempty final String sLoginName,
+                                        @Nullable final String sEmailAddress,
+                                        @NonNull final String sPlainTextPassword,
+                                        @Nullable final String sFirstName,
+                                        @Nullable final String sLastName,
+                                        @Nullable final String sDescription,
+                                        @Nullable final Locale aDesiredLocale,
+                                        @Nullable final Map <String, String> aCustomAttrs,
+                                        final boolean bDisabled)
   {
     ValueEnforcer.notEmpty (sLoginName, "LoginName");
     ValueEnforcer.notNull (sPlainTextPassword, "PlainTextPassword");
@@ -141,20 +166,30 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     }
 
     final User aUser = new User (sLoginName,
-                               sEmailAddress,
-                               GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (), sPlainTextPassword),
-                               sFirstName,
-                               sLastName,
-                               sDescription,
-                               aDesiredLocale,
-                               aCustomAttrs,
-                               bDisabled);
+                                 sEmailAddress,
+                                 GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                                       sPlainTextPassword),
+                                 sFirstName,
+                                 sLastName,
+                                 sDescription,
+                                 aDesiredLocale,
+                                 aCustomAttrs,
+                                 bDisabled);
 
-    return internalCreateNewUser (aUser, false);
+    return _internalCreateNewUser (aUser, false);
   }
 
   @Override
-  public @Nullable IUser createPredefinedUser (@NonNull @Nonempty String sID, @NonNull @Nonempty String sLoginName, @Nullable String sEmailAddress, @NonNull String sPlainTextPassword, @Nullable String sFirstName, @Nullable String sLastName, @Nullable String sDescription, @Nullable Locale aDesiredLocale, @Nullable Map <String, String> aCustomAttrs, boolean bDisabled)
+  public @Nullable IUser createPredefinedUser (@NonNull @Nonempty final String sID,
+                                               @NonNull @Nonempty final String sLoginName,
+                                               @Nullable final String sEmailAddress,
+                                               @NonNull final String sPlainTextPassword,
+                                               @Nullable final String sFirstName,
+                                               @Nullable final String sLastName,
+                                               @Nullable final String sDescription,
+                                               @Nullable final Locale aDesiredLocale,
+                                               @Nullable final Map <String, String> aCustomAttrs,
+                                               final boolean bDisabled)
   {
     ValueEnforcer.notEmpty (sLoginName, "LoginName");
     ValueEnforcer.notNull (sPlainTextPassword, "PlainTextPassword");
@@ -164,75 +199,50 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
       AuditHelper.onAuditCreateFailure (User.OT, "login-name-already-in-use", sLoginName, "predefined-user");
       return null;
     }
-    User aUser = User.createdPredefinedUser (sID,
-                               sLoginName,
-                               sEmailAddress,
-                               GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
-                                                          sPlainTextPassword),
-                               sFirstName,
-                               sLastName,
-                               sDescription,
-                               aDesiredLocale,
-                               aCustomAttrs,
-                               bDisabled);
-    return internalCreateNewUser (aUser, true);
-  }
-
-  protected User internalCreateNewUser (@NonNull final User aUser, final boolean bPredefined)
-  {
-    try
-    {
-      getCollection ().insertOne (toBson (aUser));
-      m_aCallbacks.forEach (aCB -> aCB.onUserCreated (aUser, bPredefined));
-      return aUser;
-    } catch (Exception e)
-    {
-      AuditHelper.onAuditCreateFailure (User.OT,
-                                 aUser.getID (),
-                                 aUser.getLoginName (),
-                                 aUser.getEmailAddress (),
-                                 aUser.getFirstName (),
-                                 aUser.getLastName (),
-                                 aUser.getDescription (),
-                                 aUser.getDesiredLocale (),
-                                 aUser.attrs (),
-                                 Boolean.valueOf (aUser.isDisabled ()),
-                                 bPredefined ? "predefined" : "custom",
-                                 "database-error");
-    }
-    return null;
+    final User aUser = User.createdPredefinedUser (sID,
+                                                   sLoginName,
+                                                   sEmailAddress,
+                                                   GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                                                         sPlainTextPassword),
+                                                   sFirstName,
+                                                   sLastName,
+                                                   sDescription,
+                                                   aDesiredLocale,
+                                                   aCustomAttrs,
+                                                   bDisabled);
+    return _internalCreateNewUser (aUser, true);
   }
 
   @Override
-  public @Nullable IUser getUserOfID (@Nullable String sUserID)
+  public @Nullable IUser getUserOfID (@Nullable final String sUserID)
   {
-    return findById (sUserID);
+    return findByID (sUserID);
   }
 
   @Override
-  public @Nullable IUser getUserOfLoginName (@Nullable String sLoginName)
+  public @Nullable IUser getUserOfLoginName (@Nullable final String sLoginName)
   {
     if (StringHelper.isEmpty (sLoginName))
       return null;
 
-    return findByFilter (Filters.eq (BSON_USER_LOGIN_NAME, sLoginName));
+    return findFirst (Filters.eq (BSON_USER_LOGIN_NAME, sLoginName));
   }
 
   @Override
-  public @Nullable IUser getUserOfEmailAddress (@Nullable String sEmailAddress)
+  public @Nullable IUser getUserOfEmailAddress (@Nullable final String sEmailAddress)
   {
     if (StringHelper.isEmpty (sEmailAddress))
       return null;
-    return findByFilter (Filters.eq (BSON_USER_EMAIL, sEmailAddress));
+    return findFirst (Filters.eq (BSON_USER_EMAIL, sEmailAddress));
   }
 
   @Override
-  public @Nullable IUser getUserOfEmailAddressIgnoreCase (@Nullable String sEmailAddress)
+  public @Nullable IUser getUserOfEmailAddressIgnoreCase (@Nullable final String sEmailAddress)
   {
     if (StringHelper.isEmpty (sEmailAddress))
       return null;
 
-    for (Document currentUser: getCollection ().find ())
+    for (final Document currentUser : getCollection ().find ())
     {
       if (sEmailAddress.equalsIgnoreCase (currentUser.getString (BSON_USER_EMAIL)))
       {
@@ -240,24 +250,12 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
       }
     }
     return null;
-
   }
-
-  private @Nullable IUser findByFilter (Bson filter)
-  {
-    Document aDocument = getCollection ().find (filter).first ();
-    if (aDocument == null)
-      return null;
-
-    return toEntity (aDocument);
-  }
-
-  private static final Bson ACTIVE_FILTER = Filters.and (Filters.eq (BSON_USER_DISABLED, false), Filters.eq (BSON_DELETED_TIME, null));
 
   @Override
   public @NonNull ICommonsList <IUser> getAllActiveUsers ()
   {
-    return findInternal (ACTIVE_FILTER);
+    return findAll (ACTIVE_FILTER);
   }
 
   @Override
@@ -269,107 +267,140 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
   @Override
   public @NonNull ICommonsList <IUser> getAllDisabledUsers ()
   {
-    return findInternal (Filters.and (Filters.eq (BSON_USER_DISABLED, true), Filters.eq (BSON_DELETED_TIME, null)));
+    return findAll (Filters.and (Filters.eq (BSON_USER_DISABLED, Boolean.TRUE), Filters.eq (BSON_DELETED_TIME, null)));
   }
 
   @Override
   public @NonNull ICommonsList <IUser> getAllNotDeletedUsers ()
   {
-    return findInternal (Filters.eq (BSON_DELETED_TIME, null));
+    return findAll (Filters.eq (BSON_DELETED_TIME, null));
   }
 
   @Override
   public @NonNull ICommonsList <IUser> getAllDeletedUsers ()
   {
-    return findInternal (Filters.ne (BSON_DELETED_TIME, null));
+    return findAll (Filters.ne (BSON_DELETED_TIME, null));
   }
 
   @Override
   public boolean containsAnyActiveUser ()
   {
-    return getActiveUserCount () > 0;
+    return findFirst (ACTIVE_FILTER) != null;
   }
 
   @Override
-  public @NonNull EChange setUserData (@Nullable String sUserID,
-                                       @NonNull @Nonempty String sNewLoginName,
-                                       @Nullable String sNewEmailAddress,
-                                       @Nullable String sNewFirstName,
-                                       @Nullable String sNewLastName,
-                                       @Nullable String sNewDescription,
-                                       @Nullable Locale aNewDesiredLocale,
-                                       @Nullable Map <String, String> aNewCustomAttrs,
-                                       boolean bNewDisabled)
+  public @NonNull EChange setUserData (@Nullable final String sUserID,
+                                       @NonNull @Nonempty final String sNewLoginName,
+                                       @Nullable final String sNewEmailAddress,
+                                       @Nullable final String sNewFirstName,
+                                       @Nullable final String sNewLastName,
+                                       @Nullable final String sNewDescription,
+                                       @Nullable final Locale aNewDesiredLocale,
+                                       @Nullable final Map <String, String> aNewCustomAttrs,
+                                       final boolean bNewDisabled)
   {
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
 
-    Bson update = Updates.combine (
-                               Updates.set (BSON_USER_LOGIN_NAME, sNewLoginName),
-                               Updates.set (BSON_USER_EMAIL, sNewEmailAddress),
-                               Updates.set (BSON_USER_FIRST_NAME, sNewFirstName),
-                               Updates.set (BSON_USER_LAST_NAME, sNewLastName),
-                               Updates.set (BSON_USER_DESCRIPTION, sNewDescription),
-                               Updates.set (BSON_USER_PREFERRED_LOCALE, aNewDesiredLocale.toLanguageTag ()),
-                               Updates.set (BSON_USER_DISABLED, bNewDisabled),
-                               Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs)
-    );
+    final Bson update = Updates.combine (Updates.set (BSON_USER_LOGIN_NAME, sNewLoginName),
+                                         Updates.set (BSON_USER_EMAIL, sNewEmailAddress),
+                                         Updates.set (BSON_USER_FIRST_NAME, sNewFirstName),
+                                         Updates.set (BSON_USER_LAST_NAME, sNewLastName),
+                                         Updates.set (BSON_USER_DESCRIPTION, sNewDescription),
+                                         Updates.set (BSON_USER_PREFERRED_LOCALE, aNewDesiredLocale.toLanguageTag ()),
+                                         Updates.set (BSON_USER_DISABLED, Boolean.valueOf (bNewDisabled)),
+                                         Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs));
 
     return genericUpdate (sUserID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 
   @Override
-  public @NonNull EChange setUserPassword (@Nullable String sUserID, @NonNull String sNewPlainTextPassword)
+  public @NonNull EChange setUserPassword (@Nullable final String sUserID, @NonNull final String sNewPlainTextPassword)
   {
-    PasswordHash userDefaultPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (), sNewPlainTextPassword);
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
 
-    Bson update = Updates.combine (
-                               Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_ALGO, userDefaultPasswordHash.getAlgorithmName ()),
-                               Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_SALT, userDefaultPasswordHash.getSaltAsString ()),
-                               Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_HASH, userDefaultPasswordHash.getPasswordHashValue ())
-    );
+    final PasswordHash userDefaultPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                                                       sNewPlainTextPassword);
 
-    return genericUpdate (sUserID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserPasswordChanged (sUserID)));
+    final Bson update = Updates.combine (Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_ALGO,
+                                                      userDefaultPasswordHash.getAlgorithmName ()),
+                                         Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_SALT,
+                                                      userDefaultPasswordHash.getSaltAsString ()),
+                                         Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_HASH,
+                                                      userDefaultPasswordHash.getPasswordHashValue ()));
+
+    return genericUpdate (sUserID,
+                          update,
+                          true,
+                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserPasswordChanged (sUserID)));
   }
 
   @Override
-  public @NonNull EChange updateUserLastLogin (@Nullable String sUserID)
+  public @NonNull EChange updateUserLastLogin (@Nullable final String sUserID)
   {
-    return genericUpdate (sUserID, Updates.combine (
-                               Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
-                               Updates.inc (BSON_USER_LOGIN_COUNT, 1),
-                               Updates.set (BSON_USER_FAILED_LOGIN_COUNT, 0)
-    ), true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
+    return genericUpdate (sUserID,
+                          Updates.combine (Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
+                                           Updates.inc (BSON_USER_LOGIN_COUNT, Integer.valueOf (1)),
+                                           Updates.set (BSON_USER_FAILED_LOGIN_COUNT, Integer.valueOf (0))),
+                          true,
+                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 
   @Override
-  public @NonNull EChange updateUserLastFailedLogin (@Nullable String sUserID)
+  public @NonNull EChange updateUserLastFailedLogin (@Nullable final String sUserID)
   {
-    return genericUpdate (sUserID, Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, 1), true, ()
-                               -> m_aCallbacks.forEach (aCB -> aCB.onUserLastFailedLoginUpdated (sUserID)));
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
+    return genericUpdate (sUserID,
+                          Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, Integer.valueOf (1)),
+                          true,
+                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserLastFailedLoginUpdated (sUserID)));
   }
 
   @Override
-  public @NonNull EChange deleteUser (@Nullable String sUserID)
+  public @NonNull EChange deleteUser (@Nullable final String sUserID)
   {
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
     return deleteEntity (sUserID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserDeleted (sUserID)));
   }
 
   @Override
-  public @NonNull EChange undeleteUser (@Nullable String sUserID)
+  public @NonNull EChange undeleteUser (@Nullable final String sUserID)
   {
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
     return undeleteEntity (sUserID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUndeleted (sUserID)));
   }
 
   @Override
-  public @NonNull EChange disableUser (@Nullable String sUserID)
+  public @NonNull EChange disableUser (@Nullable final String sUserID)
   {
-    return genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, true), true, ()
-                               -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
+    return genericUpdate (sUserID,
+                          Updates.set (BSON_USER_DISABLED, Boolean.TRUE),
+                          true,
+                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 
   @Override
-  public @NonNull EChange enableUser (@Nullable String sUserID)
+  public @NonNull EChange enableUser (@Nullable final String sUserID)
   {
-    return genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, false), true, ()
-                               -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
+    return genericUpdate (sUserID,
+                          Updates.set (BSON_USER_DISABLED, Boolean.FALSE),
+                          true,
+                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
   }
 }

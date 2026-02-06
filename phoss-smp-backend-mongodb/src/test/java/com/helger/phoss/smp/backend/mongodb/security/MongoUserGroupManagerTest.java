@@ -1,12 +1,13 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
-import com.helger.collection.commons.ICommonsList;
-import com.helger.photon.security.usergroup.IUserGroup;
+import java.util.Map;
+import java.util.UUID;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Map;
-import java.util.UUID;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.photon.security.usergroup.IUserGroup;
 
 public class MongoUserGroupManagerTest extends MongoBaseTest
 {
@@ -16,16 +17,16 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
   @Test
   public void testUserGroupManagerCrud ()
   {
-    mongoUserGroupManager.deleteAll ();
+    mongoUserGroupManager.getCollection ().drop ();
 
-    IUserGroup newUserGroup = mongoUserGroupManager.createNewUserGroup ("group1", "description", Map.of ("foo", "bar"));
-    String userGroupID = newUserGroup.getID ();
+    final IUserGroup newUserGroup = mongoUserGroupManager.createNewUserGroup ("group1", "description", Map.of ("foo", "bar"));
+    final String userGroupID = newUserGroup.getID ();
     mongoUserGroupManager.getUserGroupOfID (userGroupID);
 
     Assert.assertEquals (newUserGroup, mongoUserGroupManager.getUserGroupOfID (userGroupID));
 
     mongoUserGroupManager.setUserGroupData (userGroupID, "test user", "group for tests", Map.of ("foo1", "bar1"));
-    IUserGroup updated = mongoUserGroupManager.getUserGroupOfID (userGroupID);
+    final IUserGroup updated = mongoUserGroupManager.getUserGroupOfID (userGroupID);
     Assert.assertEquals ("test user", updated.getName ());
     Assert.assertEquals ("group for tests", updated.getDescription ());
     Assert.assertEquals ("bar1", updated.attrs ().get ("foo1"));
@@ -33,17 +34,17 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
     mongoUserGroupManager.renameUserGroup (userGroupID, "newName");
     Assert.assertEquals ("newName", mongoUserGroupManager.getUserGroupOfID (userGroupID).getName ());
 
-    String userId = UUID.randomUUID ().toString ();
+    final String userId = UUID.randomUUID ().toString ();
 
     mongoUserGroupManager.assignUserToUserGroup (userGroupID, userId);
     Assert.assertTrue (mongoUserGroupManager.isUserAssignedToUserGroup (userGroupID, userId));
     Assert.assertFalse (mongoUserGroupManager.isUserAssignedToUserGroup (userGroupID, "another uuid"));
 
-    IUserGroup anotherGroup = mongoUserGroupManager.createNewUserGroup ("group2", null, null);
-    String anotherGroupUserGroupID = anotherGroup.getID ();
+    final IUserGroup anotherGroup = mongoUserGroupManager.createNewUserGroup ("group2", null, null);
+    final String anotherGroupUserGroupID = anotherGroup.getID ();
     mongoUserGroupManager.assignUserToUserGroup (anotherGroupUserGroupID, userId);
 
-    ICommonsList <String> allUserGroupIDsWithAssignedUser = mongoUserGroupManager.getAllUserGroupIDsWithAssignedUser (userId);
+    final ICommonsList <String> allUserGroupIDsWithAssignedUser = mongoUserGroupManager.getAllUserGroupIDsWithAssignedUser (userId);
     Assert.assertTrue (allUserGroupIDsWithAssignedUser.contains (userGroupID));
     Assert.assertTrue (allUserGroupIDsWithAssignedUser.contains (anotherGroupUserGroupID));
 
@@ -52,10 +53,10 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
     mongoUserGroupManager.unassignUserFromAllUserGroups (userId);
     Assert.assertFalse (mongoUserGroupManager.isUserAssignedToUserGroup (anotherGroupUserGroupID, userId));
 
-    String roleUUID = UUID.randomUUID ().toString ();
+    final String roleUUID = UUID.randomUUID ().toString ();
     mongoUserGroupManager.assignRoleToUserGroup (anotherGroupUserGroupID, roleUUID);
     mongoUserGroupManager.assignRoleToUserGroup (userGroupID, roleUUID);
-    ICommonsList <String> allUserGroupIDsWithAssignedRole = mongoUserGroupManager.getAllUserGroupIDsWithAssignedRole (roleUUID);
+    final ICommonsList <String> allUserGroupIDsWithAssignedRole = mongoUserGroupManager.getAllUserGroupIDsWithAssignedRole (roleUUID);
     Assert.assertTrue (allUserGroupIDsWithAssignedRole.contains (userGroupID));
     Assert.assertTrue (allUserGroupIDsWithAssignedRole.contains (anotherGroupUserGroupID));
 
@@ -85,7 +86,6 @@ public class MongoUserGroupManagerTest extends MongoBaseTest
     Assert.assertTrue (mongoUserGroupManager.containsUserGroupWithAssignedRole (roleUUID));
     mongoUserGroupManager.unassignRoleFromUserGroup (anotherGroupUserGroupID, roleUUID);
     Assert.assertFalse (mongoUserGroupManager.containsUserGroupWithAssignedRole (roleUUID));
-
   }
 
 }

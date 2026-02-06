@@ -42,10 +42,9 @@ import com.mongodb.event.CommandListener;
 import com.mongodb.event.CommandSucceededEvent;
 
 /**
- * A provider for {@link MongoCollection} instances. This class ensures, that
- * the underlying {@link MongoClient} instance is closed correctly in the
- * {@link #close()} method. Use {@link MongoClientSingleton#getInstance()} to
- * create an instance of this class.
+ * A provider for {@link MongoCollection} instances. This class ensures, that the underlying
+ * {@link MongoClient} instance is closed correctly in the {@link #close()} method. Use
+ * {@link MongoClientSingleton#getInstance()} to create an instance of this class.
  *
  * @author Philip Helger
  */
@@ -103,8 +102,8 @@ public class MongoClientProvider implements AutoCloseable
     }
   }
 
-  public static final Integer SORT_ASCENDING = 1;
-  public static final Integer SORT_DESCENDING = -1;
+  public static final Integer SORT_ASCENDING = Integer.valueOf (1);
+  public static final Integer SORT_DESCENDING = Integer.valueOf (-1);
 
   private final MongoClient m_aMongoClient;
   private final MongoDatabase m_aDatabase;

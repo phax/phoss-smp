@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import java.util.function.Consumer;
-
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -184,7 +182,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   public ICommonsList <ISMLInfo> getAllSMLInfos ()
   {
     final ICommonsList <ISMLInfo> ret = new CommonsArrayList <> ();
-    getCollection ().find ().forEach ((Consumer <Document>) x -> ret.add (toDomain (x)));
+    getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 

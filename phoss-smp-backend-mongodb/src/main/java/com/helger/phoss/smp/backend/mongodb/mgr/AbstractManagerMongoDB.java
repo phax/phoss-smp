@@ -32,6 +32,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 
 /**
@@ -53,7 +54,9 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   {
     ValueEnforcer.notNull (sCollectionName, "CollectionName");
     m_sCollectionName = sCollectionName;
-    m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
+    m_aCollection = MongoClientSingleton.getInstance ()
+                                        .getCollection (sCollectionName)
+                                        .withWriteConcern (WriteConcern.MAJORITY.withJournal (Boolean.TRUE));
   }
 
   @OverridingMethodsMustInvokeSuper
