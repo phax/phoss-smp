@@ -43,7 +43,7 @@ public final class MongoClientProviderTest
   @Test
   public void testBasic ()
   {
-    try (final MongoClientProvider aCP = new MongoClientProvider ("mongodb://localhost", "smp-unittest"))
+    try (final MongoClientProvider aCP = new MongoClientProvider (SMPMongoConfiguration.getMongoConnectionString (), "smp-unittest"))
     {
       final Document doc = new Document ().append ("name", "MongoDB")
                                           .append ("type", "database")

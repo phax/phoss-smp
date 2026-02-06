@@ -16,57 +16,48 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
-import org.jspecify.annotations.NonNull;
-
-import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.mongodb.audit.AuditManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.MongoRoleManager;
+import com.helger.phoss.smp.backend.mongodb.security.MongoUserGroupManager;
+import com.helger.phoss.smp.backend.mongodb.security.MongoUserManager;
+import com.helger.phoss.smp.backend.mongodb.security.MongoUserTokenManager;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
-import com.helger.photon.security.role.RoleManager;
 import com.helger.photon.security.token.user.IUserTokenManager;
-import com.helger.photon.security.token.user.UserTokenManager;
 import com.helger.photon.security.user.IUserManager;
-import com.helger.photon.security.user.UserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
-import com.helger.photon.security.usergroup.UserGroupManager;
+import org.jspecify.annotations.NonNull;
 
 public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {
   @NonNull
-  public IAuditManager createAuditManager () throws Exception
+  public IAuditManager createAuditManager ()
   {
     return new AuditManagerMongoDB ();
   }
 
   @NonNull
-  public IUserManager createUserMgr () throws DAOException
+  public IUserManager createUserMgr ()
   {
-    return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                            PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
+    return new MongoUserManager ();
   }
 
   @NonNull
-  public IRoleManager createRoleMgr () throws DAOException
+  public IRoleManager createRoleMgr ()
   {
-    return new RoleManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                            PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML);
+    return new MongoRoleManager ();
   }
 
   @NonNull
-  public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr,
-                                               @NonNull final IRoleManager aRoleMgr) throws DAOException
+  public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr, @NonNull final IRoleManager aRoleMgr)
   {
-    return new UserGroupManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                                 PhotonSecurityManager.FactoryXML.FILENAME_USERGROUPS_XML,
-                                 aUserMgr,
-                                 aRoleMgr);
+    return new MongoUserGroupManager (aUserMgr, aRoleMgr);
   }
 
   @NonNull
-  public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr) throws DAOException
+  public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr)
   {
-    return new UserTokenManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                                 PhotonSecurityManager.FactoryXML.FILENAME_USERTOKENS_XML);
+    return new MongoUserTokenManager (aUserMgr);
   }
 }
