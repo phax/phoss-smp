@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Philip Helger
  */
-public class DBUser implements Serializable
+public final class DBUser implements Serializable
 {
   private final String m_sUserName;
   private final String m_sPassword;
