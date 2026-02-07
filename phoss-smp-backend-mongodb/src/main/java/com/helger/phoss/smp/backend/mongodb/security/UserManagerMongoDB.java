@@ -12,6 +12,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.DevelopersNote;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
@@ -212,6 +213,22 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                                    aCustomAttrs,
                                                    bDisabled);
     return _internalCreateNewUser (aUser, true);
+  }
+
+  @DevelopersNote ("For internal use only")
+  public @Nullable IUser internalCreateMigrationUser (@NonNull final User aSrcUser)
+  {
+    ValueEnforcer.notNull (aSrcUser, "SrcUser");
+    if (getUserOfLoginName (aSrcUser.getLoginName ()) != null)
+    {
+      // Another user with this login name already exists
+      AuditHelper.onAuditCreateFailure (User.OT,
+                                        "login-name-already-in-use",
+                                        aSrcUser.getLoginName (),
+                                        "migration-user");
+      return null;
+    }
+    return _internalCreateNewUser (aSrcUser, true);
   }
 
   @Override

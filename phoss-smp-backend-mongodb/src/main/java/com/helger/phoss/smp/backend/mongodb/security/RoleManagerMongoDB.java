@@ -7,6 +7,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
@@ -109,6 +110,13 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
     // Create role
     final Role aRole = new Role (StubObject.createForCurrentUserAndID (sID, aCustomAttrs), sName, sDescription);
     return _internalCreateNewRole (aRole, true);
+  }
+
+  @DevelopersNote ("For internal use only")
+  public @Nullable IRole internalCreateMigrationRole (@NonNull final Role aSrcRole)
+  {
+    // Create role
+    return _internalCreateNewRole (aSrcRole, true);
   }
 
   @Override

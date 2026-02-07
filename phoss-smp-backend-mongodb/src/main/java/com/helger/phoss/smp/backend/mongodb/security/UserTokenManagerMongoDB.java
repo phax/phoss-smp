@@ -11,6 +11,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
@@ -144,13 +145,8 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     return m_aCallbacks;
   }
 
-  @Override
-  public @Nullable UserToken createUserToken (@Nullable final String sTokenString,
-                                              @Nullable final Map <String, String> aCustomAttrs,
-                                              @NonNull final IUser aUser,
-                                              @Nullable final String sDescription)
+  private @Nullable UserToken _internalCreateUserToken (@NonNull final UserToken aUserToken)
   {
-    final UserToken aUserToken = new UserToken (sTokenString, aCustomAttrs, aUser, sDescription);
     if (!getCollection ().insertOne (toBson (aUserToken)).wasAcknowledged ())
     {
       AuditHelper.onAuditCreateFailure (UserToken.OT,
@@ -171,6 +167,22 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     m_aCallbacks.forEach (aCB -> aCB.onUserTokenCreated (aUserToken));
 
     return aUserToken;
+  }
+
+  @Override
+  public @Nullable UserToken createUserToken (@Nullable final String sTokenString,
+                                              @Nullable final Map <String, String> aCustomAttrs,
+                                              @NonNull final IUser aUser,
+                                              @Nullable final String sDescription)
+  {
+    final UserToken aUserToken = new UserToken (sTokenString, aCustomAttrs, aUser, sDescription);
+    return _internalCreateUserToken (aUserToken);
+  }
+
+  @DevelopersNote ("For internal use only")
+  public @Nullable UserToken internalCreateMigrationUserToken (@NonNull final UserToken aSrcUserToken)
+  {
+    return _internalCreateUserToken (aSrcUserToken);
   }
 
   @Override

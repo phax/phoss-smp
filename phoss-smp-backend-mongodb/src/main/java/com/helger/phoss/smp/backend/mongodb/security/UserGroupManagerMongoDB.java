@@ -8,6 +8,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
@@ -142,6 +143,13 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   {
     final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
     return _internalCreateNewUserGroup (aUserGroup, true);
+  }
+
+  @DevelopersNote ("For internal use only")
+  public @Nullable IUserGroup internalCreateMigrationUserGroup (@NonNull final UserGroup aSrcUserGroup)
+  {
+    // Create UserGroup
+    return _internalCreateNewUserGroup (aSrcUserGroup, true);
   }
 
   @Override
