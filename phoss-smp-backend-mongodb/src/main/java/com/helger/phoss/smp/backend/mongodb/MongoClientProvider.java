@@ -42,10 +42,9 @@ import com.mongodb.event.CommandListener;
 import com.mongodb.event.CommandSucceededEvent;
 
 /**
- * A provider for {@link MongoCollection} instances. This class ensures, that
- * the underlying {@link MongoClient} instance is closed correctly in the
- * {@link #close()} method. Use {@link MongoClientSingleton#getInstance()} to
- * create an instance of this class.
+ * A provider for {@link MongoCollection} instances. This class ensures, that the underlying
+ * {@link MongoClient} instance is closed correctly in the {@link #close()} method. Use
+ * {@link MongoClientSingleton#getInstance()} to create an instance of this class.
  *
  * @author Philip Helger
  */

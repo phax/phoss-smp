@@ -21,6 +21,7 @@ import com.helger.base.string.StringParser;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
+import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
 
@@ -31,16 +32,16 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter <SMPEndpoint>
 {
-  private static final String ATTR_TRANSPORT_PROFILE = "transportprofile";
-  private static final String ATTR_ENDPOINT_REFERENCE = "endpointref";
-  private static final String ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE = "reqblsig";
-  private static final String ATTR_MINIMUM_AUTHENTICATION_LEVEL = "minauthlevel";
-  private static final String ATTR_SERVICE_ACTIVATION_DATE = "activation";
-  private static final String ATTR_SERVICE_EXPIRATION_DATE = "expiration";
+  private static final MicroQName ATTR_TRANSPORT_PROFILE = new MicroQName ("transportprofile");
+  private static final MicroQName ATTR_ENDPOINT_REFERENCE = new MicroQName ("endpointref");
+  private static final MicroQName ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE = new MicroQName ("reqblsig");
+  private static final MicroQName ATTR_MINIMUM_AUTHENTICATION_LEVEL = new MicroQName ("minauthlevel");
+  private static final MicroQName ATTR_SERVICE_ACTIVATION_DATE = new MicroQName ("activation");
+  private static final MicroQName ATTR_SERVICE_EXPIRATION_DATE = new MicroQName ("expiration");
   private static final String ELEMENT_CERTIFICATE = "certificate";
   private static final String ELEMENT_SERVICE_DESCRIPTION = "svcdescription";
-  private static final String ATTR_TECHNICAL_CONTACT_URL = "techcontacturl";
-  private static final String ATTR_TECHNICAL_INFORMATION_URL = "techinfourl";
+  private static final MicroQName ATTR_TECHNICAL_CONTACT_URL = new MicroQName ("techcontacturl");
+  private static final MicroQName ATTR_TECHNICAL_INFORMATION_URL = new MicroQName ("techinfourl");
   private static final String ELEMENT_EXTENSION = "extension";
 
   @NonNull

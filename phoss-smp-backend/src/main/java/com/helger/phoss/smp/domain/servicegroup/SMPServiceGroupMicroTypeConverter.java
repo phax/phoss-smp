@@ -21,6 +21,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
+import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
@@ -32,7 +33,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConverter <SMPServiceGroup>
 {
-  private static final String ATTR_OWNER_ID = "ownerid";
+  private static final MicroQName ATTR_OWNER_ID = new MicroQName ("ownerid");
   private static final String ELEMENT_PARTICIPANT_ID = "participant";
   private static final String ELEMENT_EXTENSION = "extension";
 
