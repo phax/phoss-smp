@@ -1,7 +1,6 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +11,12 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.token.accesstoken.AccessToken;
@@ -32,9 +34,8 @@ import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> implements IUserTokenManager
+public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, UserToken> implements IUserTokenManager
 {
-
   public static final String TOKEN_COLLECTION_NAME = "user-tokens";
 
   private static final String BSON_USER_TOKEN_TOKENS = "tokens";
@@ -52,13 +53,13 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   private static final String BSON_USER_TOKEN_REVOCATION_REASON = "reason";
 
   private final CallbackList <IUserTokenModificationCallback> m_aCallbacks = new CallbackList <> ();
-  private final IUserManager aUserMgr;
+  private final IUserManager m_aUserMgr;
 
   public MongoUserTokenManager (@NonNull final IUserManager aUserMgr)
   {
     super (TOKEN_COLLECTION_NAME);
     ValueEnforcer.notNull (aUserMgr, "UserMgr");
-    this.aUserMgr = aUserMgr;
+    m_aUserMgr = aUserMgr;
   }
 
   @Override
@@ -66,27 +67,27 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   {
     return getDefaultBusinessDocument (aUserToken).append (BSON_USER_TOKEN_USER_ID, aUserToken.getUserID ())
                                                   .append (BSON_USER_TOKEN_TOKENS,
-                                                           userTokenToDocument (aUserToken.getAccessTokenList ()))
+                                                           _userTokenToDocument (aUserToken.getAccessTokenList ()))
                                                   .append (BSON_USER_TOKEN_DESCRIPTION, aUserToken.getDescription ());
   }
 
-  private List <Document> userTokenToDocument (@NonNull final IAccessTokenList accessTokenList)
+  private List <Document> _userTokenToDocument (@NonNull final IAccessTokenList aAccessTokenList)
   {
-    return accessTokenList.getAllAccessTokens ()
-                          .stream ()
-                          .map (iAccessToken -> new Document ().append (BSON_USER_TOKEN_TOKEN_STRING,
-                                                                        iAccessToken.getTokenString ())
-                                                               .append (BSON_USER_TOKEN_TOKEN_NOT_BEORE,
-                                                                        TypeConverter.convert (iAccessToken.getNotBefore (),
-                                                                                               Date.class))
-                                                               .append (BSON_USER_TOKEN_TOKEN_NOT_AFTER,
-                                                                        TypeConverter.convert (iAccessToken.getNotAfter (),
-                                                                                               Date.class))
-                                                               .append (BSON_USER_TOKEN_TOKEN_REVOCATION,
-                                                                        _revocationToDocument (iAccessToken.getRevocationStatus ())))
-                          .toList ();
+    return aAccessTokenList.getAllAccessTokens ()
+                           .stream ()
+                           .map (aItem -> new Document ().append (BSON_USER_TOKEN_TOKEN_STRING, aItem.getTokenString ())
+                                                         .append (BSON_USER_TOKEN_TOKEN_NOT_BEORE,
+                                                                  TypeConverter.convert (aItem.getNotBefore (),
+                                                                                         Date.class))
+                                                         .append (BSON_USER_TOKEN_TOKEN_NOT_AFTER,
+                                                                  TypeConverter.convert (aItem.getNotAfter (),
+                                                                                         Date.class))
+                                                         .append (BSON_USER_TOKEN_TOKEN_REVOCATION,
+                                                                  _revocationToDocument (aItem.getRevocationStatus ())))
+                           .toList ();
   }
 
+  @NonNull
   private Document _revocationToDocument (@NonNull final IRevocationStatus revocationStatus)
   {
     return new Document ().append (BSON_USER_TOKEN_REVOCATION_REVOKED, Boolean.valueOf (revocationStatus.isRevoked ()))
@@ -96,21 +97,13 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
                           .append (BSON_USER_TOKEN_REVOCATION_REASON, revocationStatus.getRevocationReason ());
   }
 
-  @Override
-  protected @NonNull IUserToken toEntity (@NonNull final Document document)
+  @Nullable
+  private static List <AccessToken> _readAccessTokenFromDocument (@Nullable final List <Document> aAccessTokens)
   {
-    return new UserToken (populateStubObject (document),
-                          readAccessTokenFromDocument (document.getList (BSON_USER_TOKEN_TOKENS, Document.class)),
-                          Objects.requireNonNull (aUserMgr.getUserOfID (document.getString (BSON_USER_TOKEN_USER_ID))),
-                          document.getString (BSON_USER_TOKEN_DESCRIPTION));
-  }
-
-  private static List <AccessToken> readAccessTokenFromDocument (final List <Document> sAccessTokens)
-  {
-    if (sAccessTokens == null)
+    if (aAccessTokens == null)
       return null;
 
-    return sAccessTokens.stream ()
+    return aAccessTokens.stream ()
                         .map (itemDoc -> new AccessToken (itemDoc.getString (BSON_USER_TOKEN_TOKEN_STRING),
                                                           TypeConverter.convert (itemDoc.getDate (BSON_USER_TOKEN_TOKEN_NOT_BEORE),
                                                                                  LocalDateTime.class),
@@ -121,7 +114,17 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
                         .toList ();
   }
 
-  private static RevocationStatus readRevocationFromDocument (final Document aDocument)
+  @Override
+  protected @NonNull UserToken toEntity (@NonNull final Document aDocument)
+  {
+    return new UserToken (populateStubObject (aDocument),
+                          _readAccessTokenFromDocument (aDocument.getList (BSON_USER_TOKEN_TOKENS, Document.class)),
+                          Objects.requireNonNull (m_aUserMgr.getUserOfID (aDocument.getString (BSON_USER_TOKEN_USER_ID))),
+                          aDocument.getString (BSON_USER_TOKEN_DESCRIPTION));
+  }
+
+  @Nullable
+  private static RevocationStatus readRevocationFromDocument (@Nullable final Document aDocument)
   {
     if (aDocument == null)
       return null;
@@ -134,9 +137,10 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   }
 
   @Override
+  @ReturnsMutableObject
   public @NonNull CallbackList <IUserTokenModificationCallback> userTokenModificationCallbacks ()
   {
-    return this.m_aCallbacks;
+    return m_aCallbacks;
   }
 
   @Override
@@ -146,22 +150,18 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
                                               @Nullable final String sDescription)
   {
     final UserToken aUserToken = new UserToken (sTokenString, aCustomAttrs, aUser, sDescription);
-    try
-    {
-      getCollection ().insertOne (toBson (aUserToken));
-      m_aCallbacks.forEach (aCB -> aCB.onUserTokenCreated (aUserToken));
-      return aUserToken;
-    }
-    catch (final Exception e)
-    {
-      AuditHelper.onAuditCreateFailure (UserToken.OT,
-                                        aUserToken.getID (),
-                                        aUserToken.attrs (),
-                                        aUserToken.getUserID (),
-                                        aUserToken.getDescription (),
-                                        "database-error");
-    }
-    return null;
+    if (!getCollection ().insertOne (toBson (aUserToken)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+
+    AuditHelper.onAuditCreateSuccess (UserToken.OT,
+                                      aUserToken.getID (),
+                                      aUserToken.attrs (),
+                                      aUserToken.getUserID (),
+                                      aUserToken.getDescription ());
+
+    m_aCallbacks.forEach (aCB -> aCB.onUserTokenCreated (aUserToken));
+
+    return aUserToken;
   }
 
   @Override
@@ -179,6 +179,9 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   @Override
   public @NonNull EChange deleteUserToken (@Nullable final String sUserTokenID)
   {
+    if (StringHelper.isEmpty (sUserTokenID))
+      return null;
+
     return deleteEntity (sUserTokenID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenDeleted (sUserTokenID)));
   }
 
@@ -189,20 +192,19 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
                                                 @NonNull @Nonempty final String sRevocationReason,
                                                 @Nullable final String sTokenString)
   {
-    final UserToken userToken = (UserToken) findByID (sUserTokenID);
-
-    if (userToken == null)
+    final UserToken aUserToken = findByID (sUserTokenID);
+    if (aUserToken == null)
       return EChange.UNCHANGED;
 
-    final AccessTokenList aAccessTokenList = userToken.getAccessTokenList ();
+    final AccessTokenList aAccessTokenList = aUserToken.getAccessTokenList ();
     aAccessTokenList.revokeActiveAccessToken (sRevocationUserID, aRevocationDT, sRevocationReason);
-    final AccessToken newAccessToken = aAccessTokenList.createNewAccessToken (sTokenString);
+    final AccessToken aNewAccessToken = aAccessTokenList.createNewAccessToken (sTokenString);
 
     return genericUpdate (sUserTokenID,
-                          Updates.set (BSON_USER_TOKEN_TOKENS, userTokenToDocument (aAccessTokenList)),
+                          Updates.set (BSON_USER_TOKEN_TOKENS, _userTokenToDocument (aAccessTokenList)),
                           true,
                           () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenCreateAccessToken (sUserTokenID,
-                                                                                               newAccessToken)));
+                                                                                               aNewAccessToken)));
   }
 
   @Override
@@ -211,20 +213,20 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
                                              @NonNull final LocalDateTime aRevocationDT,
                                              @NonNull @Nonempty final String sRevocationReason)
   {
-    final UserToken userToken = (UserToken) findByID (sUserTokenID);
-
-    if (userToken == null)
+    final UserToken aUserToken = findByID (sUserTokenID);
+    if (aUserToken == null)
       return EChange.UNCHANGED;
 
-    final AccessTokenList aAccessTokenList = userToken.getAccessTokenList ();
+    final AccessTokenList aAccessTokenList = aUserToken.getAccessTokenList ();
     aAccessTokenList.revokeActiveAccessToken (sRevocationUserID, aRevocationDT, sRevocationReason);
     return genericUpdate (sUserTokenID,
-                          Updates.set (BSON_USER_TOKEN_TOKENS, userTokenToDocument (aAccessTokenList)),
+                          Updates.set (BSON_USER_TOKEN_TOKENS, _userTokenToDocument (aAccessTokenList)),
                           true,
                           () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenRevokeAccessToken (sUserTokenID)));
   }
 
   @Override
+  @ReturnsMutableCopy
   public @NonNull ICommonsList <IUserToken> getAllActiveUserTokens ()
   {
     return getAllActive ();
@@ -239,15 +241,14 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken> imp
   @Override
   public @Nullable IUserToken getUserTokenOfTokenString (@Nullable final String sTokenString)
   {
-    final ArrayList <Document> into = getCollection ().find (Filters.eq (BSON_USER_TOKEN_TOKENS +
-                                                                         "." +
-                                                                         BSON_USER_TOKEN_TOKEN_STRING,
-                                                                         sTokenString)).into (new ArrayList <> ());
-
-    if (into.isEmpty ())
+    final Document aDoc = getCollection ().find (Filters.eq (BSON_USER_TOKEN_TOKENS +
+                                                             "." +
+                                                             BSON_USER_TOKEN_TOKEN_STRING,
+                                                             sTokenString)).first ();
+    if (aDoc == null)
       return null;
 
-    return toEntity (into.get (0));
+    return toEntity (aDoc);
   }
 
   @Override

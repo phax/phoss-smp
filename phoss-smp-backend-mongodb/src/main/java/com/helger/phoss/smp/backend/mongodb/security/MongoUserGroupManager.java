@@ -8,7 +8,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.callback.CallbackList;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.IHasID;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
@@ -23,7 +25,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 
-public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> implements IUserGroupManager
+public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup, UserGroup> implements IUserGroupManager
 {
   public static final String GROUP_COLLECTION_NAME = "user-groups";
 
@@ -40,18 +42,20 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   public MongoUserGroupManager (@NonNull final IUserManager aUserMgr, @NonNull final IRoleManager aRoleMgr)
   {
     super (GROUP_COLLECTION_NAME);
+    ValueEnforcer.notNull (aUserMgr, "UserMgr");
+    ValueEnforcer.notNull (aRoleMgr, "RoleMgr");
     m_aUserMgr = aUserMgr;
     m_aRoleMgr = aRoleMgr;
   }
 
   @Override
-  public @NonNull IUserManager getUserManager ()
+  public final @NonNull IUserManager getUserManager ()
   {
     return m_aUserMgr;
   }
 
   @Override
-  public @NonNull IRoleManager getRoleManager ()
+  public final @NonNull IRoleManager getRoleManager ()
   {
     return m_aRoleMgr;
   }
@@ -66,19 +70,19 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   }
 
   @Override
-  protected @NonNull IUserGroup toEntity (@NonNull final Document aDoc)
+  protected @NonNull UserGroup toEntity (@NonNull final Document aDoc)
   {
-    final UserGroup userGroup = new UserGroup (populateStubObject (aDoc),
-                                               aDoc.getString (BSON_USER_GROUP_NAME),
-                                               aDoc.getString (BSON_USER_GROUP_DESCRIPTION));
+    final UserGroup ret = new UserGroup (populateStubObject (aDoc),
+                                         aDoc.getString (BSON_USER_GROUP_NAME),
+                                         aDoc.getString (BSON_USER_GROUP_DESCRIPTION));
 
-    final List <String> roles = aDoc.getList (BSON_USER_GROUP_ROLES, String.class);
-    userGroup.assignRoles (roles);
+    final List <String> aRoles = aDoc.getList (BSON_USER_GROUP_ROLES, String.class);
+    ret.assignRoles (aRoles);
 
-    final List <String> users = aDoc.getList (BSON_USER_GROUP_USERS, String.class);
-    userGroup.assignUsers (users);
+    final List <String> aUsers = aDoc.getList (BSON_USER_GROUP_USERS, String.class);
+    ret.assignUsers (aUsers);
 
-    return userGroup;
+    return ret;
   }
 
   @Override
@@ -88,9 +92,28 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
   }
 
   @Override
+  @ReturnsMutableCopy
   public @NonNull CallbackList <IUserGroupModificationCallback> userGroupModificationCallbacks ()
   {
     return m_aCallbacks;
+  }
+
+  @NonNull
+  private UserGroup _internalCreateNewUserGroup (@NonNull final UserGroup aUserGroup, final boolean bPredefined)
+  {
+    if (!getCollection ().insertOne (toBson (aUserGroup)).wasAcknowledged ())
+      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+
+    AuditHelper.onAuditCreateSuccess (UserGroup.OT,
+                                      aUserGroup.getID (),
+                                      aUserGroup.getName (),
+                                      aUserGroup.getDescription (),
+                                      aUserGroup.attrs (),
+                                      bPredefined ? "predefined" : "custom");
+
+    m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, bPredefined));
+
+    return aUserGroup;
   }
 
   @Override
@@ -99,7 +122,7 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
                                                   @Nullable final Map <String, String> aCustomAttrs)
   {
     final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
-    return internalCreateNewUserGroup (aUserGroup, false);
+    return _internalCreateNewUserGroup (aUserGroup, false);
   }
 
   @Override
@@ -109,28 +132,7 @@ public class MongoUserGroupManager extends AbstractMongoManager <IUserGroup> imp
                                                          @Nullable final Map <String, String> aCustomAttrs)
   {
     final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
-    return internalCreateNewUserGroup (aUserGroup, true);
-  }
-
-  protected UserGroup internalCreateNewUserGroup (@NonNull final UserGroup aUserGroup, final boolean bPredefined)
-  {
-    try
-    {
-      getCollection ().insertOne (toBson (aUserGroup));
-      m_aCallbacks.forEach (aCB -> aCB.onUserGroupCreated (aUserGroup, bPredefined));
-      return aUserGroup;
-    }
-    catch (final Exception e)
-    {
-      AuditHelper.onAuditCreateFailure (UserGroup.OT,
-                                        aUserGroup.getID (),
-                                        aUserGroup.getName (),
-                                        aUserGroup.getDescription (),
-                                        aUserGroup.attrs (),
-                                        bPredefined ? "predefined" : "custom",
-                                        "database-error");
-    }
-    return null;
+    return _internalCreateNewUserGroup (aUserGroup, true);
   }
 
   @Override

@@ -1,25 +1,34 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jspecify.annotations.NonNull;
-import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.annotation.Nonempty;
+import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserModificationCallback;
 
-public class MongoUserManagerTest extends MongoBaseTest
+public final class MongoUserManagerTest extends MongoBaseTest
 {
-
-  private final MongoUserManager mongoUserManager = new MongoUserManager ();
+  @Rule
+  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
 
   @Test
   public void testUserManagerCrud ()
   {
+    final MongoUserManager mongoUserManager = new MongoUserManager ();
     mongoUserManager.getCollection ().drop ();
 
     final IUser newUser = mongoUserManager.createNewUser ("sLoginName",
@@ -32,11 +41,11 @@ public class MongoUserManagerTest extends MongoBaseTest
                                                           Map.of ("foo", "bar"),
                                                           false);
     final String id = newUser.getID ();
-    Assert.assertEquals (newUser, mongoUserManager.getUserOfID (id));
-    Assert.assertEquals (newUser, mongoUserManager.getUserOfLoginName ("sLoginName"));
-    Assert.assertEquals (newUser, mongoUserManager.getUserOfEmailAddress ("test@smp.localhost"));
-    Assert.assertEquals (newUser, mongoUserManager.getUserOfEmailAddressIgnoreCase ("Test@sMp.lOcalHost"));
-    Assert.assertNull (mongoUserManager.getUserOfEmailAddressIgnoreCase ("im Not Here"));
+    assertEquals (newUser, mongoUserManager.getUserOfID (id));
+    assertEquals (newUser, mongoUserManager.getUserOfLoginName ("sLoginName"));
+    assertEquals (newUser, mongoUserManager.getUserOfEmailAddress ("test@smp.localhost"));
+    assertEquals (newUser, mongoUserManager.getUserOfEmailAddressIgnoreCase ("Test@sMp.lOcalHost"));
+    assertNull (mongoUserManager.getUserOfEmailAddressIgnoreCase ("im Not Here"));
 
     final IUser duplicateName = mongoUserManager.createNewUser ("sLoginName",
                                                                 null,
@@ -48,23 +57,23 @@ public class MongoUserManagerTest extends MongoBaseTest
                                                                 null,
                                                                 false);
 
-    Assert.assertNull (duplicateName);
+    assertNull (duplicateName);
 
-    Assert.assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
+    assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
     mongoUserManager.disableUser (id);
-    Assert.assertEquals (1, mongoUserManager.getAllDisabledUsers ().size ());
+    assertEquals (1, mongoUserManager.getAllDisabledUsers ().size ());
     mongoUserManager.enableUser (id);
-    Assert.assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
+    assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
     mongoUserManager.deleteUser (id);
-    Assert.assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-    Assert.assertEquals (1, mongoUserManager.getAllDeletedUsers ().size ());
+    assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
+    assertEquals (1, mongoUserManager.getAllDeletedUsers ().size ());
     mongoUserManager.enableUser (id);
-    Assert.assertEquals (1, mongoUserManager.getAllDeletedUsers ().size ());
-    Assert.assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
+    assertEquals (1, mongoUserManager.getAllDeletedUsers ().size ());
+    assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
     mongoUserManager.undeleteUser (id);
-    Assert.assertTrue (mongoUserManager.getAllDeletedUsers ().isEmpty ());
-    Assert.assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-    Assert.assertEquals (1, mongoUserManager.getAllNotDeletedUsers ().size ());
+    assertTrue (mongoUserManager.getAllDeletedUsers ().isEmpty ());
+    assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
+    assertEquals (1, mongoUserManager.getAllNotDeletedUsers ().size ());
 
     final AtomicBoolean callBackWasCalled = new AtomicBoolean (false);
     mongoUserManager.userModificationCallbacks ().add (new IUserModificationCallback ()
@@ -75,21 +84,21 @@ public class MongoUserManagerTest extends MongoBaseTest
         callBackWasCalled.set (true);
       }
     });
-    Assert.assertFalse (callBackWasCalled.get ());
+    assertFalse (callBackWasCalled.get ());
     mongoUserManager.updateUserLastFailedLogin (id);
-    Assert.assertTrue (callBackWasCalled.get ());
-    Assert.assertEquals (1, mongoUserManager.getUserOfID (id).getConsecutiveFailedLoginCount ());
+    assertTrue (callBackWasCalled.get ());
+    assertEquals (1, mongoUserManager.getUserOfID (id).getConsecutiveFailedLoginCount ());
     mongoUserManager.updateUserLastFailedLogin (id);
-    Assert.assertEquals (2, mongoUserManager.getUserOfID (id).getConsecutiveFailedLoginCount ());
+    assertEquals (2, mongoUserManager.getUserOfID (id).getConsecutiveFailedLoginCount ());
     mongoUserManager.updateUserLastLogin (id);
     final IUser loggedIn = mongoUserManager.getUserOfID (id);
-    Assert.assertEquals (0, loggedIn.getConsecutiveFailedLoginCount ());
-    Assert.assertEquals (1, loggedIn.getLoginCount ());
-    Assert.assertNotNull (loggedIn.getLastLoginDateTime ());
+    assertEquals (0, loggedIn.getConsecutiveFailedLoginCount ());
+    assertEquals (1, loggedIn.getLoginCount ());
+    assertNotNull (loggedIn.getLastLoginDateTime ());
 
     mongoUserManager.setUserPassword (id, "new secure password");
-    Assert.assertNotEquals (newUser.getPasswordHash ().getPasswordHashValue (),
-                            mongoUserManager.getUserOfID (id).getPasswordHash ().getPasswordHashValue ());
+    assertNotEquals (newUser.getPasswordHash ().getPasswordHashValue (),
+                     mongoUserManager.getUserOfID (id).getPasswordHash ().getPasswordHashValue ());
 
     mongoUserManager.setUserData (id,
                                   "newloginName",
@@ -100,23 +109,22 @@ public class MongoUserManagerTest extends MongoBaseTest
                                   Locale.US,
                                   Map.of ("test", "123"),
                                   true);
-    Assert.assertEquals (1, mongoUserManager.getAllDisabledUsers ().size ());
-    Assert.assertEquals (0, mongoUserManager.getAllActiveUsers ().size ());
-    Assert.assertEquals (0, mongoUserManager.getActiveUserCount ());
-    Assert.assertFalse (mongoUserManager.containsAnyActiveUser ());
+    assertEquals (1, mongoUserManager.getAllDisabledUsers ().size ());
+    assertEquals (0, mongoUserManager.getAllActiveUsers ().size ());
+    assertEquals (0, mongoUserManager.getActiveUserCount ());
+    assertFalse (mongoUserManager.containsAnyActiveUser ());
     mongoUserManager.enableUser (id);
-    Assert.assertTrue (mongoUserManager.containsAnyActiveUser ());
-    Assert.assertEquals (1, mongoUserManager.getAllActiveUsers ().size ());
-    Assert.assertEquals (1, mongoUserManager.getActiveUserCount ());
+    assertTrue (mongoUserManager.containsAnyActiveUser ());
+    assertEquals (1, mongoUserManager.getAllActiveUsers ().size ());
+    assertEquals (1, mongoUserManager.getActiveUserCount ());
 
     final IUser newloginName = mongoUserManager.getUserOfLoginName ("newloginName");
 
-    Assert.assertEquals ("newloginName", newloginName.getLoginName ());
-    Assert.assertEquals ("newEmail@smp.localhost", newloginName.getEmailAddress ());
-    Assert.assertEquals ("NewFN", newloginName.getFirstName ());
-    Assert.assertEquals ("NewLN", newloginName.getLastName ());
-    Assert.assertEquals ("NewDescription", newloginName.getDescription ());
-    Assert.assertEquals (Locale.US, newloginName.getDesiredLocale ());
+    assertEquals ("newloginName", newloginName.getLoginName ());
+    assertEquals ("newEmail@smp.localhost", newloginName.getEmailAddress ());
+    assertEquals ("NewFN", newloginName.getFirstName ());
+    assertEquals ("NewLN", newloginName.getLastName ());
+    assertEquals ("NewDescription", newloginName.getDescription ());
+    assertEquals (Locale.US, newloginName.getDesiredLocale ());
   }
-
 }

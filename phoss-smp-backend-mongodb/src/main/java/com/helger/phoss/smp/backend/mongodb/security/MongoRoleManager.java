@@ -21,7 +21,7 @@ import com.helger.photon.security.role.IRoleModificationCallback;
 import com.helger.photon.security.role.Role;
 import com.mongodb.client.model.Updates;
 
-public class MongoRoleManager extends AbstractMongoManager <IRole> implements IRoleManager
+public class MongoRoleManager extends AbstractMongoManager <IRole, Role> implements IRoleManager
 {
   public static final String ROLE_COLLECTION_NAME = "user-roles";
 
@@ -47,7 +47,7 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
   @NonNull
   @ReturnsMutableCopy
   @Override
-  protected IRole toEntity (@NonNull final Document aDoc)
+  protected Role toEntity (@NonNull final Document aDoc)
   {
     return new Role (populateStubObject (aDoc),
                      aDoc.getString (BSON_ROLE_NAME),
@@ -122,6 +122,9 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
   @Override
   public @NonNull EChange renameRole (@Nullable final String sRoleID, @NonNull @Nonempty final String sNewName)
   {
+    if (StringHelper.isEmpty (sRoleID))
+      return EChange.UNCHANGED;
+
     return genericUpdate (sRoleID,
                           Updates.set (BSON_ROLE_NAME, sNewName),
                           true,
@@ -134,6 +137,9 @@ public class MongoRoleManager extends AbstractMongoManager <IRole> implements IR
                                        @Nullable final String sNewDescription,
                                        @Nullable final Map <String, String> aNewCustomAttrs)
   {
+    if (StringHelper.isEmpty (sRoleID))
+      return EChange.UNCHANGED;
+
     final Bson aUpdate = Updates.combine (Updates.set (BSON_ROLE_NAME, sNewName),
                                           Updates.set (BSON_ROLE_DESCRIPTION, sNewDescription),
                                           Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs));

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -28,7 +29,7 @@ import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-public class MongoUserManager extends AbstractMongoManager <IUser> implements IUserManager
+public class MongoUserManager extends AbstractMongoManager <IUser, User> implements IUserManager
 {
   public static final String USER_COLLECTION_NAME = "users";
 
@@ -85,13 +86,21 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                                              .append (BSON_USER_DISABLED, Boolean.valueOf (aUser.isDisabled ()));
   }
 
+  private @NonNull PasswordHash _documentToPasswordHash (@NonNull final Document aDoc)
+  {
+    ValueEnforcer.notNull (aDoc, "aDoc");
+    return new PasswordHash (aDoc.getString (BSON_USER_PASSWORD_ALGO),
+                             PasswordSalt.createFromStringMaybe (aDoc.getString (BSON_USER_PASSWORD_SALT)),
+                             aDoc.getString (BSON_USER_PASSWORD_HASH));
+  }
+
   @Override
-  protected @NonNull IUser toEntity (@NonNull final Document aDoc)
+  protected @NonNull User toEntity (@NonNull final Document aDoc)
   {
     return new User (populateStubObject (aDoc),
                      aDoc.getString (BSON_USER_LOGIN_NAME),
                      aDoc.getString (BSON_USER_EMAIL),
-                     documentToPasswordHash (aDoc.get (BSON_USER_PASSWORD, Document.class)),
+                     _documentToPasswordHash (aDoc.get (BSON_USER_PASSWORD, Document.class)),
                      aDoc.getString (BSON_USER_FIRST_NAME),
                      aDoc.getString (BSON_USER_LAST_NAME),
                      aDoc.getString (BSON_USER_DESCRIPTION),
@@ -100,14 +109,6 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                      aDoc.getInteger (BSON_USER_LOGIN_COUNT).intValue (),
                      aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT).intValue (),
                      aDoc.getBoolean (BSON_USER_DISABLED).booleanValue ());
-  }
-
-  private @NonNull PasswordHash documentToPasswordHash (final Document aDoc)
-  {
-    ValueEnforcer.notNull (aDoc, "aDoc");
-    return new PasswordHash (aDoc.getString (BSON_USER_PASSWORD_ALGO),
-                             PasswordSalt.createFromStringMaybe (aDoc.getString (BSON_USER_PASSWORD_SALT)),
-                             aDoc.getString (BSON_USER_PASSWORD_HASH));
   }
 
   @Override
@@ -138,10 +139,10 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
                                       aUser.getDesiredLocale (),
                                       aUser.attrs (),
                                       Boolean.valueOf (aUser.isDisabled ()),
-                                      bPredefined ? "predefined" : "custom",
-                                      "database-error");
+                                      bPredefined ? "predefined" : "custom");
 
     m_aCallbacks.forEach (aCB -> aCB.onUserCreated (aUser, bPredefined));
+
     return aUser;
   }
 
@@ -233,6 +234,7 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
   {
     if (StringHelper.isEmpty (sEmailAddress))
       return null;
+
     return findFirst (Filters.eq (BSON_USER_EMAIL, sEmailAddress));
   }
 
@@ -242,14 +244,8 @@ public class MongoUserManager extends AbstractMongoManager <IUser> implements IU
     if (StringHelper.isEmpty (sEmailAddress))
       return null;
 
-    for (final Document currentUser : getCollection ().find ())
-    {
-      if (sEmailAddress.equalsIgnoreCase (currentUser.getString (BSON_USER_EMAIL)))
-      {
-        return toEntity (currentUser);
-      }
-    }
-    return null;
+    // Use case-insensitive RegEx for case-insensitive comparison
+    return findFirst (Filters.regex (BSON_USER_EMAIL, Pattern.quote (sEmailAddress), "i"));
   }
 
   @Override

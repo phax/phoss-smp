@@ -33,7 +33,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-public abstract class AbstractMongoManager <T extends IHasID <String>> implements IPhotonManager <T>
+public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL extends TINT> implements
+                                           IPhotonManager <TINT>
 {
   protected static final String BSON_ID = "id";
   protected static final String BSON_CREATION_TIME = "creationdt";
@@ -56,9 +57,9 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
                                         .withWriteConcern (WriteConcern.MAJORITY.withJournal (Boolean.TRUE));
   }
 
-  protected abstract @NonNull Document toBson (@NonNull T aPojo);
+  protected abstract @NonNull Document toBson (@NonNull TINT aPojo);
 
-  protected abstract @NonNull T toEntity (@NonNull Document aBson);
+  protected abstract @NonNull TIMPL toEntity (@NonNull Document aBson);
 
   @Override
   public @NonNull <T1> ICommonsList <T1> getNone ()
@@ -101,7 +102,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
   protected EChange genericUpdate (@Nullable final String sDocumentID,
                                    @NonNull final Bson aUpdate,
                                    final boolean bUpdateLastModification,
-                                   @Nullable final Runnable aCallback)
+                                   @Nullable final Runnable aUpdateCallback)
   {
     if (StringHelper.isEmpty (sDocumentID))
       return EChange.UNCHANGED;
@@ -111,8 +112,8 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
                                                                                  : aUpdate).getMatchedCount ();
 
     final EChange eChange = EChange.valueOf (nMatchCount > 0);
-    if (eChange.isChanged () && aCallback != null)
-      aCallback.run ();
+    if (eChange.isChanged () && aUpdateCallback != null)
+      aUpdateCallback.run ();
 
     return eChange;
   }
@@ -138,7 +139,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
                           aCallback);
   }
 
-  protected @Nullable T findFirst (@NonNull final Bson filter)
+  protected @Nullable TIMPL findFirst (@NonNull final Bson filter)
   {
     final Document aDocument = getCollection ().find (filter).first ();
     if (aDocument == null)
@@ -147,7 +148,7 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return toEntity (aDocument);
   }
 
-  public @Nullable T findByID (@Nullable final String sID)
+  public @Nullable TIMPL findByID (@Nullable final String sID)
   {
     if (StringHelper.isEmpty (sID))
       return null;
@@ -155,28 +156,34 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     return findFirst (_whereId (sID));
   }
 
-  protected @NonNull ICommonsList <@NonNull T> findAll (@NonNull final Bson filter)
+  @ReturnsMutableCopy
+  protected @NonNull ICommonsList <@NonNull TINT> findAll (@Nullable final Bson aFilter)
   {
-    final ICommonsList <T> ret = new CommonsArrayList <> ();
-    getCollection ().find (filter).forEach (document -> ret.add (toEntity (document)));
+    final ICommonsList <TINT> ret = new CommonsArrayList <> ();
+    if (aFilter != null)
+      getCollection ().find (aFilter).forEach (aDoc -> ret.add (toEntity (aDoc)));
+    else
+      getCollection ().find ().forEach (aDoc -> ret.add (toEntity (aDoc)));
     return ret;
   }
 
   @Override
   @ReturnsMutableCopy
-  public @NonNull ICommonsList <@NonNull T> getAll ()
+  public @NonNull ICommonsList <@NonNull TINT> getAll ()
   {
     // do not filter
-    return findAll (new Document ());
+    return findAll (null);
   }
 
-  protected @NonNull ICommonsList <@NonNull T> getAllActive ()
+  @ReturnsMutableCopy
+  protected @NonNull ICommonsList <@NonNull TINT> getAllActive ()
   {
     // get all documents where deleted is null
     return findAll (Filters.eq (BSON_DELETED_TIME, null));
   }
 
-  protected @NonNull ICommonsList <@NonNull T> getAllDeleted ()
+  @ReturnsMutableCopy
+  protected @NonNull ICommonsList <@NonNull TINT> getAllDeleted ()
   {
     // get all documents where deleted is not null
     return findAll (Filters.ne (BSON_DELETED_TIME, null));
@@ -229,9 +236,9 @@ public abstract class AbstractMongoManager <T extends IHasID <String>> implement
     if (aAttrs == null || aAttrs.isEmpty ())
       return null;
 
-    final Map <String, String> out = new HashMap <> (aAttrs.size ());
-    aAttrs.forEach ( (key, value) -> out.put (key, String.valueOf (value)));
-    return out;
+    final Map <String, String> ret = new HashMap <> (aAttrs.size ());
+    aAttrs.forEach ( (key, value) -> ret.put (key, String.valueOf (value)));
+    return ret;
   }
 
   @NonNull
