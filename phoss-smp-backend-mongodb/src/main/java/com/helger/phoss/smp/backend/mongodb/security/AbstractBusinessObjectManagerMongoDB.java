@@ -28,6 +28,7 @@ import com.helger.tenancy.IBusinessObject;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 
 public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID <String>, TIMPL extends TINT> extends
                                                            AbstractManagerMongoDB implements
@@ -73,42 +74,40 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @NonNull
-  protected EChange genericUpdate (@Nullable final String sDocumentID,
-                                   @NonNull final Bson aUpdate,
-                                   final boolean bUpdateLastModification)
+  protected EChange genericUpdateOne (@Nullable final String sDocumentID, @NonNull final Bson aUpdate)
   {
     if (StringHelper.isEmpty (sDocumentID))
       return EChange.UNCHANGED;
 
-    final long nMatchCount = getCollection ().updateOne (_whereId (sDocumentID),
-                                                         bUpdateLastModification ? addLastModToUpdate (aUpdate)
-                                                                                 : aUpdate).getMatchedCount ();
+    final UpdateResult aUpdateResult = getCollection ().updateOne (_whereId (sDocumentID), aUpdate);
 
-    return EChange.valueOf (nMatchCount > 0);
+    // Was an element changed?
+    if (aUpdateResult.getModifiedCount () == 0)
+      return EChange.UNCHANGED;
+
+    return EChange.CHANGED;
   }
 
   @NonNull
-  public EChange deleteEntity (@Nullable final String sEntityId)
+  public EChange deleteEntity (@Nullable final String sEntityID)
   {
-    return genericUpdate (sEntityId,
-                          Updates.combine (Updates.set (BSON_DELETED_TIME, PDTFactory.getCurrentLocalDateTime ()),
-                                           Updates.set (BSON_DELETED_USER_ID,
-                                                        BusinessObjectHelper.getUserIDOrFallback ())),
-                          false);
+    return genericUpdateOne (sEntityID,
+                             Updates.combine (Updates.set (BSON_DELETED_TIME, PDTFactory.getCurrentLocalDateTime ()),
+                                              Updates.set (BSON_DELETED_USER_ID,
+                                                           BusinessObjectHelper.getUserIDOrFallback ())));
   }
 
   @NonNull
-  public EChange undeleteEntity (@Nullable final String sEntityId)
+  public EChange undeleteEntity (@Nullable final String sEntityID)
   {
-    return genericUpdate (sEntityId,
-                          Updates.combine (Updates.set (BSON_DELETED_TIME, null),
-                                           Updates.set (BSON_DELETED_USER_ID, null)),
-                          false);
+    return genericUpdateOne (sEntityID,
+                             Updates.combine (Updates.set (BSON_DELETED_TIME, null),
+                                              Updates.set (BSON_DELETED_USER_ID, null)));
   }
 
-  protected @Nullable TIMPL findFirst (@NonNull final Bson filter)
+  protected @Nullable TIMPL findFirst (@NonNull final Bson aFilter)
   {
-    final Document aDocument = getCollection ().find (filter).first ();
+    final Document aDocument = getCollection ().find (aFilter).first ();
     if (aDocument == null)
       return null;
 

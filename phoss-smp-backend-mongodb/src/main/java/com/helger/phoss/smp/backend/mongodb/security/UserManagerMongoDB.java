@@ -298,18 +298,23 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserID,
-                                           Updates.combine (Updates.set (BSON_USER_LOGIN_NAME, sNewLoginName),
-                                                            Updates.set (BSON_USER_EMAIL, sNewEmailAddress),
-                                                            Updates.set (BSON_USER_FIRST_NAME, sNewFirstName),
-                                                            Updates.set (BSON_USER_LAST_NAME, sNewLastName),
-                                                            Updates.set (BSON_USER_DESCRIPTION, sNewDescription),
-                                                            Updates.set (BSON_USER_PREFERRED_LOCALE,
-                                                                         aNewDesiredLocale.toLanguageTag ()),
-                                                            Updates.set (BSON_USER_DISABLED,
-                                                                         Boolean.valueOf (bNewDisabled)),
-                                                            Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs)),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserID,
+                                              addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_LOGIN_NAME,
+                                                                                                sNewLoginName),
+                                                                                   Updates.set (BSON_USER_EMAIL,
+                                                                                                sNewEmailAddress),
+                                                                                   Updates.set (BSON_USER_FIRST_NAME,
+                                                                                                sNewFirstName),
+                                                                                   Updates.set (BSON_USER_LAST_NAME,
+                                                                                                sNewLastName),
+                                                                                   Updates.set (BSON_USER_DESCRIPTION,
+                                                                                                sNewDescription),
+                                                                                   Updates.set (BSON_USER_PREFERRED_LOCALE,
+                                                                                                aNewDesiredLocale.toLanguageTag ()),
+                                                                                   Updates.set (BSON_USER_DISABLED,
+                                                                                                Boolean.valueOf (bNewDisabled)),
+                                                                                   Updates.set (BSON_ATTRIBUTES,
+                                                                                                aNewCustomAttrs))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (User.OT,
@@ -341,20 +346,19 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
 
     final PasswordHash aPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
                                                                                              sNewPlainTextPassword);
-    final EChange eChange = genericUpdate (sUserID,
-                                           Updates.combine (Updates.set (BSON_USER_PASSWORD +
-                                                                         "." +
-                                                                         BSON_USER_PASSWORD_ALGO,
-                                                                         aPasswordHash.getAlgorithmName ()),
-                                                            Updates.set (BSON_USER_PASSWORD +
-                                                                         "." +
-                                                                         BSON_USER_PASSWORD_SALT,
-                                                                         aPasswordHash.getSaltAsString ()),
-                                                            Updates.set (BSON_USER_PASSWORD +
-                                                                         "." +
-                                                                         BSON_USER_PASSWORD_HASH,
-                                                                         aPasswordHash.getPasswordHashValue ())),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserID,
+                                              addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_PASSWORD +
+                                                                                                "." +
+                                                                                                BSON_USER_PASSWORD_ALGO,
+                                                                                                aPasswordHash.getAlgorithmName ()),
+                                                                                   Updates.set (BSON_USER_PASSWORD +
+                                                                                                "." +
+                                                                                                BSON_USER_PASSWORD_SALT,
+                                                                                                aPasswordHash.getSaltAsString ()),
+                                                                                   Updates.set (BSON_USER_PASSWORD +
+                                                                                                "." +
+                                                                                                BSON_USER_PASSWORD_HASH,
+                                                                                                aPasswordHash.getPasswordHashValue ()))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (User.OT, "set-password", sUserID);
@@ -374,12 +378,13 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserID,
-                                           Updates.combine (Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
-                                                            Updates.inc (BSON_USER_LOGIN_COUNT, Integer.valueOf (1)),
-                                                            Updates.set (BSON_USER_FAILED_LOGIN_COUNT,
-                                                                         Integer.valueOf (0))),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserID,
+                                              addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_LAST_LOGIN,
+                                                                                                LocalDateTime.now ()),
+                                                                                   Updates.inc (BSON_USER_LOGIN_COUNT,
+                                                                                                Integer.valueOf (1)),
+                                                                                   Updates.set (BSON_USER_FAILED_LOGIN_COUNT,
+                                                                                                Integer.valueOf (0)))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (User.OT, "update-last-login", sUserID);
@@ -399,9 +404,9 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserID,
-                                           Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, Integer.valueOf (1)),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserID,
+                                              addLastModToUpdate (Updates.inc (BSON_USER_FAILED_LOGIN_COUNT,
+                                                                               Integer.valueOf (1))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (User.OT, "set-last-failed-login", sUserID);
@@ -461,7 +466,8 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, Boolean.TRUE), true);
+    final EChange eChange = genericUpdateOne (sUserID,
+                                              addLastModToUpdate (Updates.set (BSON_USER_DISABLED, Boolean.TRUE)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (User.OT, "disable", sUserID);
@@ -481,7 +487,8 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, Boolean.FALSE), true);
+    final EChange eChange = genericUpdateOne (sUserID,
+                                              addLastModToUpdate (Updates.set (BSON_USER_DISABLED, Boolean.FALSE)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (User.OT, "enable", sUserID);

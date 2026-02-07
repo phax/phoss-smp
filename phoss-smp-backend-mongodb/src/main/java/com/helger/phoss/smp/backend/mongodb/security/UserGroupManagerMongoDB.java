@@ -209,7 +209,8 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserGroupID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserGroupID, Updates.set (BSON_USER_GROUP_NAME, sNewName), true);
+    final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              addLastModToUpdate (Updates.set (BSON_USER_GROUP_NAME, sNewName)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "set-name", sUserGroupID, sNewName);
@@ -232,11 +233,13 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserGroupID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserGroupID,
-                                           Updates.combine (Updates.set (BSON_USER_GROUP_NAME, sNewName),
-                                                            Updates.set (BSON_USER_GROUP_DESCRIPTION, sNewDescription),
-                                                            Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs)),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_GROUP_NAME,
+                                                                                                sNewName),
+                                                                                   Updates.set (BSON_USER_GROUP_DESCRIPTION,
+                                                                                                sNewDescription),
+                                                                                   Updates.set (BSON_ATTRIBUTES,
+                                                                                                aNewCustomAttrs))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT,
@@ -262,7 +265,8 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserGroupID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserGroupID, Updates.push (BSON_USER_GROUP_USERS, sUserID), true);
+    final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              addLastModToUpdate (Updates.push (BSON_USER_GROUP_USERS, sUserID)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "assign-user", sUserGroupID, sUserID);
@@ -283,7 +287,8 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserGroupID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserGroupID, Updates.pull (BSON_USER_GROUP_USERS, sUserID), true);
+    final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              addLastModToUpdate (Updates.pull (BSON_USER_GROUP_USERS, sUserID)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "unassign-user", sUserGroupID, sUserID);
@@ -340,7 +345,8 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserGroupID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserGroupID, Updates.push (BSON_USER_GROUP_ROLES, sRoleID), true);
+    final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              addLastModToUpdate (Updates.push (BSON_USER_GROUP_ROLES, sRoleID)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "assign-role", sUserGroupID, sRoleID);
@@ -361,7 +367,8 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserGroupID) || StringHelper.isEmpty (sRoleID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserGroupID, Updates.pull (BSON_USER_GROUP_ROLES, sRoleID), true);
+    final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              addLastModToUpdate (Updates.pull (BSON_USER_GROUP_ROLES, sRoleID)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "unassign-role", sUserGroupID, sRoleID);

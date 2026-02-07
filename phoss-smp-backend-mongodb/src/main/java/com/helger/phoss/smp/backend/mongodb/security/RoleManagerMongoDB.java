@@ -3,7 +3,6 @@ package com.helger.phoss.smp.backend.mongodb.security;
 import java.util.Map;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -144,7 +143,7 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
     if (StringHelper.isEmpty (sRoleID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sRoleID, Updates.set (BSON_ROLE_NAME, sNewName), true);
+    final EChange eChange = genericUpdateOne (sRoleID, addLastModToUpdate (Updates.set (BSON_ROLE_NAME, sNewName)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (Role.OT, "set-name", sRoleID, sNewName);
@@ -167,11 +166,13 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
     if (StringHelper.isEmpty (sRoleID))
       return EChange.UNCHANGED;
 
-    final Bson aUpdate = Updates.combine (Updates.set (BSON_ROLE_NAME, sNewName),
-                                          Updates.set (BSON_ROLE_DESCRIPTION, sNewDescription),
-                                          Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs));
-
-    final EChange eChange = genericUpdate (sRoleID, aUpdate, true);
+    final EChange eChange = genericUpdateOne (sRoleID,
+                                              addLastModToUpdate (Updates.combine (Updates.set (BSON_ROLE_NAME,
+                                                                                                sNewName),
+                                                                                   Updates.set (BSON_ROLE_DESCRIPTION,
+                                                                                                sNewDescription),
+                                                                                   Updates.set (BSON_ATTRIBUTES,
+                                                                                                aNewCustomAttrs))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (Role.OT, "set-all", sRoleID, sNewName, sNewDescription, aNewCustomAttrs);

@@ -20,7 +20,7 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserModificationCallback;
 
-public final class UserManagerMongoDBTest extends MongoBaseTest
+public final class UserManagerMongoDBTest
 {
   @Rule
   public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
@@ -28,105 +28,122 @@ public final class UserManagerMongoDBTest extends MongoBaseTest
   @Test
   public void testUserManagerCrud ()
   {
-    try (final UserManagerMongoDB mongoUserManager = new UserManagerMongoDB ())
+    try (final UserManagerMongoDB aUserMgr = new UserManagerMongoDB ())
     {
-      mongoUserManager.getCollection ().drop ();
+      aUserMgr.getCollection ().drop ();
 
-      final IUser newUser = mongoUserManager.createNewUser ("sLoginName",
-                                                            "test@smp.localhost",
-                                                            "im a super secure password",
-                                                            "First Name",
-                                                            "Last Name",
-                                                            "Description",
-                                                            Locale.GERMAN,
-                                                            Map.of ("foo", "bar"),
-                                                            false);
-      final String id = newUser.getID ();
-      assertEquals (newUser, mongoUserManager.getUserOfID (id));
-      assertEquals (newUser, mongoUserManager.getUserOfLoginName ("sLoginName"));
-      assertEquals (newUser, mongoUserManager.getUserOfEmailAddress ("test@smp.localhost"));
-      assertEquals (newUser, mongoUserManager.getUserOfEmailAddressIgnoreCase ("Test@sMp.lOcalHost"));
-      assertNull (mongoUserManager.getUserOfEmailAddressIgnoreCase ("im Not Here"));
+      final IUser aUser = aUserMgr.createNewUser ("sLoginName",
+                                                  "test@smp.localhost",
+                                                  "im a super secure password",
+                                                  "First Name",
+                                                  "Last Name",
+                                                  "Description",
+                                                  Locale.GERMAN,
+                                                  Map.of ("foo", "bar"),
+                                                  false);
+      assertNotNull (aUser);
+      assertEquals ("sLoginName", aUser.getLoginName ());
+      assertEquals ("test@smp.localhost", aUser.getEmailAddress ());
+      assertNotEquals ("im a super secure password", aUser.getPasswordHash ());
+      assertEquals ("First Name", aUser.getFirstName ());
+      assertEquals ("Last Name", aUser.getLastName ());
+      assertEquals ("Description", aUser.getDescription ());
+      assertEquals (Locale.GERMAN, aUser.getDesiredLocale ());
+      assertEquals (1, aUser.attrs ().size ());
+      assertEquals ("bar", aUser.attrs ().get ("foo"));
+      assertTrue (aUser.isEnabled ());
 
-      final IUser duplicateName = mongoUserManager.createNewUser ("sLoginName",
-                                                                  null,
-                                                                  "1234",
-                                                                  null,
-                                                                  null,
-                                                                  null,
-                                                                  null,
-                                                                  null,
-                                                                  false);
+      final String sUserID = aUser.getID ();
+      assertEquals (aUser, aUserMgr.getUserOfID (sUserID));
+      assertEquals (aUser, aUserMgr.getUserOfLoginName ("sLoginName"));
+      assertEquals (aUser, aUserMgr.getUserOfEmailAddress ("test@smp.localhost"));
+      assertEquals (aUser, aUserMgr.getUserOfEmailAddressIgnoreCase ("Test@sMp.lOcalHost"));
 
-      assertNull (duplicateName);
+      assertNull (aUserMgr.getUserOfID ("im Not Here"));
+      assertNull (aUserMgr.getUserOfLoginName ("im Not Here"));
+      assertNull (aUserMgr.getUserOfEmailAddress ("im Not Here"));
+      assertNull (aUserMgr.getUserOfEmailAddressIgnoreCase ("im Not Here"));
 
-      assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-      mongoUserManager.disableUser (id);
-      assertEquals (1, mongoUserManager.getAllDisabledUsers ().size ());
-      mongoUserManager.enableUser (id);
-      assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-      mongoUserManager.deleteUser (id);
-      assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-      assertEquals (1, mongoUserManager.getAllDeletedUsers ().size ());
-      mongoUserManager.enableUser (id);
-      assertEquals (1, mongoUserManager.getAllDeletedUsers ().size ());
-      assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-      mongoUserManager.undeleteUser (id);
-      assertTrue (mongoUserManager.getAllDeletedUsers ().isEmpty ());
-      assertTrue (mongoUserManager.getAllDisabledUsers ().isEmpty ());
-      assertEquals (1, mongoUserManager.getAllNotDeletedUsers ().size ());
+      final IUser aDuplicateUser = aUserMgr.createNewUser ("sLoginName",
+                                                           null,
+                                                           "1234",
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           null,
+                                                           false);
+      assertNull (aDuplicateUser);
 
-      final AtomicBoolean callBackWasCalled = new AtomicBoolean (false);
-      mongoUserManager.userModificationCallbacks ().add (new IUserModificationCallback ()
+      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
+      assertTrue (aUserMgr.disableUser (sUserID).isChanged ());
+      assertEquals (1, aUserMgr.getAllDisabledUsers ().size ());
+      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
+      assertTrue (aUserMgr.deleteUser (sUserID).isChanged ());
+      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
+      assertEquals (1, aUserMgr.getAllDeletedUsers ().size ());
+      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+      assertEquals (1, aUserMgr.getAllDeletedUsers ().size ());
+      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
+      assertTrue (aUserMgr.undeleteUser (sUserID).isChanged ());
+      assertTrue (aUserMgr.getAllDeletedUsers ().isEmpty ());
+      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
+      assertEquals (1, aUserMgr.getAllNotDeletedUsers ().size ());
+
+      final AtomicBoolean aCBWasCalled = new AtomicBoolean (false);
+      aUserMgr.userModificationCallbacks ().add (new IUserModificationCallback ()
       {
         @Override
-        public void onUserLastFailedLoginUpdated (@NonNull @Nonempty final String sUserID)
+        public void onUserLastFailedLoginUpdated (@NonNull @Nonempty final String sID)
         {
-          callBackWasCalled.set (true);
+          aCBWasCalled.set (true);
         }
       });
-      assertFalse (callBackWasCalled.get ());
-      mongoUserManager.updateUserLastFailedLogin (id);
-      assertTrue (callBackWasCalled.get ());
-      assertEquals (1, mongoUserManager.getUserOfID (id).getConsecutiveFailedLoginCount ());
-      mongoUserManager.updateUserLastFailedLogin (id);
-      assertEquals (2, mongoUserManager.getUserOfID (id).getConsecutiveFailedLoginCount ());
-      mongoUserManager.updateUserLastLogin (id);
-      final IUser loggedIn = mongoUserManager.getUserOfID (id);
-      assertEquals (0, loggedIn.getConsecutiveFailedLoginCount ());
-      assertEquals (1, loggedIn.getLoginCount ());
-      assertNotNull (loggedIn.getLastLoginDateTime ());
+      assertFalse (aCBWasCalled.get ());
+      assertTrue (aUserMgr.updateUserLastFailedLogin (sUserID).isChanged ());
+      assertTrue (aCBWasCalled.get ());
+      assertEquals (1, aUserMgr.getUserOfID (sUserID).getConsecutiveFailedLoginCount ());
+      assertTrue (aUserMgr.updateUserLastFailedLogin (sUserID).isChanged ());
+      assertEquals (2, aUserMgr.getUserOfID (sUserID).getConsecutiveFailedLoginCount ());
+      assertTrue (aUserMgr.updateUserLastLogin (sUserID).isChanged ());
+      final IUser aLoggedInUser = aUserMgr.getUserOfID (sUserID);
+      assertNotNull (aLoggedInUser);
+      assertEquals (0, aLoggedInUser.getConsecutiveFailedLoginCount ());
+      assertEquals (1, aLoggedInUser.getLoginCount ());
+      assertNotNull (aLoggedInUser.getLastLoginDateTime ());
 
-      mongoUserManager.setUserPassword (id, "new secure password");
-      assertNotEquals (newUser.getPasswordHash ().getPasswordHashValue (),
-                       mongoUserManager.getUserOfID (id).getPasswordHash ().getPasswordHashValue ());
+      assertTrue (aUserMgr.setUserPassword (sUserID, "new secure password").isChanged ());
+      assertNotEquals (aUser.getPasswordHash ().getPasswordHashValue (),
+                       aUserMgr.getUserOfID (sUserID).getPasswordHash ().getPasswordHashValue ());
 
-      mongoUserManager.setUserData (id,
-                                    "newloginName",
-                                    "newEmail@smp.localhost",
-                                    "NewFN",
-                                    "NewLN",
-                                    "NewDescription",
-                                    Locale.US,
-                                    Map.of ("test", "123"),
-                                    true);
-      assertEquals (1, mongoUserManager.getAllDisabledUsers ().size ());
-      assertEquals (0, mongoUserManager.getAllActiveUsers ().size ());
-      assertEquals (0, mongoUserManager.getActiveUserCount ());
-      assertFalse (mongoUserManager.containsAnyActiveUser ());
-      mongoUserManager.enableUser (id);
-      assertTrue (mongoUserManager.containsAnyActiveUser ());
-      assertEquals (1, mongoUserManager.getAllActiveUsers ().size ());
-      assertEquals (1, mongoUserManager.getActiveUserCount ());
+      assertTrue (aUserMgr.setUserData (sUserID,
+                                        "newloginName",
+                                        "newEmail@smp.localhost",
+                                        "NewFN",
+                                        "NewLN",
+                                        "NewDescription",
+                                        Locale.US,
+                                        Map.of ("test", "123"),
+                                        true).isChanged ());
+      assertEquals (1, aUserMgr.getAllDisabledUsers ().size ());
+      assertEquals (0, aUserMgr.getAllActiveUsers ().size ());
+      assertEquals (0, aUserMgr.getActiveUserCount ());
+      assertFalse (aUserMgr.containsAnyActiveUser ());
+      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+      assertTrue (aUserMgr.containsAnyActiveUser ());
+      assertEquals (1, aUserMgr.getAllActiveUsers ().size ());
+      assertEquals (1, aUserMgr.getActiveUserCount ());
 
-      final IUser newloginName = mongoUserManager.getUserOfLoginName ("newloginName");
+      final IUser aNewLoginNameUser = aUserMgr.getUserOfLoginName ("newloginName");
+      assertNotNull (aNewLoginNameUser);
 
-      assertEquals ("newloginName", newloginName.getLoginName ());
-      assertEquals ("newEmail@smp.localhost", newloginName.getEmailAddress ());
-      assertEquals ("NewFN", newloginName.getFirstName ());
-      assertEquals ("NewLN", newloginName.getLastName ());
-      assertEquals ("NewDescription", newloginName.getDescription ());
-      assertEquals (Locale.US, newloginName.getDesiredLocale ());
+      assertEquals ("newloginName", aNewLoginNameUser.getLoginName ());
+      assertEquals ("newEmail@smp.localhost", aNewLoginNameUser.getEmailAddress ());
+      assertEquals ("NewFN", aNewLoginNameUser.getFirstName ());
+      assertEquals ("NewLN", aNewLoginNameUser.getLastName ());
+      assertEquals ("NewDescription", aNewLoginNameUser.getDescription ());
+      assertEquals (Locale.US, aNewLoginNameUser.getDesiredLocale ());
     }
   }
 }

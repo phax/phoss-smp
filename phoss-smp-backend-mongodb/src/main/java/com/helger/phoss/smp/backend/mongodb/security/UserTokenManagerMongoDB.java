@@ -181,10 +181,11 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     if (StringHelper.isEmpty (sUserTokenID))
       return EChange.UNCHANGED;
 
-    final EChange eChange = genericUpdate (sUserTokenID,
-                                           Updates.combine (Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs),
-                                                            Updates.set (BSON_USER_TOKEN_DESCRIPTION, sNewDescription)),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserTokenID,
+                                              addLastModToUpdate (Updates.combine (Updates.set (BSON_ATTRIBUTES,
+                                                                                                aNewCustomAttrs),
+                                                                                   Updates.set (BSON_USER_TOKEN_DESCRIPTION,
+                                                                                                sNewDescription))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserToken.OT, "set-all", sUserTokenID, aNewCustomAttrs, sNewDescription);
@@ -233,10 +234,9 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     aAccessTokenList.revokeActiveAccessToken (sRevocationUserID, aRevocationDT, sRevocationReason);
     final AccessToken aNewAccessToken = aAccessTokenList.createNewAccessToken (sTokenString);
 
-    final EChange eChange = genericUpdate (sUserTokenID,
-                                           Updates.set (BSON_USER_TOKEN_TOKENS,
-                                                        _userTokenToDocument (aAccessTokenList)),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserTokenID,
+                                              addLastModToUpdate (Updates.set (BSON_USER_TOKEN_TOKENS,
+                                                                               _userTokenToDocument (aAccessTokenList))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserToken.OT,
@@ -273,10 +273,9 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
     }
 
-    final EChange eChange = genericUpdate (sUserTokenID,
-                                           Updates.set (BSON_USER_TOKEN_TOKENS,
-                                                        _userTokenToDocument (aAccessTokenList)),
-                                           true);
+    final EChange eChange = genericUpdateOne (sUserTokenID,
+                                              addLastModToUpdate (Updates.set (BSON_USER_TOKEN_TOKENS,
+                                                                               _userTokenToDocument (aAccessTokenList))));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserToken.OT,

@@ -17,7 +17,7 @@ import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.UserToken;
 import com.helger.photon.security.user.IUser;
 
-public final class UserTokenManagerMongoDBTest extends MongoBaseTest
+public final class UserTokenManagerMongoDBTest
 {
   @Rule
   public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
@@ -25,48 +25,48 @@ public final class UserTokenManagerMongoDBTest extends MongoBaseTest
   @Test
   public void testUserTokenManagerCrud ()
   {
-    try (final UserManagerMongoDB mongoUserManager = new UserManagerMongoDB ();
-         final UserTokenManagerMongoDB mongoUserTokenManager = new UserTokenManagerMongoDB (mongoUserManager))
+    try (final UserManagerMongoDB aUserMger = new UserManagerMongoDB ();
+         final UserTokenManagerMongoDB aUserTokenMgr = new UserTokenManagerMongoDB (aUserMger))
     {
-      mongoUserManager.getCollection ().drop ();
-      mongoUserTokenManager.getCollection ().drop ();
+      aUserMger.getCollection ().drop ();
+      aUserTokenMgr.getCollection ().drop ();
 
-      final IUser newUser = mongoUserManager.createNewUser ("sLoginName",
-                                                            "test@smp.localhost",
-                                                            "im a super secure password",
-                                                            "First Name",
-                                                            "Last Name",
-                                                            "Description",
-                                                            Locale.GERMAN,
-                                                            Map.of ("foo", "bar"),
-                                                            false);
+      final IUser aUser = aUserMger.createNewUser ("sLoginName",
+                                                   "test@smp.localhost",
+                                                   "im a super secure password",
+                                                   "First Name",
+                                                   "Last Name",
+                                                   "Description",
+                                                   Locale.GERMAN,
+                                                   Map.of ("foo", "bar"),
+                                                   false);
+      assertNotNull (aUser);
 
-      final UserToken userToken = mongoUserTokenManager.createUserToken ("asd",
-                                                                         Map.of ("meta", "data"),
-                                                                         newUser,
-                                                                         "description");
-      assertNotNull (userToken);
-      assertEquals (userToken, mongoUserTokenManager.getUserTokenOfID (userToken.getID ()));
-      assertEquals (userToken, mongoUserTokenManager.getAllActiveUserTokens ().get (0));
+      final UserToken aUserToken = aUserTokenMgr.createUserToken ("asd", Map.of ("meta", "data"), aUser, "description");
+      assertNotNull (aUserToken);
+      assertEquals (aUserToken, aUserTokenMgr.getUserTokenOfID (aUserToken.getID ()));
+      assertEquals (aUserToken, aUserTokenMgr.getAllActiveUserTokens ().get (0));
 
-      mongoUserTokenManager.updateUserToken (userToken.getID (), Map.of ("foo", "bar"), "dummy token");
-      final IUserToken token = mongoUserTokenManager.getUserTokenOfID (userToken.getID ());
-      assertEquals ("dummy token", token.getDescription ());
-      assertTrue (token.attrs ().containsKey ("foo"));
+      assertTrue (aUserTokenMgr.updateUserToken (aUserToken.getID (), Map.of ("foo", "bar"), "dummy token")
+                               .isChanged ());
+      final IUserToken aResolvedUserToken = aUserTokenMgr.getUserTokenOfID (aUserToken.getID ());
+      assertNotNull (aResolvedUserToken);
+      assertEquals ("dummy token", aResolvedUserToken.getDescription ());
+      assertTrue (aResolvedUserToken.attrs ().containsKey ("foo"));
 
-      assertFalse (mongoUserTokenManager.isAccessTokenUsed (token.getID ()));
+      assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
 
-      mongoUserTokenManager.createNewAccessToken (token.getID (),
-                                                  newUser.getID (),
-                                                  LocalDateTime.now (),
-                                                  "reason",
-                                                  "tokenString");
-      final IUserToken tokenString = mongoUserTokenManager.getUserTokenOfTokenString ("tokenString");
+      assertTrue (aUserTokenMgr.createNewAccessToken (aResolvedUserToken.getID (),
+                                                      aUser.getID (),
+                                                      LocalDateTime.now (),
+                                                      "reason",
+                                                      "tokenString").isChanged ());
+      final IUserToken aUserTokenOfString = aUserTokenMgr.getUserTokenOfTokenString ("tokenString");
+      assertNotNull (aUserTokenOfString);
 
-      assertNotNull (tokenString);
-
-      mongoUserTokenManager.revokeAccessToken (newUser.getID (), newUser.getID (), LocalDateTime.now (), "revoked");
-      assertFalse (mongoUserTokenManager.isAccessTokenUsed (token.getID ()));
+      assertTrue (aUserTokenMgr.revokeAccessToken (aUserToken.getID (), aUser.getID (), LocalDateTime.now (), "revoked")
+                               .isChanged ());
+      assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
     }
   }
 }
