@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -178,12 +177,12 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (aIDs == null)
       return true;
 
-    final Set <ObjectId> aObjectIds = new CommonsHashSet <> (aIDs, ObjectId::new);
+    final Set <String> aIDSet = new CommonsHashSet <> (aIDs);
 
     // uses $in
-    final long nFoundDocuments = getCollection ().countDocuments (Filters.in (BSON_ID, aObjectIds));
+    final long nFoundDocuments = getCollection ().countDocuments (Filters.in (BSON_ID, aIDSet));
 
-    return aObjectIds.size () == nFoundDocuments;
+    return aIDSet.size () == nFoundDocuments;
   }
 
   @NonNull
