@@ -80,14 +80,14 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
           final ICommonsList <Role> aRoles = aRoleMgrXML.getAll ().getAllMapped (Role.class::cast);
           if (aRoles.isNotEmpty ())
           {
-            final RoleManagerMongoDB aRoleMgr = (RoleManagerMongoDB) PhotonSecurityManager.getRoleMgr ();
+            final RoleManagerMongoDB aRoleMgrMongo = (RoleManagerMongoDB) PhotonSecurityManager.getRoleMgr ();
 
             // Make sure we have an empty DB
-            aRoleMgr.getCollection ().drop ();
+            aRoleMgrMongo.getCollection ().drop ();
 
             // Migrate all roles
             for (final Role aRole : aRoles)
-              aRoleMgr.internalCreateMigrationRole (aRole);
+              aRoleMgrMongo.internalCreateMigrationRole (aRole);
 
             // Rename to avoid later inconsistencies
             WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
@@ -111,14 +111,14 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
           final ICommonsList <User> aUsers = aUserMgrXML.getAll ().getAllMapped (User.class::cast);
           if (aUsers.isNotEmpty ())
           {
-            final UserManagerMongoDB aUserMgr = (UserManagerMongoDB) PhotonSecurityManager.getUserMgr ();
+            final UserManagerMongoDB aUserMgrMongo = (UserManagerMongoDB) PhotonSecurityManager.getUserMgr ();
 
             // Make sure we have an empty DB
-            aUserMgr.getCollection ().drop ();
+            aUserMgrMongo.getCollection ().drop ();
 
             // Migrate all users
             for (final User aUser : aUsers)
-              aUserMgr.internalCreateMigrationUser (aUser);
+              aUserMgrMongo.internalCreateMigrationUser (aUser);
 
             // Rename to avoid later inconsistencies
             WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
@@ -148,14 +148,14 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
           final ICommonsList <UserGroup> aUserGroups = aUserGroupMgrXML.getAll ().getAllMapped (UserGroup.class::cast);
           if (aUserGroups.isNotEmpty ())
           {
-            final UserGroupManagerMongoDB aUserGroupMgr = (UserGroupManagerMongoDB) PhotonSecurityManager.getUserGroupMgr ();
+            final UserGroupManagerMongoDB aUserGroupMgrMongo = (UserGroupManagerMongoDB) PhotonSecurityManager.getUserGroupMgr ();
 
             // Make sure we have an empty DB
-            aUserGroupMgr.getCollection ().drop ();
+            aUserGroupMgrMongo.getCollection ().drop ();
 
             // Migrate all user groups
             for (final UserGroup aUserGroup : aUserGroups)
-              aUserGroupMgr.internalCreateMigrationUserGroup (aUserGroup);
+              aUserGroupMgrMongo.internalCreateMigrationUserGroup (aUserGroup);
 
             // Rename to avoid later inconsistencies
             WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
@@ -178,14 +178,14 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
           final ICommonsList <UserToken> aUserTokens = aUserTokenMgrXML.getAll ().getAllMapped (UserToken.class::cast);
           if (aUserTokens.isNotEmpty ())
           {
-            final UserTokenManagerMongoDB aUserTokenMgr = (UserTokenManagerMongoDB) PhotonSecurityManager.getUserTokenMgr ();
+            final UserTokenManagerMongoDB aUserTokenMgrMongo = (UserTokenManagerMongoDB) PhotonSecurityManager.getUserTokenMgr ();
 
             // Make sure we have an empty DB
-            aUserTokenMgr.getCollection ().drop ();
+            aUserTokenMgrMongo.getCollection ().drop ();
 
             // Migrate all users
             for (final UserToken aUserToken : aUserTokens)
-              aUserTokenMgr.internalCreateMigrationUserToken (aUserToken);
+              aUserTokenMgrMongo.internalCreateMigrationUserToken (aUserToken);
 
             // Rename to avoid later inconsistencies
             WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");

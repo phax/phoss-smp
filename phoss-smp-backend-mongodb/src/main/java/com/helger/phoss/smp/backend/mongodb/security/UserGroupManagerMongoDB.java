@@ -274,7 +274,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,
-                                              addLastModToUpdate (Updates.push (BSON_USER_GROUP_USERS, sUserID)));
+                                              addLastModToUpdate (Updates.addToSet (BSON_USER_GROUP_USERS, sUserID)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "assign-user", sUserGroupID, sUserID);
@@ -354,7 +354,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,
-                                              addLastModToUpdate (Updates.push (BSON_USER_GROUP_ROLES, sRoleID)));
+                                              addLastModToUpdate (Updates.addToSet (BSON_USER_GROUP_ROLES, sRoleID)));
     if (eChange.isChanged ())
     {
       AuditHelper.onAuditModifySuccess (UserGroup.OT, "assign-role", sUserGroupID, sRoleID);

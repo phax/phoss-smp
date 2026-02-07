@@ -71,21 +71,23 @@ public final class UserGroupManagerMongoDBTest
       assertTrue (aUserGroupMgr.unassignUserFromAllUserGroups (sUserID).isChanged ());
       assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup2ID, sUserID));
 
-      final String sRoleID = GlobalIDFactory.getNewStringID ();
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRoleID).isChanged ());
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRoleID).isChanged ());
+      final String sRole1ID = GlobalIDFactory.getNewStringID ();
+      final String sRole2ID = GlobalIDFactory.getNewStringID ();
+      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole1ID).isChanged ());
+      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole2ID).isChanged ());
+      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
 
-      final ICommonsList <String> allUserGroupIDsWithAssignedRole = aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRoleID);
+      final ICommonsList <String> allUserGroupIDsWithAssignedRole = aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRole1ID);
       assertTrue (allUserGroupIDsWithAssignedRole.contains (sUserGroup1ID));
       assertTrue (allUserGroupIDsWithAssignedRole.contains (sUserGroup2ID));
 
-      assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRoleID));
+      assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
       assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup2ID, sUserID).isChanged ());
-      assertTrue (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRoleID));
+      assertTrue (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
 
-      assertTrue (aUserGroupMgr.unassignRoleFromAllUserGroups (sRoleID).isChanged ());
-      assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRoleID));
-      assertTrue (aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRoleID).isEmpty ());
+      assertTrue (aUserGroupMgr.unassignRoleFromAllUserGroups (sRole1ID).isChanged ());
+      assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
+      assertTrue (aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRole1ID).isEmpty ());
 
       assertEquals (2, aUserGroupMgr.getAll ().size ());
       assertEquals (2, aUserGroupMgr.getAllActiveUserGroups ().size ());
@@ -104,10 +106,10 @@ public final class UserGroupManagerMongoDBTest
       assertEquals (2, aUserGroupMgr.getAllActiveUserGroups ().size ());
       assertEquals (0, aUserGroupMgr.getAllDeletedUserGroups ().size ());
 
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRoleID).isChanged ());
-      assertTrue (aUserGroupMgr.containsUserGroupWithAssignedRole (sRoleID));
-      assertTrue (aUserGroupMgr.unassignRoleFromUserGroup (sUserGroup2ID, sRoleID).isChanged ());
-      assertFalse (aUserGroupMgr.containsUserGroupWithAssignedRole (sRoleID));
+      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
+      assertTrue (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
+      assertTrue (aUserGroupMgr.unassignRoleFromUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
+      assertFalse (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
     }
   }
 }
