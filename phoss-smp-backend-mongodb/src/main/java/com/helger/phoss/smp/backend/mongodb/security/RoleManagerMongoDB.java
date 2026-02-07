@@ -21,7 +21,7 @@ import com.helger.photon.security.role.IRoleModificationCallback;
 import com.helger.photon.security.role.Role;
 import com.mongodb.client.model.Updates;
 
-public class MongoRoleManager extends AbstractMongoManager <IRole, Role> implements IRoleManager
+public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IRole, Role> implements IRoleManager
 {
   public static final String ROLE_COLLECTION_NAME = "user-roles";
 
@@ -30,7 +30,7 @@ public class MongoRoleManager extends AbstractMongoManager <IRole, Role> impleme
 
   private final CallbackList <IRoleModificationCallback> m_aCallbacks = new CallbackList <> ();
 
-  public MongoRoleManager ()
+  public RoleManagerMongoDB ()
   {
     super (ROLE_COLLECTION_NAME);
   }
@@ -71,7 +71,15 @@ public class MongoRoleManager extends AbstractMongoManager <IRole, Role> impleme
   private Role _internalCreateNewRole (@NonNull final Role aRole, final boolean bPredefined)
   {
     if (!getCollection ().insertOne (toBson (aRole)).wasAcknowledged ())
-      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    {
+      AuditHelper.onAuditCreateFailure (Role.OT,
+                                        aRole.getID (),
+                                        aRole.getName (),
+                                        aRole.getDescription (),
+                                        bPredefined ? "predefined" : "custom",
+                                        "database-error");
+      return null;
+    }
 
     AuditHelper.onAuditCreateSuccess (Role.OT,
                                       aRole.getID (),
@@ -110,7 +118,18 @@ public class MongoRoleManager extends AbstractMongoManager <IRole, Role> impleme
     if (StringHelper.isEmpty (sRoleID))
       return EChange.UNCHANGED;
 
-    return deleteEntity (sRoleID, () -> m_aCallbacks.forEach (aCB -> aCB.onRoleDeleted (sRoleID)));
+    final EChange eChange = deleteEntity (sRoleID);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditDeleteSuccess (Role.OT, sRoleID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onRoleDeleted (sRoleID));
+    }
+    else
+    {
+      AuditHelper.onAuditDeleteFailure (Role.OT, sRoleID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -125,10 +144,18 @@ public class MongoRoleManager extends AbstractMongoManager <IRole, Role> impleme
     if (StringHelper.isEmpty (sRoleID))
       return EChange.UNCHANGED;
 
-    return genericUpdate (sRoleID,
-                          Updates.set (BSON_ROLE_NAME, sNewName),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onRoleRenamed (sRoleID)));
+    final EChange eChange = genericUpdate (sRoleID, Updates.set (BSON_ROLE_NAME, sNewName), true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (Role.OT, "set-name", sRoleID, sNewName);
+
+      m_aCallbacks.forEach (aCB -> aCB.onRoleRenamed (sRoleID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (Role.OT, "set-name", sRoleID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -144,6 +171,17 @@ public class MongoRoleManager extends AbstractMongoManager <IRole, Role> impleme
                                           Updates.set (BSON_ROLE_DESCRIPTION, sNewDescription),
                                           Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs));
 
-    return genericUpdate (sRoleID, aUpdate, true, () -> m_aCallbacks.forEach (aCB -> aCB.onRoleUpdated (sRoleID)));
+    final EChange eChange = genericUpdate (sRoleID, aUpdate, true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (Role.OT, "set-all", sRoleID, sNewName, sNewDescription, aNewCustomAttrs);
+
+      m_aCallbacks.forEach (aCB -> aCB.onRoleUpdated (sRoleID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (Role.OT, "set-all", sRoleID, "no-such-id");
+    }
+    return eChange;
   }
 }

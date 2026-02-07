@@ -17,6 +17,7 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.token.accesstoken.AccessToken;
@@ -34,7 +35,8 @@ import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, UserToken> implements IUserTokenManager
+public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IUserToken, UserToken> implements
+                                     IUserTokenManager
 {
   public static final String TOKEN_COLLECTION_NAME = "user-tokens";
 
@@ -55,7 +57,7 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
   private final CallbackList <IUserTokenModificationCallback> m_aCallbacks = new CallbackList <> ();
   private final IUserManager m_aUserMgr;
 
-  public MongoUserTokenManager (@NonNull final IUserManager aUserMgr)
+  public UserTokenManagerMongoDB (@NonNull final IUserManager aUserMgr)
   {
     super (TOKEN_COLLECTION_NAME);
     ValueEnforcer.notNull (aUserMgr, "UserMgr");
@@ -71,20 +73,20 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
                                                   .append (BSON_USER_TOKEN_DESCRIPTION, aUserToken.getDescription ());
   }
 
+  @NonNull
   private List <Document> _userTokenToDocument (@NonNull final IAccessTokenList aAccessTokenList)
   {
-    return aAccessTokenList.getAllAccessTokens ()
-                           .stream ()
-                           .map (aItem -> new Document ().append (BSON_USER_TOKEN_TOKEN_STRING, aItem.getTokenString ())
-                                                         .append (BSON_USER_TOKEN_TOKEN_NOT_BEORE,
-                                                                  TypeConverter.convert (aItem.getNotBefore (),
-                                                                                         Date.class))
-                                                         .append (BSON_USER_TOKEN_TOKEN_NOT_AFTER,
-                                                                  TypeConverter.convert (aItem.getNotAfter (),
-                                                                                         Date.class))
-                                                         .append (BSON_USER_TOKEN_TOKEN_REVOCATION,
-                                                                  _revocationToDocument (aItem.getRevocationStatus ())))
-                           .toList ();
+    return new CommonsArrayList <> (aAccessTokenList.getAllAccessTokens (),
+                                    aItem -> new Document ().append (BSON_USER_TOKEN_TOKEN_STRING,
+                                                                     aItem.getTokenString ())
+                                                            .append (BSON_USER_TOKEN_TOKEN_NOT_BEORE,
+                                                                     TypeConverter.convert (aItem.getNotBefore (),
+                                                                                            Date.class))
+                                                            .append (BSON_USER_TOKEN_TOKEN_NOT_AFTER,
+                                                                     TypeConverter.convert (aItem.getNotAfter (),
+                                                                                            Date.class))
+                                                            .append (BSON_USER_TOKEN_TOKEN_REVOCATION,
+                                                                     _revocationToDocument (aItem.getRevocationStatus ())));
   }
 
   @NonNull
@@ -98,33 +100,7 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
   }
 
   @Nullable
-  private static List <AccessToken> _readAccessTokenFromDocument (@Nullable final List <Document> aAccessTokens)
-  {
-    if (aAccessTokens == null)
-      return null;
-
-    return aAccessTokens.stream ()
-                        .map (itemDoc -> new AccessToken (itemDoc.getString (BSON_USER_TOKEN_TOKEN_STRING),
-                                                          TypeConverter.convert (itemDoc.getDate (BSON_USER_TOKEN_TOKEN_NOT_BEORE),
-                                                                                 LocalDateTime.class),
-                                                          TypeConverter.convert (itemDoc.getDate (BSON_USER_TOKEN_TOKEN_NOT_AFTER),
-                                                                                 LocalDateTime.class),
-                                                          readRevocationFromDocument (itemDoc.get (BSON_USER_TOKEN_TOKEN_REVOCATION,
-                                                                                                   Document.class))))
-                        .toList ();
-  }
-
-  @Override
-  protected @NonNull UserToken toEntity (@NonNull final Document aDocument)
-  {
-    return new UserToken (populateStubObject (aDocument),
-                          _readAccessTokenFromDocument (aDocument.getList (BSON_USER_TOKEN_TOKENS, Document.class)),
-                          Objects.requireNonNull (m_aUserMgr.getUserOfID (aDocument.getString (BSON_USER_TOKEN_USER_ID))),
-                          aDocument.getString (BSON_USER_TOKEN_DESCRIPTION));
-  }
-
-  @Nullable
-  private static RevocationStatus readRevocationFromDocument (@Nullable final Document aDocument)
+  private static RevocationStatus _readRevocationFromDocument (@Nullable final Document aDocument)
   {
     if (aDocument == null)
       return null;
@@ -134,6 +110,31 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
                                  TypeConverter.convert (aDocument.getDate (BSON_USER_TOKEN_REVOCATION_TIME),
                                                         LocalDateTime.class),
                                  aDocument.getString (BSON_USER_TOKEN_REVOCATION_REASON));
+  }
+
+  @Nullable
+  private static ICommonsList <AccessToken> _readAccessTokenFromDocument (@Nullable final List <Document> aAccessTokens)
+  {
+    if (aAccessTokens == null)
+      return null;
+
+    return new CommonsArrayList <> (aAccessTokens,
+                                    aItem -> new AccessToken (aItem.getString (BSON_USER_TOKEN_TOKEN_STRING),
+                                                              TypeConverter.convert (aItem.getDate (BSON_USER_TOKEN_TOKEN_NOT_BEORE),
+                                                                                     LocalDateTime.class),
+                                                              TypeConverter.convert (aItem.getDate (BSON_USER_TOKEN_TOKEN_NOT_AFTER),
+                                                                                     LocalDateTime.class),
+                                                              _readRevocationFromDocument (aItem.get (BSON_USER_TOKEN_TOKEN_REVOCATION,
+                                                                                                      Document.class))));
+  }
+
+  @Override
+  protected @NonNull UserToken toEntity (@NonNull final Document aDocument)
+  {
+    return new UserToken (populateStubObject (aDocument),
+                          _readAccessTokenFromDocument (aDocument.getList (BSON_USER_TOKEN_TOKENS, Document.class)),
+                          Objects.requireNonNull (m_aUserMgr.getUserOfID (aDocument.getString (BSON_USER_TOKEN_USER_ID))),
+                          aDocument.getString (BSON_USER_TOKEN_DESCRIPTION));
   }
 
   @Override
@@ -151,7 +152,15 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
   {
     final UserToken aUserToken = new UserToken (sTokenString, aCustomAttrs, aUser, sDescription);
     if (!getCollection ().insertOne (toBson (aUserToken)).wasAcknowledged ())
-      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    {
+      AuditHelper.onAuditCreateFailure (UserToken.OT,
+                                        aUserToken.getID (),
+                                        aUserToken.attrs (),
+                                        aUserToken.getUserID (),
+                                        aUserToken.getDescription (),
+                                        "database-error");
+      return null;
+    }
 
     AuditHelper.onAuditCreateSuccess (UserToken.OT,
                                       aUserToken.getID (),
@@ -169,20 +178,44 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
                                            @Nullable final Map <String, String> aNewCustomAttrs,
                                            @Nullable final String sNewDescription)
   {
-    return genericUpdate (sUserTokenID,
-                          Updates.combine (Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs),
-                                           Updates.set (BSON_USER_TOKEN_DESCRIPTION, sNewDescription)),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenUpdated (sUserTokenID)));
+    if (StringHelper.isEmpty (sUserTokenID))
+      return EChange.UNCHANGED;
+
+    final EChange eChange = genericUpdate (sUserTokenID,
+                                           Updates.combine (Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs),
+                                                            Updates.set (BSON_USER_TOKEN_DESCRIPTION, sNewDescription)),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (UserToken.OT, "set-all", sUserTokenID, aNewCustomAttrs, sNewDescription);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserTokenUpdated (sUserTokenID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (UserToken.OT, "set-all", sUserTokenID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
   public @NonNull EChange deleteUserToken (@Nullable final String sUserTokenID)
   {
     if (StringHelper.isEmpty (sUserTokenID))
-      return null;
+      return EChange.UNCHANGED;
 
-    return deleteEntity (sUserTokenID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenDeleted (sUserTokenID)));
+    final EChange eChange = deleteEntity (sUserTokenID);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditDeleteSuccess (UserToken.OT, sUserTokenID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserTokenDeleted (sUserTokenID));
+    }
+    else
+    {
+      AuditHelper.onAuditDeleteFailure (UserToken.OT, sUserTokenID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -200,11 +233,27 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
     aAccessTokenList.revokeActiveAccessToken (sRevocationUserID, aRevocationDT, sRevocationReason);
     final AccessToken aNewAccessToken = aAccessTokenList.createNewAccessToken (sTokenString);
 
-    return genericUpdate (sUserTokenID,
-                          Updates.set (BSON_USER_TOKEN_TOKENS, _userTokenToDocument (aAccessTokenList)),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenCreateAccessToken (sUserTokenID,
-                                                                                               aNewAccessToken)));
+    final EChange eChange = genericUpdate (sUserTokenID,
+                                           Updates.set (BSON_USER_TOKEN_TOKENS,
+                                                        _userTokenToDocument (aAccessTokenList)),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (UserToken.OT,
+                                        "create-new-access-token",
+                                        sUserTokenID,
+                                        sRevocationUserID,
+                                        aRevocationDT,
+                                        sRevocationReason,
+                                        sTokenString);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserTokenCreateAccessToken (sUserTokenID, aNewAccessToken));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (UserToken.OT, "create-new-access-token", sUserTokenID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -218,11 +267,32 @@ public class MongoUserTokenManager extends AbstractMongoManager <IUserToken, Use
       return EChange.UNCHANGED;
 
     final AccessTokenList aAccessTokenList = aUserToken.getAccessTokenList ();
-    aAccessTokenList.revokeActiveAccessToken (sRevocationUserID, aRevocationDT, sRevocationReason);
-    return genericUpdate (sUserTokenID,
-                          Updates.set (BSON_USER_TOKEN_TOKENS, _userTokenToDocument (aAccessTokenList)),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserTokenRevokeAccessToken (sUserTokenID)));
+    if (aAccessTokenList.revokeActiveAccessToken (sRevocationUserID, aRevocationDT, sRevocationReason).isUnchanged ())
+    {
+      AuditHelper.onAuditModifyFailure (UserToken.OT, "revoke-access-token", sUserTokenID, "already-revoked");
+      return EChange.UNCHANGED;
+    }
+
+    final EChange eChange = genericUpdate (sUserTokenID,
+                                           Updates.set (BSON_USER_TOKEN_TOKENS,
+                                                        _userTokenToDocument (aAccessTokenList)),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (UserToken.OT,
+                                        "revoke-access-token",
+                                        sUserTokenID,
+                                        sRevocationUserID,
+                                        aRevocationDT,
+                                        sRevocationReason);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserTokenRevokeAccessToken (sUserTokenID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (UserToken.OT, "revoke-access-token", sUserTokenID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override

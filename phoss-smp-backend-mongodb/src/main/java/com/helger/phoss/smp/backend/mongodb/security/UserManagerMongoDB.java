@@ -29,7 +29,7 @@ import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-public class MongoUserManager extends AbstractMongoManager <IUser, User> implements IUserManager
+public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IUser, User> implements IUserManager
 {
   public static final String USER_COLLECTION_NAME = "users";
 
@@ -53,7 +53,7 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
 
   private final CallbackList <IUserModificationCallback> m_aCallbacks = new CallbackList <> ();
 
-  public MongoUserManager ()
+  public UserManagerMongoDB ()
   {
     super (USER_COLLECTION_NAME);
   }
@@ -298,16 +298,39 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final Bson update = Updates.combine (Updates.set (BSON_USER_LOGIN_NAME, sNewLoginName),
-                                         Updates.set (BSON_USER_EMAIL, sNewEmailAddress),
-                                         Updates.set (BSON_USER_FIRST_NAME, sNewFirstName),
-                                         Updates.set (BSON_USER_LAST_NAME, sNewLastName),
-                                         Updates.set (BSON_USER_DESCRIPTION, sNewDescription),
-                                         Updates.set (BSON_USER_PREFERRED_LOCALE, aNewDesiredLocale.toLanguageTag ()),
-                                         Updates.set (BSON_USER_DISABLED, Boolean.valueOf (bNewDisabled)),
-                                         Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs));
+    final EChange eChange = genericUpdate (sUserID,
+                                           Updates.combine (Updates.set (BSON_USER_LOGIN_NAME, sNewLoginName),
+                                                            Updates.set (BSON_USER_EMAIL, sNewEmailAddress),
+                                                            Updates.set (BSON_USER_FIRST_NAME, sNewFirstName),
+                                                            Updates.set (BSON_USER_LAST_NAME, sNewLastName),
+                                                            Updates.set (BSON_USER_DESCRIPTION, sNewDescription),
+                                                            Updates.set (BSON_USER_PREFERRED_LOCALE,
+                                                                         aNewDesiredLocale.toLanguageTag ()),
+                                                            Updates.set (BSON_USER_DISABLED,
+                                                                         Boolean.valueOf (bNewDisabled)),
+                                                            Updates.set (BSON_ATTRIBUTES, aNewCustomAttrs)),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (User.OT,
+                                        "set-all",
+                                        sUserID,
+                                        sNewLoginName,
+                                        sNewEmailAddress,
+                                        sNewFirstName,
+                                        sNewLastName,
+                                        sNewDescription,
+                                        aNewDesiredLocale,
+                                        aNewCustomAttrs,
+                                        Boolean.valueOf (bNewDisabled));
 
-    return genericUpdate (sUserID, update, true, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+      m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (User.OT, "set-all", sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -316,20 +339,33 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    final PasswordHash userDefaultPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
-                                                                                                       sNewPlainTextPassword);
+    final PasswordHash aPasswordHash = GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                                             sNewPlainTextPassword);
+    final EChange eChange = genericUpdate (sUserID,
+                                           Updates.combine (Updates.set (BSON_USER_PASSWORD +
+                                                                         "." +
+                                                                         BSON_USER_PASSWORD_ALGO,
+                                                                         aPasswordHash.getAlgorithmName ()),
+                                                            Updates.set (BSON_USER_PASSWORD +
+                                                                         "." +
+                                                                         BSON_USER_PASSWORD_SALT,
+                                                                         aPasswordHash.getSaltAsString ()),
+                                                            Updates.set (BSON_USER_PASSWORD +
+                                                                         "." +
+                                                                         BSON_USER_PASSWORD_HASH,
+                                                                         aPasswordHash.getPasswordHashValue ())),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (User.OT, "set-password", sUserID);
 
-    final Bson update = Updates.combine (Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_ALGO,
-                                                      userDefaultPasswordHash.getAlgorithmName ()),
-                                         Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_SALT,
-                                                      userDefaultPasswordHash.getSaltAsString ()),
-                                         Updates.set (BSON_USER_PASSWORD + "." + BSON_USER_PASSWORD_HASH,
-                                                      userDefaultPasswordHash.getPasswordHashValue ()));
-
-    return genericUpdate (sUserID,
-                          update,
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserPasswordChanged (sUserID)));
+      m_aCallbacks.forEach (aCB -> aCB.onUserPasswordChanged (sUserID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (User.OT, "set-password", sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -338,12 +374,23 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    return genericUpdate (sUserID,
-                          Updates.combine (Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
-                                           Updates.inc (BSON_USER_LOGIN_COUNT, Integer.valueOf (1)),
-                                           Updates.set (BSON_USER_FAILED_LOGIN_COUNT, Integer.valueOf (0))),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    final EChange eChange = genericUpdate (sUserID,
+                                           Updates.combine (Updates.set (BSON_USER_LAST_LOGIN, LocalDateTime.now ()),
+                                                            Updates.inc (BSON_USER_LOGIN_COUNT, Integer.valueOf (1)),
+                                                            Updates.set (BSON_USER_FAILED_LOGIN_COUNT,
+                                                                         Integer.valueOf (0))),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (User.OT, "update-last-login", sUserID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (User.OT, "update-last-login", sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -352,10 +399,20 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    return genericUpdate (sUserID,
-                          Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, Integer.valueOf (1)),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserLastFailedLoginUpdated (sUserID)));
+    final EChange eChange = genericUpdate (sUserID,
+                                           Updates.inc (BSON_USER_FAILED_LOGIN_COUNT, Integer.valueOf (1)),
+                                           true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (User.OT, "set-last-failed-login", sUserID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserLastFailedLoginUpdated (sUserID));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (User.OT, "update-last-failed-login", sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -364,7 +421,18 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    return deleteEntity (sUserID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserDeleted (sUserID)));
+    final EChange eChange = deleteEntity (sUserID);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditDeleteSuccess (User.OT, sUserID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserDeleted (sUserID));
+    }
+    else
+    {
+      AuditHelper.onAuditDeleteFailure (User.OT, sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -373,7 +441,18 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    return undeleteEntity (sUserID, () -> m_aCallbacks.forEach (aCB -> aCB.onUserUndeleted (sUserID)));
+    final EChange eChange = undeleteEntity (sUserID);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditUndeleteSuccess (User.OT, sUserID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserUndeleted (sUserID));
+    }
+    else
+    {
+      AuditHelper.onAuditUndeleteFailure (User.OT, sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -382,10 +461,18 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    return genericUpdate (sUserID,
-                          Updates.set (BSON_USER_DISABLED, Boolean.TRUE),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    final EChange eChange = genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, Boolean.TRUE), true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (User.OT, "disable", sUserID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserEnabled (sUserID, false));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (User.OT, "disable", sUserID, "no-such-id");
+    }
+    return eChange;
   }
 
   @Override
@@ -394,9 +481,17 @@ public class MongoUserManager extends AbstractMongoManager <IUser, User> impleme
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    return genericUpdate (sUserID,
-                          Updates.set (BSON_USER_DISABLED, Boolean.FALSE),
-                          true,
-                          () -> m_aCallbacks.forEach (aCB -> aCB.onUserUpdated (sUserID)));
+    final EChange eChange = genericUpdate (sUserID, Updates.set (BSON_USER_DISABLED, Boolean.FALSE), true);
+    if (eChange.isChanged ())
+    {
+      AuditHelper.onAuditModifySuccess (User.OT, "enable", sUserID);
+
+      m_aCallbacks.forEach (aCB -> aCB.onUserEnabled (sUserID, true));
+    }
+    else
+    {
+      AuditHelper.onAuditModifyFailure (User.OT, "enable", sUserID, "no-such-id");
+    }
+    return eChange;
   }
 }

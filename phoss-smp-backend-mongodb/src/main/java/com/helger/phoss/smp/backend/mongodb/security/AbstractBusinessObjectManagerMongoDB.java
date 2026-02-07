@@ -12,9 +12,7 @@ import org.bson.types.ObjectId;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
-import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.IHasID;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
@@ -22,19 +20,18 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.helper.PDTFactory;
-import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.phoss.smp.backend.mongodb.mgr.AbstractManagerMongoDB;
 import com.helger.photon.io.mgr.IPhotonManager;
 import com.helger.photon.security.object.BusinessObjectHelper;
 import com.helger.photon.security.object.StubObject;
 import com.helger.tenancy.IBusinessObject;
 import com.helger.typeconvert.impl.TypeConverter;
-import com.mongodb.WriteConcern;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL extends TINT> implements
-                                           IPhotonManager <TINT>
+public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID <String>, TIMPL extends TINT> extends
+                                                           AbstractManagerMongoDB implements
+                                                           IPhotonManager <TINT>
 {
   protected static final String BSON_ID = "id";
   protected static final String BSON_CREATION_TIME = "creationdt";
@@ -45,43 +42,20 @@ public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL 
   protected static final String BSON_DELETED_USER_ID = "deleteuserid";
   protected static final String BSON_ATTRIBUTES = "attrs";
 
-  private final String m_sCollectionName;
-  private final MongoCollection <Document> m_aCollection;
-
-  protected AbstractMongoManager (final String sCollectionName)
+  protected AbstractBusinessObjectManagerMongoDB (final String sCollectionName)
   {
-    ValueEnforcer.notNull (sCollectionName, "CollectionName");
-    m_sCollectionName = sCollectionName;
-    m_aCollection = MongoClientSingleton.getInstance ()
-                                        .getCollection (sCollectionName)
-                                        .withWriteConcern (WriteConcern.MAJORITY.withJournal (Boolean.TRUE));
+    super (sCollectionName);
   }
 
   protected abstract @NonNull Document toBson (@NonNull TINT aPojo);
 
   protected abstract @NonNull TIMPL toEntity (@NonNull Document aBson);
 
-  @Override
-  public @NonNull <T1> ICommonsList <T1> getNone ()
+  @NonNull
+  @ReturnsMutableCopy
+  public <T> ICommonsList <T> getNone ()
   {
     return new CommonsArrayList <> ();
-  }
-
-  /**
-   * @return The name of the collection as provided in the constructor. Neither <code>null</code>
-   *         nor empty.
-   */
-  @NonNull
-  @Nonempty
-  public final String getCollectionName ()
-  {
-    return m_sCollectionName;
-  }
-
-  @NonNull
-  protected final MongoCollection <Document> getCollection ()
-  {
-    return m_aCollection;
   }
 
   @NonNull
@@ -101,8 +75,7 @@ public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL 
   @NonNull
   protected EChange genericUpdate (@Nullable final String sDocumentID,
                                    @NonNull final Bson aUpdate,
-                                   final boolean bUpdateLastModification,
-                                   @Nullable final Runnable aUpdateCallback)
+                                   final boolean bUpdateLastModification)
   {
     if (StringHelper.isEmpty (sDocumentID))
       return EChange.UNCHANGED;
@@ -111,32 +84,26 @@ public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL 
                                                          bUpdateLastModification ? addLastModToUpdate (aUpdate)
                                                                                  : aUpdate).getMatchedCount ();
 
-    final EChange eChange = EChange.valueOf (nMatchCount > 0);
-    if (eChange.isChanged () && aUpdateCallback != null)
-      aUpdateCallback.run ();
-
-    return eChange;
+    return EChange.valueOf (nMatchCount > 0);
   }
 
   @NonNull
-  public EChange deleteEntity (@Nullable final String sEntityId, @Nullable final Runnable aCallback)
+  public EChange deleteEntity (@Nullable final String sEntityId)
   {
     return genericUpdate (sEntityId,
                           Updates.combine (Updates.set (BSON_DELETED_TIME, PDTFactory.getCurrentLocalDateTime ()),
                                            Updates.set (BSON_DELETED_USER_ID,
                                                         BusinessObjectHelper.getUserIDOrFallback ())),
-                          false,
-                          aCallback);
+                          false);
   }
 
   @NonNull
-  public EChange undeleteEntity (@Nullable final String sEntityId, @Nullable final Runnable aCallback)
+  public EChange undeleteEntity (@Nullable final String sEntityId)
   {
     return genericUpdate (sEntityId,
                           Updates.combine (Updates.set (BSON_DELETED_TIME, null),
                                            Updates.set (BSON_DELETED_USER_ID, null)),
-                          false,
-                          aCallback);
+                          false);
   }
 
   protected @Nullable TIMPL findFirst (@NonNull final Bson filter)
@@ -167,7 +134,17 @@ public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL 
     return ret;
   }
 
-  @Override
+  @ReturnsMutableCopy
+  protected @NonNull ICommonsList <@NonNull String> findAllIDs (@Nullable final Bson aFilter)
+  {
+    final ICommonsList <String> ret = new CommonsArrayList <> ();
+    if (aFilter != null)
+      getCollection ().find (aFilter).forEach (aDoc -> ret.add (aDoc.getString (BSON_ID)));
+    else
+      getCollection ().find ().forEach (aDoc -> ret.add (aDoc.getString (BSON_ID)));
+    return ret;
+  }
+
   @ReturnsMutableCopy
   public @NonNull ICommonsList <@NonNull TINT> getAll ()
   {
@@ -189,7 +166,6 @@ public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL 
     return findAll (Filters.ne (BSON_DELETED_TIME, null));
   }
 
-  @Override
   public boolean containsWithID (@Nullable final String sID)
   {
     if (StringHelper.isEmpty (sID))
@@ -198,7 +174,6 @@ public abstract class AbstractMongoManager <TINT extends IHasID <String>, TIMPL 
     return getCollection ().find (_whereId (sID)).first () != null;
   }
 
-  @Override
   public boolean containsAllIDs (@Nullable final Iterable <String> aIDs)
   {
     if (aIDs == null)

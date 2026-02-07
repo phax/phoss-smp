@@ -75,7 +75,7 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
   }
 
   @NonNull
-  protected final MongoCollection <Document> getCollection ()
+  public final MongoCollection <Document> getCollection ()
   {
     return m_aCollection;
   }

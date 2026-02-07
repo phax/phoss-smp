@@ -17,10 +17,10 @@
 package com.helger.phoss.smp.backend.mongodb;
 
 import com.helger.phoss.smp.backend.mongodb.audit.AuditManagerMongoDB;
-import com.helger.phoss.smp.backend.mongodb.security.MongoRoleManager;
-import com.helger.phoss.smp.backend.mongodb.security.MongoUserGroupManager;
-import com.helger.phoss.smp.backend.mongodb.security.MongoUserManager;
-import com.helger.phoss.smp.backend.mongodb.security.MongoUserTokenManager;
+import com.helger.phoss.smp.backend.mongodb.security.RoleManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.UserGroupManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.UserManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.UserTokenManagerMongoDB;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
@@ -40,24 +40,24 @@ public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManage
   @NonNull
   public IUserManager createUserMgr ()
   {
-    return new MongoUserManager ();
+    return new UserManagerMongoDB ();
   }
 
   @NonNull
   public IRoleManager createRoleMgr ()
   {
-    return new MongoRoleManager ();
+    return new RoleManagerMongoDB ();
   }
 
   @NonNull
   public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr, @NonNull final IRoleManager aRoleMgr)
   {
-    return new MongoUserGroupManager (aUserMgr, aRoleMgr);
+    return new UserGroupManagerMongoDB (aUserMgr, aRoleMgr);
   }
 
   @NonNull
   public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr)
   {
-    return new MongoUserTokenManager (aUserMgr);
+    return new UserTokenManagerMongoDB (aUserMgr);
   }
 }
