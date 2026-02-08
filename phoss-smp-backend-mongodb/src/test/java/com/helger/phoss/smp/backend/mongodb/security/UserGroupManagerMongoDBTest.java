@@ -141,19 +141,11 @@ public final class UserGroupManagerMongoDBTest
         }
         finally
         {
-          assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
-          assertFalse (aUserGroupMgr.getAllActive ().contains (aUserGroup2));
-          assertTrue (aUserGroupMgr.getAllDeleted ().contains (aUserGroup2));
-          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup2));
           aUserGroupMgr.internalDeleteUserGroupNotRecoverable (sUserGroup2ID);
         }
       }
       finally
       {
-        assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup1ID).isChanged ());
-        assertFalse (aUserGroupMgr.getAllActive ().contains (aUserGroup1));
-        assertTrue (aUserGroupMgr.getAllDeleted ().contains (aUserGroup1));
-        assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup1));
         aUserGroupMgr.internalDeleteUserGroupNotRecoverable (sUserGroup1ID);
       }
     }

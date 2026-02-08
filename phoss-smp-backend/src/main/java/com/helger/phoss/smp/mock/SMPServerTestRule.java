@@ -17,10 +17,10 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.app.mock.PhotonAppWebTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.user.IUserManager;
 
 /**
- * Special SMP server JUnit test rule. This test rules DOES NOT spawn a server
- * process.
+ * Special SMP server JUnit test rule. This test rules DOES NOT spawn a server process.
  *
  * @author Philip Helger
  */
@@ -36,17 +36,18 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
 
     SMPMetaManager.initBackendFromConfiguration ();
 
-    PhotonSecurityManager.getUserMgr ()
-                         .createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
-                                                CSecurity.USER_ADMINISTRATOR_LOGIN,
-                                                CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                CSecurity.USER_ADMINISTRATOR_PASSWORD,
-                                                "SMP",
-                                                "Admin",
-                                                "Description",
-                                                Locale.US,
-                                                (Map <String, String>) null,
-                                                false);
+    final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
+    if (!aUserMgr.containsWithID (CSecurity.USER_ADMINISTRATOR_ID))
+      aUserMgr.createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
+                                     CSecurity.USER_ADMINISTRATOR_EMAIL,
+                                     CSecurity.USER_ADMINISTRATOR_EMAIL,
+                                     CSecurity.USER_ADMINISTRATOR_PASSWORD,
+                                     "Test Firstname",
+                                     "Test Lastname",
+                                     "Test Description",
+                                     Locale.US,
+                                     (Map <String, String>) null,
+                                     false);
   }
 
   @Override

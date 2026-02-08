@@ -143,11 +143,25 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     return m_aCallbacks;
   }
 
-  @NonNull
+  @Nullable
   private User _internalCreateNewUser (@NonNull final User aUser, final boolean bPredefined)
   {
     if (!getCollection ().insertOne (toBson (aUser)).wasAcknowledged ())
-      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    {
+      AuditHelper.onAuditCreateFailure (User.OT,
+                                        aUser.getID (),
+                                        aUser.getLoginName (),
+                                        aUser.getEmailAddress (),
+                                        aUser.getFirstName (),
+                                        aUser.getLastName (),
+                                        aUser.getDescription (),
+                                        aUser.getDesiredLocale (),
+                                        aUser.attrs (),
+                                        Boolean.valueOf (aUser.isDisabled ()),
+                                        bPredefined ? "predefined" : "custom",
+                                        "database-error");
+      return null;
+    }
 
     AuditHelper.onAuditCreateSuccess (User.OT,
                                       aUser.getID (),
