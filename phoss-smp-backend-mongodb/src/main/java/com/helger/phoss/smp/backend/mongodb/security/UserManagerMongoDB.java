@@ -29,6 +29,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.DevelopersNote;
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
@@ -44,6 +45,7 @@ import com.helger.security.password.hash.PasswordHash;
 import com.helger.security.password.salt.PasswordSalt;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 
 public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IUser, User> implements IUserManager
@@ -73,6 +75,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   public UserManagerMongoDB ()
   {
     super (USER_COLLECTION_NAME);
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @NonNull
@@ -471,6 +474,12 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
       AuditHelper.onAuditDeleteFailure (User.OT, sUserID, "no-such-id");
     }
     return eChange;
+  }
+
+  @VisibleForTesting
+  void internalDeleteUserNotRecoverable (@NonNull final String sUserID)
+  {
+    getCollection ().deleteOne (Filters.eq (BSON_ID, sUserID));
   }
 
   @Override

@@ -18,8 +18,6 @@ package com.helger.phoss.smp.backend.mongodb.security;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.bson.Document;
@@ -27,13 +25,16 @@ import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.id.IHasID;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.phoss.smp.backend.mongodb.mgr.AbstractManagerMongoDB;
 import com.helger.photon.io.mgr.IPhotonManager;
@@ -58,7 +59,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   protected static final String BSON_DELETED_USER_ID = "deleteuserid";
   protected static final String BSON_ATTRIBUTES = "attrs";
 
-  protected AbstractBusinessObjectManagerMongoDB (final String sCollectionName)
+  protected AbstractBusinessObjectManagerMongoDB (@NonNull @Nonempty final String sCollectionName)
   {
     super (sCollectionName);
   }
@@ -75,9 +76,9 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @NonNull
-  private Bson _whereId (final String sId)
+  private Bson _whereID (@NonNull final String sID)
   {
-    return Filters.eq (BSON_ID, sId);
+    return Filters.eq (BSON_ID, sID);
   }
 
   @NonNull
@@ -89,12 +90,12 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @NonNull
-  protected EChange genericUpdateOne (@Nullable final String sDocumentID, @NonNull final Bson aUpdate)
+  protected EChange genericUpdateOne (@Nullable final String sID, @NonNull final Bson aUpdate)
   {
-    if (StringHelper.isEmpty (sDocumentID))
+    if (StringHelper.isEmpty (sID))
       return EChange.UNCHANGED;
 
-    final UpdateResult aUpdateResult = getCollection ().updateOne (_whereId (sDocumentID), aUpdate);
+    final UpdateResult aUpdateResult = getCollection ().updateOne (_whereID (sID), aUpdate);
 
     // Was an element changed?
     if (aUpdateResult.getModifiedCount () == 0)
@@ -104,18 +105,18 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @NonNull
-  public EChange deleteEntity (@Nullable final String sEntityID)
+  public EChange deleteEntity (@Nullable final String sID)
   {
-    return genericUpdateOne (sEntityID,
+    return genericUpdateOne (sID,
                              Updates.combine (Updates.set (BSON_DELETED_TIME, PDTFactory.getCurrentLocalDateTime ()),
                                               Updates.set (BSON_DELETED_USER_ID,
                                                            BusinessObjectHelper.getUserIDOrFallback ())));
   }
 
   @NonNull
-  public EChange undeleteEntity (@Nullable final String sEntityID)
+  public EChange undeleteEntity (@Nullable final String sID)
   {
-    return genericUpdateOne (sEntityID,
+    return genericUpdateOne (sID,
                              Updates.combine (Updates.set (BSON_DELETED_TIME, null),
                                               Updates.set (BSON_DELETED_USER_ID, null)));
   }
@@ -134,7 +135,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (StringHelper.isEmpty (sID))
       return null;
 
-    return findFirst (_whereId (sID));
+    return findFirst (_whereID (sID));
   }
 
   @ReturnsMutableCopy
@@ -185,7 +186,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (StringHelper.isEmpty (sID))
       return false;
 
-    return getCollection ().find (_whereId (sID)).first () != null;
+    return getCollection ().find (_whereID (sID)).first () != null;
   }
 
   public boolean containsAllIDs (@Nullable final Iterable <String> aIDs)
@@ -219,13 +220,13 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @Nullable
-  private static Map <String, String> _readAttrs (final Document aDocument)
+  private static ICommonsMap <String, String> _readAttrs (@NonNull final Document aDocument)
   {
     final Document aAttrs = aDocument.get (BSON_ATTRIBUTES, Document.class);
     if (aAttrs == null || aAttrs.isEmpty ())
       return null;
 
-    final Map <String, String> ret = new HashMap <> (aAttrs.size ());
+    final ICommonsMap <String, String> ret = new CommonsHashMap <> (aAttrs.size ());
     aAttrs.forEach ( (key, value) -> ret.put (key, String.valueOf (value)));
     return ret;
   }

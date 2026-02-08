@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
@@ -30,6 +29,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
@@ -50,6 +50,7 @@ import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 
 public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IUserToken, UserToken> implements
@@ -79,19 +80,11 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     super (TOKEN_COLLECTION_NAME);
     ValueEnforcer.notNull (aUserMgr, "UserMgr");
     m_aUserMgr = aUserMgr;
-  }
-
-  @Override
-  protected @NonNull Document toBson (@NonNull final IUserToken aUserToken)
-  {
-    return getDefaultBusinessDocument (aUserToken).append (BSON_USER_TOKEN_USER_ID, aUserToken.getUserID ())
-                                                  .append (BSON_USER_TOKEN_TOKENS,
-                                                           _userTokenToDocument (aUserToken.getAccessTokenList ()))
-                                                  .append (BSON_USER_TOKEN_DESCRIPTION, aUserToken.getDescription ());
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @NonNull
-  private List <Document> _userTokenToDocument (@NonNull final IAccessTokenList aAccessTokenList)
+  private ICommonsList <Document> _userTokenToDocument (@NonNull final IAccessTokenList aAccessTokenList)
   {
     return new CommonsArrayList <> (aAccessTokenList.getAllAccessTokens (),
                                     aItem -> new Document ().append (BSON_USER_TOKEN_TOKEN_STRING,
@@ -104,6 +97,15 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
                                                                                             Date.class))
                                                             .append (BSON_USER_TOKEN_TOKEN_REVOCATION,
                                                                      _revocationToDocument (aItem.getRevocationStatus ())));
+  }
+
+  @Override
+  protected @NonNull Document toBson (@NonNull final IUserToken aUserToken)
+  {
+    return getDefaultBusinessDocument (aUserToken).append (BSON_USER_TOKEN_USER_ID, aUserToken.getUserID ())
+                                                  .append (BSON_USER_TOKEN_TOKENS,
+                                                           _userTokenToDocument (aUserToken.getAccessTokenList ()))
+                                                  .append (BSON_USER_TOKEN_DESCRIPTION, aUserToken.getDescription ());
   }
 
   @NonNull
@@ -148,9 +150,14 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   @Override
   protected @NonNull UserToken toEntity (@NonNull final Document aDocument)
   {
+    final String sUserID = aDocument.getString (BSON_USER_TOKEN_USER_ID);
+    final IUser aResolvedUser = m_aUserMgr.getUserOfID (sUserID);
+    if (aResolvedUser == null)
+      throw new IllegalStateException ("Failed to resolve user with ID '" + sUserID + "'");
+
     return new UserToken (populateStubObject (aDocument),
                           _readAccessTokenFromDocument (aDocument.getList (BSON_USER_TOKEN_TOKENS, Document.class)),
-                          Objects.requireNonNull (m_aUserMgr.getUserOfID (aDocument.getString (BSON_USER_TOKEN_USER_ID))),
+                          aResolvedUser,
                           aDocument.getString (BSON_USER_TOKEN_DESCRIPTION));
   }
 
@@ -245,6 +252,12 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       AuditHelper.onAuditDeleteFailure (UserToken.OT, sUserTokenID, "no-such-id");
     }
     return eChange;
+  }
+
+  @VisibleForTesting
+  void internalDeleteUserTokenNotRecoverable (@NonNull final String sUserTokenID)
+  {
+    getCollection ().deleteOne (Filters.eq (BSON_ID, sUserTokenID));
   }
 
   @Override

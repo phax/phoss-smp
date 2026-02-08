@@ -26,6 +26,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
@@ -35,6 +36,8 @@ import com.helger.photon.security.role.IRole;
 import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.role.IRoleModificationCallback;
 import com.helger.photon.security.role.Role;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 
 public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IRole, Role> implements IRoleManager
@@ -49,6 +52,7 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
   public RoleManagerMongoDB ()
   {
     super (ROLE_COLLECTION_NAME);
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @NonNull
@@ -153,6 +157,12 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
       AuditHelper.onAuditDeleteFailure (Role.OT, sRoleID, "no-such-id");
     }
     return eChange;
+  }
+
+  @VisibleForTesting
+  void internalDeleteRoleNotRecoverable (@NonNull final String sRoleID)
+  {
+    getCollection ().deleteOne (Filters.eq (BSON_ID, sRoleID));
   }
 
   @Override

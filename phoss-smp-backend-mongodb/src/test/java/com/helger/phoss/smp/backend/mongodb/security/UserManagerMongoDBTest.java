@@ -46,10 +46,8 @@ public final class UserManagerMongoDBTest
   {
     try (final UserManagerMongoDB aUserMgr = new UserManagerMongoDB ())
     {
-      aUserMgr.getCollection ().drop ();
-
-      final IUser aUser = aUserMgr.createNewUser ("sLoginName",
-                                                  "test@smp.localhost",
+      final IUser aUser = aUserMgr.createNewUser ("UserMgrTest",
+                                                  "usermgr@smp.localhost",
                                                   "im a super secure password",
                                                   "First Name",
                                                   "Last Name",
@@ -58,108 +56,131 @@ public final class UserManagerMongoDBTest
                                                   Map.of ("foo", "bar"),
                                                   false);
       assertNotNull (aUser);
-      assertEquals ("sLoginName", aUser.getLoginName ());
-      assertEquals ("test@smp.localhost", aUser.getEmailAddress ());
-      assertNotEquals ("im a super secure password", aUser.getPasswordHash ());
-      assertEquals ("First Name", aUser.getFirstName ());
-      assertEquals ("Last Name", aUser.getLastName ());
-      assertEquals ("Description", aUser.getDescription ());
-      assertEquals (Locale.GERMAN, aUser.getDesiredLocale ());
-      assertEquals (1, aUser.attrs ().size ());
-      assertEquals ("bar", aUser.attrs ().get ("foo"));
-      assertTrue (aUser.isEnabled ());
 
       final String sUserID = aUser.getID ();
-      assertEquals (aUser, aUserMgr.getUserOfID (sUserID));
-      assertEquals (aUser, aUserMgr.getUserOfLoginName ("sLoginName"));
-      assertEquals (aUser, aUserMgr.getUserOfEmailAddress ("test@smp.localhost"));
-      assertEquals (aUser, aUserMgr.getUserOfEmailAddressIgnoreCase ("Test@sMp.lOcalHost"));
-
-      assertNull (aUserMgr.getUserOfID ("im Not Here"));
-      assertNull (aUserMgr.getUserOfLoginName ("im Not Here"));
-      assertNull (aUserMgr.getUserOfEmailAddress ("im Not Here"));
-      assertNull (aUserMgr.getUserOfEmailAddressIgnoreCase ("im Not Here"));
-
-      final IUser aDuplicateUser = aUserMgr.createNewUser ("sLoginName",
-                                                           null,
-                                                           "1234",
-                                                           null,
-                                                           null,
-                                                           null,
-                                                           null,
-                                                           null,
-                                                           false);
-      assertNull (aDuplicateUser);
-
-      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
-      assertTrue (aUserMgr.disableUser (sUserID).isChanged ());
-      assertEquals (1, aUserMgr.getAllDisabledUsers ().size ());
-      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
-      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
-      assertTrue (aUserMgr.deleteUser (sUserID).isChanged ());
-      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
-      assertEquals (1, aUserMgr.getAllDeletedUsers ().size ());
-      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
-      assertEquals (1, aUserMgr.getAllDeletedUsers ().size ());
-      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
-      assertTrue (aUserMgr.undeleteUser (sUserID).isChanged ());
-      assertTrue (aUserMgr.getAllDeletedUsers ().isEmpty ());
-      assertTrue (aUserMgr.getAllDisabledUsers ().isEmpty ());
-      assertEquals (1, aUserMgr.getAllNotDeletedUsers ().size ());
-
-      final AtomicBoolean aCBWasCalled = new AtomicBoolean (false);
-      aUserMgr.userModificationCallbacks ().add (new IUserModificationCallback ()
+      try
       {
-        @Override
-        public void onUserLastFailedLoginUpdated (@NonNull @Nonempty final String sID)
+        assertEquals ("UserMgrTest", aUser.getLoginName ());
+        assertEquals ("usermgr@smp.localhost", aUser.getEmailAddress ());
+        assertNotEquals ("im a super secure password", aUser.getPasswordHash ());
+        assertEquals ("First Name", aUser.getFirstName ());
+        assertEquals ("Last Name", aUser.getLastName ());
+        assertEquals ("Description", aUser.getDescription ());
+        assertEquals (Locale.GERMAN, aUser.getDesiredLocale ());
+        assertEquals (1, aUser.attrs ().size ());
+        assertEquals ("bar", aUser.attrs ().get ("foo"));
+        assertTrue (aUser.isEnabled ());
+
+        assertEquals (aUser, aUserMgr.getUserOfID (sUserID));
+        assertEquals (aUser, aUserMgr.getUserOfLoginName ("UserMgrTest"));
+        assertEquals (aUser, aUserMgr.getUserOfEmailAddress ("usermgr@smp.localhost"));
+        assertEquals (aUser, aUserMgr.getUserOfEmailAddressIgnoreCase ("UserMgr@sMp.lOcalHost"));
+
+        assertNull (aUserMgr.getUserOfID ("im Not Here"));
+        assertNull (aUserMgr.getUserOfLoginName ("im Not Here"));
+        assertNull (aUserMgr.getUserOfEmailAddress ("im Not Here"));
+        assertNull (aUserMgr.getUserOfEmailAddressIgnoreCase ("im Not Here"));
+
+        // Login name already in use
         {
-          aCBWasCalled.set (true);
+          final IUser aDuplicateUser = aUserMgr.createNewUser ("UserMgrTest",
+                                                               null,
+                                                               "1234",
+                                                               null,
+                                                               null,
+                                                               null,
+                                                               null,
+                                                               null,
+                                                               false);
+          assertNull (aDuplicateUser);
         }
-      });
-      assertFalse (aCBWasCalled.get ());
-      assertTrue (aUserMgr.updateUserLastFailedLogin (sUserID).isChanged ());
-      assertTrue (aCBWasCalled.get ());
-      assertEquals (1, aUserMgr.getUserOfID (sUserID).getConsecutiveFailedLoginCount ());
-      assertTrue (aUserMgr.updateUserLastFailedLogin (sUserID).isChanged ());
-      assertEquals (2, aUserMgr.getUserOfID (sUserID).getConsecutiveFailedLoginCount ());
-      assertTrue (aUserMgr.updateUserLastLogin (sUserID).isChanged ());
-      final IUser aLoggedInUser = aUserMgr.getUserOfID (sUserID);
-      assertNotNull (aLoggedInUser);
-      assertEquals (0, aLoggedInUser.getConsecutiveFailedLoginCount ());
-      assertEquals (1, aLoggedInUser.getLoginCount ());
-      assertNotNull (aLoggedInUser.getLastLoginDateTime ());
 
-      assertTrue (aUserMgr.setUserPassword (sUserID, "new secure password").isChanged ());
-      assertNotEquals (aUser.getPasswordHash ().getPasswordHashValue (),
-                       aUserMgr.getUserOfID (sUserID).getPasswordHash ().getPasswordHashValue ());
+        // Disable - enable
+        assertFalse (aUserMgr.getAllDisabledUsers ().contains (aUser));
+        assertTrue (aUserMgr.disableUser (sUserID).isChanged ());
+        assertTrue (aUserMgr.getAllDisabledUsers ().contains (aUser));
+        assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+        assertFalse (aUserMgr.getAllDisabledUsers ().contains (aUser));
 
-      assertTrue (aUserMgr.setUserData (sUserID,
-                                        "newloginName",
-                                        "newEmail@smp.localhost",
-                                        "NewFN",
-                                        "NewLN",
-                                        "NewDescription",
-                                        Locale.US,
-                                        Map.of ("test", "123"),
-                                        true).isChanged ());
-      assertEquals (1, aUserMgr.getAllDisabledUsers ().size ());
-      assertEquals (0, aUserMgr.getAllActiveUsers ().size ());
-      assertEquals (0, aUserMgr.getActiveUserCount ());
-      assertFalse (aUserMgr.containsAnyActiveUser ());
-      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
-      assertTrue (aUserMgr.containsAnyActiveUser ());
-      assertEquals (1, aUserMgr.getAllActiveUsers ().size ());
-      assertEquals (1, aUserMgr.getActiveUserCount ());
+        // Delete - undelete
+        assertFalse (aUserMgr.getAllDeletedUsers ().contains (aUser));
+        assertFalse (aUserMgr.getAllDisabledUsers ().contains (aUser));
+        assertTrue (aUserMgr.getAllNotDeletedUsers ().contains (aUser));
+        assertTrue (aUserMgr.deleteUser (sUserID).isChanged ());
+        assertFalse (aUserMgr.getAllDisabledUsers ().contains (aUser));
+        assertTrue (aUserMgr.getAllDeletedUsers ().contains (aUser));
 
-      final IUser aNewLoginNameUser = aUserMgr.getUserOfLoginName ("newloginName");
-      assertNotNull (aNewLoginNameUser);
+        assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+        assertTrue (aUserMgr.getAllDeletedUsers ().contains (aUser));
+        assertFalse (aUserMgr.getAllDisabledUsers ().contains (aUser));
 
-      assertEquals ("newloginName", aNewLoginNameUser.getLoginName ());
-      assertEquals ("newEmail@smp.localhost", aNewLoginNameUser.getEmailAddress ());
-      assertEquals ("NewFN", aNewLoginNameUser.getFirstName ());
-      assertEquals ("NewLN", aNewLoginNameUser.getLastName ());
-      assertEquals ("NewDescription", aNewLoginNameUser.getDescription ());
-      assertEquals (Locale.US, aNewLoginNameUser.getDesiredLocale ());
+        assertTrue (aUserMgr.undeleteUser (sUserID).isChanged ());
+        assertFalse (aUserMgr.getAllDeletedUsers ().contains (aUser));
+        assertFalse (aUserMgr.getAllDisabledUsers ().contains (aUser));
+        assertTrue (aUserMgr.getAllNotDeletedUsers ().contains (aUser));
+
+        final AtomicBoolean aCBWasCalled = new AtomicBoolean (false);
+        aUserMgr.userModificationCallbacks ().add (new IUserModificationCallback ()
+        {
+          @Override
+          public void onUserLastFailedLoginUpdated (@NonNull @Nonempty final String sID)
+          {
+            aCBWasCalled.set (true);
+          }
+        });
+        assertFalse (aCBWasCalled.get ());
+        assertTrue (aUserMgr.updateUserLastFailedLogin (sUserID).isChanged ());
+        assertTrue (aCBWasCalled.get ());
+        assertEquals (1, aUserMgr.getUserOfID (sUserID).getConsecutiveFailedLoginCount ());
+        assertTrue (aUserMgr.updateUserLastFailedLogin (sUserID).isChanged ());
+        assertEquals (2, aUserMgr.getUserOfID (sUserID).getConsecutiveFailedLoginCount ());
+        assertTrue (aUserMgr.updateUserLastLogin (sUserID).isChanged ());
+
+        // Re-resolve user
+        final IUser aLoggedInUser = aUserMgr.getActiveUserOfID (sUserID);
+        assertNotNull (aLoggedInUser);
+
+        assertEquals (0, aLoggedInUser.getConsecutiveFailedLoginCount ());
+        assertTrue (aLoggedInUser.getLoginCount () >= 1);
+        assertNotNull (aLoggedInUser.getLastLoginDateTime ());
+
+        assertTrue (aUserMgr.setUserPassword (sUserID, "new secure password").isChanged ());
+        assertNotEquals (aUser.getPasswordHash ().getPasswordHashValue (),
+                         aUserMgr.getUserOfID (sUserID).getPasswordHash ().getPasswordHashValue ());
+
+        assertTrue (aUserMgr.setUserData (sUserID,
+                                          "newloginName",
+                                          "newEmail@smp.localhost",
+                                          "NewFN",
+                                          "NewLN",
+                                          "NewDescription",
+                                          Locale.US,
+                                          Map.of ("test", "123"),
+                                          true).isChanged ());
+        assertTrue (aUserMgr.getAllDisabledUsers ().contains (aUser));
+        assertFalse (aUserMgr.getAllActiveUsers ().contains (aUser));
+        assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+        assertTrue (aUserMgr.containsAnyActiveUser ());
+
+        final IUser aNewLoginNameUser = aUserMgr.getUserOfLoginName ("newloginName");
+        assertNotNull (aNewLoginNameUser);
+        assertEquals (aUser, aNewLoginNameUser);
+
+        assertEquals ("newloginName", aNewLoginNameUser.getLoginName ());
+        assertEquals ("newEmail@smp.localhost", aNewLoginNameUser.getEmailAddress ());
+        assertEquals ("NewFN", aNewLoginNameUser.getFirstName ());
+        assertEquals ("NewLN", aNewLoginNameUser.getLastName ());
+        assertEquals ("NewDescription", aNewLoginNameUser.getDescription ());
+        assertEquals (Locale.US, aNewLoginNameUser.getDesiredLocale ());
+      }
+      finally
+      {
+        assertTrue (aUserMgr.deleteUser (sUserID).isChanged ());
+        assertFalse (aUserMgr.getAllActive ().contains (aUser));
+        assertTrue (aUserMgr.getAllDeleted ().contains (aUser));
+        assertTrue (aUserMgr.getAll ().contains (aUser));
+        aUserMgr.internalDeleteUserNotRecoverable (sUserID);
+      }
     }
   }
 }

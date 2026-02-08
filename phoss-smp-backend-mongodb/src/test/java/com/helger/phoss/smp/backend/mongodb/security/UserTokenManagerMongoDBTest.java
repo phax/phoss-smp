@@ -30,7 +30,6 @@ import org.junit.Test;
 
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.token.user.IUserToken;
-import com.helger.photon.security.token.user.UserToken;
 import com.helger.photon.security.user.IUser;
 
 public final class UserTokenManagerMongoDBTest
@@ -41,48 +40,64 @@ public final class UserTokenManagerMongoDBTest
   @Test
   public void testUserTokenManagerCrud ()
   {
-    try (final UserManagerMongoDB aUserMger = new UserManagerMongoDB ();
-         final UserTokenManagerMongoDB aUserTokenMgr = new UserTokenManagerMongoDB (aUserMger))
+    try (final UserManagerMongoDB aUserMgr = new UserManagerMongoDB ();
+         final UserTokenManagerMongoDB aUserTokenMgr = new UserTokenManagerMongoDB (aUserMgr))
     {
-      aUserMger.getCollection ().drop ();
-      aUserTokenMgr.getCollection ().drop ();
-
-      final IUser aUser = aUserMger.createNewUser ("sLoginName",
-                                                   "test@smp.localhost",
-                                                   "im a super secure password",
-                                                   "First Name",
-                                                   "Last Name",
-                                                   "Description",
-                                                   Locale.GERMAN,
-                                                   Map.of ("foo", "bar"),
-                                                   false);
+      final IUser aUser = aUserMgr.createNewUser ("UserTokenTestUser",
+                                                  "test@usertoken.test",
+                                                  "im a super secure password",
+                                                  "First Name",
+                                                  "Last Name",
+                                                  "Description",
+                                                  Locale.GERMAN,
+                                                  Map.of ("foo", "bar"),
+                                                  false);
       assertNotNull (aUser);
 
-      final UserToken aUserToken = aUserTokenMgr.createUserToken ("asd", Map.of ("meta", "data"), aUser, "description");
-      assertNotNull (aUserToken);
-      assertEquals (aUserToken, aUserTokenMgr.getUserTokenOfID (aUserToken.getID ()));
-      assertEquals (aUserToken, aUserTokenMgr.getAllActiveUserTokens ().get (0));
+      try
+      {
+        final IUserToken aUserToken = aUserTokenMgr.createUserToken ("asd",
+                                                                     Map.of ("meta", "data"),
+                                                                     aUser,
+                                                                     "description");
+        assertNotNull (aUserToken);
+        final String sUserTokenID = aUserToken.getID ();
 
-      assertTrue (aUserTokenMgr.updateUserToken (aUserToken.getID (), Map.of ("foo", "bar"), "dummy token")
-                               .isChanged ());
-      final IUserToken aResolvedUserToken = aUserTokenMgr.getUserTokenOfID (aUserToken.getID ());
-      assertNotNull (aResolvedUserToken);
-      assertEquals ("dummy token", aResolvedUserToken.getDescription ());
-      assertTrue (aResolvedUserToken.attrs ().containsKey ("foo"));
+        try
+        {
+          assertEquals (aUserToken, aUserTokenMgr.getUserTokenOfID (sUserTokenID));
+          assertTrue (aUserTokenMgr.getAllActiveUserTokens ().contains (aUserToken));
 
-      assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
+          assertTrue (aUserTokenMgr.updateUserToken (sUserTokenID, Map.of ("foo", "bar"), "dummy token").isChanged ());
 
-      assertTrue (aUserTokenMgr.createNewAccessToken (aResolvedUserToken.getID (),
-                                                      aUser.getID (),
-                                                      LocalDateTime.now (),
-                                                      "reason",
-                                                      "tokenString").isChanged ());
-      final IUserToken aUserTokenOfString = aUserTokenMgr.getUserTokenOfTokenString ("tokenString");
-      assertNotNull (aUserTokenOfString);
+          final IUserToken aResolvedUserToken = aUserTokenMgr.getUserTokenOfID (sUserTokenID);
+          assertNotNull (aResolvedUserToken);
+          assertEquals ("dummy token", aResolvedUserToken.getDescription ());
+          assertTrue (aResolvedUserToken.attrs ().containsKey ("foo"));
 
-      assertTrue (aUserTokenMgr.revokeAccessToken (aUserToken.getID (), aUser.getID (), LocalDateTime.now (), "revoked")
-                               .isChanged ());
-      assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
+          assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
+
+          assertTrue (aUserTokenMgr.createNewAccessToken (aResolvedUserToken.getID (),
+                                                          aUser.getID (),
+                                                          LocalDateTime.now (),
+                                                          "reason",
+                                                          "tokenString").isChanged ());
+          final IUserToken aUserTokenOfString = aUserTokenMgr.getUserTokenOfTokenString ("tokenString");
+          assertNotNull (aUserTokenOfString);
+
+          assertTrue (aUserTokenMgr.revokeAccessToken (sUserTokenID, aUser.getID (), LocalDateTime.now (), "revoked")
+                                   .isChanged ());
+          assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
+        }
+        finally
+        {
+          aUserTokenMgr.internalDeleteUserTokenNotRecoverable (sUserTokenID);
+        }
+      }
+      finally
+      {
+        aUserMgr.internalDeleteUserNotRecoverable (aUser.getID ());
+      }
     }
   }
 }

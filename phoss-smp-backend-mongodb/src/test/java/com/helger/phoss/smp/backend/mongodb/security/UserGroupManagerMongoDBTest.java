@@ -43,89 +43,119 @@ public final class UserGroupManagerMongoDBTest
          final RoleManagerMongoDB aRoleMgr = new RoleManagerMongoDB ();
          final UserGroupManagerMongoDB aUserGroupMgr = new UserGroupManagerMongoDB (aUserMgr, aRoleMgr))
     {
-      aUserMgr.getCollection ().drop ();
-      aRoleMgr.getCollection ().drop ();
-      aUserGroupMgr.getCollection ().drop ();
-
       final IUserGroup aUserGroup1 = aUserGroupMgr.createNewUserGroup ("group1", "description", Map.of ("foo", "bar"));
       assertNotNull (aUserGroup1);
       final String sUserGroup1ID = aUserGroup1.getID ();
-      assertNotNull (aUserGroupMgr.getUserGroupOfID (sUserGroup1ID));
-      assertEquals (aUserGroup1, aUserGroupMgr.getUserGroupOfID (sUserGroup1ID));
 
-      assertTrue (aUserGroupMgr.setUserGroupData (sUserGroup1ID,
-                                                  "test user",
-                                                  "group for tests",
-                                                  Map.of ("foo1", "bar1")).isChanged ());
-      final IUserGroup aResolvedUG = aUserGroupMgr.getUserGroupOfID (sUserGroup1ID);
-      assertEquals ("test user", aResolvedUG.getName ());
-      assertEquals ("group for tests", aResolvedUG.getDescription ());
-      assertEquals ("bar1", aResolvedUG.attrs ().get ("foo1"));
+      try
+      {
+        assertNotNull (aUserGroupMgr.getUserGroupOfID (sUserGroup1ID));
+        assertEquals (aUserGroup1, aUserGroupMgr.getUserGroupOfID (sUserGroup1ID));
 
-      assertTrue (aUserGroupMgr.renameUserGroup (sUserGroup1ID, "newName").isChanged ());
-      assertEquals ("newName", aUserGroupMgr.getUserGroupOfID (sUserGroup1ID).getName ());
+        assertTrue (aUserGroupMgr.setUserGroupData (sUserGroup1ID,
+                                                    "test user",
+                                                    "group for tests",
+                                                    Map.of ("foo1", "bar1")).isChanged ());
+        final IUserGroup aResolvedUG = aUserGroupMgr.getUserGroupOfID (sUserGroup1ID);
+        assertEquals ("test user", aResolvedUG.getName ());
+        assertEquals ("group for tests", aResolvedUG.getDescription ());
+        assertEquals ("bar1", aResolvedUG.attrs ().get ("foo1"));
 
-      final String sUserID = GlobalIDFactory.getNewStringID ();
+        assertTrue (aUserGroupMgr.renameUserGroup (sUserGroup1ID, "newName").isChanged ());
+        assertEquals ("newName", aUserGroupMgr.getUserGroupOfID (sUserGroup1ID).getName ());
 
-      assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
-      // Should be false but couldn't figure it out
-      assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
-      assertTrue (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, sUserID));
-      assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, "another uuid"));
+        final String sUserID = GlobalIDFactory.getNewStringID ();
 
-      final IUserGroup aUserGroup2 = aUserGroupMgr.createNewUserGroup ("group2", null, null);
-      assertNotNull (aUserGroup2);
-      final String sUserGroup2ID = aUserGroup2.getID ();
-      assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup2ID, sUserID).isChanged ());
+        assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
+        // Should be false but couldn't figure it out
+        assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
+        assertTrue (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, sUserID));
+        assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, "another uuid"));
 
-      final ICommonsList <String> allUserGroupIDsWithAssignedUser = aUserGroupMgr.getAllUserGroupIDsWithAssignedUser (sUserID);
-      assertTrue (allUserGroupIDsWithAssignedUser.contains (sUserGroup1ID));
-      assertTrue (allUserGroupIDsWithAssignedUser.contains (sUserGroup2ID));
+        final IUserGroup aUserGroup2 = aUserGroupMgr.createNewUserGroup ("group2", null, null);
+        assertNotNull (aUserGroup2);
+        final String sUserGroup2ID = aUserGroup2.getID ();
+        try
+        {
+          assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup2ID, sUserID).isChanged ());
 
-      assertTrue (aUserGroupMgr.unassignUserFromUserGroup (sUserGroup1ID, sUserID).isChanged ());
-      assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, sUserID));
-      assertTrue (aUserGroupMgr.unassignUserFromAllUserGroups (sUserID).isChanged ());
-      assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup2ID, sUserID));
+          final ICommonsList <String> allUserGroupIDsWithAssignedUser = aUserGroupMgr.getAllUserGroupIDsWithAssignedUser (sUserID);
+          assertTrue (allUserGroupIDsWithAssignedUser.contains (sUserGroup1ID));
+          assertTrue (allUserGroupIDsWithAssignedUser.contains (sUserGroup2ID));
 
-      final String sRole1ID = GlobalIDFactory.getNewStringID ();
-      final String sRole2ID = GlobalIDFactory.getNewStringID ();
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole1ID).isChanged ());
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole2ID).isChanged ());
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
+          assertTrue (aUserGroupMgr.unassignUserFromUserGroup (sUserGroup1ID, sUserID).isChanged ());
+          assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, sUserID));
+          assertTrue (aUserGroupMgr.unassignUserFromAllUserGroups (sUserID).isChanged ());
+          assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup2ID, sUserID));
 
-      final ICommonsList <String> allUserGroupIDsWithAssignedRole = aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRole1ID);
-      assertTrue (allUserGroupIDsWithAssignedRole.contains (sUserGroup1ID));
-      assertTrue (allUserGroupIDsWithAssignedRole.contains (sUserGroup2ID));
+          final String sRole1ID = GlobalIDFactory.getNewStringID ();
+          final String sRole2ID = GlobalIDFactory.getNewStringID ();
+          assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole1ID).isChanged ());
+          assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole2ID).isChanged ());
+          assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
 
-      assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
-      assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup2ID, sUserID).isChanged ());
-      assertTrue (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
+          final ICommonsList <String> allUserGroupIDsWithAssignedRole = aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRole1ID);
+          assertTrue (allUserGroupIDsWithAssignedRole.contains (sUserGroup1ID));
+          assertTrue (allUserGroupIDsWithAssignedRole.contains (sUserGroup2ID));
 
-      assertTrue (aUserGroupMgr.unassignRoleFromAllUserGroups (sRole1ID).isChanged ());
-      assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
-      assertTrue (aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRole1ID).isEmpty ());
+          assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
+          assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup2ID, sUserID).isChanged ());
+          assertTrue (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
 
-      assertEquals (2, aUserGroupMgr.getAll ().size ());
-      assertEquals (2, aUserGroupMgr.getAllActiveUserGroups ().size ());
-      assertEquals (0, aUserGroupMgr.getAllDeletedUserGroups ().size ());
+          assertTrue (aUserGroupMgr.unassignRoleFromAllUserGroups (sRole1ID).isChanged ());
+          assertFalse (aUserGroupMgr.containsAnyUserGroupWithAssignedUserAndRole (sUserID, sRole1ID));
+          assertTrue (aUserGroupMgr.getAllUserGroupIDsWithAssignedRole (sRole1ID).isEmpty ());
 
-      assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
-      // Should be false, but it's only an update operation
-      assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
-      assertEquals (2, aUserGroupMgr.getAll ().size ());
-      assertEquals (1, aUserGroupMgr.getAllActiveUserGroups ().size ());
-      assertEquals (1, aUserGroupMgr.getAllDeletedUserGroups ().size ());
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup1));
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup2));
+          assertTrue (aUserGroupMgr.getAllActiveUserGroups ().contains (aUserGroup1));
+          assertTrue (aUserGroupMgr.getAllActiveUserGroups ().contains (aUserGroup2));
+          assertFalse (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup1));
+          assertFalse (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup2));
 
-      assertTrue (aUserGroupMgr.undeleteUserGroup (sUserGroup2ID).isChanged ());
-      assertFalse (aUserGroupMgr.undeleteUserGroup (sUserGroup2ID).isChanged ());
-      assertEquals (2, aUserGroupMgr.getAll ().size ());
-      assertEquals (2, aUserGroupMgr.getAllActiveUserGroups ().size ());
-      assertEquals (0, aUserGroupMgr.getAllDeletedUserGroups ().size ());
+          assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
+          // Should be false, but it's only an update operation
+          assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
 
-      assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
-      assertTrue (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
-      assertTrue (aUserGroupMgr.unassignRoleFromUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
-      assertFalse (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup1));
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup2));
+          assertTrue (aUserGroupMgr.getAllActiveUserGroups ().contains (aUserGroup1));
+          assertFalse (aUserGroupMgr.getAllActiveUserGroups ().contains (aUserGroup2));
+          assertFalse (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup1));
+          assertTrue (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup2));
+
+          assertTrue (aUserGroupMgr.undeleteUserGroup (sUserGroup2ID).isChanged ());
+          assertFalse (aUserGroupMgr.undeleteUserGroup (sUserGroup2ID).isChanged ());
+
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup1));
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup2));
+          assertTrue (aUserGroupMgr.getAllActiveUserGroups ().contains (aUserGroup1));
+          assertTrue (aUserGroupMgr.getAllActiveUserGroups ().contains (aUserGroup2));
+          assertFalse (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup1));
+          assertFalse (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup2));
+
+          assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
+          assertTrue (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
+          assertTrue (aUserGroupMgr.unassignRoleFromUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
+          assertFalse (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
+        }
+        finally
+        {
+          assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
+          assertFalse (aUserGroupMgr.getAllActive ().contains (aUserGroup2));
+          assertTrue (aUserGroupMgr.getAllDeleted ().contains (aUserGroup2));
+          assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup2));
+          aUserGroupMgr.internalDeleteUserGroupNotRecoverable (sUserGroup2ID);
+        }
+      }
+      finally
+      {
+        assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup1ID).isChanged ());
+        assertFalse (aUserGroupMgr.getAllActive ().contains (aUserGroup1));
+        assertTrue (aUserGroupMgr.getAllDeleted ().contains (aUserGroup1));
+        assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup1));
+        aUserGroupMgr.internalDeleteUserGroupNotRecoverable (sUserGroup1ID);
+      }
     }
   }
 }

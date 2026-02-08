@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
@@ -39,6 +40,7 @@ import com.helger.photon.security.usergroup.IUserGroupManager;
 import com.helger.photon.security.usergroup.IUserGroupModificationCallback;
 import com.helger.photon.security.usergroup.UserGroup;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 
 public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IUserGroup, UserGroup> implements
@@ -63,6 +65,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     ValueEnforcer.notNull (aRoleMgr, "RoleMgr");
     m_aUserMgr = aUserMgr;
     m_aRoleMgr = aRoleMgr;
+    getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
   @Override
@@ -186,6 +189,12 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       AuditHelper.onAuditDeleteFailure (UserGroup.OT, sUserGroupID, "no-such-id");
     }
     return eChange;
+  }
+
+  @VisibleForTesting
+  void internalDeleteUserGroupNotRecoverable (@NonNull final String sUserGroupID)
+  {
+    getCollection ().deleteOne (Filters.eq (BSON_ID, sUserGroupID));
   }
 
   @Override
