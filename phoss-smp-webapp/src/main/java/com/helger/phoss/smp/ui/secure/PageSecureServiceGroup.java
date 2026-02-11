@@ -698,16 +698,18 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     {
       // Disable button if no SML URL is configured
       // Disable button if no service group is present
-      aToolbar.addAndReturnButton ("Check DNS state",
+      final boolean bTooMany = aAllServiceGroups.size () > 10_000;
+      aToolbar.addAndReturnButton ("Check DNS state" + (bTooMany ? " (too many entries)" : ""),
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (aSettings.getSMLDNSZone () == null ||
                             aAllServiceGroups.isEmpty () ||
+                            bTooMany ||
                             !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 
-    final boolean bShowDetails = aAllServiceGroups.size () <= 1000;
+    final boolean bShowDetails = aAllServiceGroups.size () <= 1_000;
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
