@@ -335,11 +335,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
-    if (SMPServerConfiguration.getRESTType ().isHttpAlsoAllowed ())
-    {
-      // Peppol SMP is always http only
-      UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
-    }
 
     // Make sure the nonce attributes are used
     // Required for CSP to work
