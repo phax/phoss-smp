@@ -86,16 +86,6 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
   }
 
   /**
-   * @return <code>true</code> if this REST API allows the usage of HTTP and HTTPS in parallel. This
-   *         is only true for {@link #PEPPOL} until 2026-02-01. Afterwards Peppol must also use
-   *         HTTPS only.
-   */
-  public boolean isHttpAlsoAllowed ()
-  {
-    return this == PEPPOL;
-  }
-
-  /**
    * @return The query path prefix for the particular REST type. This was introduced for OASIS BDXR
    *         SMP v2 support. Never <code>null</code> but maybe empty. If a path is returned, it must
    *         end with a slash.
