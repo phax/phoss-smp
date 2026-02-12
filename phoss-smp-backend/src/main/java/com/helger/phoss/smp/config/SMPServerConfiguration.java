@@ -141,8 +141,7 @@ public final class SMPServerConfiguration
    * @return The password required to open the keystore. Property
    *         <code>smp.keystore.password</code>.
    */
-  @Nullable
-  public static char [] getKeyStorePassword ()
+  public static char @Nullable [] getKeyStorePassword ()
   {
     return _getConfig ().getAsCharArray (KEY_SMP_KEYSTORE_PASSWORD);
   }
@@ -160,8 +159,7 @@ public final class SMPServerConfiguration
    * @return The password used to access the private key. May be different than the password to the
    *         overall keystore. Property <code>smp.keystore.key.password</code>.
    */
-  @Nullable
-  public static char [] getKeyStoreKeyPassword ()
+  public static char @Nullable [] getKeyStoreKeyPassword ()
   {
     return _getConfig ().getAsCharArray (KEY_SMP_KEYSTORE_KEY_PASSWORD);
   }
@@ -191,8 +189,7 @@ public final class SMPServerConfiguration
    * @return The password required to open the truststore. Property
    *         <code>smp.truststore.password</code>.
    */
-  @Nullable
-  public static char [] getTrustStorePassword ()
+  public static char @Nullable [] getTrustStorePassword ()
   {
     return _getConfig ().getAsCharArray (KEY_SMP_TRUSTSTORE_PASSWORD);
   }
