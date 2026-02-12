@@ -57,6 +57,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
@@ -66,7 +67,6 @@ import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
-import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
@@ -108,6 +108,7 @@ import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
@@ -680,6 +681,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   @Override
   protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
+    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -728,11 +730,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     // Use a username cache to avoid too many DB queries
     final SMPOwnerNameCache aOwnerNameCache = new SMPOwnerNameCache ();
+    final SMPRestDataProvider aRDP = new SMPRestDataProvider (aRequestScope);
 
     for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject.getID ());
-      final String sDisplayName = aCurObject.getParticipantIdentifier ().getURIEncoded ();
+      final IParticipantIdentifier aCurPI = aCurObject.getParticipantIdentifier ();
+      final String sDisplayName = aCurPI.getURIEncoded ();
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
@@ -740,7 +744,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       if (bShowBusinessCardName)
       {
         IHCNode aName = null;
-        final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aCurObject.getParticipantIdentifier ());
+        final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aCurPI);
         if (aBC != null)
         {
           final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);
@@ -766,7 +770,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       {
         int nProcesses = 0;
         int nEndpoints = 0;
-        final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurObject.getParticipantIdentifier ());
+        final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurPI);
         for (final ISMPServiceInformation aSI : aSIs)
         {
           nProcesses += aSI.getProcessCount ();
@@ -786,26 +790,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                             new HCTextNode (" "),
                             createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
                             new HCTextNode (" "),
-                            // TODO check if server prefix is correct
-                            new HCA (LinkHelper.getURLWithServerAndContext (eRESTType.getQueryPathPrefix () +
-                                                                            aCurObject.getParticipantIdentifier ()
-                                                                                      .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
-                                                                                                                           sDisplayName)
-                                                                                                                .setTargetBlank ()
-                                                                                                                .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-      if (eRESTType.isCompleteServiceGroupSupported ())
-      {
-        // This is implementation specific, but not contained for BDXR2
-        // TODO check if server prefix is correct
-        aActions.addChildren (new HCTextNode (" "),
-                              new HCA (LinkHelper.getURLWithServerAndContext (eRESTType.getQueryPathPrefix () +
-                                                                              "complete/" +
-                                                                              aCurObject.getParticipantIdentifier ()
-                                                                                        .getURIPercentEncoded ())).setTitle ("Perform complete SMP query on " +
-                                                                                                                             sDisplayName)
-                                                                                                                  .setTargetBlank ()
-                                                                                                                  .addChild (EFamFamIcon.SCRIPT_LINK.getAsNode ()));
-      }
+                            new HCA (new SimpleURL (aRDP.getServiceGroupHref (aCurPI))).setTitle ("Perform SMP query on " +
+                                                                                                  sDisplayName)
+                                                                                       .setTargetBlank ()
+                                                                                       .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
       aRow.addCell (aActions);
     }
 
