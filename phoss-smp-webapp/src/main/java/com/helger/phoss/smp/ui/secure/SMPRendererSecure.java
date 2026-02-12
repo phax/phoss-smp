@@ -20,6 +20,7 @@ import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
 
+import com.helger.base.debug.GlobalDebug;
 import com.helger.base.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
@@ -27,6 +28,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -55,6 +57,7 @@ import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.url.ISimpleURL;
+import com.helger.url.protocol.EURLProtocol;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
@@ -180,10 +183,27 @@ public final class SMPRendererSecure
     }
 
     // Info, mainly for support purposes
-    if (SecureSessionState.getInstance ().isHttpProxyEnabled ())
-      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTP proxy is enabled"));
-    if (SecureSessionState.getInstance ().isHttpsProxyEnabled ())
-      aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTPS proxy is enabled"));
+    {
+      final SecureSessionState aSSS = SecureSessionState.getInstance ();
+      if (aSSS.isHttpProxyEnabled ())
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTP proxy is enabled"));
+      if (aSSS.isHttpsProxyEnabled ())
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTPS proxy is enabled"));
+    }
+
+    final String sPublicURL = SMPServerConfiguration.getPublicServerURL ();
+    if (StringHelper.isNotEmpty (sPublicURL))
+    {
+      final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
+      if (eRESTType == ESMPRESTType.PEPPOL &&
+          !EURLProtocol.HTTPS.isUsedInURL (sPublicURL) &&
+          !GlobalDebug.isDebugMode ())
+      {
+        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                   .addChild (" Server is not configured with https"));
+        aBox.setType (EBootstrapAlertType.DANGER);
+      }
+    }
 
     ret.addChild (aBox);
 
