@@ -38,6 +38,7 @@ jobs:
           # See: https://hub.docker.com/_/mysql
           MYSQL_DATABASE: smp
           MYSQL_ROOT_PASSWORD: smp
+          # Additional properties for testing
           MYSQL_USER: smp
           MYSQL_PASSWORD: smp
         ports:
@@ -70,24 +71,6 @@ jobs:
       uses: supercharge/mongodb-github-action@1.12.1
       with:
         mongodb-version: '8.0'
-        
-#    - name: Start MySQL
-#      uses: mirromutth/mysql-action@v1.1
-#      with:
-#        mysql version: '8.0'
-#        mysql database: 'smp'
-#        mysql user: 'smp'
-#        mysql password: 'smp'
-
-#    - name: Start MySQL v2
-#      uses: shogo82148/actions-setup-mysql@v1
-#      with:
-#        distribution: mysql
-#        mysql-version: '8.4'
-#        auto-start: true
-#        database: 'smp'
-#        user: 'smp'
-#        password: 'smp'              
                 
     - name: Build and deploy with Maven
       run: mvn --batch-mode --update-snapshots -P release-snapshot deploy
