@@ -37,6 +37,7 @@ jobs:
           # so we can create and migrate the test database.
           # See: https://hub.docker.com/_/mysql
           MYSQL_DATABASE: smp
+          MYSQL_ROOT_PASSWORD: smp
           MYSQL_USER: smp
           MYSQL_PASSWORD: smp
         ports:
