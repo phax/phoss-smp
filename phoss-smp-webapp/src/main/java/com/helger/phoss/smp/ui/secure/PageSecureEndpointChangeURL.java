@@ -46,6 +46,7 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.html.hc.render.HCRenderer;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
@@ -68,9 +69,10 @@ import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
-import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.mgrs.longrun.LongRunningJobResult;
+import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -105,7 +107,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                   @NonNull @Nonempty final String sNewURL)
     {
       super ("BulkChangeEndpointURL",
-             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"),
+             LoggedInUserManager.getInstance ()::getCurrentUserID);
       m_aServiceGroupPID = aServiceGroupPID;
       m_sOldURL = sOldURL;
       m_sNewURL = sNewURL;
@@ -166,7 +169,9 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
           final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
                                                                         m_sOldURL +
-                                                                        "' was changed in " +
+                                                                        "' was changed to '" +
+                                                                        m_sNewURL +
+                                                                        "' in " +
                                                                         aChangedEndpoints.intValue () +
                                                                         " endpoints. Effected service groups are:"),
                                                                    aUL);
@@ -181,7 +186,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         else
           aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
 
-        return LongRunningJobResult.createXML (aRes);
+        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
       }
       finally
       {

@@ -52,6 +52,7 @@ import com.helger.html.hc.html.tabular.IHCCell;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.html.hc.render.HCRenderer;
 import com.helger.html.jquery.JQuery;
 import com.helger.html.jquery.JQueryAjaxBuilder;
 import com.helger.html.jscode.JSAnonymousFunction;
@@ -105,9 +106,9 @@ import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
-import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.mgrs.longrun.LongRunningJobResult;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.html.select.HCCountrySelect;
 import com.helger.photon.uicore.html.select.HCCountrySelect.EWithDeprecated;
@@ -212,20 +213,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
     private final PDClient m_aPDClient;
-    private final String m_sUserID;
 
     public PushAllBusinessCardsToDirectory (@NonNull final PDClient aPDClient, @NonNull final String sUserID)
     {
       super ("PushAllBusinessCardsToDirectory",
-             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"));
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"),
+             () -> sUserID);
       m_aPDClient = aPDClient;
-      m_sUserID = sUserID;
-    }
-
-    @Override
-    protected String getCurrentUserID ()
-    {
-      return m_sUserID;
     }
 
     @NonNull
@@ -281,7 +275,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aResultNodes.hasNoChildren ())
           aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
 
-        return LongRunningJobResult.createXML (aResultNodes);
+        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aResultNodes));
       }
       finally
       {

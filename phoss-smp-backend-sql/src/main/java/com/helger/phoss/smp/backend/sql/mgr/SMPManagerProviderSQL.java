@@ -40,9 +40,8 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.photon.core.mgr.PhotonBasicManager;
+import com.helger.photon.jdbc.PhotonBasicManagerFactoryJDBC;
 import com.helger.photon.jdbc.PhotonSecurityManagerFactoryJDBC;
-import com.helger.photon.jdbc.sysmigration.SystemMigrationManagerJDBC;
 
 /**
  * A JDBC based implementation of the {@link ISMPManagerProvider} interface.
@@ -64,10 +63,9 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Override
   public void beforeInitManagers ()
   {
-    // Set the system migration manager factory to use JDBC
-    // Must be before PhotonBasicManager is instantiated
-    PhotonBasicManager.setSystemMigrationMgrFactory ( () -> new SystemMigrationManagerJDBC (SMPDBExecutor::new,
-                                                                                             SMPDBExecutor.TABLE_NAME_CUSTOMIZER));
+    // Set the basic manager factory to use JDBC for all three managers
+    // Must be before Flyway and before PhotonSecurityManager is instantiated
+    PhotonBasicManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Set the special PhotonSecurityManager factory
     // Must be before Flyway, so that auditing of Flyway actions (may) work

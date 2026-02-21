@@ -44,7 +44,7 @@ import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.photon.core.mgr.PhotonBasicManager;
+import com.helger.photon.mgrs.PhotonBasicManager;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.smpclient.url.BDXLURLProvider;

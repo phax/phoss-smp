@@ -24,54 +24,50 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.photon.io.WebFileIO;
-import com.helger.photon.jdbc.basic.SystemMigrationManagerJDBC;
+import com.helger.photon.jdbc.basic.SystemMessageManagerJDBC;
 import com.helger.photon.mgrs.PhotonBasicManager;
-import com.helger.photon.mgrs.sysmigration.SystemMigrationManager;
-import com.helger.photon.mgrs.sysmigration.SystemMigrationResult;
+import com.helger.photon.mgrs.sysmsg.SystemMessageManager;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Migrate all system migration results from the XML file to the DB
+ * Migrate the system message from the XML file to the DB
  *
  * @author Philip Helger
  * @since 8.0.16
  */
-public final class V27__MigrateSystemMigrationsToDB extends BaseJavaMigration
+public final class V29__MigrateSystemMessageToDB extends BaseJavaMigration
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (V27__MigrateSystemMigrationsToDB.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (V29__MigrateSystemMessageToDB.class);
 
   public void migrate (@NonNull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {
-      LOGGER.info ("Migrating all system migration results to the DB");
+      LOGGER.info ("Migrating system message to the DB");
 
-      final String sFilename = PhotonBasicManager.FactoryXML.SYSTEM_MIGRATIONS_XML;
+      final String sFilename = PhotonBasicManager.FactoryXML.SYSTEM_MESSAGE_XML;
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {
-        final SystemMigrationManager aMgrXML = new SystemMigrationManager (sFilename);
-        final ICommonsList <SystemMigrationResult> aResults = aMgrXML.getAllMigrationResultsFlattened ();
+        final SystemMessageManager aMgrXML = new SystemMessageManager (sFilename);
 
-        if (aResults.isNotEmpty ())
+        if (aMgrXML.hasSystemMessage ())
         {
-          final SystemMigrationManagerJDBC aMgrNew = new SystemMigrationManagerJDBC (SMPDBExecutor::new,
-                                                                                     SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
-          for (final SystemMigrationResult aResult : aResults)
-            aMgrNew.addMigrationResult (aResult);
+          final SystemMessageManagerJDBC aMgrNew = new SystemMessageManagerJDBC (SMPDBExecutor::new,
+                                                                                 SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
+          aMgrNew.setSystemMessage (aMgrXML.getMessageType (), aMgrXML.getSystemMessage ());
         }
 
         // Rename to avoid later inconsistencies
         WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
 
-        LOGGER.info ("Finished migrating all " + aResults.size () + " system migration results to the DB");
+        LOGGER.info ("Finished migrating system message to the DB");
       }
       else
       {
-        LOGGER.info ("No system migrations file found");
+        LOGGER.info ("No system message file found");
       }
     }
   }

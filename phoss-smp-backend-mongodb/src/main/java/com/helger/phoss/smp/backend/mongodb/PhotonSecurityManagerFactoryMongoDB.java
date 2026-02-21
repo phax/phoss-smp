@@ -33,7 +33,7 @@ import com.helger.photon.security.usergroup.IUserGroupManager;
 public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {
   @NonNull
-  public IAuditManager createAuditManager ()
+  public IAuditManager createAuditMgr ()
   {
     return new AuditManagerMongoDB ();
   }
@@ -51,7 +51,8 @@ public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManage
   }
 
   @NonNull
-  public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr, @NonNull final IRoleManager aRoleMgr)
+  public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr,
+                                               @NonNull final IRoleManager aRoleMgr)
   {
     return new UserGroupManagerMongoDB (aUserMgr, aRoleMgr);
   }

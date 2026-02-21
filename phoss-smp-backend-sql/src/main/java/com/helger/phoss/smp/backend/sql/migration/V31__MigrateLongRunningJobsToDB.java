@@ -27,51 +27,51 @@ import org.slf4j.LoggerFactory;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.photon.io.WebFileIO;
-import com.helger.photon.jdbc.basic.SystemMigrationManagerJDBC;
+import com.helger.photon.jdbc.basic.LongRunningJobResultManagerJDBC;
 import com.helger.photon.mgrs.PhotonBasicManager;
-import com.helger.photon.mgrs.sysmigration.SystemMigrationManager;
-import com.helger.photon.mgrs.sysmigration.SystemMigrationResult;
+import com.helger.photon.mgrs.longrun.LongRunningJobData;
+import com.helger.photon.mgrs.longrun.LongRunningJobResultManager;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Migrate all system migration results from the XML file to the DB
+ * Migrate all long running job results from the XML file to the DB
  *
  * @author Philip Helger
  * @since 8.0.16
  */
-public final class V27__MigrateSystemMigrationsToDB extends BaseJavaMigration
+public final class V31__MigrateLongRunningJobsToDB extends BaseJavaMigration
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (V27__MigrateSystemMigrationsToDB.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (V31__MigrateLongRunningJobsToDB.class);
 
   public void migrate (@NonNull final Context context) throws Exception
   {
     try (final WebScoped aWS = new WebScoped ())
     {
-      LOGGER.info ("Migrating all system migration results to the DB");
+      LOGGER.info ("Migrating all long running job results to the DB");
 
-      final String sFilename = PhotonBasicManager.FactoryXML.SYSTEM_MIGRATIONS_XML;
+      final String sFilename = PhotonBasicManager.FactoryXML.LONG_RUNNING_JOB_RESULTS_XML;
       final File aFile = WebFileIO.getDataIO ().getFile (sFilename);
       if (aFile.exists ())
       {
-        final SystemMigrationManager aMgrXML = new SystemMigrationManager (sFilename);
-        final ICommonsList <SystemMigrationResult> aResults = aMgrXML.getAllMigrationResultsFlattened ();
+        final LongRunningJobResultManager aMgrXML = new LongRunningJobResultManager (sFilename);
+        final ICommonsList <LongRunningJobData> aResults = aMgrXML.getAllJobResults ();
 
         if (aResults.isNotEmpty ())
         {
-          final SystemMigrationManagerJDBC aMgrNew = new SystemMigrationManagerJDBC (SMPDBExecutor::new,
-                                                                                     SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
-          for (final SystemMigrationResult aResult : aResults)
-            aMgrNew.addMigrationResult (aResult);
+          final LongRunningJobResultManagerJDBC aMgrNew = new LongRunningJobResultManagerJDBC (SMPDBExecutor::new,
+                                                                                               SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
+          for (final LongRunningJobData aResult : aResults)
+            aMgrNew.addResult (aResult);
         }
 
         // Rename to avoid later inconsistencies
         WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
 
-        LOGGER.info ("Finished migrating all " + aResults.size () + " system migration results to the DB");
+        LOGGER.info ("Finished migrating all " + aResults.size () + " long running job results to the DB");
       }
       else
       {
-        LOGGER.info ("No system migrations file found");
+        LOGGER.info ("No long running job results file found");
       }
     }
   }

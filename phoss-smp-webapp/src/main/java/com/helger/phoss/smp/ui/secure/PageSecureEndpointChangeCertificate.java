@@ -51,6 +51,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.html.hc.render.HCRenderer;
 import com.helger.peppol.ui.CertificateUI;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
@@ -71,9 +72,10 @@ import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
-import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.mgrs.longrun.LongRunningJobResult;
+import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -109,7 +111,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
                                   @NonNull final String sNewCert)
     {
       super ("BulkChangeCertificate",
-             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"));
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change certificate"),
+             LoggedInUserManager.getInstance ()::getCurrentUserID);
       m_aDisplayLocale = aDisplayLocale;
       m_sOldUnifiedCert = sOldUnifiedCert;
       m_sNewCert = sNewCert;
@@ -178,7 +181,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         else
           aRes = warn ("No endpoint was found that contains the old certificate");
 
-        return LongRunningJobResult.createXML (aRes);
+        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
       }
       finally
       {
