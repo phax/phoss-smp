@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
+import org.jspecify.annotations.NonNull;
+
 import com.helger.phoss.smp.backend.mongodb.audit.AuditManagerMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.RoleManagerMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.UserGroupManagerMongoDB;
@@ -27,7 +29,6 @@ import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
-import org.jspecify.annotations.NonNull;
 
 public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {

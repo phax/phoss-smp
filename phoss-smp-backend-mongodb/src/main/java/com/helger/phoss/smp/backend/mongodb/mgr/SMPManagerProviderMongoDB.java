@@ -41,8 +41,8 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.core.mgr.PhotonBasicManager;
-import com.helger.photon.core.sysmigration.SystemMigrationManager;
 import com.helger.photon.io.WebFileIO;
+import com.helger.photon.mgrs.sysmigration.ISystemMigrationManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.Role;
 import com.helger.photon.security.role.RoleManager;
@@ -68,7 +68,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
     try (final WebScoped aWS = new WebScoped ())
     {
       // See issue #358, #359, #360 and #361
-      final SystemMigrationManager aSysMigMgr = PhotonBasicManager.getSystemMigrationMgr ();
+      final ISystemMigrationManager aSysMigMgr = PhotonBasicManager.getSystemMigrationMgr ();
 
       aSysMigMgr.performMigrationIfNecessary ("mongodb-security-migrate-roles-from-xml", () -> {
         LOGGER.info ("Migrating all roles from XML to MongoDB");
