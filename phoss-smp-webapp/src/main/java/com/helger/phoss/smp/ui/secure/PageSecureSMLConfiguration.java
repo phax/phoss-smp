@@ -250,29 +250,29 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     if (StringHelper.isEmpty (sDisplayName))
       aFormErrors.addFieldError (FIELD_DISPLAY_NAME, "The SML configuration name must not be empty!");
     else
-      if (sDisplayName.length () > ISMLInfoManager.MAX_LEN_DISPLAY_NAME)
+      if (sDisplayName.length () > ISMLInfoManager.DISPLAY_NAME_MAX_LENGTH)
         aFormErrors.addFieldError (FIELD_DISPLAY_NAME,
                                    "The SML configuration name must not not exceed " +
-                                                       ISMLInfoManager.MAX_LEN_DISPLAY_NAME +
+                                                       ISMLInfoManager.DISPLAY_NAME_MAX_LENGTH +
                                                        " characters!");
 
     if (StringHelper.isEmpty (sDNSZone))
       aFormErrors.addFieldError (FIELD_DNS_ZONE, "The DNS Zone must not be empty!");
     else
-      if (sDNSZone.length () > ISMLInfoManager.MAX_LEN_DNS_ZONE)
+      if (sDNSZone.length () > ISMLInfoManager.DNS_ZONE_MAX_LENGTH)
         aFormErrors.addFieldError (FIELD_DNS_ZONE,
                                    "The DNS Zone must not not exceed " +
-                                                   ISMLInfoManager.MAX_LEN_DNS_ZONE +
+                                                   ISMLInfoManager.DNS_ZONE_MAX_LENGTH +
                                                    " characters!");
 
     if (StringHelper.isEmpty (sManagementAddressURL))
       aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL, "The Management Address URL must not be empty!");
     else
     {
-      if (sManagementAddressURL.length () > ISMLInfoManager.MAX_LEN_SERVICE_URL)
+      if (sManagementAddressURL.length () > ISMLInfoManager.SERVICE_URL_MAX_LENGTH)
         aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL,
                                    "The Management Address URL must not not exceed " +
-                                                                 ISMLInfoManager.MAX_LEN_SERVICE_URL +
+                                                                 ISMLInfoManager.SERVICE_URL_MAX_LENGTH +
                                                                  " characters!");
 
       final URL aURL = URLHelper.getAsURL (sManagementAddressURL);
@@ -286,10 +286,10 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
     if (StringHelper.isNotEmpty (sURLSuffixManageSMP))
     {
-      if (sURLSuffixManageSMP.length () > ISMLInfoManager.MAX_LEN_MANAGE_SMP)
+      if (sURLSuffixManageSMP.length () > ISMLInfoManager.MANAGE_SMP_MAX_LENGTH)
         aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_SMP,
                                    "The URL suffix must not not exceed " +
-                                                                ISMLInfoManager.MAX_LEN_MANAGE_SMP +
+                                                                ISMLInfoManager.MANAGE_SMP_MAX_LENGTH +
                                                                 " characters!");
 
       if (!SMLInfo.isValidURLSuffix (sURLSuffixManageSMP))
@@ -299,10 +299,10 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
     if (StringHelper.isNotEmpty (sURLSuffixManageParticipant))
     {
-      if (sURLSuffixManageParticipant.length () > ISMLInfoManager.MAX_LEN_MANAGE_PARTICIPANT)
+      if (sURLSuffixManageParticipant.length () > ISMLInfoManager.MANAGE_PARTICIPANT_MAX_LENGTH)
         aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT,
                                    "The URL suffix must not not exceed " +
-                                                                        ISMLInfoManager.MAX_LEN_MANAGE_PARTICIPANT +
+                                                                        ISMLInfoManager.MANAGE_PARTICIPANT_MAX_LENGTH +
                                                                         " characters!");
 
       if (!SMLInfo.isValidURLSuffix (sURLSuffixManageParticipant))

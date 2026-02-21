@@ -93,15 +93,15 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (aSMLInfo.getID (),
                                                                                                                                            CSMPServer.MAX_LEN_ID),
                                                                                                          DBValueHelper.getTrimmedToLength (sDisplayName,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_DISPLAY_NAME),
+                                                                                                                                           ISMLInfoManager.DISPLAY_NAME_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sDNSZone,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_DNS_ZONE),
+                                                                                                                                           ISMLInfoManager.DNS_ZONE_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sManagementServiceURL,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_SERVICE_URL),
+                                                                                                                                           ISMLInfoManager.SERVICE_URL_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sURLSuffixManageSMP,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_SMP),
+                                                                                                                                           ISMLInfoManager.MANAGE_SMP_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sURLSuffixManageParticipant,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_PARTICIPANT),
+                                                                                                                                           ISMLInfoManager.MANAGE_PARTICIPANT_MAX_LENGTH),
                                                                                                          Boolean.valueOf (bClientCertificateRequired)));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
@@ -138,15 +138,15 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                                                               " SET displayname=?, dnszone=?, serviceurl=?, managesmp=?, manageparticipant=?, clientcert=?" +
                                                               " WHERE id=?",
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sDisplayName,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_DISPLAY_NAME),
+                                                                                                                                           ISMLInfoManager.DISPLAY_NAME_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sDNSZone,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_DNS_ZONE),
+                                                                                                                                           ISMLInfoManager.DNS_ZONE_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sManagementServiceURL,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_SERVICE_URL),
+                                                                                                                                           ISMLInfoManager.SERVICE_URL_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sURLSuffixManageSMP,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_SMP),
+                                                                                                                                           ISMLInfoManager.MANAGE_SMP_MAX_LENGTH),
                                                                                                          DBValueHelper.getTrimmedToLength (sURLSuffixManageParticipant,
-                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_PARTICIPANT),
+                                                                                                                                           ISMLInfoManager.MANAGE_PARTICIPANT_MAX_LENGTH),
                                                                                                          Boolean.valueOf (bClientCertificateRequired),
                                                                                                          sSMLInfoID));
       aUpdated.set (nUpdated);
