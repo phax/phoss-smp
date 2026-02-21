@@ -44,10 +44,8 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.network.port.NetworkOnlineStatusDeterminator;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
-import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -688,7 +686,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
     final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
     final boolean bShowBusinessCardName = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
 

@@ -65,7 +65,7 @@ public interface ISMLInfoManager
    * Update an existing SML information.
    *
    * @param sSMLInfoID
-   *        The ID of the SML information to be updated. May be <code>null</code>.
+   *        The ID of the SML information to be updated. May not be <code>null</code>.
    * @param sDisplayName
    *        The "shorthand" display name like "SML" or "SMK". May neither be <code>null</code> nor
    *        empty.
@@ -91,7 +91,7 @@ public interface ISMLInfoManager
    * @return {@link EChange#CHANGED} if something was changed.
    */
   @NonNull
-  EChange updateSMLInfo (@Nullable String sSMLInfoID,
+  EChange updateSMLInfo (@NonNull String sSMLInfoID,
                          @NonNull @Nonempty String sDisplayName,
                          @NonNull @Nonempty String sDNSZone,
                          @NonNull @Nonempty String sManagementServiceURL,
@@ -135,15 +135,4 @@ public interface ISMLInfoManager
    * @return <code>true</code> if the ID is contained, <code>false</code> otherwise.
    */
   boolean containsSMLInfoWithID (@Nullable String sID);
-
-  /**
-   * Find the first SML information that contains the provided manage participant identifier
-   * endpoint address.
-   *
-   * @param sAddress
-   *        The address to search. May be <code>null</code>.
-   * @return <code>null</code> if no such SML information exists.
-   */
-  @Nullable
-  ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable String sAddress);
 }

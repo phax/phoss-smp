@@ -62,9 +62,4 @@ final class MockSMLInfoManager implements ISMLInfoManager
   {
     return false;
   }
-
-  public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (final String sAddress)
-  {
-    return null;
-  }
 }

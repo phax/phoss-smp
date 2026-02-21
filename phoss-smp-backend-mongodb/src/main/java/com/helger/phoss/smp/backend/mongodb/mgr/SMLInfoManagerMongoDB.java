@@ -27,7 +27,6 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.peppol.sml.CSMLDefault;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
@@ -126,7 +125,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   }
 
   @NonNull
-  public EChange updateSMLInfo (@Nullable final String sSMLInfoID,
+  public EChange updateSMLInfo (@NonNull final String sSMLInfoID,
                                 @NonNull @Nonempty final String sDisplayName,
                                 @NonNull @Nonempty final String sDNSZone,
                                 @NonNull @Nonempty final String sManagementServiceURL,
@@ -195,19 +194,5 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   public boolean containsSMLInfoWithID (@Nullable final String sID)
   {
     return getCollection ().find (new Document (BSON_ID, sID)).first () != null;
-  }
-
-  @Nullable
-  public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable final String sAddress)
-  {
-    if (StringHelper.isEmpty (sAddress))
-      return null;
-
-    // The stored field does not contain the suffix
-    final String sSearchAddress = StringHelper.trimEnd (sAddress,
-                                                        '/' + CSMLDefault.MANAGEMENT_SERVICE_PARTICIPANTIDENTIFIER);
-    return getCollection ().find (new Document (BSON_SERVICEURL, sSearchAddress))
-                           .map (SMLInfoManagerMongoDB::toDomain)
-                           .first ();
   }
 }

@@ -45,6 +45,7 @@ import com.helger.phoss.smp.backend.sql.migration.V12__MigrateUserGroupsToDB;
 import com.helger.phoss.smp.backend.sql.migration.V14__MigrateSettingsToDB;
 import com.helger.phoss.smp.backend.sql.migration.V15__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.backend.sql.migration.V21__MigrateUserTokensToDB;
+import com.helger.phoss.smp.backend.sql.migration.V25__MigrateSMLInfoToDB;
 import com.helger.phoss.smp.backend.sql.migration.V2__MigrateDBUsersToPhotonUsers;
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.photon.audit.AuditHelper;
@@ -149,7 +150,8 @@ final class FlywayMigrator
                                   new V12__MigrateUserGroupsToDB (),
                                   new V14__MigrateSettingsToDB (),
                                   new V15__MigrateDBUsersToPhotonUsers (),
-                                  new V21__MigrateUserTokensToDB ());
+                                  new V21__MigrateUserTokensToDB (),
+                                  new V25__MigrateSMLInfoToDB ());
 
     // Callbacks
     aFlywayConfig.callbacks (aCallbackLogging, aCallbackAudit);
