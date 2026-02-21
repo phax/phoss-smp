@@ -43,6 +43,7 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.ISMPSettingsCallback;
@@ -101,9 +102,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
                                                             SMPDBExecutor.TABLE_NAME_PREFIX +
                                                             "smp_settings SET value=? WHERE id=?",
                                                             new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sValue,
-                                                                                                                                         500),
+                                                                                                                                         ISMPSettingsManager.MAX_LEN_VALUE),
                                                                                                        DBValueHelper.getTrimmedToLength (sKey,
-                                                                                                                                         45)));
+                                                                                                                                         CSMPServer.MAX_LEN_ID)));
     if (nUpdated == 0)
     {
       // Create
@@ -111,9 +112,9 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
                                                               SMPDBExecutor.TABLE_NAME_PREFIX +
                                                               "smp_settings (id, value) VALUES (?, ?)",
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sKey,
-                                                                                                                                           45),
+                                                                                                                                           CSMPServer.MAX_LEN_ID),
                                                                                                          DBValueHelper.getTrimmedToLength (sValue,
-                                                                                                                                           500)));
+                                                                                                                                           ISMPSettingsManager.MAX_LEN_VALUE)));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
     }

@@ -26,6 +26,13 @@ import com.helger.peppol.sml.ISMLInfo;
  */
 public interface ISMLInfoManager
 {
+  // To match SQL restrictions
+  int MAX_LEN_DISPLAY_NAME = 256;
+  int MAX_LEN_DNS_ZONE = 256;
+  int MAX_LEN_SERVICE_URL = 500;
+  int MAX_LEN_MANAGE_SMP = 256;
+  int MAX_LEN_MANAGE_PARTICIPANT = 256;
+
   /**
    * Create a new SML information.
    *

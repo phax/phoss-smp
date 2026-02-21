@@ -17,7 +17,7 @@
 
 CREATE TABLE smp_sml_info (
   id                varchar(45)  NOT NULL,
-  displayname       text         NOT NULL,
+  displayname       varchar(256) NOT NULL,
   dnszone           varchar(256) NOT NULL,
   serviceurl        varchar(500) NOT NULL,
   managesmp         varchar(256) NOT NULL,

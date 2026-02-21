@@ -30,12 +30,14 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.photon.audit.AuditHelper;
 
@@ -46,7 +48,7 @@ import com.helger.photon.audit.AuditHelper;
  */
 public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager implements ISMLInfoManager
 {
-  private static final boolean DEFAULT_CLIENT_CERT_REQUIRED = false;
+  private static final boolean DEFAULT_CLIENT_CERTIFICATE_REQUIRED = CSMPServer.SML_CONFIGURATION_DEFAULT_CLIENT_CERTIFICATE_REQUIRES;
   private final String m_sTableName;
 
   /**
@@ -88,12 +90,18 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                                                               m_sTableName +
                                                               " (id, displayname, dnszone, serviceurl, managesmp, manageparticipant, clientcert)" +
                                                               " VALUES (?, ?, ?, ?, ?, ?, ?)",
-                                                              new ConstantPreparedStatementDataProvider (aSMLInfo.getID (),
-                                                                                                         sDisplayName,
-                                                                                                         sDNSZone,
-                                                                                                         sManagementServiceURL,
-                                                                                                         sURLSuffixManageSMP,
-                                                                                                         sURLSuffixManageParticipant,
+                                                              new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (aSMLInfo.getID (),
+                                                                                                                                           CSMPServer.MAX_LEN_ID),
+                                                                                                         DBValueHelper.getTrimmedToLength (sDisplayName,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_DISPLAY_NAME),
+                                                                                                         DBValueHelper.getTrimmedToLength (sDNSZone,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_DNS_ZONE),
+                                                                                                         DBValueHelper.getTrimmedToLength (sManagementServiceURL,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_SERVICE_URL),
+                                                                                                         DBValueHelper.getTrimmedToLength (sURLSuffixManageSMP,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_SMP),
+                                                                                                         DBValueHelper.getTrimmedToLength (sURLSuffixManageParticipant,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_PARTICIPANT),
                                                                                                          Boolean.valueOf (bClientCertificateRequired)));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
@@ -129,11 +137,16 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                                                               m_sTableName +
                                                               " SET displayname=?, dnszone=?, serviceurl=?, managesmp=?, manageparticipant=?, clientcert=?" +
                                                               " WHERE id=?",
-                                                              new ConstantPreparedStatementDataProvider (sDisplayName,
-                                                                                                         sDNSZone,
-                                                                                                         sManagementServiceURL,
-                                                                                                         sURLSuffixManageSMP,
-                                                                                                         sURLSuffixManageParticipant,
+                                                              new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sDisplayName,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_DISPLAY_NAME),
+                                                                                                         DBValueHelper.getTrimmedToLength (sDNSZone,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_DNS_ZONE),
+                                                                                                         DBValueHelper.getTrimmedToLength (sManagementServiceURL,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_SERVICE_URL),
+                                                                                                         DBValueHelper.getTrimmedToLength (sURLSuffixManageSMP,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_SMP),
+                                                                                                         DBValueHelper.getTrimmedToLength (sURLSuffixManageParticipant,
+                                                                                                                                           ISMLInfoManager.MAX_LEN_MANAGE_PARTICIPANT),
                                                                                                          Boolean.valueOf (bClientCertificateRequired),
                                                                                                          sSMLInfoID));
       aUpdated.set (nUpdated);
@@ -198,7 +211,7 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                         .managementServiceURL (aRow.getAsString (3))
                         .urlSuffixManageSMP (aRow.getAsString (4))
                         .urlSuffixManageParticipant (aRow.getAsString (5))
-                        .clientCertificateRequired (aRow.getAsBoolean (6, DEFAULT_CLIENT_CERT_REQUIRED))
+                        .clientCertificateRequired (aRow.getAsBoolean (6, DEFAULT_CLIENT_CERTIFICATE_REQUIRED))
                         .build ());
     return ret;
   }
@@ -227,7 +240,7 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                   .managementServiceURL (aRow.getAsString (2))
                   .urlSuffixManageSMP (aRow.getAsString (3))
                   .urlSuffixManageParticipant (aRow.getAsString (4))
-                  .clientCertificateRequired (aRow.getAsBoolean (5, DEFAULT_CLIENT_CERT_REQUIRED))
+                  .clientCertificateRequired (aRow.getAsBoolean (5, DEFAULT_CLIENT_CERTIFICATE_REQUIRED))
                   .build ();
   }
 

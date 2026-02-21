@@ -54,6 +54,9 @@ public final class CSMPServer
 
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
 
+  public static final boolean SML_CONFIGURATION_DEFAULT_CLIENT_CERTIFICATE_REQUIRES = true;
+  public static final int MAX_LEN_ID = 45;
+
   private static final String VERSION_NUMBER;
   private static final String TIMESTAMP;
 

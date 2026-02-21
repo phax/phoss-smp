@@ -17,7 +17,7 @@
 
 CREATE TABLE `smp_sml_info` (
   `id`               varchar(45)  NOT NULL COMMENT 'Internal ID',
-  `displayname`      text         NOT NULL COMMENT 'Display name',
+  `displayname`      varchar(256) NOT NULL COMMENT 'Display name',
   `dnszone`          varchar(256) NOT NULL COMMENT 'DNS zone',
   `serviceurl`       varchar(500) NOT NULL COMMENT 'Management service URL',
   `managesmp`        varchar(256) NOT NULL COMMENT 'URL suffix for managing SMPs',
