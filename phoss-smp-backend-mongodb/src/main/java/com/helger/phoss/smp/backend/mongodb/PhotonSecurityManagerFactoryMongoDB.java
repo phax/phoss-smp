@@ -30,7 +30,12 @@ import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
 
-public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
+/**
+ * A MongoDB based implementation of PhotonSecurityManager.IFactory.
+ *
+ * @author Philip Helger
+ */
+public final class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {
   @NonNull
   public IAuditManager createAuditMgr ()
@@ -61,5 +66,15 @@ public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManage
   public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr)
   {
     return new UserTokenManagerMongoDB (aUserMgr);
+  }
+
+  /**
+   * Install the MongoDB basic manager factory and instantiate the singleton. Must be called before
+   * {@link PhotonSecurityManager#getInstance()} is called anywhere else.
+   */
+  public static void install ()
+  {
+    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryMongoDB ());
+    PhotonSecurityManager.getInstance ();
   }
 }
