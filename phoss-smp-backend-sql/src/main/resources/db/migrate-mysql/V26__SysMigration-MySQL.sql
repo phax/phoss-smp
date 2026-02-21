@@ -16,10 +16,10 @@
 --
 
 CREATE TABLE `smp_sys_migration` (
-  `id`           varchar(45)  NOT NULL COMMENT 'Internal ID',
   `migration_id` varchar(256) NOT NULL COMMENT 'Migration ID',
   `execution_dt` datetime     NOT NULL COMMENT 'Execution date and time',
   `success`      tinyint(1)   NOT NULL COMMENT 'Success?',
-  `error_msg`    text                  COMMENT 'Error message',
-  PRIMARY KEY (`id`)
+  `error_msg`    text                  COMMENT 'Error message'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='System Migration Results';
+
+CREATE INDEX idx_smp_sys_migration_mid ON `smp_sys_migration` (`migration_id`);

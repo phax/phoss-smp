@@ -16,11 +16,10 @@
 --
 
 CREATE TABLE smp_sys_migration (
-  id           varchar(45)  NOT NULL,
   migration_id varchar(256) NOT NULL,
   execution_dt timestamp    NOT NULL,
   success      SMALLINT     NOT NULL,
-  error_msg    CLOB,
-  CONSTRAINT pk_smp_sys_migration PRIMARY KEY
-    (id)
+  error_msg    CLOB
 );
+
+CREATE INDEX idx_smp_sys_migration_mid ON smp_sys_migration (migration_id);
