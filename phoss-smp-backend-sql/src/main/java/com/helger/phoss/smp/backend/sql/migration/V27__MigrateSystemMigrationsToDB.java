@@ -37,6 +37,7 @@ import com.helger.web.scope.mgr.WebScoped;
  * Migrate all system migration results from the XML file to the DB
  *
  * @author Philip Helger
+ * @since 8.0.16
  */
 public final class V27__MigrateSystemMigrationsToDB extends BaseJavaMigration
 {

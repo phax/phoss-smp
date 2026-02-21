@@ -36,6 +36,7 @@ import com.helger.web.scope.mgr.WebScoped;
  * Migrate all SML info entries from the XML file to the DB
  *
  * @author Philip Helger
+ * @since 8.0.16
  */
 public final class V25__MigrateSMLInfoToDB extends BaseJavaMigration
 {
