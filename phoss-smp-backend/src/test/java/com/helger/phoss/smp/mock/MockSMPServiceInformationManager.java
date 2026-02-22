@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
@@ -113,5 +114,19 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
     return false;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    return 0;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    return 0;
   }
 }

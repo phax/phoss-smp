@@ -59,6 +59,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 
 /**
@@ -686,5 +687,64 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                    " WHERE transportProfile=?",
                                                    new ConstantPreparedStatementDataProvider (sTransportProfileID));
     return nCount > 0;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    if (aServiceGroupID != null)
+    {
+      return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                    m_sTableNameE +
+                                                    " SET endpointReference=? WHERE endpointReference=? AND businessIdentifierScheme=? AND businessIdentifier=?",
+                                                    new ConstantPreparedStatementDataProvider (sNewURL,
+                                                                                               sOldURL,
+                                                                                               aServiceGroupID.getScheme (),
+                                                                                               aServiceGroupID.getValue ()));
+    }
+    return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                  m_sTableNameE +
+                                                  " SET endpointReference=? WHERE endpointReference=?",
+                                                  new ConstantPreparedStatementDataProvider (sNewURL, sOldURL));
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    ValueEnforcer.notNull (sOldCert, "OldCert");
+    ValueEnforcer.notNull (sNewCert, "NewCert");
+
+    final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
+
+    // Get all distinct certificate values
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT DISTINCT certificate FROM " +
+                                                                          m_sTableNameE +
+                                                                          " WHERE certificate IS NOT NULL");
+    long nEndpointsChanged = 0;
+    if (aDBResult != null)
+    {
+      for (final DBResultRow aRow : aDBResult)
+      {
+        final String sStoredCert = aRow.getAsString (0);
+        if (StringHelper.isNotEmpty (sStoredCert))
+        {
+          final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
+          if (sOldCertNormalized.equals (sStoredCertNormalized))
+          {
+            nEndpointsChanged += newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                        m_sTableNameE +
+                                                                        " SET certificate=? WHERE certificate=?",
+                                                                        new ConstantPreparedStatementDataProvider (sNewCert,
+                                                                                                                   sStoredCert));
+          }
+        }
+      }
+    }
+    return nEndpointsChanged;
   }
 }

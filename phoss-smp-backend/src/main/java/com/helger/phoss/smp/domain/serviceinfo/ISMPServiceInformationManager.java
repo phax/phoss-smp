@@ -198,4 +198,36 @@ public interface ISMPServiceInformationManager
    *         <code>false</code> if not.
    */
   boolean containsAnyEndpointWithTransportProfile (@Nullable String sTransportProfileID);
+
+  /**
+   * Bulk-update the endpoint URL of all matching endpoints.
+   *
+   * @param aServiceGroupID
+   *        Optional service group ID to limit the update to. If <code>null</code>, all service
+   *        groups are updated.
+   * @param sOldURL
+   *        The old endpoint URL to search for. May not be <code>null</code>.
+   * @param sNewURL
+   *        The new endpoint URL to set. May not be <code>null</code>.
+   * @return The number of endpoints that were changed. Always &ge; 0.
+   * @since 8.0.16
+   */
+  @Nonnegative
+  long updateAllEndpointURLs (@Nullable IParticipantIdentifier aServiceGroupID,
+                              @NonNull String sOldURL,
+                              @NonNull String sNewURL);
+
+  /**
+   * Bulk-update the certificate of all matching endpoints. The comparison of the old certificate is
+   * performed using the normalized form via {@code CertificateHelper.getWithoutPEMHeader}.
+   *
+   * @param sOldCert
+   *        The old certificate (normalized/unified) to search for. May not be <code>null</code>.
+   * @param sNewCert
+   *        The new certificate to set (stored as-is). May not be <code>null</code>.
+   * @return The number of endpoints that were changed. Always &ge; 0.
+   * @since 8.0.16
+   */
+  @Nonnegative
+  long updateAllEndpointCertificates (@NonNull String sOldCert, @NonNull String sNewCert);
 }

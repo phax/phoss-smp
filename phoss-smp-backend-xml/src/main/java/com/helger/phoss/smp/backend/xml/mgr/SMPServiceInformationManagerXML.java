@@ -30,6 +30,7 @@ import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.equals.EqualsHelper;
+import com.helger.base.numeric.mutable.MutableLong;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
@@ -44,7 +45,9 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
@@ -371,5 +374,73 @@ public final class SMPServiceInformationManagerXML extends
       return false;
 
     return containsAny (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave ( () -> {
+      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
+      for (final ISMPServiceInformation aSI : aAllSIs)
+      {
+        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+          continue;
+
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+            if (sOldURL.equals (aEndpoint.getEndpointReference ()))
+            {
+              ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
+              bSIChanged = true;
+              aEndpointsChanged.inc ();
+            }
+        if (bSIChanged)
+          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    ValueEnforcer.notNull (sOldCert, "OldCert");
+    ValueEnforcer.notNull (sNewCert, "NewCert");
+
+    final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
+
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave ( () -> {
+      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
+      for (final ISMPServiceInformation aSI : aAllSIs)
+      {
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          {
+            final String sCert = aEndpoint.getCertificate ();
+            if (sCert != null)
+            {
+              final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sCert);
+              if (sOldCertNormalized.equals (sStoredCertNormalized))
+              {
+                ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
+                bSIChanged = true;
+                aEndpointsChanged.inc ();
+              }
+            }
+          }
+        if (bSIChanged)
+          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
   }
 }

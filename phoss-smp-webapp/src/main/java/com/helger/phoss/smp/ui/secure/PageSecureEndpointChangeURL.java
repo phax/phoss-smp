@@ -32,16 +32,13 @@ import com.helger.collection.CollectionHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.CommonsHashSet;
-import com.helger.collection.commons.CommonsTreeSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.commons.ICommonsSet;
-import com.helger.collection.commons.ICommonsSortedSet;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCSelect;
-import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -56,9 +53,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -122,67 +117,19 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-        // Modify all endpoints
-        final MutableInt aChangedEndpoints = new MutableInt (0);
-        final MutableInt aSaveErrors = new MutableInt (0);
-        final ICommonsList <ISMPServiceInformation> aChangedSIs = new CommonsArrayList <> ();
-        // Run in a read-lock
-        aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
-          if (m_aServiceGroupPID != null &&
-              !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (m_aServiceGroupPID))
-          {
-            // Wrong service group
-            return;
-          }
-
-          boolean bChanged = false;
-          for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-            for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-              if (m_sOldURL.equals (aEndpoint.getEndpointReference ()))
-              {
-                ((SMPEndpoint) aEndpoint).setEndpointReference (m_sNewURL);
-                bChanged = true;
-                aChangedEndpoints.inc ();
-              }
-          if (bChanged)
-          {
-            // Remember and do not merge here to avoid deadlock
-            aChangedSIs.add (aSI);
-          }
-        });
-
-        // Write out of read-lock
-        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
-        for (final var aSI : aChangedSIs)
-        {
-          if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
-            aSaveErrors.inc ();
-          aChangedServiceGroup.add (aSI.getServiceGroupID ());
-        }
+        final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointURLs (m_aServiceGroupPID, m_sOldURL, m_sNewURL);
 
         final IHCNode aRes;
-        if (aChangedEndpoints.isGT0 ())
-        {
-          final HCUL aUL = new HCUL ();
-          for (final String sChangedServiceGroupID : aChangedServiceGroup)
-            aUL.addItem (sChangedServiceGroupID);
-
-          final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
-                                                                        m_sOldURL +
-                                                                        "' was changed to '" +
-                                                                        m_sNewURL +
-                                                                        "' in " +
-                                                                        aChangedEndpoints.intValue () +
-                                                                        " endpoints. Effected service groups are:"),
-                                                                   aUL);
-          if (aSaveErrors.is0 ())
-            aRes = success (aNodes);
-          else
-          {
-            aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
-            aRes = error (aNodes);
-          }
-        }
+        if (nEndpointsChanged > 0)
+          aRes = success (div ("The old URL '" +
+                               m_sOldURL +
+                               "' was changed to '" +
+                               m_sNewURL +
+                               "' in " +
+                               nEndpointsChanged +
+                               " " +
+                               (nEndpointsChanged == 1 ? "endpoint" : "endpoints") +
+                               "."));
         else
           aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
 

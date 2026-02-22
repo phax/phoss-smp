@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
@@ -491,6 +493,87 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                    aDocumentTypeIdentifier.getURIEncoded () +
                    "'. This seems to be a bug! Using the first one.");
     return ret.getFirstOrNull ();
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    // Count matching endpoints before the update via aggregation
+    final String sEndpointRefPath = BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_ENDPOINT_REFERENCE;
+    long nEndpointsChanged = 0;
+
+    // Find all documents that have matching endpoints
+    Bson aFilter = Filters.eq (sEndpointRefPath, sOldURL);
+    if (aServiceGroupID != null)
+      aFilter = Filters.and (aFilter, Filters.eq (BSON_SERVICE_GROUP_ID, aServiceGroupID.getURIEncoded ()));
+
+    // Iterate each matching document, update endpoints in Java, and replace
+    for (final Document aDoc : getCollection ().find (aFilter))
+    {
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+              if (sOldURL.equals (aEndpoint.getString (BSON_ENDPOINT_REFERENCE)))
+              {
+                aEndpoint.put (BSON_ENDPOINT_REFERENCE, sNewURL);
+                bDocChanged = true;
+                nEndpointsChanged++;
+              }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    ValueEnforcer.notNull (sOldCert, "OldCert");
+    ValueEnforcer.notNull (sNewCert, "NewCert");
+
+    final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
+    long nEndpointsChanged = 0;
+
+    // Find all documents that have endpoints with certificates
+    for (final Document aDoc : getCollection ().find ())
+    {
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              final String sStoredCert = aEndpoint.getString (BSON_CERTIFICATE);
+              if (sStoredCert != null)
+              {
+                final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
+                if (sOldCertNormalized.equals (sStoredCertNormalized))
+                {
+                  aEndpoint.put (BSON_CERTIFICATE, sNewCert);
+                  bDocChanged = true;
+                  nEndpointsChanged++;
+                }
+              }
+            }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)

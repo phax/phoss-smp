@@ -64,6 +64,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -75,7 +76,6 @@ import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.uicore.css.CUICoreCSS;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateDecodeHelper;
-import com.helger.security.certificate.CertificateHelper;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
@@ -123,7 +123,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     @NonNull
     CertCacheItem getOrCreate (@NonNull final String sCert)
     {
-      final String sNormalizedCert = CertificateHelper.getWithoutPEMHeader (sCert);
+      final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (sCert);
       return m_aMap.computeIfAbsent (sNormalizedCert, k -> new CertCacheItem (m_aMap.size () + 1));
     }
 
