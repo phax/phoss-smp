@@ -383,12 +383,9 @@ public final class SMPServiceInformationManagerXML extends
   @Nonnegative
   public long getEndpointCount ()
   {
-    final MutableLong aCount = new MutableLong (0);
-    forEachValue (aSI -> {
-      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-        aCount.inc (aProcess.getEndpointCount ());
-    });
-    return aCount.longValue ();
+    final MutableLong ret = new MutableLong (0);
+    forEachValue (aSI -> { ret.inc (aSI.getTotalEndpointCount ()); });
+    return ret.longValue ();
   }
 
   @NonNull
