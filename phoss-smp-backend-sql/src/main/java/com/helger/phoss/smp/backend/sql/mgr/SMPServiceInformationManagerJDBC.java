@@ -45,12 +45,15 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
+import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
+import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -687,6 +690,54 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                    " WHERE transportProfile=?",
                                                    new ConstantPreparedStatementDataProvider (sTransportProfileID));
     return nCount > 0;
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableNameE);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT endpointReference, businessIdentifierScheme, businessIdentifier FROM " +
+                                                                          m_sTableNameE +
+                                                                          " WHERE endpointReference IS NOT NULL");
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+      {
+        final String sURL = aRow.getAsString (0);
+        if (StringHelper.isNotEmpty (sURL))
+        {
+          final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (1), aRow.getAsString (2));
+
+          final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
+          ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+        }
+      }
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT certificate, businessIdentifierScheme, businessIdentifier FROM " +
+                                                                          m_sTableNameE);
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+      {
+        final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aRow.getAsString (0));
+        final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (1), aRow.getAsString (2));
+
+        final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sNormalizedCert, k -> new EndpointUsageInfo ());
+        ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+      }
+    return ret;
   }
 
   @Nonnegative

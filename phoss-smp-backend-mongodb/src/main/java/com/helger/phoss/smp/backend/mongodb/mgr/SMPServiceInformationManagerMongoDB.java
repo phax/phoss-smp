@@ -37,12 +37,16 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -493,6 +497,77 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                    aDocumentTypeIdentifier.getURIEncoded () +
                    "'. This seems to be a bug! Using the first one.");
     return ret.getFirstOrNull ();
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    long nCount = 0;
+    for (final Document aDoc : getCollection ().find ())
+    {
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            nCount += aEndpoints.size ();
+        }
+    }
+    return nCount;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    for (final Document aDoc : getCollection ().find ())
+    {
+      final String sServiceGroupID = aDoc.getString (BSON_SERVICE_GROUP_ID);
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              final String sURL = aEndpoint.getString (BSON_ENDPOINT_REFERENCE);
+              if (StringHelper.isNotEmpty (sURL))
+              {
+                final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
+                ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+              }
+            }
+        }
+    }
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    for (final Document aDoc : getCollection ().find ())
+    {
+      final String sServiceGroupID = aDoc.getString (BSON_SERVICE_GROUP_ID);
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aEndpoint.getString (BSON_CERTIFICATE));
+              final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sNormalizedCert, k -> new EndpointUsageInfo ());
+              ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+            }
+        }
+    }
+    return ret;
   }
 
   @Nonnegative

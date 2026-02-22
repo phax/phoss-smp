@@ -35,11 +35,15 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -374,6 +378,52 @@ public final class SMPServiceInformationManagerXML extends
       return false;
 
     return containsAny (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    final long [] aCount = { 0 };
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        aCount[0] += aProcess.getAllEndpoints ().size ();
+    });
+    return aCount[0];
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          if (aEndpoint.hasEndpointReference ())
+          {
+            final IEndpointUsageInfo aInfo = ret.computeIfAbsent (aEndpoint.getEndpointReference (),
+                                                                  k -> new EndpointUsageInfo ());
+            ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (aSI.getServiceGroupID ());
+          }
+    });
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        {
+          final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aEndpoint.getCertificate ());
+          final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sNormalizedCert, k -> new EndpointUsageInfo ());
+          ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (aSI.getServiceGroupID ());
+        }
+    });
+    return ret;
   }
 
   @Nonnegative

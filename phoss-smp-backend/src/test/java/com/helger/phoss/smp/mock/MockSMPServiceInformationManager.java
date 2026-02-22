@@ -22,9 +22,11 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
@@ -114,6 +116,24 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
     return false;
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    return 0;
+  }
+
+  @NonNull
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @NonNull
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    throw new UnsupportedOperationException ();
   }
 
   @Nonnegative

@@ -23,6 +23,7 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -198,6 +199,35 @@ public interface ISMPServiceInformationManager
    *         <code>false</code> if not.
    */
   boolean containsAnyEndpointWithTransportProfile (@Nullable String sTransportProfileID);
+
+  /**
+   * @return The total number of endpoints across all service groups. Always &ge; 0.
+   * @since 8.0.16
+   */
+  @Nonnegative
+  long getEndpointCount ();
+
+  /**
+   * Get a map from endpoint URL to {@link EndpointUsageInfo} containing the count and service group
+   * IDs for each distinct URL. Only endpoints that have a non-empty URL are included.
+   *
+   * @return A non-<code>null</code> mutable map.
+   * @since 8.0.16
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ();
+
+  /**
+   * Get a map from normalized certificate string to {@link EndpointUsageInfo} containing the count
+   * and service group IDs for each distinct certificate. All endpoints are included.
+   *
+   * @return A non-<code>null</code> mutable map.
+   * @since 8.0.16
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ();
 
   /**
    * Bulk-update the endpoint URL of all matching endpoints.
