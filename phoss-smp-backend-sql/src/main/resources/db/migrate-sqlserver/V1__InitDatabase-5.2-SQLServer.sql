@@ -25,7 +25,7 @@ CREATE TABLE smp_user (
 
 CREATE TABLE smp_service_group (
     businessIdentifierScheme VARCHAR(25) NOT NULL,
-    businessIdentifier       VARCHAR(50) NOT NULL,
+    businessIdentifier       VARCHAR(135) NOT NULL,
     extension                varchar(max),
     CONSTRAINT pk_smp_service_group PRIMARY KEY
       (businessIdentifierScheme, businessIdentifier)
@@ -34,7 +34,7 @@ CREATE TABLE smp_service_group (
 
 CREATE TABLE smp_service_metadata (
     businessIdentifierScheme VARCHAR(25)  NOT NULL,
-    businessIdentifier       VARCHAR(50)  NOT NULL,
+    businessIdentifier       VARCHAR(135) NOT NULL,
     documentIdentifierScheme VARCHAR(25)  NOT NULL,
     documentIdentifier       VARCHAR(500) NOT NULL,
     extension                varchar(max),
@@ -46,7 +46,7 @@ CREATE TABLE smp_service_metadata (
 
 CREATE TABLE smp_process (
     businessIdentifierScheme VARCHAR(25)  NOT NULL,
-    businessIdentifier       VARCHAR(50)  NOT NULL,
+    businessIdentifier       VARCHAR(135) NOT NULL,
     documentIdentifierScheme VARCHAR(25)  NOT NULL,
     documentIdentifier       VARCHAR(500) NOT NULL,
     processIdentifierType    VARCHAR(25)  NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE smp_process (
 
 CREATE TABLE smp_endpoint (
     businessIdentifierScheme      VARCHAR(25)  NOT NULL,
-    businessIdentifier            VARCHAR(50)  NOT NULL,
+    businessIdentifier            VARCHAR(135) NOT NULL,
     documentIdentifierScheme      VARCHAR(25)  NOT NULL,
     documentIdentifier            VARCHAR(500) NOT NULL,
     processIdentifierType         VARCHAR(25)  NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE smp_endpoint (
 
 CREATE TABLE smp_ownership (
     businessIdentifierScheme VARCHAR(25)  NOT NULL,
-    businessIdentifier       VARCHAR(50)  NOT NULL,
+    businessIdentifier       VARCHAR(135) NOT NULL,
     username                 VARCHAR(256) NOT NULL,
     CONSTRAINT pk_smp_ownership PRIMARY KEY
       (businessIdentifierScheme, businessIdentifier,
@@ -98,11 +98,11 @@ CREATE TABLE smp_ownership (
 
 CREATE TABLE smp_service_metadata_red (
     businessIdentifierScheme VARCHAR(25)  NOT NULL,
-    businessIdentifier       VARCHAR(50)  NOT NULL,
+    businessIdentifier       VARCHAR(135) NOT NULL,
     documentIdentifierScheme VARCHAR(25)  NOT NULL,
     documentIdentifier       VARCHAR(500) NOT NULL,
     certificateUID           VARCHAR(256),
-    redirectionUrl           VARCHAR(256) NOT NULL,
+    redirectionUrl           varchar(max) NOT NULL,
     extension                varchar(max),
     certificate              varchar(max),
     CONSTRAINT pk_smp_service_metadata_red PRIMARY KEY
@@ -114,7 +114,8 @@ CREATE TABLE smp_service_metadata_red (
 CREATE TABLE smp_bce (
     id          VARCHAR(45)  NOT NULL,
     pid         VARCHAR(255) NOT NULL,
-    name        varchar(max) NOT NULL,
+    name        varchar(max) NULL,
+    names       varchar(max) NULL,
     country     VARCHAR(3)   NOT NULL,
     geoinfo     varchar(max),
     identifiers varchar(max),

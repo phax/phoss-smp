@@ -15,4 +15,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_service_metadata_red ALTER COLUMN redirectionUrl varchar(max) NOT NULL;
+-- Already done in V1

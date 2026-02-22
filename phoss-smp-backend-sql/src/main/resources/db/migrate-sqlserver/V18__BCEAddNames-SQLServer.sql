@@ -15,5 +15,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_bce ADD names varchar(max) NULL;
-ALTER TABLE smp_bce ALTER COLUMN name varchar(max) NULL;
+-- Already done in V1
