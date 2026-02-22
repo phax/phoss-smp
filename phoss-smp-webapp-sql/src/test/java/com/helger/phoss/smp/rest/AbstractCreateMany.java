@@ -27,7 +27,7 @@ import com.helger.photon.security.CSecurity;
 abstract class AbstractCreateMany
 {
   protected static final int START_INDEX = 0;
-  protected static final int PARTICIPANT_COUNT = 20_000;
+  protected static final int PARTICIPANT_COUNT = 2_000;
 
   protected static final String SERVER_BASE_PATH = "http://localhost:90";
   protected static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,

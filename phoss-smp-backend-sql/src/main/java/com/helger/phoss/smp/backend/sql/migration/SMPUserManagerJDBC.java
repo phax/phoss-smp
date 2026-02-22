@@ -101,8 +101,9 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
           case POSTGRESQL:
             aExecutor.executeStatement ("ALTER TABLE " + m_sTableNameO + " DROP CONSTRAINT FK_smp_ownership_username");
             break;
-          case ORACLE:
           case DB2:
+          case ORACLE:
+          case SQLSERVER:
             // No such constraint
             break;
           default:
