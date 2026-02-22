@@ -163,7 +163,8 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     {
       // Do not allow any Extension here
       // Do NOT create in SMK/SML
-      aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, (String) null, false);
+      final boolean bCreateInSML = false;
+      aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, (String) null, bCreateInSML);
     }
     catch (final Exception ex)
     {
