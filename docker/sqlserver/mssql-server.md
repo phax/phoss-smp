@@ -1,5 +1,10 @@
 # Docker
 
+## Effectively
+
+Call `build-and-run.sh` to start a proper Docker image in here. Name `mssql-dev` on port `1433`
+
+## From scratch
 ```
 docker volume create mssql_data
 docker run -e "ACCEPT_EULA=Y" \
