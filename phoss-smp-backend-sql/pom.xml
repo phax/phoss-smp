@@ -102,6 +102,11 @@
       <artifactId>flyway-database-postgresql</artifactId>
       <version>${flyway.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-sqlserver</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>jakarta.servlet</groupId>

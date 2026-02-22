@@ -39,7 +39,8 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   private static final EnumSet <EDatabaseSystemType> ALLOWED_DB_TYPES = EnumSet.of (EDatabaseSystemType.DB2,
                                                                                     EDatabaseSystemType.MYSQL,
                                                                                     EDatabaseSystemType.ORACLE,
-                                                                                    EDatabaseSystemType.POSTGRESQL);
+                                                                                    EDatabaseSystemType.POSTGRESQL,
+                                                                                    EDatabaseSystemType.SQLSERVER);
   private static final EDatabaseSystemType DB_TYPE;
 
   static
