@@ -117,7 +117,7 @@ Use an existing binary release, with the XML backend.
 To build, run and stop the SMP image with XML backend use the following command:
 
 ```shell
-docker build --pull -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml --build-arg SMP_VERSION=8.0.16 .
+docker build --pull -t phoss-smp-release-binary-xml -f Dockerfile-release-binary-xml --build-arg SMP_VERSION=8.0.17 .
 docker run -d --name phoss-smp-release-binary-xml -p 8888:8080 phoss-smp-release-binary-xml
 docker stop phoss-smp-release-binary-xml
 docker rm phoss-smp-release-binary-xml
@@ -133,7 +133,7 @@ Use an existing binary release, with the SQL backend.
 To build the SMP image with SQL backend use the following command:
 
 ```shell
-docker build --pull -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql --build-arg SMP_VERSION=8.0.16 .
+docker build --pull -t phoss-smp-release-binary-sql -f Dockerfile-release-binary-sql --build-arg SMP_VERSION=8.0.17 .
 docker run -d --name phoss-smp-release-binary-sql -p 8888:8080 phoss-smp-release-binary-sql
 docker stop phoss-smp-release-binary-sql
 docker rm phoss-smp-release-binary-sql
@@ -150,7 +150,7 @@ Use an existing binary release, with the MongoDB backend.
 To build the SMP image with MongoDB backend use the following command:
 
 ```shell
-docker build --pull -t phoss-smp-release-binary-mongodb -f Dockerfile-release-binary-mongodb --build-arg SMP_VERSION=8.0.16 .
+docker build --pull -t phoss-smp-release-binary-mongodb -f Dockerfile-release-binary-mongodb --build-arg SMP_VERSION=8.0.17 .
 docker run -d --name phoss-smp-release-binary-mongodb -p 8888:8080 phoss-smp-release-binary-mongodb
 docker stop phoss-smp-release-binary-mongodb
 docker rm phoss-smp-release-binary-mongodb
@@ -164,7 +164,7 @@ Open `http://localhost:8888` in your browser.
 Build the SMP from GitHub source with the XML backend using the tag of the last release.
 
 ```shell
-docker build --pull -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml --build-arg SMP_VERSION=8.0.16 .
+docker build --pull -t phoss-smp-release-from-source-xml -f Dockerfile-release-from-source-xml --build-arg SMP_VERSION=8.0.17 .
 docker run -d --name phoss-smp-release-from-source-xml -p 8888:8080 phoss-smp-release-from-source-xml
 docker stop phoss-smp-release-from-source-xml
 docker rm phoss-smp-release-from-source-xml
@@ -226,7 +226,7 @@ docker rm phoss-smp-snapshot-from-local-source-sql
 To change the version build of binary release versions you can specify the version on the commandline when building:
 
 ```shell
-docker build --build-arg SMP_VERSION=8.0.16 -t phoss-smp-release-binary-xml-8.0.16 -f Dockerfile-release-binary-xml .
+docker build --build-arg SMP_VERSION=8.0.17 -t phoss-smp-release-binary-xml-8.0.17 -f Dockerfile-release-binary-xml .
 ```
 
 ### Docker cheatsheet
