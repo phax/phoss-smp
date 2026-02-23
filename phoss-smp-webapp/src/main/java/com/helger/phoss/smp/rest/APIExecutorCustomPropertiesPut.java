@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.string.StringHelper;
-import com.helger.json.IJsonArray;
-import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -43,6 +41,9 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.microdom.IMicroDocument;
+import com.helger.xml.microdom.convert.MicroTypeConverter;
+import com.helger.xml.microdom.serialize.MicroReader;
 
 /**
  * REST API executor for <code>PUT /{ServiceGroupId}/customproperties</code>. Authenticated.
@@ -90,25 +91,19 @@ public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
 
     SMPUserManagerPhoton.verifyOwnership (aParticipantID, aSMPUser);
 
-    // Read JSON body
+    // Read XML body
     final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
     if (aPayload == null || aPayload.length == 0)
       throw new SMPBadRequestException ("No request body provided", aDataProvider.getCurrentURI ());
 
-    final IJsonArray aJsonArray = JsonReader.builder ().source (aPayload).readAsArray ();
-    if (aJsonArray == null)
-      throw new SMPBadRequestException ("Failed to parse request body as JSON array", aDataProvider.getCurrentURI ());
+    final IMicroDocument aDoc = MicroReader.readMicroXML (aPayload);
+    if (aDoc == null || aDoc.getDocumentElement () == null)
+      throw new SMPBadRequestException ("Failed to parse request body as XML document", aDataProvider.getCurrentURI ());
 
-    final SGCustomPropertyList aCustomProperties;
-    try
-    {
-      aCustomProperties = SGCustomPropertyList.fromJson (aJsonArray);
-    }
-    catch (final RuntimeException ex)
-    {
-      throw new SMPBadRequestException ("Failed to parse custom properties from JSON: " + ex.getMessage (),
-                                        aDataProvider.getCurrentURI ());
-    }
+    final SGCustomPropertyList aCustomProperties = MicroTypeConverter.convertToNative (aDoc.getDocumentElement (),
+                                                                                       SGCustomPropertyList.class);
+    if (aCustomProperties == null)
+      throw new SMPBadRequestException ("Failed to parse custom properties from XML", aDataProvider.getCurrentURI ());
 
     // Update the service group with the new custom properties
     aServiceGroupMgr.updateSMPServiceGroup (aParticipantID,
@@ -116,13 +111,12 @@ public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
                                             aServiceGroup.getExtensions ().getExtensionsAsJsonString (),
                                             aCustomProperties);
 
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug (SMPRestFilter.LOG_PREFIX +
-                    "PUT customproperties for '" +
-                    sServiceGroupID +
-                    "' - " +
-                    aCustomProperties.size () +
-                    " properties set");
+    LOGGER.info (SMPRestFilter.LOG_PREFIX +
+                 "PUT customproperties for '" +
+                 sServiceGroupID +
+                 "' - " +
+                 aCustomProperties.size () +
+                 " properties set");
 
     aUnifiedResponse.createOk ();
   }

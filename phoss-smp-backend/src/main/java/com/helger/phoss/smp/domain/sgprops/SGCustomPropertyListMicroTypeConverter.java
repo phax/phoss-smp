@@ -44,7 +44,13 @@ public final class SGCustomPropertyListMicroTypeConverter implements IMicroTypeC
   {
     final SGCustomPropertyList ret = new SGCustomPropertyList ();
     for (final IMicroElement eChild : aElement.getAllChildElements (ELEMENT_CUSTOM_PROPERTY))
-      ret.add (MicroTypeConverter.convertToNative (eChild, SGCustomProperty.class));
+    {
+      final SGCustomProperty aCustomProperty = MicroTypeConverter.convertToNative (eChild, SGCustomProperty.class);
+      if (aCustomProperty != null && ret.add (aCustomProperty).isUnchanged ())
+        throw new IllegalStateException ("Another Custom Property with the name '" +
+                                         aCustomProperty.getName () +
+                                         "' is already contained in the list.");
+    }
     return ret;
   }
 }

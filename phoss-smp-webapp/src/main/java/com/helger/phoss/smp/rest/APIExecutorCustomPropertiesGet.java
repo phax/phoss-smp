@@ -110,15 +110,14 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     ret.addChild (MicroTypeConverter.convertToMicroElement (aEffectiveCustomProperties,
                                                             SMPServiceGroupMicroTypeConverter.ELEMENT_CUSTOM_PROPERTIES));
 
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug (SMPRestFilter.LOG_PREFIX +
-                    "GET customproperties" +
-                    (bAuthenticated ? " [authenticated]" : "") +
-                    " for '" +
-                    sServiceGroupID +
-                    "' - returning " +
-                    aEffectiveCustomProperties.size () +
-                    " properties");
+    LOGGER.info (SMPRestFilter.LOG_PREFIX +
+                 "GET customproperties" +
+                 (bAuthenticated ? " [authenticated]" : "") +
+                 " for '" +
+                 sServiceGroupID +
+                 "' - returning " +
+                 aEffectiveCustomProperties.size () +
+                 " properties");
 
     aUnifiedResponse.xml (ret);
   }

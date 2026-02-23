@@ -110,13 +110,12 @@ public final class APIExecutorCustomPropertyDelete extends AbstractSMPAPIExecuto
                                             aServiceGroup.getExtensions ().getExtensionsAsJsonString (),
                                             aCustomProperties);
 
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug (SMPRestFilter.LOG_PREFIX +
-                    "DELETE customproperties/" +
-                    sPropertyName +
-                    " for '" +
-                    sServiceGroupID +
-                    "'");
+    LOGGER.info (SMPRestFilter.LOG_PREFIX +
+                 "DELETE customproperties/" +
+                 sPropertyName +
+                 " for '" +
+                 sServiceGroupID +
+                 "'");
 
     aUnifiedResponse.createOk ();
   }
