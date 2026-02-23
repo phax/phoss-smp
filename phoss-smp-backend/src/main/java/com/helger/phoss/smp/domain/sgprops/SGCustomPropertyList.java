@@ -21,7 +21,6 @@ import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.annotation.style.ReturnsMutableCopy;
-import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.state.EChange;
@@ -161,7 +160,6 @@ public class SGCustomPropertyList implements IHasJson, ICommonsIterable <SGCusto
   }
 
   @NonNull
-  @ReturnsMutableObject
   public static SGCustomPropertyList fromJson (@NonNull final IJsonArray aJson)
   {
     final SGCustomPropertyList ret = new SGCustomPropertyList ();
