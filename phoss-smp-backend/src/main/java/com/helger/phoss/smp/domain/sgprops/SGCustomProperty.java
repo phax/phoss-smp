@@ -166,13 +166,13 @@ public final class SGCustomProperty implements IHasName, IHasJson
     if (!getClass ().equals (o.getClass ()))
       return false;
     final SGCustomProperty rhs = (SGCustomProperty) o;
-    return m_sName.equals (rhs.m_sName);
+    return m_eType.equals (rhs.m_eType) && m_sName.equals (rhs.m_sName) && m_sValue.equals (rhs.m_sValue);
   }
 
   @Override
   public int hashCode ()
   {
-    return new HashCodeGenerator (this).append (m_sName).getHashCode ();
+    return new HashCodeGenerator (this).append (m_eType).append (m_sName).append (m_sValue).getHashCode ();
   }
 
   @Override
