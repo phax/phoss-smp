@@ -19,26 +19,27 @@ package com.helger.phoss.smp.rest;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.phoss.smp.app.PDClientProvider;
-import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
-import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
+import com.helger.phoss.smp.restapi.CustomPropertiesServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
-public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
+/**
+ * REST API executor for <code>DELETE /{ServiceGroupId}/customproperties</code>. Authenticated.
+ * Deletes all custom properties.
+ *
+ * @author Philip Helger
+ * @since 8.1.0
+ */
+public final class APIExecutorCustomPropertiesDelete extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardPush.class);
-
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
                             @NonNull @Nonempty final String sPath,
@@ -49,25 +50,18 @@ public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
-    if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
+    if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      // PD integration is disabled
-      throw new SMPPreconditionFailedException ("The " +
-                                                SMPWebAppConfiguration.getDirectoryName () +
-                                                " integration is disabled. pushBusinessCard will not be executed",
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. customproperties DELETE will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
 
-    // Check if credentials are present
+    // Authenticate
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
-    // Do main push
-    // The PDClient stuff must be here, because the backend project is missing the dependency
-    new BusinessCardServerAPI (aDataProvider).pushBusinessCard (sPathServiceGroupID,
-                                                                aCredentials,
-                                                                aServiceGroupID -> PDClientProvider.getInstance ()
-                                                                                                   .getPDClient ()
-                                                                                                   .addServiceGroupToIndex (aServiceGroupID));
-    aUnifiedResponse.createOk ();
+    final int nDeletedProperties = new CustomPropertiesServerAPI (aDataProvider).deleteCustomProperties (sPathServiceGroupID,
+                                                                                                        aCredentials);
+
+    aUnifiedResponse.text (Integer.toString (nDeletedProperties));
   }
 }

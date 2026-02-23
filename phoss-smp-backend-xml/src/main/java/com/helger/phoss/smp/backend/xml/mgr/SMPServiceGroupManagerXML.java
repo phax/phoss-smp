@@ -40,6 +40,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
@@ -80,6 +81,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
                                                 @NonNull final IParticipantIdentifier aParticipantID,
                                                 @Nullable final String sExtension,
+                                                @Nullable final SGCustomPropertyList aCustomProperties,
                                                 final boolean bCreateInSML) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
@@ -96,7 +98,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                     bCreateInSML +
                     ")");
 
-    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
+    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension, aCustomProperties);
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -154,7 +156,8 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   @NonNull
   public EChange updateSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                         @NonNull @Nonempty final String sNewOwnerID,
-                                        @Nullable final String sExtension) throws SMPServerException
+                                        @Nullable final String sExtension,
+                                        @Nullable final SGCustomPropertyList aCustomProperties) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notEmpty (sNewOwnerID, "NewOwnerID");
@@ -184,6 +187,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       EChange eChange = EChange.UNCHANGED;
       eChange = eChange.or (aSMPServiceGroup.setOwnerID (sNewOwnerID));
       eChange = eChange.or (aSMPServiceGroup.getExtensions ().setExtensionAsString (sExtension));
+      eChange = eChange.or (aSMPServiceGroup.setCustomProperties (aCustomProperties));
       if (eChange.isUnchanged ())
       {
         if (LOGGER.isDebugEnabled ())

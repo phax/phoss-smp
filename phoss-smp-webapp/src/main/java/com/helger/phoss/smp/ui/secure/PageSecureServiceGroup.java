@@ -26,21 +26,30 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.WorkInProgress;
 import com.helger.base.compare.ESortOrder;
+import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCTextArea;
+import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCEM;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.html.jquery.JQuery;
+import com.helger.html.jquery.JQueryAjaxBuilder;
+import com.helger.html.jscode.JSAnonymousFunction;
+import com.helger.html.jscode.JSAssocArray;
+import com.helger.html.jscode.JSPackage;
+import com.helger.html.jscode.JSParam;
 import com.helger.network.port.NetworkOnlineStatusDeterminator;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -54,6 +63,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.sgprops.ESGCustomPropertyType;
+import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -63,8 +75,13 @@ import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
+import com.helger.phoss.smp.ui.secure.hc.HCSMPCustomPropertyTypeSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
+import com.helger.photon.app.PhotonUnifiedResponse;
+import com.helger.photon.bootstrap4.CBootstrapCSS;
 import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
@@ -74,14 +91,18 @@ import com.helger.photon.bootstrap4.button.EBootstrapButtonType;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap4.form.BootstrapForm;
 import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap4.form.BootstrapFormHelper;
 import com.helger.photon.bootstrap4.form.BootstrapViewForm;
 import com.helger.photon.bootstrap4.grid.BootstrapRow;
 import com.helger.photon.bootstrap4.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
 import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap4.table.BootstrapTable;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.core.execcontext.ILayoutExecutionContext;
+import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
@@ -91,6 +112,7 @@ import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -98,6 +120,8 @@ import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.photon.uictrls.famfam.EFamFamIcon;
+import com.helger.servlet.request.IRequestParamMap;
+import com.helger.servlet.request.RequestParamMap;
 import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.smpclient.url.IBDXLURLProvider;
 import com.helger.smpclient.url.IPeppolURLProvider;
@@ -282,6 +306,11 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String FIELD_PARTICIPANT_ID_VALUE = "participantidvalue";
   private static final String FIELD_OWNING_USER_ID = "owninguser";
   private static final String FIELD_EXTENSION = "extension";
+  private static final String PREFIX_CUSTPROP = "custprop";
+  private static final String SUFFIX_TYPE = "type";
+  private static final String SUFFIX_NAME = "name";
+  private static final String SUFFIX_VALUE = "value";
+  private static final String TMP_ID_PREFIX = "tmp";
 
   private static final String ACTION_CHECK_DNS = "checkdns";
   private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
@@ -289,6 +318,22 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
   private static final String PARAM_CREATE_IN_SML = "create-in-sml";
   private static final String PARAM_DELETE_IN_SML = "delete-in-sml";
+
+  private static final IAjaxFunctionDeclaration AJAX_CREATE_CUSTPROP;
+
+  static
+  {
+    AJAX_CREATE_CUSTPROP = CAjax.addAjaxWithLogin ( (aRequestScope, aAjaxResponse) -> {
+      final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
+      final IHCNode aNode = _createCustomPropertyInputForm (aLEC,
+                                                            (SGCustomProperty) null,
+                                                            (String) null,
+                                                            new FormErrorList ());
+
+      // Build the HTML response
+      aAjaxResponse.html (aNode);
+    });
+  }
 
   public PageSecureServiceGroup (@NonNull @Nonempty final String sID)
   {
@@ -466,6 +511,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                             "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
+    aForm.setLeft (-1, 12, 4, 3, 2);
+
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
                                                  .setCtrl (aSelectedObject.getParticipantIdentifier ()
                                                                           .getURIEncoded ()));
@@ -474,6 +521,24 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     if (aSelectedObject.getExtensions ().extensions ().isNotEmpty ())
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPExtensionUI.getExtensionDisplay (aSelectedObject)));
+
+    // Show custom properties
+    final SGCustomPropertyList aCustomProperties = aSelectedObject.getCustomProperties ();
+    if (aCustomProperties != null && aCustomProperties.isNotEmpty ())
+    {
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Custom Properties"));
+
+      final HCTable aCPTable = new HCTable (new DTCol ("Type"), new DTCol ("Name"), new DTCol ("Value")).setID (
+                                                                                                                getID () +
+                                                                                                                "_customprops");
+      aCustomProperties.forEach (x -> {
+        final HCRow aRow = aCPTable.addBodyRow ();
+        aRow.addCell (x.getType ().getDisplayText (aDisplayLocale));
+        aRow.addCell (x.getName ());
+        aRow.addCell (x.getValue ());
+      });
+      aForm.addChildren (aCPTable, BootstrapDataTables.createDefaultDataTables (aWPEC, aCPTable));
+    }
 
     if (bShowBusinessCard)
     {
@@ -495,6 +560,65 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     aNodeList.addChild (aForm);
   }
 
+  @NonNull
+  private static HCRow _createCustomPropertyInputForm (@NonNull final ILayoutExecutionContext aLEC,
+                                                       @Nullable final SGCustomProperty aExistingCustProp,
+                                                       @Nullable final String sExistingID,
+                                                       @NonNull final FormErrorList aFormErrors)
+  {
+    final Locale aDisplayLocale = aLEC.getDisplayLocale ();
+    final String sIdentifierID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
+                                                                                       Integer.toString (GlobalIDFactory.getNewIntID ());
+
+    final HCRow aRow = new HCRow ();
+
+    // Custom Property type
+    {
+      final String sFieldName = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sIdentifierID, SUFFIX_TYPE);
+      final var aCtrl = new HCSMPCustomPropertyTypeSelect (new RequestField (sFieldName,
+                                                                             aExistingCustProp == null
+                                                                                                       ? ESGCustomPropertyType.DEFAULT.getID ()
+                                                                                                       : aExistingCustProp.getType ()
+                                                                                                                          .getID ()),
+                                                           aDisplayLocale);
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldName),
+                                                                aDisplayLocale));
+    }
+
+    // Custom Property name
+    {
+      final String sFieldName = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sIdentifierID, SUFFIX_NAME);
+      final var aCtrl = new HCEdit (new RequestField (sFieldName,
+                                                      aExistingCustProp == null ? null : aExistingCustProp.getName ()))
+                                                                                                                       .setMaxLength (SGCustomProperty.NAME_MAX_LEN)
+                                                                                                                       .setPlaceholder ("Custom Property name");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldName),
+                                                                aDisplayLocale));
+    }
+
+    // Custom Property Value
+    {
+      final String sFieldValue = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sIdentifierID, SUFFIX_VALUE);
+      final var aCtrl = new HCEdit (new RequestField (sFieldValue,
+                                                      aExistingCustProp == null ? null : aExistingCustProp.getValue ()))
+                                                                                                                        .setMaxLength (SGCustomProperty.VALUE_MAX_LEN)
+                                                                                                                        .setPlaceholder ("Custom Property value");
+      aCtrl.addClass (CBootstrapCSS.FORM_CONTROL);
+      aRow.addCell (aCtrl,
+                    BootstrapFormHelper.createDefaultErrorNode (aFormErrors.getListOfField (sFieldValue),
+                                                                aDisplayLocale));
+    }
+
+    aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).setIcon (EDefaultIcon.DELETE)
+                                                                  .setOnClick (JQuery.idRef (aRow).remove ()));
+
+    return aRow;
+  }
+
   @Override
   protected void showInputForm (@NonNull final WebPageExecutionContext aWPEC,
                                 @Nullable final ISMPServiceGroup aSelectedObject,
@@ -503,6 +627,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                 @NonNull final EWebPageFormAction eFormAction,
                                 @NonNull final FormErrorList aFormErrors)
   {
+    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bEdit = eFormAction.isEdit ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
@@ -568,6 +693,60 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                           : "JSON or XML") +
                                                                " content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
+
+    // Custom properties
+    {
+      final SGCustomPropertyList aExistingProps = aSelectedObject != null ? aSelectedObject.getCustomProperties ()
+                                                                          : null;
+      final String sBodyID = aSelectedObject != null ? aSelectedObject.getID () : TMP_ID_PREFIX +
+                                                                                  Integer.toString (GlobalIDFactory.getNewIntID ());
+
+      final HCNodeList aNL = new HCNodeList ();
+      final BootstrapTable aTable = aNL.addAndReturnChild (new BootstrapTable (HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star (),
+                                                                               HCCol.star ()));
+      aTable.addHeaderRow ().addCells ("Type", "Name", "Value", "");
+      aTable.setBodyID (sBodyID);
+
+      final IRequestParamMap aCustProps = aWPEC.getRequestParamMap ().getMap (PREFIX_CUSTPROP);
+      if (bFormSubmitted)
+      {
+        // Re-show of form
+        if (aCustProps != null)
+          for (final String sIdentifierRowID : aCustProps.keySet ())
+            aTable.addBodyRow (_createCustomPropertyInputForm (aWPEC, null, sIdentifierRowID, aFormErrors));
+      }
+      else
+      {
+        if (aExistingProps != null)
+        {
+          // add all existing stored properties
+          for (final SGCustomProperty aProp : aExistingProps)
+            aTable.addBodyRow (_createCustomPropertyInputForm (aWPEC, aProp, (String) null, aFormErrors));
+        }
+      }
+
+      {
+        final JSAnonymousFunction aJSAppend = new JSAnonymousFunction ();
+        final JSParam aJSAppendData = aJSAppend.param ("data");
+        aJSAppend.body ()
+                 .add (JQuery.idRef (sBodyID)
+                             .append (aJSAppendData.ref (PhotonUnifiedResponse.HtmlHelper.PROPERTY_HTML)));
+
+        final JSPackage aOnAdd = new JSPackage ();
+        aOnAdd.add (new JQueryAjaxBuilder ().url (AJAX_CREATE_CUSTPROP.getInvocationURL (aRequestScope))
+                                            .data (new JSAssocArray ())
+                                            .success (JSJQueryHelper.jqueryAjaxSuccessHandler (aJSAppend, null))
+                                            .build ());
+
+        aNL.addChild (new BootstrapButton ().setIcon (EDefaultIcon.PLUS)
+                                            .addChild ("Add Custom Property")
+                                            .setOnClick (aOnAdd));
+      }
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Custom Properties").setCtrl (aNL));
+    }
   }
 
   @Override
@@ -627,6 +806,54 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       }
     }
 
+    final SGCustomPropertyList aCustomProperties = new SGCustomPropertyList ();
+    {
+      // Entity Identifiers
+      final IRequestParamMap aCustProps = aWPEC.getRequestParamMap ().getMap (PREFIX_CUSTPROP);
+      if (aCustProps != null)
+        for (final String sCustPropRowID : aCustProps.keySet ())
+        {
+          final ICommonsMap <String, String> aCustPropRow = aCustProps.getValueMap (sCustPropRowID);
+          final int nErrors2 = aFormErrors.size ();
+
+          // Type
+          final String sFieldType = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sCustPropRowID, SUFFIX_TYPE);
+          final String sType = aCustPropRow.get (SUFFIX_TYPE);
+          final ESGCustomPropertyType eType = ESGCustomPropertyType.getFromIDOrNull (sType);
+          if (eType == null)
+            aFormErrors.addFieldError (sFieldType, "The type of the custom property must be provided!");
+
+          // Name
+          final String sFieldName = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sCustPropRowID, SUFFIX_NAME);
+          final String sName = aCustPropRow.get (SUFFIX_NAME);
+          if (StringHelper.isEmpty (sName))
+            aFormErrors.addFieldError (sFieldName, "The name of the custom property must be provided.");
+          else
+            if (!SGCustomProperty.isValidName (sName))
+              aFormErrors.addFieldError (sFieldName,
+                                         "The custom property name '" +
+                                                     sName +
+                                                     "' is invalid. Must be alphanumeric (with dot, minus, underscore), max 256 chars.");
+            else
+              if (aCustomProperties.containsName (sName))
+                aFormErrors.addFieldError (sFieldName, "Duplicate custom property name '" + sName + "'.");
+
+          // Value
+          final String sFieldValue = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sCustPropRowID, SUFFIX_VALUE);
+          final String sValue = aCustPropRow.get (SUFFIX_VALUE);
+          // Empty value is okay
+          if (!SGCustomProperty.isValidValue (sValue))
+            aFormErrors.addFieldError (sFieldValue,
+                                       "The custom property value '" + sValue + "' is invalid. Max 256 chars.");
+
+          if (aFormErrors.size () == nErrors2)
+          {
+            // No errors in this custom property
+            aCustomProperties.add (new SGCustomProperty (eType, sName, sValue));
+          }
+        }
+    }
+
     if (aFormErrors.isEmpty ())
     {
       if (bEdit)
@@ -635,7 +862,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         // necessary. Only the owner and the extension can be edited!
         try
         {
-          aServiceGroupMgr.updateSMPServiceGroup (aParticipantID, aOwningUser.getID (), sExtension);
+          aServiceGroupMgr.updateSMPServiceGroup (aParticipantID, aOwningUser.getID (), sExtension, aCustomProperties);
           aWPEC.postRedirectGetInternal (success ("The SMP Service Group for participant '" +
                                                   aParticipantID.getURIEncoded () +
                                                   "' was successfully updated."));
@@ -654,7 +881,11 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         Exception aCaughtEx = null;
         try
         {
-          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, bCreateInSML);
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (),
+                                                        aParticipantID,
+                                                        sExtension,
+                                                        aCustomProperties,
+                                                        bCreateInSML);
         }
         catch (final Exception ex)
         {
@@ -698,22 +929,25 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     {
       // Disable button if no SML URL is configured
       // Disable button if no service group is present
-      aToolbar.addAndReturnButton ("Check DNS state",
+      final boolean bTooMany = aAllServiceGroups.size () > 10_000;
+      aToolbar.addAndReturnButton ("Check DNS state" + (bTooMany ? " (too many entries)" : ""),
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (aSettings.getSMLDNSZone () == null ||
                             aAllServiceGroups.isEmpty () ||
+                            bTooMany ||
                             !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 
-    final boolean bShowDetails = aAllServiceGroups.size () <= 1000;
+    final boolean bShowDetails = aAllServiceGroups.size () <= 1_000;
 
     final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Owner"),
                                         bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
                                         new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle (
                                                                                                            "Is an Extension present?")),
+                                        new DTCol ("Properties").setDisplayType (EDTColType.INT, aDisplayLocale),
                                         bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
                                                                                                                                                 aDisplayLocale)
                                                      : null,
@@ -762,6 +996,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.getExtensions ().extensions ().isNotEmpty (),
                                                   aDisplayLocale));
       }
+
+      aRow.addCell (Integer.toString (aCurObject.getCustomPropertyCount ()));
 
       if (bShowDetails)
       {

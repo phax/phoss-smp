@@ -45,4 +45,50 @@ public class SMPNotFoundException extends SMPServerException
   {
     super ("Not found: " + sMessage + (aNotFoundURI == null ? "" : " at " + aNotFoundURI));
   }
+
+  @NonNull
+  public static SMPNotFoundException unknownSG (@NonNull final String sServiceGroupID, @Nullable final URI aEffectedURI)
+  {
+    return new SMPNotFoundException ("Service Group '" + sServiceGroupID + "' is not registered on this SMP",
+                                     aEffectedURI);
+  }
+
+  @NonNull
+  public static SMPNotFoundException unknownDocType (@NonNull final String sServiceGroupID,
+                                                     @NonNull final String sDocTypeID,
+                                                     @Nullable final URI aEffectedURI)
+  {
+    return new SMPNotFoundException ("Service Group '" +
+                                     sServiceGroupID +
+                                     "' doesn't support the document type ID '" +
+                                     sDocTypeID +
+                                     "'",
+                                     aEffectedURI);
+  }
+
+  @NonNull
+  public static SMPNotFoundException unknownServiceInformation (@NonNull final String sServiceGroupID,
+                                                                @NonNull final String sDocTypeID,
+                                                                @Nullable final URI aEffectedURI)
+  {
+    return new SMPNotFoundException ("Service Information for '" +
+                                     sServiceGroupID +
+                                     "' and '" +
+                                     sDocTypeID +
+                                     "' is not registered on this SMP",
+                                     aEffectedURI);
+  }
+
+  @NonNull
+  public static SMPNotFoundException unknownServiceRedirect (@NonNull final String sServiceGroupID,
+                                                             @NonNull final String sDocTypeID,
+                                                             @Nullable final URI aEffectedURI)
+  {
+    return new SMPNotFoundException ("Service Redirect for '" +
+                                     sServiceGroupID +
+                                     "' and '" +
+                                     sDocTypeID +
+                                     "' is not registered on this SMP",
+                                     aEffectedURI);
+  }
 }

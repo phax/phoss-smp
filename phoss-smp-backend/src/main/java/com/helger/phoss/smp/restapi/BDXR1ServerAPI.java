@@ -43,6 +43,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
@@ -100,7 +101,7 @@ public final class BDXR1ServerAPI
   }
 
   @NonNull
-  public CompleteServiceGroupType getCompleteServiceGroup (final String sPathServiceGroupID) throws SMPServerException
+  public CompleteServiceGroupType getCompleteServiceGroup (@NonNull final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /complete/" + sPathServiceGroupID;
     final String sAction = "getCompleteServiceGroup";
@@ -126,8 +127,7 @@ public final class BDXR1ServerAPI
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown Service Group ID '" + sPathServiceGroupID + "'",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       // Then add the service metadata references
@@ -258,8 +258,7 @@ public final class BDXR1ServerAPI
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       // Then add the service metadata references
@@ -357,10 +356,15 @@ public final class BDXR1ServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final String sExtension = convertToJsonString (aServiceGroup.getExtension ());
+      final SGCustomPropertyList aCustomProperties = null;
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
-        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
+        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension, aCustomProperties);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
+        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (),
+                                                aPathServiceGroupID,
+                                                sExtension,
+                                                aCustomProperties,
+                                                bCreateInSML);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
@@ -426,13 +430,14 @@ public final class BDXR1ServerAPI
     if (sValue.startsWith ("9934:"))
       nCharsToSkip = 5;
     else
+      // TODO wrong
       if (sValue.startsWith ("0088:385"))
         nCharsToSkip = 8;
       else
         return null;
 
     final String sNamespaceURI = CSMPServer.HR_EXTENSION_NAMESPACE_URI;
-    String sNSPrefix = CSMPServer.HR_EXTENSION_DEFAULT_PREFIX + ':';
+    final String sNSPrefix = CSMPServer.HR_EXTENSION_DEFAULT_PREFIX + ':';
     final Document aDoc = XMLFactory.newDocument ();
     final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "HRMPS"));
     // Take everything after 9934:
@@ -473,8 +478,7 @@ public final class BDXR1ServerAPI
                                                                .getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("No such Service Group '" + sPathServiceGroupID + "'",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
@@ -518,8 +522,9 @@ public final class BDXR1ServerAPI
         if (aSM == null)
         {
           // Neither nor is present, or no endpoint is available
-          throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,
+                                                                sPathDocTypeID,
+                                                                m_aAPIDataProvider.getCurrentURI ());
         }
         if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
         {
@@ -650,8 +655,7 @@ public final class BDXR1ServerAPI
       if (aPathServiceGroup == null)
       {
         // Service group not found
-        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       if (aServiceMetadata.getRedirect () != null)
@@ -772,8 +776,7 @@ public final class BDXR1ServerAPI
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -786,12 +789,9 @@ public final class BDXR1ServerAPI
         if (eChange.isUnchanged ())
         {
           // Most likely an internal error or an inconsistency
-          throw new SMPNotFoundException ("serviceInformation (" +
-                                          aPathServiceGroupID.getURIEncoded () +
-                                          ", " +
-                                          aPathDocTypeID.getURIEncoded () +
-                                          ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,
+                                                                sPathDocTypeID,
+                                                                m_aAPIDataProvider.getCurrentURI ());
         }
         LOGGER.info (sLog + " SUCCESS - ServiceInformation");
         STATS_COUNTER_SUCCESS.increment (sAction);
@@ -805,20 +805,18 @@ public final class BDXR1ServerAPI
         if (aRedirect == null)
         {
           // Neither redirect nor endpoint found
-          throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownDocType (sPathServiceGroupID,
+                                                     sPathDocTypeID,
+                                                     m_aAPIDataProvider.getCurrentURI ());
         }
         // Handle redirect
         final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
         if (eChange.isUnchanged ())
         {
           // Most likely an internal error or an inconsistency
-          throw new SMPNotFoundException ("redirect(" +
-                                          aPathServiceGroupID.getURIEncoded () +
-                                          ", " +
-                                          aPathDocTypeID.getURIEncoded () +
-                                          ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownServiceRedirect (sPathServiceGroupID,
+                                                             sPathDocTypeID,
+                                                             m_aAPIDataProvider.getCurrentURI ());
         }
         LOGGER.info (sLog + " SUCCESS - Redirect");
         STATS_COUNTER_SUCCESS.increment (sAction);
@@ -858,8 +856,7 @@ public final class BDXR1ServerAPI
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();

@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.equals.EqualsHelper;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.state.EChange;
 import com.helger.base.tostring.ToStringGenerator;
@@ -27,6 +28,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 
 /**
  * This class represents a single service group.
@@ -40,6 +42,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
 
   private final String m_sID;
   private String m_sOwnerID;
+  private SGCustomPropertyList m_aCustomProperties;
 
   // Status member
   private final IParticipantIdentifier m_aParticipantIdentifier;
@@ -77,9 +80,18 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
                           @NonNull final IParticipantIdentifier aParticipantIdentifier,
                           @Nullable final String sExtension)
   {
+    this (sOwnerID, aParticipantIdentifier, sExtension, null);
+  }
+
+  public SMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
+                          @NonNull final IParticipantIdentifier aParticipantIdentifier,
+                          @Nullable final String sExtension,
+                          @Nullable final SGCustomPropertyList aCustomProperties)
+  {
     m_sID = createSMPServiceGroupID (aParticipantIdentifier);
     setOwnerID (sOwnerID);
     getExtensions ().setExtensionAsString (sExtension);
+    m_aCustomProperties = aCustomProperties;
     // Make a copy to avoid unwanted changes
     m_aParticipantIdentifier = _createUnifiedParticipantIdentifier (aParticipantIdentifier);
   }
@@ -112,6 +124,21 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   public IParticipantIdentifier getParticipantIdentifier ()
   {
     return m_aParticipantIdentifier;
+  }
+
+  @Nullable
+  public SGCustomPropertyList getCustomProperties ()
+  {
+    return m_aCustomProperties;
+  }
+
+  @NonNull
+  public final EChange setCustomProperties (@Nullable final SGCustomPropertyList aCustomProperties)
+  {
+    if (EqualsHelper.equals (aCustomProperties, m_aCustomProperties))
+      return EChange.UNCHANGED;
+    m_aCustomProperties = aCustomProperties;
+    return EChange.CHANGED;
   }
 
   public com.helger.xsds.peppol.smp1.@NonNull ServiceGroupType getAsJAXBObjectPeppol ()

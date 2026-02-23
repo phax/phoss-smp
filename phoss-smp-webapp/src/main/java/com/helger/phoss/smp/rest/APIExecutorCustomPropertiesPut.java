@@ -16,29 +16,36 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.array.ArrayHelper;
 import com.helger.base.io.stream.StreamHelper;
-import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
-import com.helger.peppol.businesscard.generic.PDBusinessCard;
-import com.helger.peppol.businesscard.helper.PDBusinessCardHelper;
-import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
-import com.helger.phoss.smp.restapi.BusinessCardServerAPI;
+import com.helger.phoss.smp.restapi.CustomPropertiesServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.microdom.IMicroDocument;
+import com.helger.xml.microdom.convert.MicroTypeConverter;
+import com.helger.xml.microdom.serialize.MicroReader;
 
-public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
+/**
+ * REST API executor for <code>PUT /{ServiceGroupId}/customproperties</code>. Authenticated.
+ * Replaces all custom properties with the provided XML body.
+ *
+ * @author Philip Helger
+ * @since 8.1.0
+ */
+public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
 {
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
@@ -47,43 +54,37 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      throw new SMPPreconditionFailedException ("The writable REST API is disabled. createBusinessCard will not be executed",
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. customproperties PUT will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
 
-    // Check credentials first
+    // Authenticate
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
-    if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
-    {
-      // PD integration is disabled
-      throw new SMPPreconditionFailedException ("The " +
-                                                SMPWebAppConfiguration.getDirectoryName () +
-                                                " integration is disabled. createBusinessCard will not be executed",
-                                                aDataProvider.getCurrentURI ());
-    }
+    // Read XML body
+    final byte [] aPayloadBytes = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
+    if (ArrayHelper.isEmpty (aPayloadBytes))
+      throw new SMPBadRequestException ("No request body provided", aDataProvider.getCurrentURI ());
 
-    // Parse main payload
-    final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
-    final PDBusinessCard aBC = PDBusinessCardHelper.parseBusinessCard (aPayload, (Charset) null);
-    if (aBC == null)
-    {
-      // Cannot parse
-      throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
-    }
+    final IMicroDocument aDoc = MicroReader.readMicroXML (aPayloadBytes);
+    if (aDoc == null || aDoc.getDocumentElement () == null)
+      throw new SMPBadRequestException ("Failed to parse request body as XML document", aDataProvider.getCurrentURI ());
 
-    final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
-                                                                                            aBC,
-                                                                                            aCredentials);
-    if (eSuccess.isFailure ())
-      aUnifiedResponse.createInternalServerError ();
-    else
-      aUnifiedResponse.createOk ();
+    final SGCustomPropertyList aCustomProperties = MicroTypeConverter.convertToNative (aDoc.getDocumentElement (),
+                                                                                       SGCustomPropertyList.class);
+    if (aCustomProperties == null)
+      throw new SMPBadRequestException ("Failed to parse custom properties from XML", aDataProvider.getCurrentURI ());
+
+    new CustomPropertiesServerAPI (aDataProvider).setCustomProperties (sPathServiceGroupID,
+                                                                      aCustomProperties,
+                                                                      aCredentials);
+
+    aUnifiedResponse.createNoContent ();
   }
 }

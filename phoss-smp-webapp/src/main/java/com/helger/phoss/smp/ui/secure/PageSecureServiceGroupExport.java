@@ -61,13 +61,14 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
         final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
         final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+        final boolean bExportBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
 
         final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups,
-                                                                                 aSettings.isDirectoryIntegrationEnabled ());
+                                                                                 bExportBusinessCards);
 
         // Build the XML response
         aAjaxResponse.xml (aDoc);
-        aAjaxResponse.attachment ("smp-data-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml");
+        aAjaxResponse.attachment ("phoss-smp-export-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml");
       }
     });
   }
@@ -86,7 +87,7 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final long nServiceGroupCount = aServiceGroupMgr.getSMPServiceGroupCount ();
 
-    final boolean bHandleBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
+    final boolean bExportBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
 
     if (nServiceGroupCount < 0)
       aNodeList.addChild (error ("The number of service groups is unknown, hence nothing can be exported!"));
@@ -96,9 +97,10 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       else
       {
         aNodeList.addChild (info ("Export " +
-                                  (nServiceGroupCount == 1 ? "service group"
-                                                           : "all " + nServiceGroupCount + " service groups") +
-                                  (bHandleBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
+                                  (nServiceGroupCount == 1 ? "service group" : "all " +
+                                                                               nServiceGroupCount +
+                                                                               " service groups") +
+                                  (bExportBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
                                                         : "") +
                                   " to an XML file."));
       }

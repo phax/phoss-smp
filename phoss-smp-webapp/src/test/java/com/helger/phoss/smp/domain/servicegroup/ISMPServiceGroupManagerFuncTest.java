@@ -73,13 +73,13 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
       assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isUnchanged ());
       assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner1ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner2ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner1ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner2ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension, null).isUnchanged ());
 
       // Register first and check state
-      ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension, true);
+      ISMPServiceGroup aSG1 = aSGMgr.createSMPServiceGroup (sOwner1ID, aPI1, sExtension, null, true);
       assertNotNull (aSG1);
       assertEquals (aPI1, aSG1.getParticipantIdentifier ());
       assertEquals (sSG1, aSG1.getID ());
@@ -99,17 +99,17 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
 
       // change owner
-      assertTrue (aSGMgr.updateSMPServiceGroup (aPI1, sOwner1ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroup (aPI1, sOwner2ID, sExtension).isChanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroup (aPI1, sOwner1ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroup (aPI1, sOwner2ID, sExtension, null).isChanged ());
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner1ID).size ());
       assertEquals (1, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
       assertTrue (aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).contains (aSG1));
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension, null).isUnchanged ());
       aSG1 = aSGMgr.getSMPServiceGroupOfID (aPI1);
       assertEquals (sOwner2ID, aSG1.getOwnerID ());
 
-      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sOwner2ID, aPI2, sExtension, true);
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sOwner2ID, aPI2, sExtension, null, true);
       assertNotNull (aSG2);
       assertEquals (aPI2, aSG2.getParticipantIdentifier ());
       assertEquals (sSG2, aSG2.getID ());
@@ -161,10 +161,10 @@ public final class ISMPServiceGroupManagerFuncTest
       assertEquals (0, aSGMgr.getAllSMPServiceGroupsOfOwner (sOwner2ID).size ());
       assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI1, true).isUnchanged ());
       assertTrue (aSGMgr.deleteSMPServiceGroupNoEx (aPI2, true).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner1ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner2ID, sExtension).isUnchanged ());
-      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner1ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner1ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI1, sOwner2ID, sExtension, null).isUnchanged ());
+      assertTrue (aSGMgr.updateSMPServiceGroupNoEx (aPI2, sOwner2ID, sExtension, null).isUnchanged ());
     }
     finally
     {

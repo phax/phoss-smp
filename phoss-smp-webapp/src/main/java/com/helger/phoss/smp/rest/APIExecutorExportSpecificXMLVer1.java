@@ -87,8 +87,7 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
     if (aServiceGroup == null)
     {
       // No such service group
-      throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
-                                      aDataProvider.getCurrentURI ());
+      throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,

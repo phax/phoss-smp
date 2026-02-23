@@ -21,6 +21,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 
 /**
  * Mock implementation of {@link ISMPServiceGroupManager}.
@@ -41,6 +42,7 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
   public ISMPServiceGroup createSMPServiceGroup (final String sOwnerID,
                                                  final IParticipantIdentifier aParticipantID,
                                                  final String sExtension,
+                                                 final SGCustomPropertyList aCustomProperties,
                                                  final boolean bCreateInSML)
   {
     throw new UnsupportedOperationException ();
@@ -48,7 +50,8 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
 
   public EChange updateSMPServiceGroup (final IParticipantIdentifier aParticipantID,
                                         final String sOwnerID,
-                                        final String sExtension)
+                                        final String sExtension,
+                                        final SGCustomPropertyList aCustomProperties)
   {
     throw new UnsupportedOperationException ();
   }

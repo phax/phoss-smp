@@ -473,6 +473,7 @@ public final class ServiceGroupImport
                                                                            aImportServiceGroup.getParticipantIdentifier (),
                                                                            aImportServiceGroup.getExtensions ()
                                                                                               .getExtensionsAsJsonString (),
+                                                                           aImportServiceGroup.getCustomProperties (),
                                                                            bCreateInSML);
                 aImportLogger.success (sServiceGroupID, "Successfully created Service Group");
                 aImportLogger.onSuccess (EImportSummaryAction.CREATE_SG);

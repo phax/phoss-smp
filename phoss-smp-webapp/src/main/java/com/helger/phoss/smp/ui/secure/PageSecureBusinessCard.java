@@ -152,6 +152,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static final String SUFFIX_ADDITIONAL_INFO = "additional";
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
+
   private static final String ACTION_PUBLISH_TO_INDEXER = "publishtoindexer";
   private static final String ACTION_PUBLISH_ALL_TO_INDEXER = "publishalltoindexer";
 
@@ -252,11 +253,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
               aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
           }
           else
+          {
             aBox.addChild ("Successfully notified the " +
                            sDirectoryName +
                            " to index " +
                            aSuccess.size () +
                            " participants");
+          }
           aResultNodes.addChild (aBox);
         }
         if (aFailure.isNotEmpty ())
@@ -1280,6 +1283,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
       if (aCurObject.getEntityCount () == 0)
       {
+        // Business Card without an entity
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
         for (int i = 1; i < aTable.getColumnCount () - 1; ++i)
@@ -1288,6 +1292,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       }
       else
       {
+        // Show all BusinessCard entities
         for (final SMPBusinessCardEntity aEntity : aCurObject.getAllEntities ())
         {
           final HCRow aRow = aTable.addBodyRow ();
@@ -1316,7 +1321,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-
     aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

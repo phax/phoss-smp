@@ -13,12 +13,15 @@ package com.helger.phoss.smp.domain.servicegroup;
 import java.util.Comparator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.base.id.IHasID;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 
 /**
  * Base interface for a single SMP service group.
@@ -47,6 +50,34 @@ public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
    */
   @NonNull
   IParticipantIdentifier getParticipantIdentifier ();
+
+  /**
+   * @return <code>true</code> if this service group has custom properties, <code>false</code> if
+   *         not.
+   * @since 8.1.0
+   */
+  default boolean hasCustomProperties ()
+  {
+    return getCustomProperties () != null;
+  }
+
+  /**
+   * @return The number of contained custom properties. Always &ge; 0.
+   * @since 8.1.0
+   */
+  @Nonnegative
+  default int getCustomPropertyCount ()
+  {
+    final var aList = getCustomProperties ();
+    return aList == null ? 0 : aList.size ();
+  }
+
+  /**
+   * @return The custom properties of this service group. May be <code>null</code>.
+   * @since 8.1.0
+   */
+  @Nullable
+  SGCustomPropertyList getCustomProperties ();
 
   /**
    * @return This service information object as a Peppol SMP JAXB object for the REST interface.
