@@ -63,7 +63,7 @@ public final class BusinessCardServerAPI
   }
 
   @NonNull
-  public PD3BusinessCardType getBusinessCard (final String sPathServiceGroupID) throws SMPServerException
+  public PD3BusinessCardType getBusinessCard (@NonNull final String sPathServiceGroupID) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "GET /businesscard/" + sPathServiceGroupID;
     final String sAction = "getBusinessCard";
