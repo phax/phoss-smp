@@ -153,7 +153,6 @@ public final class SGCustomProperty implements IHasName, IHasJson
    * Get a simple JSON representation of this object.
    */
   @NonNull
-  @ReturnsMutableObject
   public IJsonObject getAsJson ()
   {
     return new JsonObject ().add ("type", m_eType.getID ()).add ("name", m_sName).add ("value", m_sValue);
