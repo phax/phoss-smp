@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
@@ -32,6 +33,7 @@ import com.helger.json.JsonObject;
  * @since 8.1.0
  */
 @Immutable
+@MustImplementEqualsAndHashcode
 public final class SGCustomProperty implements IHasName, IHasJson
 {
   public static final int NAME_MAX_LEN = 256;

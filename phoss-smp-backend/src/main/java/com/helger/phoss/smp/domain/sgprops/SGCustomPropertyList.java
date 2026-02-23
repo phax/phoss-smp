@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.sgprops;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -18,13 +19,14 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
-import com.helger.base.iface.IHasSize;
 import com.helger.base.state.EChange;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.collection.commons.CommonsLinkedHashMap;
+import com.helger.collection.commons.ICommonsIterable;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.json.IHasJson;
 import com.helger.json.IJsonArray;
@@ -39,7 +41,8 @@ import com.helger.json.JsonArray;
  * @since 8.1.0
  */
 @NotThreadSafe
-public class SGCustomPropertyList implements IHasJson, IHasSize
+@MustImplementEqualsAndHashcode
+public class SGCustomPropertyList implements IHasJson, ICommonsIterable <SGCustomProperty>
 {
   private final ICommonsOrderedMap <String, SGCustomProperty> m_aList = new CommonsLinkedHashMap <> ();
 
@@ -78,13 +81,13 @@ public class SGCustomPropertyList implements IHasJson, IHasSize
     return EChange.valueOf (m_aList.remove (sName) != null);
   }
 
-  public void iterate (@NonNull final Consumer <? super SGCustomProperty> aConsumer)
+  public void forEach (@NonNull final Consumer <? super SGCustomProperty> aConsumer)
   {
     ValueEnforcer.notNull (aConsumer, "Consumer");
     m_aList.forEachValue (aConsumer);
   }
 
-  public void iterate (@Nullable final Predicate <? super SGCustomProperty> aFilter,
+  public void forEach (@Nullable final Predicate <? super SGCustomProperty> aFilter,
                        @NonNull final Consumer <? super SGCustomProperty> aConsumer)
   {
     ValueEnforcer.notNull (aConsumer, "Consumer");
@@ -111,6 +114,12 @@ public class SGCustomPropertyList implements IHasJson, IHasSize
   public IJsonArray getAsJson ()
   {
     return new JsonArray ().addAllMapped (m_aList.values (), SGCustomProperty::getAsJson);
+  }
+
+  @NonNull
+  public Iterator <SGCustomProperty> iterator ()
+  {
+    return m_aList.values ().iterator ();
   }
 
   @Override

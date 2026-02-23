@@ -42,6 +42,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
@@ -219,10 +220,15 @@ public final class BDXR2ServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final String sExtension = convertToJsonString (aServiceGroup.getSMPExtensions ());
+      final SGCustomPropertyList aCustomProperties = null;
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
-        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
+        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension, aCustomProperties);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
+        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (),
+                                                aPathServiceGroupID,
+                                                sExtension,
+                                                aCustomProperties,
+                                                bCreateInSML);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);

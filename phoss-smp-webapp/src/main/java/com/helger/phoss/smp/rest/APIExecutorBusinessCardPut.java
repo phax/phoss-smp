@@ -56,6 +56,10 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       throw new SMPPreconditionFailedException ("The writable REST API is disabled. saveBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
+
+    // Check credentials first
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // PD integration is disabled
@@ -73,8 +77,6 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       // Cannot parse
       throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
     }
-
-    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
                                                                                             aBC,

@@ -34,6 +34,8 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.html.hc.html.forms.HCTextArea;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -54,6 +56,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.sgprops.ESGCustomPropertyType;
+import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -282,6 +287,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String FIELD_PARTICIPANT_ID_VALUE = "participantidvalue";
   private static final String FIELD_OWNING_USER_ID = "owninguser";
   private static final String FIELD_EXTENSION = "extension";
+  private static final String FIELD_CP_COUNT = "cpcount";
+  private static final String FIELD_CP_NAME_PREFIX = "cpname";
+  private static final String FIELD_CP_TYPE_PREFIX = "cptype";
+  private static final String FIELD_CP_VALUE_PREFIX = "cpvalue";
 
   private static final String ACTION_CHECK_DNS = "checkdns";
   private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
@@ -475,6 +484,24 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                    .setCtrl (SMPExtensionUI.getExtensionDisplay (aSelectedObject)));
 
+    // Show custom properties
+    final SGCustomPropertyList aCustomProperties = aSelectedObject.getCustomProperties ();
+    if (aCustomProperties != null && aCustomProperties.isNotEmpty ())
+    {
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Custom Properties"));
+
+      final HCTable aCPTable = new HCTable (new DTCol ("Name"),
+                                             new DTCol ("Type"),
+                                             new DTCol ("Value")).setID (getID () + "_customprops");
+      aCustomProperties.forEach (x -> {
+        final HCRow aRow = aCPTable.addBodyRow ();
+        aRow.addCell (x.getName ());
+        aRow.addCell (x.isPublic () ? "Public" : "Private");
+        aRow.addCell (x.getValue ());
+      });
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Custom Properties").setCtrl (aCPTable));
+    }
+
     if (bShowBusinessCard)
     {
       aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Details"));
@@ -568,6 +595,71 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                           : "JSON or XML") +
                                                                " content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
+
+    // Custom properties
+    {
+      final SGCustomPropertyList aExistingProps = aSelectedObject != null ? aSelectedObject.getCustomProperties () : null;
+      final int nExistingCount = aExistingProps != null ? aExistingProps.size () : 0;
+
+      // Determine count from form submission or existing data
+      final String sCountStr = aWPEC.params ().getAsString (FIELD_CP_COUNT);
+      final int nCount = sCountStr != null ? Math.max (0, Integer.parseInt (sCountStr)) : nExistingCount;
+
+      final HCNodeList aCPContent = new HCNodeList ();
+      aCPContent.addChild (new HCHiddenField (FIELD_CP_COUNT, Integer.toString (nCount)));
+
+      if (nCount > 0)
+      {
+        final HCTable aCPTable = new HCTable (new DTCol ("Name"),
+                                               new DTCol ("Type"),
+                                               new DTCol ("Value")).setID (getID () + "_cpedit");
+        int nIndex = 0;
+        if (aExistingProps != null && sCountStr == null)
+        {
+          // Populate from existing data on initial display
+          for (final var aIter = new java.util.concurrent.atomic.AtomicInteger (0); nIndex < nExistingCount; nIndex++)
+          {
+            final int nFinalIndex = nIndex;
+            aExistingProps.forEach (new java.util.function.Predicate <SGCustomProperty> ()
+            {
+              private int m_nCurrent = 0;
+
+              public boolean test (final SGCustomProperty x)
+              {
+                return m_nCurrent++ == nFinalIndex;
+              }
+            }, x -> {
+              final HCRow aRow = aCPTable.addBodyRow ();
+              aRow.addCell (new HCEdit (new RequestField (FIELD_CP_NAME_PREFIX + nFinalIndex, x.getName ())));
+              final HCSelect aSelect = new HCSelect (new RequestField (FIELD_CP_TYPE_PREFIX + nFinalIndex, x.getType ().getID ()));
+              aSelect.addOption (ESGCustomPropertyType.PUBLIC.getID (), "Public");
+              aSelect.addOption (ESGCustomPropertyType.PRIVATE.getID (), "Private");
+              aRow.addCell (aSelect);
+              aRow.addCell (new HCEdit (new RequestField (FIELD_CP_VALUE_PREFIX + nFinalIndex, x.getValue ())));
+            });
+          }
+        }
+        else
+        {
+          // Populate from form submission data
+          for (nIndex = 0; nIndex < nCount; nIndex++)
+          {
+            final HCRow aRow = aCPTable.addBodyRow ();
+            aRow.addCell (new HCEdit (new RequestField (FIELD_CP_NAME_PREFIX + nIndex)));
+            final HCSelect aSelect = new HCSelect (new RequestField (FIELD_CP_TYPE_PREFIX + nIndex, ESGCustomPropertyType.PUBLIC.getID ()));
+            aSelect.addOption (ESGCustomPropertyType.PUBLIC.getID (), "Public");
+            aSelect.addOption (ESGCustomPropertyType.PRIVATE.getID (), "Private");
+            aRow.addCell (aSelect);
+            aRow.addCell (new HCEdit (new RequestField (FIELD_CP_VALUE_PREFIX + nIndex)));
+          }
+        }
+        aCPContent.addChild (aCPTable);
+      }
+
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Custom Properties")
+                                                   .setCtrl (aCPContent)
+                                                   .setHelpText ("Optional per-ServiceGroup key/value custom properties. Names must be alphanumeric (with dot, minus, underscore), max 256 chars. Type can be Public (visible to anyone) or Private (only visible when authenticated)."));
+    }
   }
 
   @Override
@@ -627,6 +719,49 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       }
     }
 
+    // Extract custom properties from form
+    SGCustomPropertyList aCustomProperties = null;
+    {
+      final String sCountStr = aWPEC.params ().getAsString (FIELD_CP_COUNT);
+      final int nCount = sCountStr != null ? Math.max (0, Integer.parseInt (sCountStr)) : 0;
+      if (nCount > 0)
+      {
+        aCustomProperties = new SGCustomPropertyList ();
+        for (int i = 0; i < nCount; i++)
+        {
+          final String sCPName = StringHelper.trim (aWPEC.params ().getAsString (FIELD_CP_NAME_PREFIX + i));
+          final String sCPTypeID = aWPEC.params ().getAsString (FIELD_CP_TYPE_PREFIX + i);
+          final String sCPValue = aWPEC.params ().getAsString (FIELD_CP_VALUE_PREFIX + i);
+
+          // Skip empty rows
+          if (StringHelper.isEmpty (sCPName) && StringHelper.isEmpty (sCPValue))
+            continue;
+
+          if (!SGCustomProperty.isValidName (sCPName))
+          {
+            aFormErrors.addFieldError (FIELD_CP_NAME_PREFIX + i,
+                                       "Custom property name is invalid. Must be alphanumeric (with dot, minus, underscore), max 256 chars.");
+            continue;
+          }
+          if (!SGCustomProperty.isValidValue (sCPValue))
+          {
+            aFormErrors.addFieldError (FIELD_CP_VALUE_PREFIX + i,
+                                       "Custom property value is invalid. Max 256 chars.");
+            continue;
+          }
+          ESGCustomPropertyType eType = ESGCustomPropertyType.getFromIDOrNull (sCPTypeID);
+          if (eType == null)
+            eType = ESGCustomPropertyType.PUBLIC;
+          if (aCustomProperties.containsName (sCPName))
+          {
+            aFormErrors.addFieldError (FIELD_CP_NAME_PREFIX + i, "Duplicate custom property name '" + sCPName + "'.");
+            continue;
+          }
+          aCustomProperties.add (new SGCustomProperty (eType, sCPName, sCPValue));
+        }
+      }
+    }
+
     if (aFormErrors.isEmpty ())
     {
       if (bEdit)
@@ -635,7 +770,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         // necessary. Only the owner and the extension can be edited!
         try
         {
-          aServiceGroupMgr.updateSMPServiceGroup (aParticipantID, aOwningUser.getID (), sExtension);
+          aServiceGroupMgr.updateSMPServiceGroup (aParticipantID, aOwningUser.getID (), sExtension, aCustomProperties);
           aWPEC.postRedirectGetInternal (success ("The SMP Service Group for participant '" +
                                                   aParticipantID.getURIEncoded () +
                                                   "' was successfully updated."));
@@ -654,7 +789,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         Exception aCaughtEx = null;
         try
         {
-          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, bCreateInSML);
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, aCustomProperties, bCreateInSML);
         }
         catch (final Exception ex)
         {

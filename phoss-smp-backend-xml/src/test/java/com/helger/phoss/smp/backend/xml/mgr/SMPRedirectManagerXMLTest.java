@@ -69,7 +69,7 @@ public final class SMPRedirectManagerXMLTest
                                                                                        "0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, true);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, null, true);
     assertNotNull (aSG);
     try
     {
@@ -118,7 +118,7 @@ public final class SMPRedirectManagerXMLTest
     assertNotNull (aPI);
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, true);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, null, true);
     assertNotNull (aSG);
     try
     {

@@ -25,6 +25,7 @@ import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPServerException;
 
 /**
@@ -53,6 +54,9 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param sExtension
    *        The optional extension element that must be either a well-formed XML
    *        string (for Peppol SMP) or a valid JSON string (for BDXR SMP).
+   * @param aCustomProperties
+   *        The optional custom properties for this service group. May be
+   *        <code>null</code>.
    * @param bCreateInSML
    *        <code>true</code> if the service group should also be created in the
    *        SML, <code>false</code> if not.
@@ -64,6 +68,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   ISMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty String sOwnerID,
                                           @NonNull IParticipantIdentifier aParticipantIdentifier,
                                           @Nullable String sExtension,
+                                          @Nullable SGCustomPropertyList aCustomProperties,
                                           boolean bCreateInSML) throws SMPServerException;
 
   /**
@@ -78,6 +83,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @param sExtension
    *        The optional (new) extension element that must be well-formed XML if
    *        present.
+   * @param aCustomProperties
+   *        The optional (new) custom properties. May be <code>null</code>.
    * @throws SMPServerException
    *         In case of error
    * @return {@link EChange#CHANGED} if the passed service group is contained
@@ -87,16 +94,18 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   @NonNull
   EChange updateSMPServiceGroup (@NonNull IParticipantIdentifier aParticipantIdentifier,
                                  @NonNull @Nonempty String sOwnerID,
-                                 @Nullable String sExtension) throws SMPServerException;
+                                 @Nullable String sExtension,
+                                 @Nullable SGCustomPropertyList aCustomProperties) throws SMPServerException;
 
   @NonNull
   default EChange updateSMPServiceGroupNoEx (@NonNull final IParticipantIdentifier aParticipantIdentifier,
                                              @NonNull @Nonempty final String sOwnerID,
-                                             @Nullable final String sExtension)
+                                             @Nullable final String sExtension,
+                                             @Nullable final SGCustomPropertyList aCustomProperties)
   {
     try
     {
-      return updateSMPServiceGroup (aParticipantIdentifier, sOwnerID, sExtension);
+      return updateSMPServiceGroup (aParticipantIdentifier, sOwnerID, sExtension, aCustomProperties);
     }
     catch (final SMPServerException ex)
     {

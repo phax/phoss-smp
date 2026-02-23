@@ -68,6 +68,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
 {
   public static final String PATH_BUSINESSCARD = "/businesscard/";
   public static final String PATH_COMPLETE = "/complete/";
+  public static final String PATH_CUSTOM_PROPERTIES = "/customproperties";
   public static final String PATH_LIST = "/list/";
   public static final String PATH_SERVICES = "/services/";
 
@@ -77,6 +78,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
   public static final String PARAM_MIGRATION_ID = "MigrationId";
   public static final String PARAM_MIGRATION_KEY = "MigrationKey";
+  public static final String PARAM_CUSTOM_PROPERTY_NAME = "PropertyName";
 
   static final String LOG_PREFIX = "[REST API] ";
 
@@ -215,6 +217,39 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                          new APIExecutorServiceMetadataDeleteAll ());
       aDeleteAllServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteAllServiceMetadata);
+    }
+
+    // Custom Properties API since 8.1.0
+    {
+      final APIDescriptor aGetCustomProperties = new APIDescriptor (APIPath.get ("/{" +
+                                                                                  PARAM_SERVICE_GROUP_ID +
+                                                                                  "}" +
+                                                                                  PATH_CUSTOM_PROPERTIES),
+                                                                     new APIExecutorCustomPropertiesGet ());
+      aGetCustomProperties.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aGetCustomProperties);
+    }
+    {
+      final APIDescriptor aPutCustomProperties = new APIDescriptor (APIPath.put ("/{" +
+                                                                                  PARAM_SERVICE_GROUP_ID +
+                                                                                  "}" +
+                                                                                  PATH_CUSTOM_PROPERTIES),
+                                                                     new APIExecutorCustomPropertiesPut ());
+      aPutCustomProperties.allowedMimeTypes ().addAll (CMimeType.APPLICATION_JSON.getAsString ());
+      aPutCustomProperties.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aPutCustomProperties);
+    }
+    {
+      final APIDescriptor aDeleteCustomProperty = new APIDescriptor (APIPath.delete ("/{" +
+                                                                                      PARAM_SERVICE_GROUP_ID +
+                                                                                      "}" +
+                                                                                      PATH_CUSTOM_PROPERTIES +
+                                                                                      "/{" +
+                                                                                      PARAM_CUSTOM_PROPERTY_NAME +
+                                                                                      "}"),
+                                                                      new APIExecutorCustomPropertyDelete ());
+      aDeleteCustomProperty.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aDeleteCustomProperty);
     }
 
     // Extended Query APIs since 5.3.0

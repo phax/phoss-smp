@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.xml.microdom.IMicroElement;
@@ -36,6 +37,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   private static final MicroQName ATTR_OWNER_ID = new MicroQName ("ownerid");
   private static final String ELEMENT_PARTICIPANT_ID = "participant";
   private static final String ELEMENT_EXTENSION = "extension";
+  private static final String ELEMENT_CUSTOM_PROPERTIES = "customproperties";
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPServiceGroup aValue,
@@ -48,8 +50,16 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
                                                                  sNamespaceURI,
                                                                  ELEMENT_PARTICIPANT_ID));
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
+    {
       aElement.addElementNS (sNamespaceURI, ELEMENT_EXTENSION)
               .addText (aValue.getExtensions ().getExtensionsAsJsonString ());
+    }
+    if (aValue.hasCustomProperties ())
+    {
+      aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getCustomProperties (),
+                                                                   sNamespaceURI,
+                                                                   ELEMENT_CUSTOM_PROPERTIES));
+    }
     return aElement;
   }
 
@@ -65,13 +75,18 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     final SimpleParticipantIdentifier aParticipantIdentifier = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_PARTICIPANT_ID),
                                                                                                    SimpleParticipantIdentifier.class);
     if (aParticipantIdentifier == null)
+    {
       throw new IllegalStateException ("Failed to parse participant identifier " +
                                        MicroHelper.getChildTextContent (aElement, ELEMENT_PARTICIPANT_ID));
+    }
 
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
+    final SGCustomPropertyList aCustomProperties = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_CUSTOM_PROPERTIES),
+                                                                                       SGCustomPropertyList.class);
+
     // Use the new ID in case the ID was changed!
-    return new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension);
+    return new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension, aCustomProperties);
   }
 
   @NonNull

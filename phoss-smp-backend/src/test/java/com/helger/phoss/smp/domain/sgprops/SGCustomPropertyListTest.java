@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import com.helger.json.IJsonArray;
 import com.helger.unittest.support.TestHelper;
+import com.helger.xml.mock.XMLTestHelper;
 
 /**
  * Test class for class {@link SGCustomPropertyList}.
@@ -45,6 +46,8 @@ public final class SGCustomPropertyListTest
     assertFalse (aList.add (SGCustomProperty.createPublic ("key2", "value2a")).isChanged ());
     assertFalse (aList.isEmpty ());
     assertEquals (2, aList.size ());
+
+    XMLTestHelper.testMicroTypeConversion (aList);
 
     final IJsonArray aJson = aList.getAsJson ();
     assertNotNull (aJson);

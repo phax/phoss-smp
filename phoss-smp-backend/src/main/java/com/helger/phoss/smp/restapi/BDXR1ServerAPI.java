@@ -43,6 +43,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
@@ -357,10 +358,15 @@ public final class BDXR1ServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final String sExtension = convertToJsonString (aServiceGroup.getExtension ());
+      final SGCustomPropertyList aCustomProperties = null;
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
-        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
+        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension, aCustomProperties);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
+        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (),
+                                                aPathServiceGroupID,
+                                                sExtension,
+                                                aCustomProperties,
+                                                bCreateInSML);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
@@ -432,7 +438,7 @@ public final class BDXR1ServerAPI
         return null;
 
     final String sNamespaceURI = CSMPServer.HR_EXTENSION_NAMESPACE_URI;
-    String sNSPrefix = CSMPServer.HR_EXTENSION_DEFAULT_PREFIX + ':';
+    final String sNSPrefix = CSMPServer.HR_EXTENSION_DEFAULT_PREFIX + ':';
     final Document aDoc = XMLFactory.newDocument ();
     final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "HRMPS"));
     // Take everything after 9934:

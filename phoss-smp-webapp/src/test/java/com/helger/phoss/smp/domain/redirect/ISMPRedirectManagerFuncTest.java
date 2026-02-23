@@ -65,7 +65,7 @@ public final class ISMPRedirectManagerFuncTest
     assertNotNull (aDocTypeID);
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, null, true);
     assertNotNull (aSG);
     try
     {
@@ -102,7 +102,7 @@ public final class ISMPRedirectManagerFuncTest
       assertEquals (nCount, aRedirectMgr.getSMPRedirectCount ());
 
       // Add second one
-      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null, true);
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null, null, true);
       assertNotNull (aSG2);
       try
       {

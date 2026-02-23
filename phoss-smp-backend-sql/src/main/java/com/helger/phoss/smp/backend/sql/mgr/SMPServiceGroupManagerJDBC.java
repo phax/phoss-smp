@@ -52,6 +52,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
+import com.helger.json.IJsonArray;
+import com.helger.json.serialize.JsonReader;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
@@ -119,10 +122,30 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return m_aCBs;
   }
 
+  @Nullable
+  private static String _getCustomPropertiesAsJsonString (@Nullable final SGCustomPropertyList aCustomProperties)
+  {
+    if (aCustomProperties == null || aCustomProperties.isEmpty ())
+      return null;
+    return aCustomProperties.getAsJson ().getAsJsonString ();
+  }
+
+  @Nullable
+  private static SGCustomPropertyList _getCustomPropertiesFromJsonString (@Nullable final String sJson)
+  {
+    if (StringHelper.isEmpty (sJson))
+      return null;
+    final IJsonArray aJson = JsonReader.builder ().source (sJson).readAsArray ();
+    if (aJson == null)
+      return null;
+    return SGCustomPropertyList.fromJson (aJson);
+  }
+
   @NonNull
   public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
                                                 @NonNull final IParticipantIdentifier aParticipantID,
                                                 @Nullable final String sExtension,
+                                                @Nullable final SGCustomPropertyList aCustomProperties,
                                                 final boolean bCreateInSML) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
@@ -161,12 +184,14 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       }
 
       // Did not exist. Create it.
+      final String sCustomPropsJson = _getCustomPropertiesAsJsonString (aCustomProperties);
       if (aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                             m_sTableNameSG +
-                                            " (businessIdentifierScheme, businessIdentifier, extension) VALUES (?, ?, ?)",
+                                            " (businessIdentifierScheme, businessIdentifier, extension, customproperties) VALUES (?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                        aParticipantID.getValue (),
-                                                                                       sExtension)) > 0)
+                                                                                       sExtension,
+                                                                                       sCustomPropsJson)) > 0)
       {
         aCreatedSGDB.set (true);
         aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
@@ -218,7 +243,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                       sExtension,
                                       Boolean.valueOf (bCreateInSML));
 
-    final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
+    final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension, aCustomProperties);
     if (m_aCache != null)
       m_aCache.put (aParticipantID.getURIEncoded (), aServiceGroup);
 
@@ -229,7 +254,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   @NonNull
   public EChange updateSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                         @NonNull @Nonempty final String sNewOwnerID,
-                                        @Nullable final String sNewExtension) throws SMPServerException
+                                        @Nullable final String sNewExtension,
+                                        @Nullable final SGCustomPropertyList aNewCustomProperties) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notEmpty (sNewOwnerID, "NewOwnerID");
@@ -283,6 +309,24 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                                                                                                         .getValue ()));
         if (nCount != 1)
           throw new IllegalStateException ("Failed to update the service_group extension to '" + sNewExtension + "'");
+        aWrappedChange.set (EChange.CHANGED);
+      }
+
+      final String sNewCustomPropsJson = _getCustomPropertiesAsJsonString (aNewCustomProperties);
+      final String sOldCustomPropsJson = _getCustomPropertiesAsJsonString (aDBServiceGroup.getCustomProperties ());
+      if (!EqualsHelper.equals (sNewCustomPropsJson, sOldCustomPropsJson))
+      {
+        // Update custom properties
+        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                              m_sTableNameSG +
+                                                              " SET customproperties=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                              new ConstantPreparedStatementDataProvider (sNewCustomPropsJson,
+                                                                                                         aDBServiceGroup.getParticipantIdentifier ()
+                                                                                                                        .getScheme (),
+                                                                                                         aDBServiceGroup.getParticipantIdentifier ()
+                                                                                                                        .getValue ()));
+        if (nCount != 1)
+          throw new IllegalStateException ("Failed to update the service_group customproperties");
         aWrappedChange.set (EChange.CHANGED);
       }
     }, aCaughtException::set);
@@ -412,7 +456,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroups()");
 
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username" +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username, sg.customproperties" +
                                                                           " FROM " +
                                                                           m_sTableNameSG +
                                                                           " sg, " +
@@ -425,7 +469,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       for (final DBResultRow aRow : aDBResult)
         ret.add (new SMPServiceGroup (aRow.getAsString (3),
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
-                                      aRow.getAsString (2)));
+                                      aRow.getAsString (2),
+                                      _getCustomPropertiesFromJsonString (aRow.getAsString (4))));
     return ret;
   }
 
@@ -455,7 +500,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension" +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, sg.customproperties" +
                                                                           " FROM " +
                                                                           m_sTableNameSG +
                                                                           " sg, " +
@@ -470,7 +515,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       for (final DBResultRow aRow : aDBResult)
         ret.add (new SMPServiceGroup (sOwnerID,
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
-                                      aRow.getAsString (2)));
+                                      aRow.getAsString (2),
+                                      _getCustomPropertiesFromJsonString (aRow.getAsString (3))));
     return ret;
   }
 
@@ -510,7 +556,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     // Not in cache
     final Wrapper <DBResultRow> aResult = new Wrapper <> ();
-    aDBExecutor.querySingle ("SELECT sg.extension, so.username" +
+    aDBExecutor.querySingle ("SELECT sg.extension, so.username, sg.customproperties" +
                              " FROM " +
                              m_sTableNameSG +
                              " sg, " +
@@ -524,7 +570,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (aResult.isNotSet ())
       return null;
 
-    ret = new SMPServiceGroup (aResult.get ().getAsString (1), aParticipantID, aResult.get ().getAsString (0));
+    ret = new SMPServiceGroup (aResult.get ().getAsString (1),
+                               aParticipantID,
+                               aResult.get ().getAsString (0),
+                               _getCustomPropertiesFromJsonString (aResult.get ().getAsString (2)));
     if (m_aCache != null)
       m_aCache.put (aParticipantID.getURIEncoded (), ret);
     return ret;

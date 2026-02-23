@@ -36,6 +36,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
@@ -329,10 +330,15 @@ public final class SMPServerAPI
 
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final String sExtension = SMPExtensionConverter.convertToString (aServiceGroup.getExtension ());
+      final SGCustomPropertyList aCustomProperties = null;
       if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPathServiceGroupID))
-        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension);
+        aServiceGroupMgr.updateSMPServiceGroup (aPathServiceGroupID, aSMPUser.getID (), sExtension, aCustomProperties);
       else
-        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (), aPathServiceGroupID, sExtension, bCreateInSML);
+        aServiceGroupMgr.createSMPServiceGroup (aSMPUser.getID (),
+                                                aPathServiceGroupID,
+                                                sExtension,
+                                                aCustomProperties,
+                                                bCreateInSML);
 
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
@@ -433,16 +439,13 @@ public final class SMPServerAPI
         final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                            aPathDocTypeID);
         final ServiceMetadataType aSM = aServiceInfo == null ? null : aServiceInfo.getAsJAXBObjectPeppol ();
-        if (aSM != null)
-        {
-          aSignedServiceMetadata.setServiceMetadata (aSM);
-        }
-        else
+        if (aSM == null)
         {
           // Neither nor is present, or no endpoint is available
           throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
+        aSignedServiceMetadata.setServiceMetadata (aSM);
       }
       // Signature must be added by the rest service
 
@@ -706,29 +709,26 @@ public final class SMPServerAPI
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
         final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                  aPathDocTypeID);
-        if (aRedirect != null)
-        {
-          // Handle redirect
-          final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
-          if (eChange.isUnchanged ())
-          {
-            // Most likely an internal error or an inconsistency
-            throw new SMPNotFoundException ("redirect(" +
-                                            aPathServiceGroupID.getURIEncoded () +
-                                            ", " +
-                                            aPathDocTypeID.getURIEncoded () +
-                                            ")",
-                                            m_aAPIDataProvider.getCurrentURI ());
-          }
-          LOGGER.info (sLog + " SUCCESS - Redirect");
-          STATS_COUNTER_SUCCESS.increment (sAction);
-        }
-        else
+        if (aRedirect == null)
         {
           // Neither redirect nor endpoint found
           throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
                                           m_aAPIDataProvider.getCurrentURI ());
         }
+        // Handle redirect
+        final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
+        if (eChange.isUnchanged ())
+        {
+          // Most likely an internal error or an inconsistency
+          throw new SMPNotFoundException ("redirect(" +
+                                          aPathServiceGroupID.getURIEncoded () +
+                                          ", " +
+                                          aPathDocTypeID.getURIEncoded () +
+                                          ")",
+                                          m_aAPIDataProvider.getCurrentURI ());
+        }
+        LOGGER.info (sLog + " SUCCESS - Redirect");
+        STATS_COUNTER_SUCCESS.increment (sAction);
       }
     }
     catch (final SMPServerException ex)
