@@ -405,10 +405,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     {
       LOGGER.debug ("REST Filter path variants:");
       LOGGER.debug ("a) " + aRequestScope.getRequest ().getRequestURI ());
-      LOGGER.debug ("b) " +
-                    new StringBuilder (new StringBuilder (new StringBuilder (new StringBuilder (new StringBuilder (aRequestScope.getRequest ()
-                                                                                                                                .getRequestURL ()
-                                                                                                                                .toString ()).toString ()).toString ()).toString ()).toString ()).toString ());
+      LOGGER.debug ("b) " + aRequestScope.getRequest ().getRequestURL ().toString ());
       LOGGER.debug ("c) " + aRequestScope.getRequestURIEncoded ());
       LOGGER.debug ("d) " + aRequestScope.getRequestURLEncoded ().toString ());
       LOGGER.debug ("e) " + aRequestScope.getRequestURIDecoded ());
