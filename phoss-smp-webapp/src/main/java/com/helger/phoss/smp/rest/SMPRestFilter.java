@@ -222,32 +222,52 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     // Custom Properties API since 8.1.0
     {
       final APIDescriptor aGetCustomProperties = new APIDescriptor (APIPath.get ("/{" +
-                                                                                  PARAM_SERVICE_GROUP_ID +
-                                                                                  "}" +
-                                                                                  PATH_CUSTOM_PROPERTIES),
-                                                                     new APIExecutorCustomPropertiesGet ());
+                                                                                 PARAM_SERVICE_GROUP_ID +
+                                                                                 "}" +
+                                                                                 PATH_CUSTOM_PROPERTIES +
+                                                                                 "/{" +
+                                                                                 PARAM_CUSTOM_PROPERTY_NAME +
+                                                                                 "}"),
+                                                                    new APIExecutorCustomPropertyGet ());
+      aGetCustomProperties.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aGetCustomProperties);
+    }
+    {
+      final APIDescriptor aGetCustomProperties = new APIDescriptor (APIPath.get ("/{" +
+                                                                                 PARAM_SERVICE_GROUP_ID +
+                                                                                 "}" +
+                                                                                 PATH_CUSTOM_PROPERTIES),
+                                                                    new APIExecutorCustomPropertiesGet ());
       aGetCustomProperties.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetCustomProperties);
     }
     {
       final APIDescriptor aPutCustomProperties = new APIDescriptor (APIPath.put ("/{" +
-                                                                                  PARAM_SERVICE_GROUP_ID +
-                                                                                  "}" +
-                                                                                  PATH_CUSTOM_PROPERTIES),
-                                                                     new APIExecutorCustomPropertiesPut ());
-      aPutCustomProperties.allowedMimeTypes ().addAll (CMimeType.APPLICATION_JSON.getAsString ());
+                                                                                 PARAM_SERVICE_GROUP_ID +
+                                                                                 "}" +
+                                                                                 PATH_CUSTOM_PROPERTIES),
+                                                                    new APIExecutorCustomPropertiesPut ());
       aPutCustomProperties.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutCustomProperties);
     }
     {
       final APIDescriptor aDeleteCustomProperty = new APIDescriptor (APIPath.delete ("/{" +
-                                                                                      PARAM_SERVICE_GROUP_ID +
-                                                                                      "}" +
-                                                                                      PATH_CUSTOM_PROPERTIES +
-                                                                                      "/{" +
-                                                                                      PARAM_CUSTOM_PROPERTY_NAME +
-                                                                                      "}"),
-                                                                      new APIExecutorCustomPropertyDelete ());
+                                                                                     PARAM_SERVICE_GROUP_ID +
+                                                                                     "}" +
+                                                                                     PATH_CUSTOM_PROPERTIES),
+                                                                     new APIExecutorCustomPropertiesDelete ());
+      aDeleteCustomProperty.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aDeleteCustomProperty);
+    }
+    {
+      final APIDescriptor aDeleteCustomProperty = new APIDescriptor (APIPath.delete ("/{" +
+                                                                                     PARAM_SERVICE_GROUP_ID +
+                                                                                     "}" +
+                                                                                     PATH_CUSTOM_PROPERTIES +
+                                                                                     "/{" +
+                                                                                     PARAM_CUSTOM_PROPERTY_NAME +
+                                                                                     "}"),
+                                                                     new APIExecutorCustomPropertyDelete ());
       aDeleteCustomProperty.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteCustomProperty);
     }
@@ -386,8 +406,9 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       LOGGER.debug ("REST Filter path variants:");
       LOGGER.debug ("a) " + aRequestScope.getRequest ().getRequestURI ());
       LOGGER.debug ("b) " +
-                    new StringBuilder (new StringBuilder (aRequestScope.getRequest ().getRequestURL ().toString ())
-                                                                                                                   .toString ()).toString ());
+                    new StringBuilder (new StringBuilder (new StringBuilder (new StringBuilder (new StringBuilder (aRequestScope.getRequest ()
+                                                                                                                                .getRequestURL ()
+                                                                                                                                .toString ()).toString ()).toString ()).toString ()).toString ()).toString ());
       LOGGER.debug ("c) " + aRequestScope.getRequestURIEncoded ());
       LOGGER.debug ("d) " + aRequestScope.getRequestURLEncoded ().toString ());
       LOGGER.debug ("e) " + aRequestScope.getRequestURIDecoded ());

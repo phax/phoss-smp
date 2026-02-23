@@ -109,8 +109,7 @@ public final class SMPServerAPI
       if (aPathServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown Service Group ID '" + sPathServiceGroupID + "'",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       // Then add the service metadata references
@@ -233,8 +232,7 @@ public final class SMPServerAPI
       if (aPathServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
       final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectPeppol ();
@@ -414,8 +412,7 @@ public final class SMPServerAPI
                                                                .getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("No such Service Group '" + sPathServiceGroupID + "'",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
       if (aPathDocTypeID == null)
@@ -442,8 +439,9 @@ public final class SMPServerAPI
         if (aSM == null)
         {
           // Neither nor is present, or no endpoint is available
-          throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,
+                                                                sPathDocTypeID,
+                                                                m_aAPIDataProvider.getCurrentURI ());
         }
         aSignedServiceMetadata.setServiceMetadata (aSM);
       }
@@ -565,8 +563,7 @@ public final class SMPServerAPI
       if (aPathServiceGroup == null)
       {
         // Service group not found
-        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
       if (aServiceMetadata.getRedirect () != null)
       {
@@ -680,8 +677,7 @@ public final class SMPServerAPI
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
@@ -693,12 +689,9 @@ public final class SMPServerAPI
         if (eChange.isUnchanged ())
         {
           // Most likely an internal error or an inconsistency
-          throw new SMPNotFoundException ("serviceInformation(" +
-                                          aPathServiceGroupID.getURIEncoded () +
-                                          ", " +
-                                          aPathDocTypeID.getURIEncoded () +
-                                          ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,
+                                                                sPathDocTypeID,
+                                                                m_aAPIDataProvider.getCurrentURI ());
         }
         LOGGER.info (sLog + " SUCCESS - ServiceInformation");
         STATS_COUNTER_SUCCESS.increment (sAction);
@@ -712,20 +705,18 @@ public final class SMPServerAPI
         if (aRedirect == null)
         {
           // Neither redirect nor endpoint found
-          throw new SMPNotFoundException ("service(" + sPathServiceGroupID + "," + sPathDocTypeID + ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownDocType (sPathServiceGroupID,
+                                                     sPathDocTypeID,
+                                                     m_aAPIDataProvider.getCurrentURI ());
         }
         // Handle redirect
         final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
         if (eChange.isUnchanged ())
         {
           // Most likely an internal error or an inconsistency
-          throw new SMPNotFoundException ("redirect(" +
-                                          aPathServiceGroupID.getURIEncoded () +
-                                          ", " +
-                                          aPathDocTypeID.getURIEncoded () +
-                                          ")",
-                                          m_aAPIDataProvider.getCurrentURI ());
+          throw SMPNotFoundException.unknownServiceRedirect (sPathServiceGroupID,
+                                                             sPathDocTypeID,
+                                                             m_aAPIDataProvider.getCurrentURI ());
         }
         LOGGER.info (sLog + " SUCCESS - Redirect");
         STATS_COUNTER_SUCCESS.increment (sAction);
@@ -763,8 +754,7 @@ public final class SMPServerAPI
       final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
       if (aPathServiceGroup == null)
       {
-        throw new SMPNotFoundException ("Service Group '" + sPathServiceGroupID + "' is not on this SMP",
-                                        m_aAPIDataProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       EChange eChange = aServiceInfoMgr.deleteAllSMPServiceInformationOfServiceGroup (aPathServiceGroupID);

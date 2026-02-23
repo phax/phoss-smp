@@ -42,14 +42,13 @@ public final class SMPUserManagerPhoton
   {}
 
   /**
-   * Check if the provided credentials are valid. This checks if the user
-   * exists, if it is not deleted, if the password matches and if the user is
-   * not disabled. If valid, the resolved user is returned.
+   * Check if the provided credentials are valid. This checks if the user exists, if it is not
+   * deleted, if the password matches and if the user is not disabled. If valid, the resolved user
+   * is returned.
    *
    * @param aCredentials
    *        The credentials to check. May not be <code>null</code>.
-   * @return <code>null</code> if something does wrong, the user on success
-   *         only.
+   * @return <code>null</code> if something does wrong, the user on success only.
    * @throws SMPUnknownUserException
    *         if the user does not exist or if the user is marked as deleted.
    * @throws SMPUnauthorizedException
@@ -130,6 +129,19 @@ public final class SMPUserManagerPhoton
     throw new IllegalStateException ("Unsupported credential method provided!");
   }
 
+  /**
+   * Verify that the Service Group is owned by the provided user. If the method returns normally,
+   * the ownership is fine.
+   * 
+   * @param aServiceGroupID
+   *        The service group ID to check. May not be <code>null</code>
+   * @param aCurrentUser
+   *        The user to check for ownership. May not be <code>null</code>
+   * @throws SMPNotFoundException
+   *         If no such service group exists
+   * @throws SMPUnauthorizedException
+   *         If the service group is owned by a different user.
+   */
   public static void verifyOwnership (@NonNull final IParticipantIdentifier aServiceGroupID,
                                       @NonNull final IUser aCurrentUser) throws SMPNotFoundException,
                                                                          SMPUnauthorizedException
@@ -139,7 +151,7 @@ public final class SMPUserManagerPhoton
                                                          .getSMPServiceGroupOfID (aServiceGroupID);
     if (aServiceGroup == null)
     {
-      throw new SMPNotFoundException ("Service group " + aServiceGroupID.getURIEncoded () + " does not exist");
+      throw SMPNotFoundException.unknownSG (aServiceGroupID.getURIEncoded (), null);
     }
 
     // Resolve user
@@ -148,8 +160,9 @@ public final class SMPUserManagerPhoton
     {
       throw new SMPUnauthorizedException ("User '" +
                                           aCurrentUser.getLoginName () +
-                                          "' does not own " +
-                                          aServiceGroupID.getURIEncoded ());
+                                          "' does not own '" +
+                                          aServiceGroup.getID () +
+                                          "'");
     }
 
     if (LOGGER.isDebugEnabled ())

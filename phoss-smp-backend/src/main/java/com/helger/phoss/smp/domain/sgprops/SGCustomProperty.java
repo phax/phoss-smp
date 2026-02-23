@@ -97,22 +97,34 @@ public final class SGCustomProperty implements IHasName, IHasJson
     m_sValue = sValue;
   }
 
+  /**
+   * @return The custom property type. Never <code>null</code>.
+   */
   @NonNull
   public ESGCustomPropertyType getType ()
   {
     return m_eType;
   }
 
+  /**
+   * @return <code>true</code> if this is a private property.
+   */
   public boolean isPrivate ()
   {
     return m_eType.isPrivate ();
   }
 
+  /**
+   * @return <code>true</code> if this is a public property.
+   */
   public boolean isPublic ()
   {
     return m_eType.isPublic ();
   }
 
+  /**
+   * Get the custom property name. Is case-sensitive.
+   */
   @NonNull
   @Nonempty
   public String getName ()
@@ -120,17 +132,26 @@ public final class SGCustomProperty implements IHasName, IHasJson
     return m_sName;
   }
 
+  /**
+   * @return <code>true</code> if this custom property has a name, <code>false</code> if not.
+   */
+  public boolean hasValue ()
+  {
+    return !m_sValue.isEmpty ();
+  }
+
+  /**
+   * @return The custom property value. May be empty but never <code>null</code>.
+   */
   @NonNull
   public String getValue ()
   {
     return m_sValue;
   }
 
-  public boolean hasValue ()
-  {
-    return !m_sValue.isEmpty ();
-  }
-
+  /**
+   * Get a simple JSON representation of this object.
+   */
   @NonNull
   @ReturnsMutableObject
   public IJsonObject getAsJson ()

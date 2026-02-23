@@ -29,7 +29,6 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
@@ -42,20 +41,18 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
- * REST API executor for <code>GET /{ServiceGroupId}/customproperties</code>. Returns public
- * properties for unauthenticated requests; returns all properties if authenticated.
+ * REST API executor for <code>GET /{ServiceGroupId}/customproperties/{PropertyName}</code>. Returns
+ * only the values of public properties for unauthenticated requests; returns the value of each
+ * property if authenticated.
  *
  * @author Philip Helger
  * @since 8.1.0
  */
-public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
+public final class APIExecutorCustomPropertyGet extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorCustomPropertiesGet.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorCustomPropertyGet.class);
 
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
@@ -65,15 +62,16 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathPropertyName = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_CUSTOM_PROPERTY_NAME));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
-    if (aServiceGroupID == null)
+    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+    if (aParticipantID == null)
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aServiceGroup == null)
       throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
@@ -83,7 +81,7 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     {
       final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
+      SMPUserManagerPhoton.verifyOwnership (aParticipantID, aSMPUser);
       bAuthenticated = true;
     }
     catch (final SMPUnauthorizedException ex)
@@ -93,33 +91,29 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     }
 
     final SGCustomPropertyList aCustomProperties = aServiceGroup.getCustomProperties ();
-    final SGCustomPropertyList aEffectiveCustomProperties;
-    if (aCustomProperties == null)
-      aEffectiveCustomProperties = new SGCustomPropertyList ();
-    else
-      if (bAuthenticated)
-      {
-        // Return all properties
-        aEffectiveCustomProperties = aCustomProperties;
-      }
-      else
-      {
-        // Return only public properties
-        aEffectiveCustomProperties = aCustomProperties.getFiltered (SGCustomProperty::isPublic);
-      }
+    final SGCustomProperty aCustomProperty = aCustomProperties == null ? null : bAuthenticated ? aCustomProperties
+                                                                                                                  .findFirst (x -> x.getName ()
+                                                                                                                                    .equals (sPathPropertyName))
+                                                                                               : aCustomProperties.findFirst (x -> x.isPublic () &&
+                                                                                                                                   x.getName ()
+                                                                                                                                    .equals (sPathPropertyName));
+    if (aCustomProperty == null)
+      throw new SMPNotFoundException ("Custom property '" +
+                                      sPathPropertyName +
+                                      "' not found in Service Group '" +
+                                      sPathServiceGroupID +
+                                      "'",
+                                      aDataProvider.getCurrentURI ());
 
     LOGGER.info (SMPRestFilter.LOG_PREFIX +
-                 "GET customproperties" +
+                 "GET CustomProperty" +
                  (bAuthenticated ? " [authenticated]" : "") +
                  " for '" +
                  sPathServiceGroupID +
-                 "' - returning " +
-                 aEffectiveCustomProperties.size () +
-                 " properties");
+                 "' and property '" +
+                 sPathPropertyName +
+                 "'");
 
-    final IMicroDocument ret = new MicroDocument ();
-    ret.addChild (MicroTypeConverter.convertToMicroElement (aEffectiveCustomProperties,
-                                                            SMPServiceGroupMicroTypeConverter.ELEMENT_CUSTOM_PROPERTIES));
-    aUnifiedResponse.xml (ret);
+    aUnifiedResponse.text (aCustomProperty.getValue ());
   }
 }

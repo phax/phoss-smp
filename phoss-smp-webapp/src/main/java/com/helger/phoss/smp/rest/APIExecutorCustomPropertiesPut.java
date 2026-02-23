@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.array.ArrayHelper;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -63,7 +64,7 @@ public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -78,25 +79,23 @@ public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
     final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
-      throw new SMPBadRequestException ("Failed to parse participant identifier '" + sServiceGroupID + "'",
-                                        aDataProvider.getCurrentURI ());
+      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aServiceGroup == null)
-      throw new SMPNotFoundException ("No such service group '" + sServiceGroupID + "'",
-                                      aDataProvider.getCurrentURI ());
+      throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
     SMPUserManagerPhoton.verifyOwnership (aParticipantID, aSMPUser);
 
     // Read XML body
-    final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
-    if (aPayload == null || aPayload.length == 0)
+    final byte [] aPayloadBytes = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
+    if (ArrayHelper.isEmpty (aPayloadBytes))
       throw new SMPBadRequestException ("No request body provided", aDataProvider.getCurrentURI ());
 
-    final IMicroDocument aDoc = MicroReader.readMicroXML (aPayload);
+    final IMicroDocument aDoc = MicroReader.readMicroXML (aPayloadBytes);
     if (aDoc == null || aDoc.getDocumentElement () == null)
       throw new SMPBadRequestException ("Failed to parse request body as XML document", aDataProvider.getCurrentURI ());
 
@@ -113,11 +112,11 @@ public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
 
     LOGGER.info (SMPRestFilter.LOG_PREFIX +
                  "PUT customproperties for '" +
-                 sServiceGroupID +
+                 sPathServiceGroupID +
                  "' - " +
                  aCustomProperties.size () +
                  " properties set");
 
-    aUnifiedResponse.createOk ();
+    aUnifiedResponse.createNoContent ();
   }
 }

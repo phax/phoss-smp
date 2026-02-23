@@ -29,33 +29,28 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
-import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
-import com.helger.phoss.smp.exception.SMPUnauthorizedException;
+import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.microdom.IMicroDocument;
-import com.helger.xml.microdom.MicroDocument;
-import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
- * REST API executor for <code>GET /{ServiceGroupId}/customproperties</code>. Returns public
- * properties for unauthenticated requests; returns all properties if authenticated.
+ * REST API executor for <code>DELETE /{ServiceGroupId}/customproperties</code>. Authenticated.
+ * Deletes all custom properties.
  *
  * @author Philip Helger
  * @since 8.1.0
  */
-public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
+public final class APIExecutorCustomPropertiesDelete extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorCustomPropertiesGet.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorCustomPropertiesDelete.class);
 
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
@@ -67,59 +62,50 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
+    if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
+    {
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. customproperties DELETE will not be executed",
+                                                aDataProvider.getCurrentURI ());
+    }
+
+    // Authenticate
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+    final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
-    if (aServiceGroupID == null)
+    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+    if (aParticipantID == null)
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aServiceGroup == null)
       throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
-    // Check if authenticated - if so, return all properties; otherwise only public
-    boolean bAuthenticated = false;
-    try
-    {
-      final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
-      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
-      bAuthenticated = true;
-    }
-    catch (final SMPUnauthorizedException ex)
-    {
-      // Not authenticated - that's fine for GET
-      // Only the public properties will be listed
-    }
+    SMPUserManagerPhoton.verifyOwnership (aParticipantID, aSMPUser);
 
+    // Remove the property
     final SGCustomPropertyList aCustomProperties = aServiceGroup.getCustomProperties ();
-    final SGCustomPropertyList aEffectiveCustomProperties;
-    if (aCustomProperties == null)
-      aEffectiveCustomProperties = new SGCustomPropertyList ();
+    int nDeletedProperties;
+    if (aCustomProperties != null && aCustomProperties.isNotEmpty ())
+    {
+      nDeletedProperties = aCustomProperties.size ();
+      // Update the service group but setting no properties
+      aServiceGroupMgr.updateSMPServiceGroup (aParticipantID,
+                                              aServiceGroup.getOwnerID (),
+                                              aServiceGroup.getExtensions ().getExtensionsAsJsonString (),
+                                              null);
+    }
     else
-      if (bAuthenticated)
-      {
-        // Return all properties
-        aEffectiveCustomProperties = aCustomProperties;
-      }
-      else
-      {
-        // Return only public properties
-        aEffectiveCustomProperties = aCustomProperties.getFiltered (SGCustomProperty::isPublic);
-      }
+      nDeletedProperties = 0;
 
     LOGGER.info (SMPRestFilter.LOG_PREFIX +
-                 "GET customproperties" +
-                 (bAuthenticated ? " [authenticated]" : "") +
-                 " for '" +
+                 "DELETE customproperties (" +
+                 nDeletedProperties +
+                 ") '" +
                  sPathServiceGroupID +
-                 "' - returning " +
-                 aEffectiveCustomProperties.size () +
-                 " properties");
+                 "'");
 
-    final IMicroDocument ret = new MicroDocument ();
-    ret.addChild (MicroTypeConverter.convertToMicroElement (aEffectiveCustomProperties,
-                                                            SMPServiceGroupMicroTypeConverter.ELEMENT_CUSTOM_PROPERTIES));
-    aUnifiedResponse.xml (ret);
+    aUnifiedResponse.text (Integer.toString (nDeletedProperties));
   }
 }

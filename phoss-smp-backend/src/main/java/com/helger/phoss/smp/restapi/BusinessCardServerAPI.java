@@ -63,9 +63,9 @@ public final class BusinessCardServerAPI
   }
 
   @NonNull
-  public PD3BusinessCardType getBusinessCard (final String sServiceGroupID) throws SMPServerException
+  public PD3BusinessCardType getBusinessCard (final String sPathServiceGroupID) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "GET /businesscard/" + sServiceGroupID;
+    final String sLog = LOG_PREFIX + "GET /businesscard/" + sPathServiceGroupID;
     final String sAction = "getBusinessCard";
 
     LOGGER.info (sLog);
@@ -73,19 +73,18 @@ public final class BusinessCardServerAPI
     try
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
       if (aServiceGroup == null)
       {
         // No such service group
-        throw new SMPNotFoundException ("Unknown Service Group '" + sServiceGroupID + "'",
-                                        m_aAPIProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
       if (aBusinessCardMgr == null)
@@ -97,7 +96,7 @@ public final class BusinessCardServerAPI
       if (aBusinessCard == null)
       {
         // No such business card
-        throw new SMPNotFoundException ("No Business Card assigned to Service Group '" + sServiceGroupID + "'",
+        throw new SMPNotFoundException ("No Business Card assigned to Service Group '" + sPathServiceGroupID + "'",
                                         m_aAPIProvider.getCurrentURI ());
       }
       LOGGER.info (sLog + " SUCCESS");
@@ -113,11 +112,11 @@ public final class BusinessCardServerAPI
   }
 
   @NonNull
-  public ESuccess createBusinessCard (@NonNull final String sServiceGroupID,
+  public ESuccess createBusinessCard (@NonNull final String sPathServiceGroupID,
                                       @NonNull final PDBusinessCard aBusinessCard,
                                       @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
   {
-    final String sLog = LOG_PREFIX + "PUT /businesscard/" + sServiceGroupID;
+    final String sLog = LOG_PREFIX + "PUT /businesscard/" + sPathServiceGroupID;
     final String sAction = "createBusinessCard";
 
     LOGGER.info (sLog + " ==> " + aBusinessCard);
@@ -126,11 +125,11 @@ public final class BusinessCardServerAPI
     {
       // Parse and validate identifier
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       if (aServiceGroupID == null)
       {
         // Invalid identifier
-        throw SMPBadRequestException.failedToParseSG (sServiceGroupID, m_aAPIProvider.getCurrentURI ());
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
       final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aBusinessCard.getParticipantIdentifier ()
                                                                                                                          .getScheme (),
@@ -152,8 +151,7 @@ public final class BusinessCardServerAPI
       if (aServiceGroup == null)
       {
         // No such service group (on this server)
-        throw new SMPNotFoundException ("Unknown serviceGroup '" + sServiceGroupID + "'",
-                                        m_aAPIProvider.getCurrentURI ());
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
       }
       // Check credentials and verify service group is owned by provided user
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);

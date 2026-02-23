@@ -60,8 +60,8 @@ public final class APIExecutorCustomPropertyDelete extends AbstractSMPAPIExecuto
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final String sPropertyName = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_CUSTOM_PROPERTY_NAME));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathPropertyName = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_CUSTOM_PROPERTY_NAME));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
@@ -75,32 +75,28 @@ public final class APIExecutorCustomPropertyDelete extends AbstractSMPAPIExecuto
     final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
     if (aParticipantID == null)
-      throw new SMPBadRequestException ("Failed to parse participant identifier '" + sServiceGroupID + "'",
-                                        aDataProvider.getCurrentURI ());
+      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aParticipantID);
     if (aServiceGroup == null)
-      throw new SMPNotFoundException ("No such service group '" + sServiceGroupID + "'",
-                                      aDataProvider.getCurrentURI ());
+      throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
     SMPUserManagerPhoton.verifyOwnership (aParticipantID, aSMPUser);
 
-    if (StringHelper.isEmpty (sPropertyName))
-      throw new SMPBadRequestException ("Missing custom property name", aDataProvider.getCurrentURI ());
-    if (!SGCustomProperty.isValidName (sPropertyName))
-      throw new SMPBadRequestException ("Invalid custom property name '" + sPropertyName + "'",
+    if (!SGCustomProperty.isValidName (sPathPropertyName))
+      throw new SMPBadRequestException ("Invalid custom property name '" + sPathPropertyName + "'",
                                         aDataProvider.getCurrentURI ());
 
     // Remove the property
     final SGCustomPropertyList aCustomProperties = aServiceGroup.getCustomProperties ();
-    if (aCustomProperties == null || aCustomProperties.remove (sPropertyName).isUnchanged ())
+    if (aCustomProperties == null || aCustomProperties.remove (sPathPropertyName).isUnchanged ())
       throw new SMPNotFoundException ("Custom property '" +
-                                      sPropertyName +
-                                      "' not found in service group '" +
-                                      sServiceGroupID +
+                                      sPathPropertyName +
+                                      "' not found in Service Group '" +
+                                      sPathServiceGroupID +
                                       "'",
                                       aDataProvider.getCurrentURI ());
 
@@ -112,11 +108,11 @@ public final class APIExecutorCustomPropertyDelete extends AbstractSMPAPIExecuto
 
     LOGGER.info (SMPRestFilter.LOG_PREFIX +
                  "DELETE customproperties/" +
-                 sPropertyName +
+                 sPathPropertyName +
                  " for '" +
-                 sServiceGroupID +
+                 sPathServiceGroupID +
                  "'");
 
-    aUnifiedResponse.createOk ();
+    aUnifiedResponse.createNoContent ();
   }
 }
