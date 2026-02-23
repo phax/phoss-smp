@@ -37,7 +37,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   private static final MicroQName ATTR_OWNER_ID = new MicroQName ("ownerid");
   private static final String ELEMENT_PARTICIPANT_ID = "participant";
   private static final String ELEMENT_EXTENSION = "extension";
-  private static final String ELEMENT_CUSTOM_PROPERTIES = "customproperties";
+  public static final String ELEMENT_CUSTOM_PROPERTIES = "customproperties";
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPServiceGroup aValue,

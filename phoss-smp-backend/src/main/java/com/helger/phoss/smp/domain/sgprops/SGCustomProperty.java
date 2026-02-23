@@ -39,9 +39,9 @@ public final class SGCustomProperty implements IHasName, IHasJson
   public static final int NAME_MAX_LEN = 256;
   public static final int VALUE_MAX_LEN = 256;
 
-  private @NonNull final ESGCustomPropertyType m_eType;
-  private @NonNull @Nonempty final String m_sName;
-  private @NonNull @Nonempty final String m_sValue;
+  private final ESGCustomPropertyType m_eType;
+  private final String m_sName;
+  private final String m_sValue;
 
   /**
    * Check if the provided property name is valid or not. Valid names have a length between 1 and

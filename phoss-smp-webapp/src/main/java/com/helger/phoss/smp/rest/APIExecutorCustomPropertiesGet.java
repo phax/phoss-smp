@@ -24,21 +24,25 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.json.IJsonArray;
-import com.helger.json.JsonArray;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
+import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
+import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.helger.xml.microdom.IMicroDocument;
+import com.helger.xml.microdom.MicroDocument;
+import com.helger.xml.microdom.convert.MicroTypeConverter;
 
 /**
  * REST API executor for <code>GET /{ServiceGroupId}/customproperties</code>. Returns public
@@ -77,35 +81,34 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     boolean bAuthenticated = false;
     try
     {
-      getMandatoryAuth (aRequestScope.headers ());
+      final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+      SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       bAuthenticated = true;
     }
     catch (final SMPUnauthorizedException ex)
     {
       // Not authenticated - that's fine for GET
+      // Only the public properties will be listed
     }
 
     final SGCustomPropertyList aCustomProperties = aServiceGroup.getCustomProperties ();
-    final IJsonArray aResultJson;
-    if (aCustomProperties == null || aCustomProperties.isEmpty ())
+    final SGCustomPropertyList aEffectiveCustomProperties;
+    if (bAuthenticated)
     {
-      aResultJson = new JsonArray ();
+      // Return all properties
+      aEffectiveCustomProperties = aCustomProperties != null ? aCustomProperties : new SGCustomPropertyList ();
     }
     else
     {
-      if (bAuthenticated)
-      {
-        // Return all properties
-        aResultJson = aCustomProperties.getAsJson ();
-      }
-      else
-      {
-        // Return only public properties
-        final SGCustomPropertyList aPublicProps = new SGCustomPropertyList ();
-        aCustomProperties.forEach (SGCustomProperty::isPublic, aPublicProps::add);
-        aResultJson = aPublicProps.getAsJson ();
-      }
+      // Return only public properties
+      aEffectiveCustomProperties = aCustomProperties != null ? aCustomProperties.getFiltered (
+                                                                                              SGCustomProperty::isPublic)
+                                                             : new SGCustomPropertyList ();
     }
+
+    final IMicroDocument ret = new MicroDocument ();
+    ret.addChild (MicroTypeConverter.convertToMicroElement (aEffectiveCustomProperties,
+                                                            SMPServiceGroupMicroTypeConverter.ELEMENT_CUSTOM_PROPERTIES));
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug (SMPRestFilter.LOG_PREFIX +
@@ -114,9 +117,9 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
                     " for '" +
                     sServiceGroupID +
                     "' - returning " +
-                    aResultJson.size () +
+                    aEffectiveCustomProperties.size () +
                     " properties");
 
-    aUnifiedResponse.json (aResultJson);
+    aUnifiedResponse.xml (ret);
   }
 }

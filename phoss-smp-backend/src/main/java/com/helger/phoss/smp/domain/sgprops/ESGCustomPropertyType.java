@@ -10,28 +10,40 @@
  */
 package com.helger.phoss.smp.domain.sgprops;
 
+import java.util.Locale;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
 import com.helger.base.lang.EnumHelper;
+import com.helger.text.display.IHasDisplayText;
 
-public enum ESGCustomPropertyType implements IHasID <String>
+/**
+ * Defines the types for ServiceGroup Custom Properties.
+ * 
+ * @author Philip Helger
+ * @since 8.1.0
+ */
+public enum ESGCustomPropertyType implements IHasID <String>, IHasDisplayText
 {
-  PRIVATE ("priv"),
-  PUBLIC ("pub");
+  PUBLIC ("pub", ESGCustomPropertyTypeName.PUBLIC),
+  PRIVATE ("priv", ESGCustomPropertyTypeName.PRIVATE);
+
+  /** The default property type is: public */
+  public static final ESGCustomPropertyType DEFAULT = PUBLIC;
 
   // for DB storage
   public static final int ID_MAX_LEN = 6;
 
-  @NonNull
-  @Nonempty
   private final String m_sID;
+  private final ESGCustomPropertyTypeName m_eName;
 
-  private ESGCustomPropertyType (@NonNull @Nonempty final String sID)
+  private ESGCustomPropertyType (@NonNull @Nonempty final String sID, @NonNull final ESGCustomPropertyTypeName eName)
   {
     m_sID = sID;
+    m_eName = eName;
   }
 
   @NonNull
@@ -49,6 +61,12 @@ public enum ESGCustomPropertyType implements IHasID <String>
   public boolean isPublic ()
   {
     return this == PUBLIC;
+  }
+
+  @Nullable
+  public String getDisplayText (@NonNull final Locale aContentLocale)
+  {
+    return m_eName.getDisplayText (aContentLocale);
   }
 
   @Nullable

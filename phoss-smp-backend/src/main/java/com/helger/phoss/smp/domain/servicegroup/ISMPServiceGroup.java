@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.base.id.IHasID;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -58,6 +59,17 @@ public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
   default boolean hasCustomProperties ()
   {
     return getCustomProperties () != null;
+  }
+
+  /**
+   * @return The number of contained custom properties. Always &ge; 0.
+   * @since 8.1.0
+   */
+  @Nonnegative
+  default int getCustomPropertyCount ()
+  {
+    final var aList = getCustomProperties ();
+    return aList == null ? 0 : aList.size ();
   }
 
   /**

@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
+import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
@@ -48,6 +49,13 @@ public class SGCustomPropertyList implements IHasJson, ICommonsIterable <SGCusto
 
   public SGCustomPropertyList ()
   {}
+
+  public SGCustomPropertyList (@Nullable final Iterable <SGCustomProperty> aProperties)
+  {
+    if (aProperties != null)
+      for (final var aProp : aProperties)
+        add (aProp);
+  }
 
   public SGCustomPropertyList (@Nullable final SGCustomProperty @Nullable... aProperties)
   {
@@ -120,6 +128,13 @@ public class SGCustomPropertyList implements IHasJson, ICommonsIterable <SGCusto
   public Iterator <SGCustomProperty> iterator ()
   {
     return m_aList.values ().iterator ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public SGCustomPropertyList getFiltered (@NonNull final Predicate <? super SGCustomProperty> aFilter)
+  {
+    return new SGCustomPropertyList (m_aList.copyOfValues (aFilter));
   }
 
   @Override
