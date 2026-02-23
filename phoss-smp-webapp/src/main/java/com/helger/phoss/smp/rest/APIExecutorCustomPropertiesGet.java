@@ -19,28 +19,17 @@ package com.helger.phoss.smp.rest;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroupMicroTypeConverter;
-import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
-import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
-import com.helger.phoss.smp.exception.SMPBadRequestException;
-import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
+import com.helger.phoss.smp.restapi.CustomPropertiesServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
-import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.MicroDocument;
@@ -55,8 +44,6 @@ import com.helger.xml.microdom.convert.MicroTypeConverter;
  */
 public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorCustomPropertiesGet.class);
-
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
                             @NonNull @Nonempty final String sPath,
@@ -67,55 +54,19 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
-    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
-    if (aServiceGroupID == null)
-      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
-
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
-    if (aServiceGroup == null)
-      throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
-
-    // Check if authenticated - if so, return all properties; otherwise only public
-    boolean bAuthenticated = false;
+    // Try optional authentication
+    SMPAPICredentials aCredentials = null;
     try
     {
-      final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
-      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
-      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
-      bAuthenticated = true;
+      aCredentials = getMandatoryAuth (aRequestScope.headers ());
     }
     catch (final SMPUnauthorizedException ex)
     {
       // Not authenticated - that's fine for GET
-      // Only the public properties will be listed
     }
 
-    final SGCustomPropertyList aCustomProperties = aServiceGroup.getCustomProperties ();
-    final SGCustomPropertyList aEffectiveCustomProperties;
-    if (aCustomProperties == null)
-      aEffectiveCustomProperties = new SGCustomPropertyList ();
-    else
-      if (bAuthenticated)
-      {
-        // Return all properties
-        aEffectiveCustomProperties = aCustomProperties;
-      }
-      else
-      {
-        // Return only public properties
-        aEffectiveCustomProperties = aCustomProperties.getFiltered (SGCustomProperty::isPublic);
-      }
-
-    LOGGER.info (SMPRestFilter.LOG_PREFIX +
-                 "GET customproperties" +
-                 (bAuthenticated ? " [authenticated]" : "") +
-                 " for '" +
-                 sPathServiceGroupID +
-                 "' - returning " +
-                 aEffectiveCustomProperties.size () +
-                 " properties");
+    final SGCustomPropertyList aEffectiveCustomProperties = new CustomPropertiesServerAPI (aDataProvider).getCustomProperties (sPathServiceGroupID,
+                                                                                                                              aCredentials);
 
     final IMicroDocument ret = new MicroDocument ();
     ret.addChild (MicroTypeConverter.convertToMicroElement (aEffectiveCustomProperties,

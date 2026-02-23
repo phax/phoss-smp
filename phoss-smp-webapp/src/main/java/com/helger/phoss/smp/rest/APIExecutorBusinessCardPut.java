@@ -53,7 +53,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      throw new SMPPreconditionFailedException ("The writable REST API is disabled. saveBusinessCard will not be executed",
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. createBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
 
@@ -65,7 +65,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       // PD integration is disabled
       throw new SMPPreconditionFailedException ("The " +
                                                 SMPWebAppConfiguration.getDirectoryName () +
-                                                " integration is disabled. saveBusinessCard will not be executed",
+                                                " integration is disabled. createBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
 
