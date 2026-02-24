@@ -63,9 +63,10 @@ public final class SGCustomProperty implements IHasName, IHasJson
   }
 
   /**
-   * Check if the provided property value is valid or not. Valid names have a length between 0 and
-   * 256 and may contain any character.
-   * 
+   * Check if the provided property value is valid or not. Valid values have a length between 0 and
+   * 256 and must not contain newline characters ({@code \r}, {@code \n}) or the null character
+   * ({@code \0}), because these cannot be properly represented in XML attributes.
+   *
    * @param s
    *        The String to check
    * @return <code>true</code> if the value is valid, <code>false</code> if not.
@@ -78,7 +79,13 @@ public final class SGCustomProperty implements IHasName, IHasJson
     final int nLen = s.length ();
     if (nLen > VALUE_MAX_LEN)
       return false;
-    // No further restrictions
+    // Disallow characters that cannot be properly represented in XML attributes
+    for (int i = 0; i < nLen; i++)
+    {
+      final char c = s.charAt (i);
+      if (c == '\r' || c == '\n' || c == '\0')
+        return false;
+    }
     // Empty value is okay
     return true;
   }
