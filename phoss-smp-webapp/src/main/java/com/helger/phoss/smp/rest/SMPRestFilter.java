@@ -67,10 +67,11 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SMPRestFilter extends AbstractXFilterUnifiedResponse
 {
   public static final String PATH_BUSINESSCARD = "/businesscard/";
-  public static final String PATH_COMPLETE = "/complete/";
+  public static final String PATH_COMPLETE = "/complete";
   public static final String PATH_CUSTOM_PROPERTIES = "/customproperties";
-  public static final String PATH_LIST = "/list/";
-  public static final String PATH_SERVICES = "/services/";
+  public static final String PATH_LIST = "/list";
+  public static final String PATH_SERVICE_GROUP_IDS = "/servicegroupids";
+  public static final String PATH_SERVICES = "/services";
 
   public static final String PATH_PREFIX_OASIS_BDXR_SMP_2 = "bdxr-smp-2";
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
@@ -120,7 +121,6 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aDeleteBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteBusinessCard);
     }
-    // Push BusinessCard
     {
       final APIDescriptor aPushBusinessCard = new APIDescriptor (APIPath.post (PATH_BUSINESSCARD +
                                                                                "{" +
@@ -130,23 +130,34 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aPushBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPushBusinessCard);
     }
+
     // CompleteServiceGroup
     {
       final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get (PATH_COMPLETE +
-                                                                                     "{" +
+                                                                                     "/{" +
                                                                                      PARAM_SERVICE_GROUP_ID +
                                                                                      "}"),
                                                                         new APIExecutorServiceGroupCompleteGet ());
       aGetCompleteServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetCompleteServiceGroup);
     }
+
     // List
     {
-      final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "{" + PARAM_USER_ID + "}"),
+      final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "/{" + PARAM_USER_ID + "}"),
                                                         new APIExecutorUserListGet ());
       aGetList.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetList);
     }
+
+    // Service Group IDs
+    {
+      final APIDescriptor aGetServiceGroupIDs = new APIDescriptor (APIPath.get (PATH_SERVICE_GROUP_IDS + "/all"),
+                                                                   new APIExecutorServiceGroupIDsGet ());
+      aGetServiceGroupIDs.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aGetServiceGroupIDs);
+    }
+
     // ServiceGroup
     {
       final APIDescriptor aGetServiceGroup = new APIDescriptor (APIPath.get (sQueryPathPrefix +
@@ -177,7 +188,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                                 PARAM_SERVICE_GROUP_ID +
                                                                                 "}" +
                                                                                 PATH_SERVICES +
-                                                                                "{" +
+                                                                                "/{" +
                                                                                 PARAM_DOCUMENT_TYPE_ID +
                                                                                 "}"),
                                                                    new APIExecutorServiceMetadataGet ());
@@ -189,7 +200,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                                 PARAM_SERVICE_GROUP_ID +
                                                                                 "}" +
                                                                                 PATH_SERVICES +
-                                                                                "{" +
+                                                                                "/{" +
                                                                                 PARAM_DOCUMENT_TYPE_ID +
                                                                                 "}"),
                                                                    new APIExecutorServiceMetadataPut ());
@@ -203,7 +214,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                                       PARAM_SERVICE_GROUP_ID +
                                                                                       "}" +
                                                                                       PATH_SERVICES +
-                                                                                      "{" +
+                                                                                      "/{" +
                                                                                       PARAM_DOCUMENT_TYPE_ID +
                                                                                       "}"),
                                                                       new APIExecutorServiceMetadataDelete ());
