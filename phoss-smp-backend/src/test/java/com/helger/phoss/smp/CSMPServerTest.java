@@ -36,6 +36,7 @@ public final class CSMPServerTest
                                           "-1",
                                           "smptest.intercenter.it",
                                           "smp.bla",
+                                          "smp.Bla",
                                           "a.b",
                                           "a.b.c.d.e.f.g" })
       assertTrue ("Pattern: '" + s + "'", RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
@@ -50,6 +51,7 @@ public final class CSMPServerTest
                                           ".smp",
                                           ".smp.",
                                           "smp.",
+                                          "SMP.",
                                           "a..b",
                                           "a.b.",
                                           "a.b.c..d.e.f" })
