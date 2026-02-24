@@ -16,7 +16,6 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
-import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.name.IHasName;
@@ -62,6 +61,11 @@ public final class SGCustomProperty implements IHasName, IHasJson
     return RegExHelper.stringMatchesPattern ("[a-zA-Z0-9\\.\\-_]{1," + NAME_MAX_LEN + "}", s);
   }
 
+  public static boolean isCharacterForbiddenInValue (final char c)
+  {
+    return c == '\r' || c == '\n' || c == '\0';
+  }
+
   /**
    * Check if the provided property value is valid or not. Valid values have a length between 0 and
    * 256 and must not contain newline characters ({@code \r}, {@code \n}) or the null character
@@ -79,13 +83,12 @@ public final class SGCustomProperty implements IHasName, IHasJson
     final int nLen = s.length ();
     if (nLen > VALUE_MAX_LEN)
       return false;
+
     // Disallow characters that cannot be properly represented in XML attributes
-    for (int i = 0; i < nLen; i++)
-    {
-      final char c = s.charAt (i);
-      if (c == '\r' || c == '\n' || c == '\0')
+    for (final char c : s.toCharArray ())
+      if (isCharacterForbiddenInValue (c))
         return false;
-    }
+
     // Empty value is okay
     return true;
   }

@@ -129,5 +129,54 @@ public final class SGCustomPropertyTest
     assertTrue (SGCustomProperty.isValidValue ("_"));
     assertTrue (SGCustomProperty.isValidValue ("_.-0123456789abcdefghijkjlmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"));
     assertTrue (SGCustomProperty.isValidValue ("$"));
+
+    // Characters forbidden because they cannot be properly represented in XML attributes
+    assertFalse (SGCustomProperty.isValidValue ("\n"));
+    assertFalse (SGCustomProperty.isValidValue ("\r"));
+    assertFalse (SGCustomProperty.isValidValue ("\0"));
+    assertFalse (SGCustomProperty.isValidValue ("abc\ndef"));
+    assertFalse (SGCustomProperty.isValidValue ("abc\rdef"));
+    assertFalse (SGCustomProperty.isValidValue ("abc\0def"));
+    assertFalse (SGCustomProperty.isValidValue ("\r\n"));
+
+    // Tabs and other whitespace are allowed
+    assertTrue (SGCustomProperty.isValidValue ("\t"));
+    assertTrue (SGCustomProperty.isValidValue ("abc\tdef"));
+    assertTrue (SGCustomProperty.isValidValue (" "));
+    assertTrue (SGCustomProperty.isValidValue ("abc def"));
+  }
+
+  @Test
+  public void testConstructorRejectsInvalidValue ()
+  {
+    try
+    {
+      new SGCustomProperty (ESGCustomPropertyType.PUBLIC, "name", "abc\ndef");
+      fail ();
+    }
+    catch (final IllegalArgumentException ex)
+    {
+      // Expected
+    }
+
+    try
+    {
+      new SGCustomProperty (ESGCustomPropertyType.PUBLIC, "name", "abc\rdef");
+      fail ();
+    }
+    catch (final IllegalArgumentException ex)
+    {
+      // Expected
+    }
+
+    try
+    {
+      new SGCustomProperty (ESGCustomPropertyType.PUBLIC, "name", "abc\0def");
+      fail ();
+    }
+    catch (final IllegalArgumentException ex)
+    {
+      // Expected
+    }
   }
 }
