@@ -52,6 +52,7 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.phoss.smp.ui.secure.hc.IHCServiceGroupSelect;
 import com.helger.photon.bootstrap4.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -339,10 +340,11 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                         ISMPParticipantMigration::getParticipantIdentifier);
 
     // Filter out all for which it makes no sense
-    final HCServiceGroupSelect aSGSelect = new HCServiceGroupSelect (new RequestField (FIELD_PARTICIPANT_ID),
-                                                                     aDisplayLocale,
-                                                                     x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticipantIdentifier ()
-                                                                                                                    .hasSameContent (y)));
+    final IHCServiceGroupSelect aSGSelect = HCServiceGroupSelect.create (new RequestField (FIELD_PARTICIPANT_ID),
+                                                                         aDisplayLocale,
+                                                                         x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticipantIdentifier ()
+                                                                                                                        .hasSameContent (y)),
+                                                                         false);
     if (!aSGSelect.containsAnyServiceGroup ())
     {
       aForm.addChild (warn ("No Service Group on this SMP can currently be migrated."));

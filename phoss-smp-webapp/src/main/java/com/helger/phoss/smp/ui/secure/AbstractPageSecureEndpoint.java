@@ -505,8 +505,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     if (aSelectedEndpoint.hasTechnicalInformationUrl ())
     {
       final String sTechInfo = aSelectedEndpoint.getTechnicalInformationUrl ();
-      final IHCNode aCtrl = URLHelper.getAsURL (sTechInfo) != null ? HCA.createLinkedWebsite (sTechInfo, HC_Target.BLANK)
-                                                             : span (sTechInfo);
+      final IHCNode aCtrl = URLHelper.getAsURL (sTechInfo) != null ? HCA.createLinkedWebsite (sTechInfo,
+                                                                                              HC_Target.BLANK) : span (
+                                                                                                                       sTechInfo);
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information").setCtrl (aCtrl));
     }
     if (aSelectedEndpoint.getExtensions ().extensions ().isNotEmpty ())
@@ -749,11 +750,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Endpoint" : "Create new Endpoint"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                       aSelectedObject !=
-                                                                                                                               null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                    : null),
-                                                                                     aDisplayLocale).setReadOnly (bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                          aSelectedObject !=
+                                                                                                                                  null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                       : null),
+                                                                                        aDisplayLocale,
+                                                                                        null,
+                                                                                        bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     {
       final BootstrapRow aRow = new BootstrapRow ();

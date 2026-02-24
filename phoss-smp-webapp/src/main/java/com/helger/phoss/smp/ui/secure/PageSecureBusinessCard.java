@@ -37,6 +37,7 @@ import com.helger.cache.regex.RegExHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
@@ -1139,14 +1140,16 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     else
     {
       // Show only service groups that don't have a BC already
+      final ICommonsSet <String> aAllParticipantIDsWithBusinessCards = aBusinessCardMgr.getAllSMPBusinessCardIDs ();
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                   .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                         aSelectedObject !=
-                                                                                                                                 null ? aSelectedObject.getID ()
-                                                                                                                                      : null),
-                                                                                       aDisplayLocale,
-                                                                                       x -> aBusinessCardMgr.getSMPBusinessCardOfID (x.getParticipantIdentifier ()) ==
-                                                                                            null))
+                                                   .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                            aSelectedObject !=
+                                                                                                                                    null ? aSelectedObject.getID ()
+                                                                                                                                         : null),
+                                                                                          aDisplayLocale,
+                                                                                          x -> !aAllParticipantIDsWithBusinessCards.contains (x.getParticipantIdentifier ()
+                                                                                                                                               .getURIEncoded ()),
+                                                                                          false))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     }
 
