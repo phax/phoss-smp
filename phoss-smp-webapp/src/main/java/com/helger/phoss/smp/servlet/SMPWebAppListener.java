@@ -400,13 +400,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                            "' is not valid. It must match the regular expression '" +
                                            CSMPServer.PATTERN_HR_OIB +
                                            "'!");
-
-      // Backwards configuration check
-      if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
-        throw new InitializationException ("As the HR eDelivery Extension mode is enabled, the configuration property '" +
-                                           SMPServerConfiguration.KEY_HREDELIVERY_SG_EXTENSION_ON_SI +
-                                           "' must be removed");
-
     }
   }
 

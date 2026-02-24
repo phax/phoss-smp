@@ -497,20 +497,12 @@ public final class BDXR1ServerAPI
       {
         aSignedServiceMetadata.setServiceMetadata (aRedirect.getAsJAXBObjectBDXR1 ());
 
-        if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
+        if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
         {
-          // Copy extensions over (#376)
           aSignedServiceMetadata.getServiceMetadata ()
                                 .getRedirect ()
-                                .setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
+                                .setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
         }
-        else
-          if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
-          {
-            aSignedServiceMetadata.getServiceMetadata ()
-                                  .getRedirect ()
-                                  .setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
-          }
       }
       else
       {
@@ -526,16 +518,10 @@ public final class BDXR1ServerAPI
                                                                 sPathDocTypeID,
                                                                 m_aAPIDataProvider.getCurrentURI ());
         }
-        if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
+        if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
         {
-          // Copy extensions over (#376)
-          aSM.getServiceInformation ().setExtension (aPathServiceGroup.getExtensions ().getAsBDXRExtensions ());
+          aSM.getServiceInformation ().setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
         }
-        else
-          if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
-          {
-            aSM.getServiceInformation ().setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
-          }
         aSignedServiceMetadata.setServiceMetadata (aSM);
       }
 
