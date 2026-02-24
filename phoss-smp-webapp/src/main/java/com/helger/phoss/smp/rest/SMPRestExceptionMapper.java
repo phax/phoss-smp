@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.state.EHandled;
+import com.helger.http.EHttpMethod;
 import com.helger.base.string.StringHelper;
 import com.helger.http.CHttp;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -122,8 +123,17 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPNotFoundException)
     {
-      _logRestException ("Not found", aThrowable);
-      _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_NOT_FOUND, getResponseEntityWithoutStackTrace (aThrowable));
+      if (aRequestScope.getHttpMethod () == EHttpMethod.DELETE &&
+          SMPServerConfiguration.isRestDeleteNotFoundAsOk ())
+      {
+        _logRestException ("Not found on DELETE (treated as OK)", aThrowable);
+        aUnifiedResponse.setStatus (CHttp.HTTP_NO_CONTENT);
+      }
+      else
+      {
+        _logRestException ("Not found", aThrowable);
+        _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_NOT_FOUND, getResponseEntityWithoutStackTrace (aThrowable));
+      }
       return EHandled.HANDLED;
     }
     if (aThrowable instanceof SMPInternalErrorException)

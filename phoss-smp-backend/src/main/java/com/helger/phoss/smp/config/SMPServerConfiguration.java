@@ -53,6 +53,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_LOG_EXCEPTIONS = "smp.rest.log.exceptions";
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
+  public static final String KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK = "smp.rest.delete.notfound.as.ok";
 
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
@@ -77,6 +78,7 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_LOG_EXCEPTIONS = false;
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
+  public static final boolean DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK = false;
 
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
@@ -299,6 +301,18 @@ public final class SMPServerConfiguration
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_REMOTE_QUERY_API_DISABLED,
                                        DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED);
+  }
+
+  /**
+   * @return <code>true</code> if HTTP DELETE requests on non-existing entities should return HTTP
+   *         204 (No Content) instead of HTTP 404 (Not Found), <code>false</code> if not. By
+   *         default this is disabled.
+   * @since 8.1.0
+   */
+  public static boolean isRestDeleteNotFoundAsOk ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK,
+                                       DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK);
   }
 
   /**
