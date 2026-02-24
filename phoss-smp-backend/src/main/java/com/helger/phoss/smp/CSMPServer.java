@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -53,6 +53,9 @@ public final class CSMPServer
   public static final String LOG_SUFFIX_NO_SML_INTERACTION = " (no SML interaction)";
 
   public static final String SMP_SERVER_VERSION_FILENAME = "smp-server-version.properties";
+
+  public static final boolean SML_CONFIGURATION_DEFAULT_CLIENT_CERTIFICATE_REQUIRES = true;
+  public static final int MAX_LEN_ID = 45;
 
   private static final String VERSION_NUMBER;
   private static final String TIMESTAMP;

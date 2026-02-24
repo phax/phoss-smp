@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -29,6 +29,10 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
 import com.helger.phoss.smp.domain.spf.SMPSPF4PeppolPolicy;
 import com.helger.phoss.smp.domain.spf.SMPSPF4PeppolPolicyMicroTypeConverter;
+import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyListMicroTypeConverter;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyMicroTypeConverter;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistry;
 
@@ -53,5 +57,8 @@ public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeCon
                                                  new SMPServiceInformationMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPSPF4PeppolPolicy.class,
                                                  new SMPSPF4PeppolPolicyMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SGCustomProperty.class, new SGCustomPropertyMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SGCustomPropertyList.class,
+                                                 new SGCustomPropertyListMicroTypeConverter ());
   }
 }

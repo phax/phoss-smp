@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -101,8 +101,9 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
           case POSTGRESQL:
             aExecutor.executeStatement ("ALTER TABLE " + m_sTableNameO + " DROP CONSTRAINT FK_smp_ownership_username");
             break;
-          case ORACLE:
           case DB2:
+          case ORACLE:
+          case SQLSERVER:
             // No such constraint
             break;
           default:

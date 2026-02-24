@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,7 +70,7 @@ public final class SMPRedirectManagerMongoDBTest
                                                                                        "0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, true);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, null, true);
     assertNotNull (aSG);
     try
     {
@@ -117,7 +117,7 @@ public final class SMPRedirectManagerMongoDBTest
     assertNotNull (aPI);
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, true);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, null, true);
     assertNotNull (aSG);
     try
     {
@@ -170,7 +170,7 @@ public final class SMPRedirectManagerMongoDBTest
                                                                                        "0088:dummy");
     aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
 
-    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup ("blub", aPI, null, true);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup ("blub", aPI, null, null, true);
     assertNotNull (aSG);
     try
     {

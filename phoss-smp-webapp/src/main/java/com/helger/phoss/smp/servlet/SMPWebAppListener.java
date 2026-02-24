@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -283,7 +283,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     return StringHelper.isNotEmpty (sCtx) && !sCtx.equals ("/");
   }
 
-  @SuppressWarnings ("removal")
   @Override
   protected void initGlobalSettings ()
   {
@@ -335,11 +334,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
-    if (SMPServerConfiguration.getRESTType ().isHttpAlsoAllowed ())
-    {
-      // Peppol SMP is always http only
-      UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
-    }
 
     // Make sure the nonce attributes are used
     // Required for CSP to work
@@ -353,23 +347,37 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
 
     // Check SMP ID
-    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-    if (StringHelper.isEmpty (sSMPID))
-      throw new InitializationException ("The SMP ID is missing. It must match the regular expression '" +
-                                         CSMPServer.PATTERN_SMP_ID +
-                                         "'!");
-    if (!RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, sSMPID))
-      throw new InitializationException ("The provided SMP ID '" +
-                                         sSMPID +
-                                         "' is not valid when used as a DNS name. It must match the regular expression '" +
-                                         CSMPServer.PATTERN_SMP_ID +
-                                         "'!");
-    LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
+    {
+      final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
+      if (StringHelper.isEmpty (sSMPID))
+        throw new InitializationException ("The SMP ID is missing. It must match the regular expression '" +
+                                           CSMPServer.PATTERN_SMP_ID +
+                                           "'!");
+      if (!RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, sSMPID))
+        throw new InitializationException ("The provided SMP ID '" +
+                                           sSMPID +
+                                           "' is not valid when used as a DNS name. It must match the regular expression '" +
+                                           CSMPServer.PATTERN_SMP_ID +
+                                           "'!");
+      LOGGER.info ("This SMP has the ID '" + sSMPID + "'");
+    }
+
     LOGGER.info ("This SMP uses REST API type '" + SMPServerConfiguration.getRESTType () + "'");
 
     // Check other consistency stuff
     if (SMPWebAppConfiguration.isImprintEnabled () && StringHelper.isEmpty (SMPWebAppConfiguration.getImprintText ()))
       LOGGER.warn ("The custom Imprint is enabled in the configuration, but no imprint text is configured. Therefore no imprint will be shown.");
+
+    // Check the SMP hostname for SML interaction
+    final String sSMLSMPHostName = SMPServerConfiguration.getSMLSMPHostname ();
+    if (StringHelper.isNotEmpty (sSMLSMPHostName))
+    {
+      // Ensure prefix
+      if (!sSMLSMPHostName.startsWith ("http://") && !sSMLSMPHostName.startsWith ("https://"))
+        throw new InitializationException ("The value of the configuration property '" +
+                                           SMPServerConfiguration.KEY_SML_SMP_HOSTNAME +
+                                           "' MUST start with http:// or https://");
+    }
 
     if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
     {
@@ -391,13 +399,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
                                            "' is not valid. It must match the regular expression '" +
                                            CSMPServer.PATTERN_HR_OIB +
                                            "'!");
-
-      // Backwards configuration check
-      if (SMPServerConfiguration.isHRIncludeSGExtOnSI ())
-        throw new InitializationException ("As the HR eDelivery Extension mode is enabled, the configuration property '" +
-                                           SMPServerConfiguration.KEY_HREDELIVERY_SG_EXTENSION_ON_SI +
-                                           "' must be removed");
-
     }
   }
 

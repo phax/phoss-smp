@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -366,11 +366,13 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Redirect" : "Create new Redirect"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                       aSelectedObject !=
-                                                                                                                               null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                    : null),
-                                                                                     aDisplayLocale).setReadOnly (bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                          aSelectedObject !=
+                                                                                                                                  null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                       : null),
+                                                                                        aDisplayLocale,
+                                                                                        null,
+                                                                                        bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document Type ID")
@@ -409,7 +411,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                                                                                      : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid " +
                                                                (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
-                                                                                                              : "JSON or XML") +
+                                                                                                          : "JSON or XML") +
                                                                "  content!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2015-2025 Philip Helger and contributors
+# Copyright (C) 2015-2026 Philip Helger and contributors
 # philip[at]helger[dot]com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-version=8.0.12
+version=8.1.0
 
 echo Docker login
 docker login --username phelger

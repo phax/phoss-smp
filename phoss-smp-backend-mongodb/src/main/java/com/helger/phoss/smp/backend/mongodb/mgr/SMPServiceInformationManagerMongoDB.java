@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,12 +37,16 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -50,6 +55,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
@@ -491,6 +497,158 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                    aDocumentTypeIdentifier.getURIEncoded () +
                    "'. This seems to be a bug! Using the first one.");
     return ret.getFirstOrNull ();
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    long nCount = 0;
+    for (final Document aDoc : getCollection ().find ())
+    {
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            nCount += aEndpoints.size ();
+        }
+    }
+    return nCount;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    for (final Document aDoc : getCollection ().find ())
+    {
+      final String sServiceGroupID = aDoc.getString (BSON_SERVICE_GROUP_ID);
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              final String sURL = aEndpoint.getString (BSON_ENDPOINT_REFERENCE);
+              if (StringHelper.isNotEmpty (sURL))
+              {
+                final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
+                ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+              }
+            }
+        }
+    }
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    for (final Document aDoc : getCollection ().find ())
+    {
+      final String sServiceGroupID = aDoc.getString (BSON_SERVICE_GROUP_ID);
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aEndpoint.getString (BSON_CERTIFICATE));
+              final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sNormalizedCert, k -> new EndpointUsageInfo ());
+              ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+            }
+        }
+    }
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    // Count matching endpoints before the update via aggregation
+    final String sEndpointRefPath = BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_ENDPOINT_REFERENCE;
+    long nEndpointsChanged = 0;
+
+    // Find all documents that have matching endpoints
+    Bson aFilter = Filters.eq (sEndpointRefPath, sOldURL);
+    if (aServiceGroupID != null)
+      aFilter = Filters.and (aFilter, Filters.eq (BSON_SERVICE_GROUP_ID, aServiceGroupID.getURIEncoded ()));
+
+    // Iterate each matching document, update endpoints in Java, and replace
+    for (final Document aDoc : getCollection ().find (aFilter))
+    {
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+              if (sOldURL.equals (aEndpoint.getString (BSON_ENDPOINT_REFERENCE)))
+              {
+                aEndpoint.put (BSON_ENDPOINT_REFERENCE, sNewURL);
+                bDocChanged = true;
+                nEndpointsChanged++;
+              }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    ValueEnforcer.notNull (sOldCert, "OldCert");
+    ValueEnforcer.notNull (sNewCert, "NewCert");
+
+    final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
+    long nEndpointsChanged = 0;
+
+    // Find all documents that have endpoints with certificates
+    for (final Document aDoc : getCollection ().find ())
+    {
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              final String sStoredCert = aEndpoint.getString (BSON_CERTIFICATE);
+              if (sStoredCert != null)
+              {
+                final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
+                if (sOldCertNormalized.equals (sStoredCertNormalized))
+                {
+                  aEndpoint.put (BSON_CERTIFICATE, sNewCert);
+                  bDocChanged = true;
+                  nEndpointsChanged++;
+                }
+              }
+            }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)

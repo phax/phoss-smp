@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.email.EmailAddressHelper;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
@@ -33,6 +34,7 @@ import com.helger.base.url.URLHelper;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.datetime.helper.PDTFactory;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
@@ -495,14 +497,18 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     }
     if (aSelectedEndpoint.hasTechnicalContactUrl ())
     {
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact")
-                                                   .setCtrl (HCA_MailTo.createLinkedEmail (aSelectedEndpoint.getTechnicalContactUrl ())));
+      final String sContactURL = aSelectedEndpoint.getTechnicalContactUrl ();
+      final IHCNode aCtrl = EmailAddressHelper.isValidForSimplePattern (sContactURL) ? HCA_MailTo.createLinkedEmail (sContactURL)
+                                                                                     : span (sContactURL);
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical contact").setCtrl (aCtrl));
     }
     if (aSelectedEndpoint.hasTechnicalInformationUrl ())
     {
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information")
-                                                   .setCtrl (HCA.createLinkedWebsite (aSelectedEndpoint.getTechnicalInformationUrl (),
-                                                                                      HC_Target.BLANK)));
+      final String sTechInfo = aSelectedEndpoint.getTechnicalInformationUrl ();
+      final IHCNode aCtrl = URLHelper.getAsURL (sTechInfo) != null ? HCA.createLinkedWebsite (sTechInfo,
+                                                                                              HC_Target.BLANK) : span (
+                                                                                                                       sTechInfo);
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Technical information").setCtrl (aCtrl));
     }
     if (aSelectedEndpoint.getExtensions ().extensions ().isNotEmpty ())
     {
@@ -744,11 +750,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Endpoint" : "Create new Endpoint"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                       aSelectedObject !=
-                                                                                                                               null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                    : null),
-                                                                                     aDisplayLocale).setReadOnly (bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                          aSelectedObject !=
+                                                                                                                                  null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                       : null),
+                                                                                        aDisplayLocale,
+                                                                                        null,
+                                                                                        bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     {
       final BootstrapRow aRow = new BootstrapRow ();

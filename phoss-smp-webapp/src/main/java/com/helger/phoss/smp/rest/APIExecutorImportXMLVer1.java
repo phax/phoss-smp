@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,6 +39,7 @@ import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
+import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -165,6 +166,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                                        aDefaultOwner,
                                        aAllServiceGroupIDs,
                                        aAllBusinessCardIDs,
+                                       PDClientProvider.getInstance ().getPDClient ()::addServiceGroupToIndex,
                                        aActionList,
                                        aImportSummary);
 

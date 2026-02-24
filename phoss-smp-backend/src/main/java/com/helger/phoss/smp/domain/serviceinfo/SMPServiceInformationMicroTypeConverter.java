@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -23,6 +23,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupProvider;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
+import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
 import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.microdom.util.MicroHelper;
@@ -34,7 +35,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPServiceInformationMicroTypeConverter implements IMicroTypeConverter <SMPServiceInformation>
 {
-  private static final String ATTR_SERVICE_GROUP_ID = "servicegroupid";
+  private static final MicroQName ATTR_SERVICE_GROUP_ID = new MicroQName ("servicegroupid");
   private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
   private static final String ELEMENT_PROCESS = "process";
   private static final String ELEMENT_EXTENSION = "extension";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,15 +53,19 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
     // Is the writable API disabled?
     if (SMPMetaManager.getSettings ().isRESTWritableAPIDisabled ())
     {
-      throw new SMPPreconditionFailedException ("The writable REST API is disabled. saveBusinessCard will not be executed",
+      throw new SMPPreconditionFailedException ("The writable REST API is disabled. createBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
+
+    // Check credentials first
+    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
+
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
     {
       // PD integration is disabled
       throw new SMPPreconditionFailedException ("The " +
                                                 SMPWebAppConfiguration.getDirectoryName () +
-                                                " integration is disabled. saveBusinessCard will not be executed",
+                                                " integration is disabled. createBusinessCard will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
 
@@ -73,8 +77,6 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       // Cannot parse
       throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
     }
-
-    final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
                                                                                             aBC,

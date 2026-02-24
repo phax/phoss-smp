@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -61,10 +61,5 @@ final class MockSMLInfoManager implements ISMLInfoManager
   public boolean containsSMLInfoWithID (final String sID)
   {
     return false;
-  }
-
-  public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (final String sAddress)
-  {
-    return null;
   }
 }

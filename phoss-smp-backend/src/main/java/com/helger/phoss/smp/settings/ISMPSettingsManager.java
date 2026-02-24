@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -24,6 +24,8 @@ import com.helger.base.state.EChange;
  */
 public interface ISMPSettingsManager
 {
+  int MAX_LEN_VALUE = 500;
+
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
@@ -47,18 +49,16 @@ public interface ISMPSettingsManager
    * @param bDirectoryIntegrationRequired
    *        <code>true</code> to warn if Directory is disabled
    * @param bDirectoryIntegrationAutoUpdate
-   *        <code>true</code> to automatically update the Directory if a
-   *        business card changes
+   *        <code>true</code> to automatically update the Directory if a business card changes
    * @param sDirectoryHostName
-   *        The hostname of the Directory server to use. Must be fully qualified
-   *        including the protocol.
+   *        The hostname of the Directory server to use. Must be fully qualified including the
+   *        protocol.
    * @param bSMLEnabled
    *        <code>true</code> to enable write access to the SML
    * @param bSMLRequired
    *        <code>true</code> to warn if SML is disabled
    * @param sSMLInfoID
-   *        The SMLInfo object ID to use. May be <code>null</code> if not
-   *        active.
+   *        The SMLInfo object ID to use. May be <code>null</code> if not active.
    * @return {@link EChange}
    */
   @NonNull

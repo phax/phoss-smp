@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,8 +87,7 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
     if (aServiceGroup == null)
     {
       // No such service group
-      throw new SMPNotFoundException ("Unknown Service Group '" + sPathServiceGroupID + "'",
-                                      aDataProvider.getCurrentURI ());
+      throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
     final boolean bIncludeBusinessCards = aRequestScope.params ()
                                                        .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -15,15 +15,18 @@ import java.util.function.Consumer;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
@@ -113,5 +116,37 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
     return false;
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    return 0;
+  }
+
+  @NonNull
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @NonNull
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    return 0;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    return 0;
   }
 }

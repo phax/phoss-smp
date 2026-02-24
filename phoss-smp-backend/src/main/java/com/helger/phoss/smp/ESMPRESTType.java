@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -83,16 +83,6 @@ public enum ESMPRESTType implements IHasID <String>, IHasDisplayName
   public boolean isCompleteServiceGroupSupported ()
   {
     return this == PEPPOL || this == OASIS_BDXR_V1;
-  }
-
-  /**
-   * @return <code>true</code> if this REST API allows the usage of HTTP and HTTPS in parallel. This
-   *         is only true for {@link #PEPPOL} until 2026-02-01. Afterwards Peppol must also use
-   *         HTTPS only.
-   */
-  public boolean isHttpAlsoAllowed ()
-  {
-    return this == PEPPOL;
   }
 
   /**

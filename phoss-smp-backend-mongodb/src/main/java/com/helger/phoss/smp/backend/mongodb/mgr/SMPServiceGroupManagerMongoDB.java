@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,8 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.json.IJsonArray;
+import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -42,6 +44,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -65,6 +68,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   private static final String BSON_OWNER_ID = "ownerid";
   private static final String BSON_PARTICIPANT_ID = "participantid";
   private static final String BSON_EXTENSION = "extension";
+  private static final String BSON_CUSTOM_PROPERTIES = "customproperties";
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
@@ -81,6 +85,13 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     return m_aCBs;
   }
 
+  @Nullable
+  private static String _toString (@Nullable final SGCustomPropertyList aCustomProperties)
+  {
+    return aCustomProperties != null && aCustomProperties.isNotEmpty () ? aCustomProperties.getAsJson ()
+                                                                                           .getAsJsonString () : null;
+  }
+
   @NonNull
   @ReturnsMutableCopy
   public static Document toBson (@NonNull final ISMPServiceGroup aValue)
@@ -90,6 +101,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                         .append (BSON_PARTICIPANT_ID, toBson (aValue.getParticipantIdentifier ()));
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
       ret.append (BSON_EXTENSION, aValue.getExtensions ().getExtensionsAsJsonString ());
+    ret.append (BSON_CUSTOM_PROPERTIES, _toString (aValue.getCustomProperties ()));
     return ret;
   }
 
@@ -101,13 +113,23 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     final IParticipantIdentifier aParticipantIdentifier = toParticipantID (aDoc.get (BSON_PARTICIPANT_ID,
                                                                                      Document.class));
     final String sExtension = aDoc.getString (BSON_EXTENSION);
-    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension);
+
+    SGCustomPropertyList aCustomProperties = null;
+    final String sCustomPropsJson = aDoc.getString (BSON_CUSTOM_PROPERTIES);
+    if (StringHelper.isNotEmpty (sCustomPropsJson))
+    {
+      final IJsonArray aJson = JsonReader.builder ().source (sCustomPropsJson).readAsArray ();
+      if (aJson != null)
+        aCustomProperties = SGCustomPropertyList.fromJson (aJson);
+    }
+    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension, aCustomProperties);
   }
 
   @NonNull
   public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
                                                 @NonNull final IParticipantIdentifier aParticipantID,
                                                 @Nullable final String sExtension,
+                                                @Nullable final SGCustomPropertyList aCustomProperties,
                                                 final boolean bCreateInSML) throws SMPServerException
   {
     ValueEnforcer.notEmpty (sOwnerID, "OwnerID");
@@ -123,7 +145,10 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                     bCreateInSML +
                     ")");
 
-    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension);
+    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID,
+                                                                  aParticipantID,
+                                                                  sExtension,
+                                                                  aCustomProperties);
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -177,7 +202,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   @NonNull
   public EChange updateSMPServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                         @NonNull @Nonempty final String sNewOwnerID,
-                                        @Nullable final String sExtension) throws SMPServerException
+                                        @Nullable final String sExtension,
+                                        @Nullable final SGCustomPropertyList aCustomProperties) throws SMPServerException
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notEmpty (sNewOwnerID, "NewOwnerID");
@@ -191,11 +217,14 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                     ")");
 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    final String sCustomPropsJson = _toString (aCustomProperties);
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sServiceGroupID),
                                                                 Updates.combine (Updates.set (BSON_OWNER_ID,
                                                                                               sNewOwnerID),
                                                                                  Updates.set (BSON_EXTENSION,
-                                                                                              sExtension)));
+                                                                                              sExtension),
+                                                                                 Updates.set (BSON_CUSTOM_PROPERTIES,
+                                                                                              sCustomPropsJson)));
     if (aOldDoc == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", sServiceGroupID, "no-such-id");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,10 +42,9 @@ import com.mongodb.event.CommandListener;
 import com.mongodb.event.CommandSucceededEvent;
 
 /**
- * A provider for {@link MongoCollection} instances. This class ensures, that
- * the underlying {@link MongoClient} instance is closed correctly in the
- * {@link #close()} method. Use {@link MongoClientSingleton#getInstance()} to
- * create an instance of this class.
+ * A provider for {@link MongoCollection} instances. This class ensures, that the underlying
+ * {@link MongoClient} instance is closed correctly in the {@link #close()} method. Use
+ * {@link MongoClientSingleton#getInstance()} to create an instance of this class.
  *
  * @author Philip Helger
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,21 +30,28 @@ import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.equals.EqualsHelper;
+import com.helger.base.numeric.mutable.MutableLong;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
@@ -371,5 +378,116 @@ public final class SMPServiceInformationManagerXML extends
       return false;
 
     return containsAny (x -> x.containsAnyEndpointWithTransportProfile (sTransportProfileID));
+  }
+
+  @Nonnegative
+  public long getEndpointCount ()
+  {
+    final MutableLong ret = new MutableLong (0);
+    forEachValue (aSI -> { ret.inc (aSI.getTotalEndpointCount ()); });
+    return ret.longValue ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          if (aEndpoint.hasEndpointReference ())
+          {
+            final IEndpointUsageInfo aInfo = ret.computeIfAbsent (aEndpoint.getEndpointReference (),
+                                                                  k -> new EndpointUsageInfo ());
+            ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (aSI.getServiceGroupID ());
+          }
+    });
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        {
+          final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aEndpoint.getCertificate ());
+          final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sNormalizedCert, k -> new EndpointUsageInfo ());
+          ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (aSI.getServiceGroupID ());
+        }
+    });
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                     @NonNull final String sOldURL,
+                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave ( () -> {
+      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
+      for (final ISMPServiceInformation aSI : aAllSIs)
+      {
+        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+          continue;
+
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+            if (sOldURL.equals (aEndpoint.getEndpointReference ()))
+            {
+              ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
+              bSIChanged = true;
+              aEndpointsChanged.inc ();
+            }
+        if (bSIChanged)
+          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
+  }
+
+  @Nonnegative
+  public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    ValueEnforcer.notNull (sOldCert, "OldCert");
+    ValueEnforcer.notNull (sNewCert, "NewCert");
+
+    final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
+
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave ( () -> {
+      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
+      for (final ISMPServiceInformation aSI : aAllSIs)
+      {
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          {
+            final String sCert = aEndpoint.getCertificate ();
+            if (sCert != null)
+            {
+              final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sCert);
+              if (sOldCertNormalized.equals (sStoredCertNormalized))
+              {
+                ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
+                bSIChanged = true;
+                aEndpointsChanged.inc ();
+              }
+            }
+          }
+        if (bSIChanged)
+          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
   }
 }

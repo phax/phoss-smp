@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,8 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   private static final EnumSet <EDatabaseSystemType> ALLOWED_DB_TYPES = EnumSet.of (EDatabaseSystemType.DB2,
                                                                                     EDatabaseSystemType.MYSQL,
                                                                                     EDatabaseSystemType.ORACLE,
-                                                                                    EDatabaseSystemType.POSTGRESQL);
+                                                                                    EDatabaseSystemType.POSTGRESQL,
+                                                                                    EDatabaseSystemType.SQLSERVER);
   private static final EDatabaseSystemType DB_TYPE;
 
   static

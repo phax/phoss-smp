@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -160,13 +160,5 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
   public boolean containsSMLInfoWithID (@Nullable final String sID)
   {
     return containsWithID (sID);
-  }
-
-  @Nullable
-  public ISMLInfo findFirstWithManageParticipantIdentifierEndpointAddress (@Nullable final String sAddress)
-  {
-    if (StringHelper.isEmpty (sAddress))
-      return null;
-    return findFirst (x -> x.getManageParticipantIdentifierEndpointAddress ().toExternalForm ().equals (sAddress));
   }
 }

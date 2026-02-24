@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,7 @@ import com.helger.cache.regex.RegExHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
@@ -52,6 +53,7 @@ import com.helger.html.hc.html.tabular.IHCCell;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
+import com.helger.html.hc.render.HCRenderer;
 import com.helger.html.jquery.JQuery;
 import com.helger.html.jquery.JQueryAjaxBuilder;
 import com.helger.html.jscode.JSAnonymousFunction;
@@ -105,9 +107,9 @@ import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
-import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.mgrs.longrun.LongRunningJobResult;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.html.select.HCCountrySelect;
 import com.helger.photon.uicore.html.select.HCCountrySelect.EWithDeprecated;
@@ -151,6 +153,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static final String SUFFIX_ADDITIONAL_INFO = "additional";
   private static final String SUFFIX_REG_DATE = "regdate";
   private static final String TMP_ID_PREFIX = "tmp";
+
   private static final String ACTION_PUBLISH_TO_INDEXER = "publishtoindexer";
   private static final String ACTION_PUBLISH_ALL_TO_INDEXER = "publishalltoindexer";
 
@@ -212,20 +215,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
     private final PDClient m_aPDClient;
-    private final String m_sUserID;
 
     public PushAllBusinessCardsToDirectory (@NonNull final PDClient aPDClient, @NonNull final String sUserID)
     {
       super ("PushAllBusinessCardsToDirectory",
-             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"));
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Update all participants in Directory"),
+             () -> sUserID);
       m_aPDClient = aPDClient;
-      m_sUserID = sUserID;
-    }
-
-    @Override
-    protected String getCurrentUserID ()
-    {
-      return m_sUserID;
     }
 
     @NonNull
@@ -258,11 +254,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
               aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
           }
           else
+          {
             aBox.addChild ("Successfully notified the " +
                            sDirectoryName +
                            " to index " +
                            aSuccess.size () +
                            " participants");
+          }
           aResultNodes.addChild (aBox);
         }
         if (aFailure.isNotEmpty ())
@@ -281,7 +279,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
         if (aResultNodes.hasNoChildren ())
           aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
 
-        return LongRunningJobResult.createXML (aResultNodes);
+        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aResultNodes));
       }
       finally
       {
@@ -1142,14 +1140,16 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     else
     {
       // Show only service groups that don't have a BC already
+      final ICommonsSet <String> aAllParticipantIDsWithBusinessCards = aBusinessCardMgr.getAllSMPBusinessCardIDs ();
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                   .setCtrl (new HCServiceGroupSelect (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                         aSelectedObject !=
-                                                                                                                                 null ? aSelectedObject.getID ()
-                                                                                                                                      : null),
-                                                                                       aDisplayLocale,
-                                                                                       x -> aBusinessCardMgr.getSMPBusinessCardOfID (x.getParticipantIdentifier ()) ==
-                                                                                            null))
+                                                   .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                            aSelectedObject !=
+                                                                                                                                    null ? aSelectedObject.getID ()
+                                                                                                                                         : null),
+                                                                                          aDisplayLocale,
+                                                                                          x -> !aAllParticipantIDsWithBusinessCards.contains (x.getParticipantIdentifier ()
+                                                                                                                                               .getURIEncoded ()),
+                                                                                          false))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     }
 
@@ -1286,6 +1286,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
       if (aCurObject.getEntityCount () == 0)
       {
+        // Business Card without an entity
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
         for (int i = 1; i < aTable.getColumnCount () - 1; ++i)
@@ -1294,6 +1295,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       }
       else
       {
+        // Show all BusinessCard entities
         for (final SMPBusinessCardEntity aEntity : aCurObject.getAllEntities ())
         {
           final HCRow aRow = aTable.addBodyRow ();
@@ -1322,7 +1324,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-
     aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

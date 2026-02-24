@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,55 +18,63 @@ package com.helger.phoss.smp.backend.mongodb;
 
 import org.jspecify.annotations.NonNull;
 
-import com.helger.dao.DAOException;
 import com.helger.phoss.smp.backend.mongodb.audit.AuditManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.RoleManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.UserGroupManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.UserManagerMongoDB;
+import com.helger.phoss.smp.backend.mongodb.security.UserTokenManagerMongoDB;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
-import com.helger.photon.security.role.RoleManager;
 import com.helger.photon.security.token.user.IUserTokenManager;
-import com.helger.photon.security.token.user.UserTokenManager;
 import com.helger.photon.security.user.IUserManager;
-import com.helger.photon.security.user.UserManager;
 import com.helger.photon.security.usergroup.IUserGroupManager;
-import com.helger.photon.security.usergroup.UserGroupManager;
 
-public class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
+/**
+ * A MongoDB based implementation of PhotonSecurityManager.IFactory.
+ *
+ * @author Philip Helger
+ */
+public final class PhotonSecurityManagerFactoryMongoDB implements PhotonSecurityManager.IFactory
 {
   @NonNull
-  public IAuditManager createAuditManager () throws Exception
+  public IAuditManager createAuditMgr ()
   {
     return new AuditManagerMongoDB ();
   }
 
   @NonNull
-  public IUserManager createUserMgr () throws DAOException
+  public IUserManager createUserMgr ()
   {
-    return new UserManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                            PhotonSecurityManager.FactoryXML.FILENAME_USERS_XML);
+    return new UserManagerMongoDB ();
   }
 
   @NonNull
-  public IRoleManager createRoleMgr () throws DAOException
+  public IRoleManager createRoleMgr ()
   {
-    return new RoleManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                            PhotonSecurityManager.FactoryXML.FILENAME_ROLES_XML);
+    return new RoleManagerMongoDB ();
   }
 
   @NonNull
   public IUserGroupManager createUserGroupMgr (@NonNull final IUserManager aUserMgr,
-                                               @NonNull final IRoleManager aRoleMgr) throws DAOException
+                                               @NonNull final IRoleManager aRoleMgr)
   {
-    return new UserGroupManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                                 PhotonSecurityManager.FactoryXML.FILENAME_USERGROUPS_XML,
-                                 aUserMgr,
-                                 aRoleMgr);
+    return new UserGroupManagerMongoDB (aUserMgr, aRoleMgr);
   }
 
   @NonNull
-  public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr) throws DAOException
+  public IUserTokenManager createUserTokenMgr (@NonNull final IUserManager aUserMgr)
   {
-    return new UserTokenManager (PhotonSecurityManager.FactoryXML.DIRECTORY_SECURITY +
-                                 PhotonSecurityManager.FactoryXML.FILENAME_USERTOKENS_XML);
+    return new UserTokenManagerMongoDB (aUserMgr);
+  }
+
+  /**
+   * Install the MongoDB basic manager factory and instantiate the singleton. Must be called before
+   * {@link PhotonSecurityManager#getInstance()} is called anywhere else.
+   */
+  public static void install ()
+  {
+    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryMongoDB ());
+    PhotonSecurityManager.getInstance ();
   }
 }

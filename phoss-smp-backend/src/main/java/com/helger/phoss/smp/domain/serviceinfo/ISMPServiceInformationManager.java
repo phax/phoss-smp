@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
@@ -23,6 +23,7 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -198,4 +199,65 @@ public interface ISMPServiceInformationManager
    *         <code>false</code> if not.
    */
   boolean containsAnyEndpointWithTransportProfile (@Nullable String sTransportProfileID);
+
+  /**
+   * @return The total number of endpoints across all service groups. Always &ge; 0.
+   * @since 8.0.16
+   */
+  @Nonnegative
+  long getEndpointCount ();
+
+  /**
+   * Get a map from endpoint URL to {@link EndpointUsageInfo} containing the count and service group
+   * IDs for each distinct URL. Only endpoints that have a non-empty URL are included.
+   *
+   * @return A non-<code>null</code> mutable map.
+   * @since 8.0.16
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ();
+
+  /**
+   * Get a map from normalized certificate string to {@link EndpointUsageInfo} containing the count
+   * and service group IDs for each distinct certificate. All endpoints are included.
+   *
+   * @return A non-<code>null</code> mutable map.
+   * @since 8.0.16
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ();
+
+  /**
+   * Bulk-update the endpoint URL of all matching endpoints.
+   *
+   * @param aServiceGroupID
+   *        Optional service group ID to limit the update to. If <code>null</code>, all service
+   *        groups are updated.
+   * @param sOldURL
+   *        The old endpoint URL to search for. May not be <code>null</code>.
+   * @param sNewURL
+   *        The new endpoint URL to set. May not be <code>null</code>.
+   * @return The number of endpoints that were changed. Always &ge; 0.
+   * @since 8.0.16
+   */
+  @Nonnegative
+  long updateAllEndpointURLs (@Nullable IParticipantIdentifier aServiceGroupID,
+                              @NonNull String sOldURL,
+                              @NonNull String sNewURL);
+
+  /**
+   * Bulk-update the certificate of all matching endpoints. The comparison of the old certificate is
+   * performed using the normalized form via {@code CertificateHelper.getWithoutPEMHeader}.
+   *
+   * @param sOldCert
+   *        The old certificate (normalized/unified) to search for. May not be <code>null</code>.
+   * @param sNewCert
+   *        The new certificate to set (stored as-is). May not be <code>null</code>.
+   * @return The number of endpoints that were changed. Always &ge; 0.
+   * @since 8.0.16
+   */
+  @Nonnegative
+  long updateAllEndpointCertificates (@NonNull String sOldCert, @NonNull String sNewCert);
 }

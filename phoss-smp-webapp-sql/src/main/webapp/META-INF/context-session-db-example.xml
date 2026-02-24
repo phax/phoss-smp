@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014-2026 Philip Helger and contributors
+    philip[at]helger[dot]com
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<Context>
+  <!-- JNDI DataSource for session storage -->
+  <Resource name="jdbc/sessionsDB"
+            auth="Container"
+            type="javax.sql.DataSource"
+            maxTotal="100"
+            maxIdle="30"
+            maxWaitMillis="10000"
+            username="smp"
+            password="smp"
+            driverClassName="com.mysql.cj.jdbc.Driver"
+            _url="jdbc:mysql://localhost:3306/smp?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;autoReconnect=true"
+            url="jdbc:mysql://host.docker.internal:3306/smp?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;autoReconnect=true"
+            />
+
+  <!-- PersistentManager with DataSourceStore for Tomcat 10+
+       NOTE: You must set either the org.apache.catalina.session.StandardSession.ACTIVITY_CHECK or 
+         org.apache.catalina.STRICT_SERVLET_COMPLIANCE system properties to true for the persistent manager to work correctly. 
+  -->
+  <Manager className="org.apache.catalina.session.PersistentManager"
+           maxIdleSwap="3600"
+           maxIdleBackup="10800"
+           saveOnRestart="true"
+           processExpiresFrequency="6">
+    <Store className="org.apache.catalina.session.DataSourceStore"
+           dataSourceName="jdbc/sessionsDB"
+           localDataSource="true"
+           sessionTable="tomcat_sessions"
+           sessionAppCol="app_name"
+           sessionDataCol="session_data"
+           sessionIdCol="session_id"
+           sessionLastAccessedCol="last_access"
+           sessionMaxInactiveCol="max_inactive"
+           sessionValidCol="valid_session" />
+  </Manager>
+</Context>

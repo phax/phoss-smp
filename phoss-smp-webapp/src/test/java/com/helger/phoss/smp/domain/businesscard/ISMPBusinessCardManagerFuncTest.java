@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,7 +78,7 @@ public final class ISMPBusinessCardManagerFuncTest
     final IParticipantIdentifier aPI2 = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:junittest2");
 
     final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
-    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, true);
+    final ISMPServiceGroup aSG = aSGMgr.createSMPServiceGroup (sUserID, aPI1, null, null, true);
     assertNotNull (aSG);
 
     final boolean bSyncToDirectory = false;
@@ -109,7 +109,7 @@ public final class ISMPBusinessCardManagerFuncTest
       assertEquals (aBusinessCard, aBusinessCardMgr.getSMPBusinessCardOfID (aSG.getParticipantIdentifier ()));
 
       // Add second one
-      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null, true);
+      final ISMPServiceGroup aSG2 = aSGMgr.createSMPServiceGroup (sUserID, aPI2, null, null, true);
       assertNotNull (aSG2);
       ISMPBusinessCard aBusinessCard2 = null;
       try

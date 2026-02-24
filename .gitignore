@@ -8,6 +8,7 @@ _*.cmd
 *.jks
 *.p12
 
+.claude/
 .settings/ 
 bin/
 generated/

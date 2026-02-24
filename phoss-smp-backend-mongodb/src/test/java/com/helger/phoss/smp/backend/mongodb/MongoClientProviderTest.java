@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,7 @@ public final class MongoClientProviderTest
   @Test
   public void testBasic ()
   {
-    try (final MongoClientProvider aCP = new MongoClientProvider ("mongodb://localhost", "smp-unittest"))
+    try (final MongoClientProvider aCP = new MongoClientProvider (SMPMongoConfiguration.getMongoConnectionString (), "smp-unittest"))
     {
       final Document doc = new Document ().append ("name", "MongoDB")
                                           .append ("type", "database")

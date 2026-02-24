@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2025 Philip Helger and contributors
+ * Copyright (C) 2015-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -157,15 +157,15 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
       m_aRWLock.writeLock ().unlock ();
     }
 
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("deleteSMPBusinessCard successful");
+
     AuditHelper.onAuditDeleteSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
-
-    if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("deleteSMPBusinessCard successful");
 
     return EChange.CHANGED;
   }

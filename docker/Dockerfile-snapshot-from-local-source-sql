@@ -1,0 +1,42 @@
+#
+# Copyright (C) 2015-2019 Philip Helger (www.helger.com)
+# philip[at]helger[dot]com
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Use an official Tomcat runtime as a base image
+FROM tomcat:10.1-jdk21
+
+# Use non-blocking random
+ENV CATALINA_OPTS="$CATALINA_OPTS -Djava.security.egd=file:/dev/urandom -Dorg.apache.catalina.session.StandardSession.ACTIVITY_CHECK=true"
+
+# MinRAMPercentage - for low memory containers (<250MB)
+# MaxRAMPercentage - for large memory containers (>250MB)
+# See: https://medium.com/pernod-ricard-tech/how-to-control-java-memory-in-tomcat-running-on-docker-cec267f858d4
+ENV CATALINA_OPTS="$CATALINA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80"
+
+LABEL vendor="Philip Helger"
+LABEL version="HEAD"
+
+# Install vim etc.
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y vim inetutils-ping telnet \
+  && rm -rf /var/lib/apt/lists/*
+  
+  # Copy result to Tomcat webapps dir
+COPY phoss-smp-webapp-sql/target/phoss-smp-webapp-sql-*/ $CATALINA_HOME/webapps/ROOT
+
+# Checkout from git and build
+WORKDIR /home/git

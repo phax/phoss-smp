@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2014-2025 Philip Helger and contributors
+    Copyright (C) 2014-2026 Philip Helger and contributors
     philip[at]helger[dot]com
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
-    <version>8.0.13-SNAPSHOT</version>
+    <version>8.1.1-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-webapp</artifactId>
   <packaging>jar</packaging>

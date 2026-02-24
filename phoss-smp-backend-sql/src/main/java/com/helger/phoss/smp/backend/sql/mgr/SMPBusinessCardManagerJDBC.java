@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -315,6 +315,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
     // Invoke generic callbacks
     m_aCBs.forEach (x -> x.onSMPBusinessCardDeleted (aSMPBusinessCard, bSyncToDirectory));
+
     return EChange.CHANGED;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,40 +25,27 @@ import org.jspecify.annotations.NonNull;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.compare.ESortOrder;
-import com.helger.base.numeric.mutable.MutableInt;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
-import com.helger.collection.CollectionHelper;
-import com.helger.collection.commons.CommonsArrayList;
-import com.helger.collection.commons.CommonsHashMap;
-import com.helger.collection.commons.CommonsHashSet;
-import com.helger.collection.commons.CommonsTreeSet;
-import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.collection.commons.ICommonsSet;
-import com.helger.collection.commons.ICommonsSortedSet;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCSelect;
-import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.html.hc.render.HCRenderer;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
-import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.button.BootstrapButton;
 import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
@@ -68,9 +56,9 @@ import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.core.longrun.AbstractLongRunningJobRunnable;
-import com.helger.photon.core.longrun.LongRunningJobResult;
 import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.mgrs.longrun.LongRunningJobResult;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -102,10 +90,12 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
     public BulkChangeEndpointURL (@Nullable final IParticipantIdentifier aServiceGroupPID,
                                   @NonNull @Nonempty final String sOldURL,
-                                  @NonNull @Nonempty final String sNewURL)
+                                  @NonNull @Nonempty final String sNewURL,
+                                  @Nullable final String sUserID)
     {
       super ("BulkChangeEndpointURL",
-             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"));
+             new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint URL"),
+             () -> sUserID);
       m_aServiceGroupPID = aServiceGroupPID;
       m_sOldURL = sOldURL;
       m_sNewURL = sNewURL;
@@ -119,69 +109,23 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       {
         final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-        // Modify all endpoints
-        final MutableInt aChangedEndpoints = new MutableInt (0);
-        final MutableInt aSaveErrors = new MutableInt (0);
-        final ICommonsList <ISMPServiceInformation> aChangedSIs = new CommonsArrayList <> ();
-        // Run in a read-lock
-        aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
-          if (m_aServiceGroupPID != null &&
-              !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (m_aServiceGroupPID))
-          {
-            // Wrong service group
-            return;
-          }
-
-          boolean bChanged = false;
-          for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-            for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-              if (m_sOldURL.equals (aEndpoint.getEndpointReference ()))
-              {
-                ((SMPEndpoint) aEndpoint).setEndpointReference (m_sNewURL);
-                bChanged = true;
-                aChangedEndpoints.inc ();
-              }
-          if (bChanged)
-          {
-            // Remember and do not merge here to avoid deadlock
-            aChangedSIs.add (aSI);
-          }
-        });
-
-        // Write out of read-lock
-        final ICommonsSortedSet <String> aChangedServiceGroup = new CommonsTreeSet <> ();
-        for (final var aSI : aChangedSIs)
-        {
-          if (aServiceInfoMgr.mergeSMPServiceInformation (aSI).isFailure ())
-            aSaveErrors.inc ();
-          aChangedServiceGroup.add (aSI.getServiceGroupID ());
-        }
+        final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointURLs (m_aServiceGroupPID, m_sOldURL, m_sNewURL);
 
         final IHCNode aRes;
-        if (aChangedEndpoints.isGT0 ())
-        {
-          final HCUL aUL = new HCUL ();
-          for (final String sChangedServiceGroupID : aChangedServiceGroup)
-            aUL.addItem (sChangedServiceGroupID);
-
-          final HCNodeList aNodes = new HCNodeList ().addChildren (div ("The old URL '" +
-                                                                        m_sOldURL +
-                                                                        "' was changed in " +
-                                                                        aChangedEndpoints.intValue () +
-                                                                        " endpoints. Effected service groups are:"),
-                                                                   aUL);
-          if (aSaveErrors.is0 ())
-            aRes = success (aNodes);
-          else
-          {
-            aNodes.addChildAt (0, h3 ("Some changes could NOT be saved! Please check the logs!"));
-            aRes = error (aNodes);
-          }
-        }
+        if (nEndpointsChanged > 0)
+          aRes = success (div ("The old URL '" +
+                               m_sOldURL +
+                               "' was changed to '" +
+                               m_sNewURL +
+                               "' in " +
+                               nEndpointsChanged +
+                               " " +
+                               (nEndpointsChanged == 1 ? "endpoint" : "endpoints") +
+                               "."));
         else
           aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
 
-        return LongRunningJobResult.createXML (aRes);
+        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
       }
       finally
       {
@@ -234,27 +178,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     boolean bShowList = true;
 
-    final ICommonsMap <String, ICommonsList <ISMPEndpoint>> aEndpointsGroupedPerURL = new CommonsHashMap <> ();
-    final ICommonsMap <String, ICommonsSet <IParticipantIdentifier>> aServiceGroupsGroupedPerURL = new CommonsHashMap <> ();
-    final MutableInt aTotalEndpointCount = new MutableInt (0);
-    final MutableInt aTotalEndpointCountWithURL = new MutableInt (0);
-    aServiceInfoMgr.forEachSMPServiceInformation (aSI -> {
-      // Service Group needs to be resolved in here
-      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-        {
-          aTotalEndpointCount.inc ();
-          if (aEndpoint.hasEndpointReference ())
-          {
-            aEndpointsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (), k -> new CommonsArrayList <> ())
-                                   .add (aEndpoint);
-            aServiceGroupsGroupedPerURL.computeIfAbsent (aEndpoint.getEndpointReference (),
-                                                         k -> new CommonsHashSet <> ())
-                                       .add (aSI.getServiceGroupParticipantIdentifier ());
-            aTotalEndpointCountWithURL.inc ();
-          }
-        }
-    });
+    // Init lazily
+    ICommonsMap <String, IEndpointUsageInfo> aURLUsage = null;
 
     {
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
@@ -313,7 +238,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                 new BulkChangeEndpointURL (aSelectedServiceGroup == null ? null : aSelectedServiceGroup
                                                                                                                        .getParticipantIdentifier (),
                                                            sOldURL,
-                                                           sNewURL));
+                                                           sNewURL,
+                                                           aWPEC.getLoggedInUserID ()));
 
           aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
                                                   sOldURL +
@@ -323,9 +249,11 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         }
       }
 
-      final ICommonsSet <IParticipantIdentifier> aServiceGroups = aServiceGroupsGroupedPerURL.get (sOldURL);
-      final int nSGCount = CollectionHelper.getSize (aServiceGroups);
-      final int nEPCount = CollectionHelper.getSize (aEndpointsGroupedPerURL.get (sOldURL));
+      // Lazy load
+      aURLUsage = aServiceInfoMgr.getEndpointURLUsageMap ();
+      final IEndpointUsageInfo aOldURLUsageInfo = aURLUsage.get (sOldURL);
+      final int nSGCount = aOldURLUsageInfo != null ? aOldURLUsageInfo.getServiceGroupCount () : 0;
+      final int nEPCount = aOldURLUsageInfo != null ? aOldURLUsageInfo.getEndpointCount () : 0;
       aNodeList.addChild (info ("The selected old URL '" +
                                 sOldURL +
                                 "' is currently used in " +
@@ -349,9 +277,9 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         // Select the affected service groups if more than one is available
         final HCSelect aSGSelect = new HCSelect (new RequestField (FIELD_SERVICE_GROUP));
         aSGSelect.addOption (SERVICE_GROUP_ALL, "All affected Service Groups");
-        if (aServiceGroups != null)
-          for (final IParticipantIdentifier aPI : aServiceGroups.getSorted (IParticipantIdentifier.comparator ()))
-            aSGSelect.addOption (SMPServiceGroup.createSMPServiceGroupID (aPI), aPI.getURIEncoded ());
+        if (aOldURLUsageInfo != null)
+          for (final String sSGID : aOldURLUsageInfo.getServiceGroupIDsSorted (Comparator.naturalOrder ()))
+            aSGSelect.addOption (sSGID, sSGID);
         aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Service group")
                                                      .setCtrl (aSGSelect)
                                                      .setHelpText ("If a specific service group is selected, the URL change will only happen in the endpoints of the selected service group. Othwerwise the endpoint is changed in ALL service groups with matching endpoints.")
@@ -381,17 +309,24 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
     if (bShowList)
     {
+      if (aURLUsage == null)
+        aURLUsage = aServiceInfoMgr.getEndpointURLUsageMap ();
+
+      final long nTotalEndpointCount = aServiceInfoMgr.getEndpointCount ();
+      final long nTotalEndpointCountWithURL = aURLUsage.values ()
+                                                       .stream ()
+                                                       .mapToInt (IEndpointUsageInfo::getEndpointCount)
+                                                       .sum ();
+
       aNodeList.addChild (info ().addChildren (div ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
                                                div ("Currently " +
-                                                    (aTotalEndpointCount.intValue () == 1 ? "1 endpoint is"
-                                                                                          : aTotalEndpointCount.intValue () +
-                                                                                            " endpoints are") +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is" : nTotalEndpointCount +
+                                                                                                  " endpoints are") +
                                                     " registered" +
-                                                    (aTotalEndpointCountWithURL.intValue () <
-                                                     aTotalEndpointCount.intValue () ? " of which " +
-                                                                                       aTotalEndpointCountWithURL.intValue () +
-                                                                                       " have an endpoint reference"
-                                                                                     : "") +
+                                                    (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
+                                                                                                        nTotalEndpointCountWithURL +
+                                                                                                        " have an endpoint reference"
+                                                                                                      : "") +
                                                     ".")));
 
       final HCTable aTable = new HCTable (new DTCol ("Endpoint URL").setInitialSorting (ESortOrder.ASCENDING),
@@ -399,14 +334,13 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                                                                             aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      aEndpointsGroupedPerURL.forEach ( (sURL, aEndpoints) -> {
+      aURLUsage.forEach ( (sURL, aUsageInfo) -> {
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (sURL);
 
-        final int nSGCount = CollectionHelper.getSize (aServiceGroupsGroupedPerURL.get (sURL));
-        aRow.addCell (Integer.toString (nSGCount));
+        aRow.addCell (Integer.toString (aUsageInfo.getServiceGroupCount ()));
 
-        aRow.addCell (Integer.toString (aEndpoints.size ()));
+        aRow.addCell (Integer.toString (aUsageInfo.getEndpointCount ()));
 
         final ISimpleURL aEditURL = aWPEC.getSelfHref ()
                                          .add (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT)

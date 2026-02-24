@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.base.state.ETriState;
 import com.helger.base.tostring.ToStringGenerator;
-import com.helger.dao.DAOException;
 import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -39,9 +38,9 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
-import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
+import com.helger.photon.jdbc.PhotonBasicManagerFactoryJDBC;
 import com.helger.photon.jdbc.PhotonSecurityManagerFactoryJDBC;
 
 /**
@@ -54,8 +53,6 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPManagerProviderSQL.class);
 
-  private static final String SML_INFO_XML = "sml-info.xml";
-
   private final EDatabaseSystemType m_eDBType;
 
   public SMPManagerProviderSQL ()
@@ -66,6 +63,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   @Override
   public void beforeInitManagers ()
   {
+    // Set the basic manager factory to use JDBC for all three managers
+    // Must be before Flyway and before PhotonSecurityManager is instantiated
+    PhotonBasicManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
+
     // Set the special PhotonSecurityManager factory
     // Must be before Flyway, so that auditing of Flyway actions (may) work
     PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
@@ -93,18 +94,10 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     return ETriState.UNDEFINED;
   }
 
-  // TODO currently also file based
   @NonNull
   public ISMLInfoManager createSMLInfoMgr ()
   {
-    try
-    {
-      return new SMLInfoManagerXML (SML_INFO_XML);
-    }
-    catch (final DAOException ex)
-    {
-      throw new IllegalStateException (ex.getMessage (), ex);
-    }
+    return new SMLInfoManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @NonNull

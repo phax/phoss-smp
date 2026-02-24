@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +52,7 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
@@ -383,7 +384,13 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
         try
         {
           // Do NOT create in SMK/SML
-          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, sExtension, false);
+          final SGCustomPropertyList aCustomProperties = null;
+          final boolean bCreateInSML = false;
+          aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (),
+                                                        aParticipantID,
+                                                        sExtension,
+                                                        aCustomProperties,
+                                                        bCreateInSML);
         }
         catch (final Exception ex)
         {

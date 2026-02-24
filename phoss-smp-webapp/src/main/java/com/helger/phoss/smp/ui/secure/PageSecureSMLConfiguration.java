@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -68,7 +69,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   private static final String FIELD_URL_SUFFIX_MANAGE_PARTICIPANT = "manageparticipant";
   private static final String FIELD_CLIENT_CERTIFICATE_REQUIRED = "clientcert";
 
-  private static final boolean DEFAULT_CLIENT_CERTIFICATE_REQUIRED = true;
+  private static final boolean DEFAULT_CLIENT_CERTIFICATE_REQUIRED = CSMPServer.SML_CONFIGURATION_DEFAULT_CLIENT_CERTIFICATE_REQUIRES;
 
   public PageSecureSMLConfiguration (@NonNull @Nonempty final String sID)
   {
@@ -248,14 +249,32 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     // validations
     if (StringHelper.isEmpty (sDisplayName))
       aFormErrors.addFieldError (FIELD_DISPLAY_NAME, "The SML configuration name must not be empty!");
+    else
+      if (sDisplayName.length () > ISMLInfoManager.DISPLAY_NAME_MAX_LENGTH)
+        aFormErrors.addFieldError (FIELD_DISPLAY_NAME,
+                                   "The SML configuration name must not not exceed " +
+                                                       ISMLInfoManager.DISPLAY_NAME_MAX_LENGTH +
+                                                       " characters!");
 
     if (StringHelper.isEmpty (sDNSZone))
       aFormErrors.addFieldError (FIELD_DNS_ZONE, "The DNS Zone must not be empty!");
+    else
+      if (sDNSZone.length () > ISMLInfoManager.DNS_ZONE_MAX_LENGTH)
+        aFormErrors.addFieldError (FIELD_DNS_ZONE,
+                                   "The DNS Zone must not not exceed " +
+                                                   ISMLInfoManager.DNS_ZONE_MAX_LENGTH +
+                                                   " characters!");
 
     if (StringHelper.isEmpty (sManagementAddressURL))
       aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL, "The Management Address URL must not be empty!");
     else
     {
+      if (sManagementAddressURL.length () > ISMLInfoManager.SERVICE_URL_MAX_LENGTH)
+        aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL,
+                                   "The Management Address URL must not not exceed " +
+                                                                 ISMLInfoManager.SERVICE_URL_MAX_LENGTH +
+                                                                 " characters!");
+
       final URL aURL = URLHelper.getAsURL (sManagementAddressURL);
       if (aURL == null)
         aFormErrors.addFieldError (FIELD_MANAGEMENT_ADDRESS_URL, "The Management Address URL is not a valid URL!");
@@ -267,6 +286,12 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
     if (StringHelper.isNotEmpty (sURLSuffixManageSMP))
     {
+      if (sURLSuffixManageSMP.length () > ISMLInfoManager.MANAGE_SMP_MAX_LENGTH)
+        aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_SMP,
+                                   "The URL suffix must not not exceed " +
+                                                                ISMLInfoManager.MANAGE_SMP_MAX_LENGTH +
+                                                                " characters!");
+
       if (!SMLInfo.isValidURLSuffix (sURLSuffixManageSMP))
         aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_SMP,
                                    "The URL suffix must be empty or start with a slash followed by at least one character.");
@@ -274,6 +299,12 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
     if (StringHelper.isNotEmpty (sURLSuffixManageParticipant))
     {
+      if (sURLSuffixManageParticipant.length () > ISMLInfoManager.MANAGE_PARTICIPANT_MAX_LENGTH)
+        aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT,
+                                   "The URL suffix must not not exceed " +
+                                                                        ISMLInfoManager.MANAGE_PARTICIPANT_MAX_LENGTH +
+                                                                        " characters!");
+
       if (!SMLInfo.isValidURLSuffix (sURLSuffixManageParticipant))
         aFormErrors.addFieldError (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT,
                                    "The URL suffix must be empty or start with a slash followed by at least one character.");

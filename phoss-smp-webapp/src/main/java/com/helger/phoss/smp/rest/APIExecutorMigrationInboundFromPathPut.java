@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2025 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,7 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
@@ -163,7 +164,14 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     {
       // Do not allow any Extension here
       // Do NOT create in SMK/SML
-      aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (), aParticipantID, (String) null, false);
+      final String sExtension = null;
+      final SGCustomPropertyList aCustomProperties = null;
+      final boolean bCreateInSML = false;
+      aSG = aServiceGroupMgr.createSMPServiceGroup (aOwningUser.getID (),
+                                                    aParticipantID,
+                                                    sExtension,
+                                                    aCustomProperties,
+                                                    bCreateInSML);
     }
     catch (final Exception ex)
     {

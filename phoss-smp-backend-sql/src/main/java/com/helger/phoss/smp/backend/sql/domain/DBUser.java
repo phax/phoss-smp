@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 Philip Helger and contributors
+ * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Philip Helger
  */
-public class DBUser implements Serializable
+public final class DBUser implements Serializable
 {
   private final String m_sUserName;
   private final String m_sPassword;
