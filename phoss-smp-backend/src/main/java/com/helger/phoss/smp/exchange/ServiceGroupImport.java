@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.exchange;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -44,6 +45,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardMicroTypeConverter;
+import com.helger.phoss.smp.domain.directory.IPeppolDirectoryPushCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirectMicroTypeConverter;
@@ -332,6 +334,8 @@ public final class ServiceGroupImport
    * @param aAllExistingBusinessCardIDs
    *        A read-only set with existing service group IDs that have business cards. May not be
    *        <code>null</code>.
+   * @param aMainPushToDirectory
+   *        The action to actually push data to Peppol Directory. May not be <code>null</code>.
    * @param aActionList
    *        The action list to be filled. May not be <code>null</code>.
    * @param aSummary
@@ -342,6 +346,7 @@ public final class ServiceGroupImport
                                      @NonNull final IUser aDefaultOwner,
                                      @NonNull final ICommonsSet <String> aAllExistingServiceGroupIDs,
                                      @NonNull final ICommonsSet <String> aAllExistingBusinessCardIDs,
+                                     @NonNull final IPeppolDirectoryPushCallback aMainPushToDirectory,
                                      @NonNull final ICommonsList <ImportActionItem> aActionList,
                                      @NonNull final ImportSummary aSummary)
   {
@@ -403,6 +408,9 @@ public final class ServiceGroupImport
         // Filled in block 1, but needed later for PDF
         final ICommonsSet <IParticipantIdentifier> aDeletedServiceGroups = new CommonsHashSet <> ();
         final Set <IParticipantIdentifier> aThreadSafeDeletedServiceGroups = Collections.synchronizedSet (aDeletedServiceGroups);
+
+        // Remember all the Participant IDs that could have an impact on the Directory
+        final Set <IParticipantIdentifier> aServiceGroupsWithDocTypesForBC = Collections.synchronizedSet (new HashSet <> ());
 
         final boolean bOriginalPDAutoUpdate = bDirectoryIntegrationEnabled &&
                                               aSettings.isDirectoryIntegrationAutoUpdate ();
@@ -501,6 +509,8 @@ public final class ServiceGroupImport
 
                 if (aNewServiceGroup != null)
                 {
+                  final IParticipantIdentifier aServiceGroupID = aImportServiceGroup.getParticipantIdentifier ();
+
                   // 3a. create all endpoints
                   for (final ISMPServiceInformation aServiceInfoToImport : aEntry.getValue ().getServiceInfo ())
                   {
@@ -510,6 +520,8 @@ public final class ServiceGroupImport
                       {
                         aImportLogger.success (sServiceGroupID, "Successfully created Service Information");
                         aImportLogger.onSuccess (EImportSummaryAction.CREATE_SI);
+                        if (bOriginalPDAutoUpdate)
+                          aServiceGroupsWithDocTypesForBC.add (aServiceGroupID);
                       }
                       else
                       {
@@ -539,6 +551,8 @@ public final class ServiceGroupImport
                       {
                         aImportLogger.success (sServiceGroupID, "Successfully created Redirect");
                         aImportLogger.onSuccess (EImportSummaryAction.CREATE_REDIRECT);
+                        if (bOriginalPDAutoUpdate)
+                          aServiceGroupsWithDocTypesForBC.add (aServiceGroupID);
                       }
                       else
                       {
@@ -631,27 +645,33 @@ public final class ServiceGroupImport
             aBusinessCardsToImport.values ().forEach (aImportBusinessCard -> aExecutorSvc.submit ( () -> {
               try (final WebScoped aWebScoped = new WebScoped ())
               {
-                final String sBusinessCardID = aImportBusinessCard.getID ();
+                final String sParticipantCardID = aImportBusinessCard.getID ();
+                final IParticipantIdentifier aParticipantID = aImportBusinessCard.getParticipantIdentifier ();
+
+                // Remove this ID from the the Service Groups that need a push, as the create call
+                // does it anyway
+                if (bOriginalPDAutoUpdate)
+                  aServiceGroupsWithDocTypesForBC.remove (aParticipantID);
 
                 try
                 {
                   // Always sync to the Directory after the creation
-                  if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aImportBusinessCard.getParticipantIdentifier (),
+                  if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aParticipantID,
                                                                       aImportBusinessCard.getAllEntities (),
                                                                       true) != null)
                   {
-                    aImportLogger.success (sBusinessCardID, "Successfully created Business Card");
+                    aImportLogger.success (sParticipantCardID, "Successfully created Business Card");
                     aImportLogger.onSuccess (EImportSummaryAction.CREATE_BC);
                   }
                   else
                   {
-                    aImportLogger.error (sBusinessCardID, "Failed to create Business Card");
+                    aImportLogger.error (sParticipantCardID, "Failed to create Business Card");
                     aImportLogger.onError (EImportSummaryAction.CREATE_BC);
                   }
                 }
                 catch (final Exception ex)
                 {
-                  aImportLogger.error (sBusinessCardID, "Failed to create Business Card", ex);
+                  aImportLogger.error (sParticipantCardID, "Failed to create Business Card", ex);
                   aImportLogger.onError (EImportSummaryAction.CREATE_BC);
                 }
 
@@ -664,6 +684,30 @@ public final class ServiceGroupImport
             ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
             aSW.stop ();
             aImportLogger.info ("Business Card creation is finalized after " + aSW.getDuration ());
+          }
+
+          // 6. Provide an additional update to the Peppol Directory for the affected participants
+          // remaining
+          {
+            aImportLogger.info ("Trying to push " + aServiceGroupsWithDocTypesForBC.size () + " Business Cards");
+            final StopWatch aSW = StopWatch.createdStarted ();
+            final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+
+            final AtomicInteger aBCCount = new AtomicInteger (0);
+            aServiceGroupsWithDocTypesForBC.forEach (aParticipantID -> aExecutorSvc.submit ( () -> {
+              try (final WebScoped aWebScoped = new WebScoped ())
+              {
+                aMainPushToDirectory.pushToDirectory (aParticipantID);
+
+                final int nCount = aBCCount.incrementAndGet ();
+                if ((nCount % 1_000) == 0)
+                  LOGGER.info ("  Pushed " + nCount + " Business Groups so far");
+              }
+            }));
+
+            ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
+            aSW.stop ();
+            aImportLogger.info ("Business Card pushing is finalized after " + aSW.getDuration ());
           }
         }
         aImportLogger.info ("Import is finalized");

@@ -32,6 +32,7 @@ import com.helger.diagnostics.error.level.IErrorLevel;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -140,6 +141,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                                                aDefaultOwner,
                                                aAllServiceGroupIDs,
                                                aAllBusinessCardIDs,
+                                               PDClientProvider.getInstance ().getPDClient ()::addServiceGroupToIndex,
                                                aActionList,
                                                aImportSummary);
             for (final ImportActionItem aAction : aActionList)

@@ -10,8 +10,6 @@
  */
 package com.helger.phoss.smp.restapi;
 
-import java.util.function.Function;
-
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +27,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.phoss.smp.domain.directory.IPeppolDirectoryPushCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
@@ -245,7 +244,7 @@ public final class BusinessCardServerAPI
 
   public void pushBusinessCard (@NonNull final String sPathServiceGroupID,
                                 @NonNull final SMPAPICredentials aCredentials,
-                                @NonNull final Function <IParticipantIdentifier, ESuccess> aMainPushToDirectory) throws SMPServerException
+                                @NonNull final IPeppolDirectoryPushCallback aMainPushToDirectory) throws SMPServerException
   {
     final String sLog = LOG_PREFIX + "POST /businesscard/" + sPathServiceGroupID + "/push";
     final String sAction = "pushBusinessCard";
@@ -279,7 +278,7 @@ public final class BusinessCardServerAPI
                                           m_aDataProvider.getCurrentURI ());
 
       // Notify PD server: update
-      if (aMainPushToDirectory.apply (aServiceGroupID).isFailure ())
+      if (aMainPushToDirectory.pushToDirectory (aServiceGroupID).isFailure ())
         throw new SMPInternalErrorException ("Failed to inform the Directory to index '" +
                                              sPathServiceGroupID +
                                              "' - see server log file for details");

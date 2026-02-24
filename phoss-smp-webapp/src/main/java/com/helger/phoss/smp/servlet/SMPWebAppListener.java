@@ -283,7 +283,6 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     return StringHelper.isNotEmpty (sCtx) && !sCtx.equals ("/");
   }
 
-  @SuppressWarnings ("removal")
   @Override
   protected void initGlobalSettings ()
   {

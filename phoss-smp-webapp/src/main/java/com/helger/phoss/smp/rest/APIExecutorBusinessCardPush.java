@@ -61,9 +61,8 @@ public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
     // The PDClient stuff must be here, because the backend project is missing the dependency
     new BusinessCardServerAPI (aDataProvider).pushBusinessCard (sPathServiceGroupID,
                                                                 aCredentials,
-                                                                aServiceGroupID -> PDClientProvider.getInstance ()
-                                                                                                   .getPDClient ()
-                                                                                                   .addServiceGroupToIndex (aServiceGroupID));
+                                                                PDClientProvider.getInstance ()
+                                                                                .getPDClient ()::addServiceGroupToIndex);
     aUnifiedResponse.createOk ();
   }
 }

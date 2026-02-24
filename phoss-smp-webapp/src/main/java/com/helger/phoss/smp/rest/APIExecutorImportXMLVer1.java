@@ -39,6 +39,7 @@ import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
+import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -165,6 +166,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                                        aDefaultOwner,
                                        aAllServiceGroupIDs,
                                        aAllBusinessCardIDs,
+                                       PDClientProvider.getInstance ().getPDClient ()::addServiceGroupToIndex,
                                        aActionList,
                                        aImportSummary);
 
