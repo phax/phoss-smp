@@ -28,14 +28,13 @@ import com.helger.text.display.IHasDisplayText;
  */
 public enum ESGCustomPropertyType implements IHasID <String>, IHasDisplayText
 {
-  PUBLIC ("pub", ESGCustomPropertyTypeName.PUBLIC),
-  PRIVATE ("priv", ESGCustomPropertyTypeName.PRIVATE);
+  PUBLIC ("public", ESGCustomPropertyTypeName.PUBLIC),
+  PRIVATE ("private", ESGCustomPropertyTypeName.PRIVATE);
 
   /** The default property type is: public */
   public static final ESGCustomPropertyType DEFAULT = PUBLIC;
 
-  // for DB storage
-  public static final int ID_MAX_LEN = 6;
+  public static final int ID_MAX_LEN = 7;
 
   private final String m_sID;
   private final ESGCustomPropertyTypeName m_eName;

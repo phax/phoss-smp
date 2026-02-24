@@ -22,6 +22,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.sgprops.ESGCustomPropertyType;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
@@ -175,6 +176,11 @@ public final class CustomPropertiesServerAPI
       if (aServiceGroup == null)
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
 
+      // Validate property name
+      if (!SGCustomProperty.isValidName (sPropertyName))
+        throw new SMPBadRequestException ("Invalid custom property name '" + sPropertyName + "'",
+                                          m_aAPIProvider.getCurrentURI ());
+
       // Check if authenticated
       boolean bAuthenticated = false;
       if (aCredentials != null)
@@ -261,6 +267,100 @@ public final class CustomPropertiesServerAPI
                                               aCustomProperties);
 
       LOGGER.info (sLog + " SUCCESS - " + aCustomProperties.size () + " properties set");
+      STATS_COUNTER_SUCCESS.increment (sAction);
+    }
+    catch (final SMPServerException ex)
+    {
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      STATS_COUNTER_ERROR.increment (sAction);
+      throw ex;
+    }
+  }
+
+  /**
+   * Set a single custom property for a service group. If a property with the same name already
+   * exists, it is replaced.
+   *
+   * @param sPathServiceGroupID
+   *        The service group ID from the URL path. May not be <code>null</code>.
+   * @param sPropertyType
+   *        The property type ID (e.g. "pub" or "priv"). May not be <code>null</code>.
+   * @param sPropertyName
+   *        The property name. May not be <code>null</code>.
+   * @param sPropertyValue
+   *        The property value. May not be <code>null</code>.
+   * @param aCredentials
+   *        The credentials to be used. May not be <code>null</code>.
+   * @throws SMPServerException
+   *         In case of error
+   */
+  public void setCustomProperty (@NonNull final String sPathServiceGroupID,
+                                 @NonNull final String sPropertyType,
+                                 @NonNull final String sPropertyName,
+                                 @NonNull final String sPropertyValue,
+                                 @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
+  {
+    final String sLog = LOG_PREFIX +
+                        "PUT /customproperties/" +
+                        sPathServiceGroupID +
+                        "/" +
+                        sPropertyType +
+                        "/" +
+                        sPropertyName;
+    final String sAction = "setCustomProperty";
+
+    LOGGER.info (sLog);
+    STATS_COUNTER_INVOCATION.increment (sAction);
+    try
+    {
+      // Validate property type
+      final ESGCustomPropertyType eType = ESGCustomPropertyType.getFromIDOrNull (sPropertyType);
+      if (eType == null)
+        throw new SMPBadRequestException ("Invalid custom property type '" +
+                                          sPropertyType +
+                                          "'. Must be one of 'pub' or 'priv'",
+                                          m_aAPIProvider.getCurrentURI ());
+
+      // Validate property name
+      if (!SGCustomProperty.isValidName (sPropertyName))
+        throw new SMPBadRequestException ("Invalid custom property name '" + sPropertyName + "'",
+                                          m_aAPIProvider.getCurrentURI ());
+
+      // Validate property value
+      if (!SGCustomProperty.isValidValue (sPropertyValue))
+        throw new SMPBadRequestException ("Invalid custom property value (max " +
+                                          SGCustomProperty.VALUE_MAX_LEN +
+                                          " characters)",
+                                          m_aAPIProvider.getCurrentURI ());
+
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aServiceGroupID == null)
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
+
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aServiceGroupID);
+      if (aServiceGroup == null)
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIProvider.getCurrentURI ());
+
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
+
+      // Build the updated property list
+      final SGCustomPropertyList aExistingProperties = aServiceGroup.getCustomProperties ();
+      final SGCustomPropertyList aNewProperties = aExistingProperties != null ? aExistingProperties
+                                                                              : new SGCustomPropertyList ();
+      // Remove existing property with the same name (if any) and add the new one
+      aNewProperties.remove (sPropertyName);
+      aNewProperties.add (new SGCustomProperty (eType, sPropertyName, sPropertyValue));
+
+      // Update the service group
+      aServiceGroupMgr.updateSMPServiceGroup (aServiceGroupID,
+                                              aServiceGroup.getOwnerID (),
+                                              aServiceGroup.getExtensions ().getExtensionsAsJsonString (),
+                                              aNewProperties);
+
+      LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)

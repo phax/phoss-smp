@@ -79,6 +79,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_MIGRATION_ID = "MigrationId";
   public static final String PARAM_MIGRATION_KEY = "MigrationKey";
   public static final String PARAM_CUSTOM_PROPERTY_NAME = "PropertyName";
+  public static final String PARAM_CUSTOM_PROPERTY_TYPE = "PropertyType";
 
   static final String LOG_PREFIX = "[REST API] ";
 
@@ -249,6 +250,20 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                     new APIExecutorCustomPropertiesPut ());
       aPutCustomProperties.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutCustomProperties);
+    }
+    {
+      final APIDescriptor aPutCustomProperty = new APIDescriptor (APIPath.put ("/{" +
+                                                                               PARAM_SERVICE_GROUP_ID +
+                                                                               "}" +
+                                                                               PATH_CUSTOM_PROPERTIES +
+                                                                               "/{" +
+                                                                               PARAM_CUSTOM_PROPERTY_TYPE +
+                                                                               "}/{" +
+                                                                               PARAM_CUSTOM_PROPERTY_NAME +
+                                                                               "}"),
+                                                                  new APIExecutorCustomPropertyPut ());
+      aPutCustomProperty.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aPutCustomProperty);
     }
     {
       final APIDescriptor aDeleteCustomProperty = new APIDescriptor (APIPath.delete ("/{" +
