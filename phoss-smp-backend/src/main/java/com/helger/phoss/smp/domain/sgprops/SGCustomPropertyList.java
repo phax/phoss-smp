@@ -92,6 +92,16 @@ public class SGCustomPropertyList implements IHasJson, ICommonsIterable <SGCusto
     return EChange.valueOf (m_aList.remove (sName) != null);
   }
 
+  @Nullable
+  public String getValue (@Nullable final String sCustomPropertyName)
+  {
+    if (sCustomPropertyName == null)
+      return null;
+
+    final SGCustomProperty aProperty = m_aList.get (sCustomPropertyName);
+    return aProperty == null ? null : aProperty.getValue ();
+  }
+
   public void forEach (@NonNull final Consumer <? super SGCustomProperty> aConsumer)
   {
     ValueEnforcer.notNull (aConsumer, "Consumer");

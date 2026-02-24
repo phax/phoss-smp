@@ -79,6 +79,12 @@ public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
   @Nullable
   SGCustomPropertyList getCustomProperties ();
 
+  default @Nullable String getCustomPropertyValue (@Nullable final String sCustomPropertyName)
+  {
+    final SGCustomPropertyList aList = getCustomProperties ();
+    return aList == null ? null : aList.getValue (sCustomPropertyName);
+  }
+
   /**
    * @return This service information object as a Peppol SMP JAXB object for the REST interface.
    *         Never <code>null</code>.

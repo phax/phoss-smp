@@ -43,6 +43,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.domain.sgprops.ESGPredefinedCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
@@ -421,20 +422,20 @@ public final class BDXR1ServerAPI
   }
 
   @Nullable
-  private static List <ExtensionType> _createHREDeliveryExtension (@NonNull final IParticipantIdentifier aPathServiceGroupID)
+  private static List <ExtensionType> _createHREDeliveryExtension (@NonNull final IParticipantIdentifier aPathServiceGroupID,
+                                                                   @NonNull final ISMPServiceGroup aPathServiceGroup)
   {
-    final String sValue = aPathServiceGroupID.getValue ();
-
     // The extension handling is only for HR participant identifiers
-    final int nCharsToSkip;
-    if (sValue.startsWith ("9934:"))
-      nCharsToSkip = 5;
-    else
-      // TODO wrong
-      if (sValue.startsWith ("0088:385"))
-        nCharsToSkip = 8;
-      else
-        return null;
+    String sParticipantOIB = aPathServiceGroup.getCustomPropertyValue (ESGPredefinedCustomProperty.HR_OIB.getName ());
+    if (sParticipantOIB == null)
+    {
+      // Fallback checks
+      final String sValue = aPathServiceGroupID.getValue ();
+      if (sValue.startsWith ("9934:"))
+        sParticipantOIB = sValue.substring (5);
+    }
+    if (sParticipantOIB == null)
+      return null;
 
     final String sNamespaceURI = CSMPServer.HR_EXTENSION_NAMESPACE_URI;
     final String sNSPrefix = CSMPServer.HR_EXTENSION_DEFAULT_PREFIX + ':';
@@ -442,7 +443,7 @@ public final class BDXR1ServerAPI
     final Element eRoot = (Element) aDoc.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "HRMPS"));
     // Take everything after 9934:
     eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "ParticipantOIB"))
-         .appendChild (aDoc.createTextNode (sValue.substring (nCharsToSkip)));
+         .appendChild (aDoc.createTextNode (sParticipantOIB));
 
     // On startup it is ensured that the value is present and configured correctly
     eRoot.appendChild (aDoc.createElementNS (sNamespaceURI, sNSPrefix + "AccessPointOIB"))
@@ -501,7 +502,7 @@ public final class BDXR1ServerAPI
         {
           aSignedServiceMetadata.getServiceMetadata ()
                                 .getRedirect ()
-                                .setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
+                                .setExtension (_createHREDeliveryExtension (aPathServiceGroupID, aPathServiceGroup));
         }
       }
       else
@@ -520,7 +521,8 @@ public final class BDXR1ServerAPI
         }
         if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
         {
-          aSM.getServiceInformation ().setExtension (_createHREDeliveryExtension (aPathServiceGroupID));
+          aSM.getServiceInformation ()
+             .setExtension (_createHREDeliveryExtension (aPathServiceGroupID, aPathServiceGroup));
         }
         aSignedServiceMetadata.setServiceMetadata (aSM);
       }
