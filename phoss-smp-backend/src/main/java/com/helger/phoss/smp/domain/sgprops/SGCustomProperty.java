@@ -61,6 +61,11 @@ public final class SGCustomProperty implements IHasName, IHasJson
     return RegExHelper.stringMatchesPattern ("[a-zA-Z0-9\\.\\-_]{1," + NAME_MAX_LEN + "}", s);
   }
 
+  /**
+   * @param c
+   *        character to check
+   * @return <code>true</code> if the character is forbidden in custom property values.
+   */
   public static boolean isCharacterForbiddenInValue (final char c)
   {
     return c == '\r' || c == '\n' || c == '\0';

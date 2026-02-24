@@ -76,14 +76,15 @@ public final class APIExecutorCustomPropertiesPut extends AbstractSMPAPIExecutor
     if (aDoc == null || aDoc.getDocumentElement () == null)
       throw new SMPBadRequestException ("Failed to parse request body as XML document", aDataProvider.getCurrentURI ());
 
+    // Custom property name and value are checked when reading the XML
     final SGCustomPropertyList aCustomProperties = MicroTypeConverter.convertToNative (aDoc.getDocumentElement (),
                                                                                        SGCustomPropertyList.class);
     if (aCustomProperties == null)
       throw new SMPBadRequestException ("Failed to parse custom properties from XML", aDataProvider.getCurrentURI ());
 
     new CustomPropertiesServerAPI (aDataProvider).setCustomProperties (sPathServiceGroupID,
-                                                                      aCustomProperties,
-                                                                      aCredentials);
+                                                                       aCustomProperties,
+                                                                       aCredentials);
 
     aUnifiedResponse.createNoContent ();
   }

@@ -65,6 +65,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sgprops.ESGCustomPropertyType;
+import com.helger.phoss.smp.domain.sgprops.ESGPredefinedCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -535,7 +536,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aCustomProperties.forEach (x -> {
         final HCRow aRow = aCPTable.addBodyRow ();
         aRow.addCell (x.getType ().getDisplayText (aDisplayLocale));
-        aRow.addCell (x.getName ());
+
+        // Check if this is a predefined property
+        final ESGPredefinedCustomProperty ePredefined = ESGPredefinedCustomProperty.getFromNameOrNull (x.getName ());
+        if (ePredefined != null)
+          aRow.addCell (new HCNodeList ().addChild (x.getName ())
+                                         .addChild (" ")
+                                         .addChild (badgeSuccess (ePredefined.getDisplayText (aDisplayLocale))));
+        else
+          aRow.addCell (x.getName ());
         aRow.addCell (x.getValue ());
       });
       aForm.addChildren (aCPTable, BootstrapDataTables.createDefaultDataTables (aWPEC, aCPTable));
@@ -760,6 +769,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
     final String sParticipantIDScheme = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_SCHEME);
     final String sParticipantIDValue = aWPEC.params ().getAsStringTrimmed (FIELD_PARTICIPANT_ID_VALUE);
@@ -827,6 +837,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           // Name
           final String sFieldName = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sCustPropRowID, SUFFIX_NAME);
           final String sName = aCustPropRow.get (SUFFIX_NAME);
+          ESGPredefinedCustomProperty ePredefined = null;
           if (StringHelper.isEmpty (sName))
             aFormErrors.addFieldError (sFieldName, "The name of the custom property must be provided.");
           else
@@ -836,8 +847,11 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                      sName +
                                                      "' is invalid. Must be alphanumeric (with dot, minus, underscore), max 256 chars.");
             else
+            {
+              ePredefined = ESGPredefinedCustomProperty.getFromNameOrNull (sName);
               if (aCustomProperties.containsName (sName))
                 aFormErrors.addFieldError (sFieldName, "Duplicate custom property name '" + sName + "'.");
+            }
 
           // Value
           final String sFieldValue = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sCustPropRowID, SUFFIX_VALUE);
@@ -846,6 +860,17 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
           if (!SGCustomProperty.isValidValue (sValue))
             aFormErrors.addFieldError (sFieldValue,
                                        "The custom property value '" + sValue + "' is invalid. Max 256 chars.");
+          else
+            if (ePredefined != null && !ePredefined.isValueValid (sValue))
+            {
+              aFormErrors.addFieldError (sFieldValue,
+                                         "The value '" +
+                                                      sValue +
+                                                      "' for the predefined custom property '" +
+                                                      ePredefined.getDisplayText (aDisplayLocale) +
+                                                      "' is invalid according to the specific rules: " +
+                                                      ePredefined.getValueRuleDisplayText (aDisplayLocale));
+            }
 
           if (aFormErrors.size () == nErrors2)
           {

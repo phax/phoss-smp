@@ -19,10 +19,12 @@ import com.helger.annotation.Nonnegative;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.sgprops.ESGCustomPropertyType;
+import com.helger.phoss.smp.domain.sgprops.ESGPredefinedCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
@@ -260,6 +262,19 @@ public final class CustomPropertiesServerAPI
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aServiceGroupID, aSMPUser);
 
+      // Check for predefined custom properties
+      for (final SGCustomProperty aCustomProperty : aCustomProperties)
+      {
+        final String sName = aCustomProperty.getName ();
+        final ESGPredefinedCustomProperty ePredefined = ESGPredefinedCustomProperty.getFromNameOrNull (sName);
+        if (ePredefined != null && !ePredefined.isValueValid (aCustomProperty.getValue ()))
+          throw new SMPBadRequestException ("Predefined custom property '" +
+                                            sName +
+                                            "' has an invalid value: " +
+                                            ePredefined.getValueRuleDisplayText (CSMPServer.DEFAULT_LOCALE),
+                                            m_aAPIProvider.getCurrentURI ());
+      }
+
       // Update the service group with the new custom properties
       aServiceGroupMgr.updateSMPServiceGroup (aServiceGroupID,
                                               aServiceGroup.getOwnerID (),
@@ -331,6 +346,14 @@ public final class CustomPropertiesServerAPI
         throw new SMPBadRequestException ("Invalid custom property value (max " +
                                           SGCustomProperty.VALUE_MAX_LEN +
                                           " characters)",
+                                          m_aAPIProvider.getCurrentURI ());
+
+      // Check predefined property value
+      final ESGPredefinedCustomProperty ePredefined = ESGPredefinedCustomProperty.getFromNameOrNull (sPropertyName);
+      if (ePredefined != null && !ePredefined.isValueValid (sPropertyValue))
+        throw new SMPBadRequestException ("Invalid predefined custom property value (" +
+                                          ePredefined.getValueRuleDisplayText (CSMPServer.DEFAULT_LOCALE) +
+                                          ")",
                                           m_aAPIProvider.getCurrentURI ());
 
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
