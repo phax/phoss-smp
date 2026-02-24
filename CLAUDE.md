@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **phoss-SMP** is a complete SMP (Service Metadata Publisher) server implementing the Peppol SMP 1.x, OASIS BDXR SMP 1.0, and OASIS BDXR SMP 2.0 specifications. It provides a management GUI and supports three pluggable storage backends: XML (file-based), SQL (MySQL/PostgreSQL/Oracle/DB2), and MongoDB.
 
-Current version: `8.0.16-SNAPSHOT`. License: MPL 2.0 + Apache 2.0.
+Current version: `8.1.0`. License: MPL 2.0 + Apache 2.0.
 
 ## Build Commands
 
