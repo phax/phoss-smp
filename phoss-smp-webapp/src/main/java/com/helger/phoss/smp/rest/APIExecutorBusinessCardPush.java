@@ -19,8 +19,6 @@ package com.helger.phoss.smp.rest;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
@@ -37,8 +35,6 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorBusinessCardPush.class);
-
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
                             @NonNull @Nonempty final String sPath,
