@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.ui.secure;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
@@ -528,9 +529,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     {
       aForm.addChild (getUIHandler ().createDataGroupHeader ("Custom Properties"));
 
-      final HCTable aCPTable = new HCTable (new DTCol ("Type"), new DTCol ("Name"), new DTCol ("Value")).setID (
-                                                                                                                getID () +
-                                                                                                                "_customprops");
+      final HCTable aCPTable = new HCTable (new DTCol ("Type"),
+                                            new DTCol ("Name").setInitialSorting (ESortOrder.ASCENDING),
+                                            new DTCol ("Value")).setID (getID () + "_customprops");
       aCustomProperties.forEach (x -> {
         final HCRow aRow = aCPTable.addBodyRow ();
         aRow.addCell (x.getType ().getDisplayText (aDisplayLocale));
@@ -722,7 +723,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         if (aExistingProps != null)
         {
           // add all existing stored properties
-          for (final SGCustomProperty aProp : aExistingProps)
+          for (final SGCustomProperty aProp : aExistingProps.getSorted (Comparator.comparing (SGCustomProperty::getName)))
             aTable.addBodyRow (_createCustomPropertyInputForm (aWPEC, aProp, (String) null, aFormErrors));
         }
       }

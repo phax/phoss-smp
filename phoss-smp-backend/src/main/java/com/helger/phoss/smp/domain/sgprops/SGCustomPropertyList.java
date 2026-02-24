@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.sgprops;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -28,7 +29,9 @@ import com.helger.base.state.EChange;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.collection.commons.CommonsLinkedHashMap;
 import com.helger.collection.commons.ICommonsIterable;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsOrderedMap;
+import com.helger.collection.helper.CollectionSort;
 import com.helger.json.IHasJson;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
@@ -128,6 +131,13 @@ public class SGCustomPropertyList implements IHasJson, ICommonsIterable <SGCusto
   public Iterator <SGCustomProperty> iterator ()
   {
     return m_aList.values ().iterator ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <SGCustomProperty> getSorted (@NonNull final Comparator <? super SGCustomProperty> aComparator)
+  {
+    return CollectionSort.getSorted (m_aList.values (), aComparator);
   }
 
   @NonNull
