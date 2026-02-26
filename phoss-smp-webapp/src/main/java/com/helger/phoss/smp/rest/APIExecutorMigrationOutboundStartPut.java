@@ -73,7 +73,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -84,7 +84,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     }
 
     final String sLogPrefix = "[REST API Migration-Outbound-Start] ";
-    LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sServiceGroupID + "'");
+    LOGGER.info (sLogPrefix + "Starting outbound migration for Service Group ID '" + sPathServiceGroupID + "'");
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
@@ -107,17 +107,17 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
     if (aServiceGroupID == null)
     {
       // Invalid identifier
-      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
 
     // Check that service group exists
     if (!aServiceGroupMgr.containsSMPServiceGroupWithID (aServiceGroupID))
     {
-      throw new SMPBadRequestException ("The Service Group '" + sServiceGroupID + "' does not exist",
+      throw new SMPBadRequestException ("The Service Group '" + sPathServiceGroupID + "' does not exist",
                                         aDataProvider.getCurrentURI ());
     }
 
@@ -125,7 +125,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aServiceGroupID))
     {
       throw new SMPBadRequestException ("The outbound Participant Migration of the Service Group '" +
-                                        sServiceGroupID +
+                                        sPathServiceGroupID +
                                         "' is already in progress",
                                         aDataProvider.getCurrentURI ());
     }
@@ -146,7 +146,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     }
     catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault | ClientTransportException ex)
     {
-      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sServiceGroupID + "'",
+      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sPathServiceGroupID + "'",
                                  ex);
     }
 
@@ -156,7 +156,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     if (aMigration == null)
     {
       throw new SMPInternalErrorException ("Failed to create outbound Participant Migration for '" +
-                                           sServiceGroupID +
+                                           sPathServiceGroupID +
                                            "' internally");
     }
 
@@ -169,7 +169,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     final IMicroDocument aResponseDoc = new MicroDocument ();
     final IMicroElement eRoot = aResponseDoc.addElement ("migrationOutboundResponse");
     eRoot.setAttribute ("success", true);
-    eRoot.addElement (XML_ELEMENT_PARTICIPANT_ID).addText (sServiceGroupID);
+    eRoot.addElement (XML_ELEMENT_PARTICIPANT_ID).addText (sPathServiceGroupID);
     eRoot.addElement (XML_ELEMENT_MIGRATION_KEY).addText (sMigrationKey);
 
     aUnifiedResponse.xml (aResponseDoc);

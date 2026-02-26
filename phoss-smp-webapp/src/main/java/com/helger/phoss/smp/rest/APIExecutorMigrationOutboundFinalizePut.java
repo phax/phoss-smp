@@ -60,7 +60,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -71,7 +71,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     }
 
     final String sLogPrefix = "[REST API Migration-Outbound-Finalize] ";
-    LOGGER.info (sLogPrefix + "Finalizing outbound migration for Service Group ID '" + sServiceGroupID + "'");
+    LOGGER.info (sLogPrefix + "Finalizing outbound migration for Service Group ID '" + sPathServiceGroupID + "'");
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
@@ -81,11 +81,11 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
     if (aServiceGroupID == null)
     {
       // Invalid identifier
-      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
 
     // Find matching migration object
@@ -95,7 +95,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
     if (aMigration == null)
     {
       throw new SMPBadRequestException ("Failed to resolve outbound participant migration for Service Group ID '" +
-                                        sServiceGroupID +
+                                        sPathServiceGroupID +
                                         "'",
                                         aDataProvider.getCurrentURI ());
     }
@@ -116,7 +116,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
                  "The outbound Participant Migration with ID '" +
                  sMigrationID +
                  "' for '" +
-                 sServiceGroupID +
+                 sPathServiceGroupID +
                  "' was successfully finalized!");
 
     try
@@ -127,13 +127,13 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       {
         LOGGER.info (sLogPrefix +
                      "The SMP Service Group for participant '" +
-                     sServiceGroupID +
+                     sPathServiceGroupID +
                      "' was successfully deleted from this SMP (without SML)!");
       }
       else
       {
         throw new SMPBadRequestException ("The SMP Service Group for participant '" +
-                                          sServiceGroupID +
+                                          sPathServiceGroupID +
                                           "' could not be deleted",
                                           aDataProvider.getCurrentURI ());
       }
@@ -146,7 +146,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
       {
         LOGGER.warn (sLogPrefix +
                      "Successfully reverted the state of the outbound Participant Migration for '" +
-                     sServiceGroupID +
+                     sPathServiceGroupID +
                      "' to " +
                      eOldState +
                      "!");
@@ -156,7 +156,7 @@ public final class APIExecutorMigrationOutboundFinalizePut extends AbstractSMPAP
         // Error in error handling. Yeah
         LOGGER.error (sLogPrefix +
                       "Failed to revert the state of the outbound Participant Migration for '" +
-                      sServiceGroupID +
+                      sPathServiceGroupID +
                       "' to " +
                       eOldState +
                       "!");

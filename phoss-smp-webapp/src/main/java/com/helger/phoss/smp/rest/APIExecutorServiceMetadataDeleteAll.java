@@ -57,17 +57,11 @@ public final class APIExecutorServiceMetadataDeleteAll extends AbstractSMPAPIExe
 
     switch (SMPServerConfiguration.getRESTType ())
     {
-      case PEPPOL:
-        new SMPServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
-        break;
-      case OASIS_BDXR_V1:
-        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
-        break;
-      case OASIS_BDXR_V2:
-        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
-        break;
-      default:
-        throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      case PEPPOL -> new SMPServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID, aCredentials);
+      case OASIS_BDXR_V1 -> new BDXR1ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID,
+                                                                                           aCredentials);
+      case OASIS_BDXR_V2 -> new BDXR2ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID,
+                                                                                           aCredentials);
     }
     aUnifiedResponse.createOk ();
   }

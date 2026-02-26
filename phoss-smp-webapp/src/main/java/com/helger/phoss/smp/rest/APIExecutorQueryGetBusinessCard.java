@@ -65,7 +65,6 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[QueryAPI] ";
-
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 

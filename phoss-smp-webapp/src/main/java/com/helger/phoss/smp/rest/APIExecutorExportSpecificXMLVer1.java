@@ -62,7 +62,6 @@ public final class APIExecutorExportSpecificXMLVer1 extends AbstractSMPAPIExecut
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-Specific-XML-V1] ";
-
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     LOGGER.info (sLogPrefix + "Starting Export of '" + sPathServiceGroupID + "'");
 

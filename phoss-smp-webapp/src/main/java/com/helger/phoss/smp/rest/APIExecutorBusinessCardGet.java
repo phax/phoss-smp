@@ -44,7 +44,7 @@ public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     if (!SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ())
@@ -57,7 +57,7 @@ public final class APIExecutorBusinessCardGet extends AbstractSMPAPIExecutor
     }
 
     // getBusinessCard throws an exception if none is found
-    final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sServiceGroupID);
+    final PD3BusinessCardType ret = new BusinessCardServerAPI (aDataProvider).getBusinessCard (sPathServiceGroupID);
     final byte [] aBytes = new PD3BusinessCardMarshaller ().getAsBytes (ret);
 
     aUnifiedResponse.setContent (aBytes)

@@ -241,9 +241,9 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     }
 
     final String sLogPrefix = "[REST API Migration-Inbound] ";
-    final String sServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
-    final String sMigrationKey = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_KEY);
+    final String sPathServiceGroupID = aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID);
+    final String sPathMigrationKey = aPathVariables.get (SMPRestFilter.PARAM_MIGRATION_KEY);
 
-    migrationInbound (sServiceGroupID, sMigrationKey, sLogPrefix, aRequestScope, aUnifiedResponse);
+    migrationInbound (sPathServiceGroupID, sPathMigrationKey, sLogPrefix, aRequestScope, aUnifiedResponse);
   }
 }

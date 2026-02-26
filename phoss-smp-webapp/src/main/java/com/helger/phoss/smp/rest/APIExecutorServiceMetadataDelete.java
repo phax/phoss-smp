@@ -44,6 +44,7 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -53,26 +54,19 @@ public final class APIExecutorServiceMetadataDelete extends AbstractSMPAPIExecut
                                                 aDataProvider.getCurrentURI ());
     }
 
-    final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     switch (SMPServerConfiguration.getRESTType ())
     {
-      case PEPPOL:
-        new SMPServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID, sDocumentTypeID, aCredentials);
-        break;
-      case OASIS_BDXR_V1:
-        new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
-                                                                      sDocumentTypeID,
-                                                                      aCredentials);
-        break;
-      case OASIS_BDXR_V2:
-        new BDXR2ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
-                                                                      sDocumentTypeID,
-                                                                      aCredentials);
-        break;
-      default:
-        throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      case PEPPOL -> new SMPServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
+                                                                                 sPathDocumentTypeID,
+                                                                                 aCredentials);
+      case OASIS_BDXR_V1 -> new BDXR1ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
+                                                                                          sPathDocumentTypeID,
+                                                                                          aCredentials);
+      case OASIS_BDXR_V2 -> new BDXR2ServerAPI (aDataProvider).deleteServiceRegistration (sPathServiceGroupID,
+                                                                                          sPathDocumentTypeID,
+                                                                                          aCredentials);
     }
     aUnifiedResponse.createOk ();
   }

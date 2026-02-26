@@ -52,6 +52,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -69,7 +70,6 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
       throw new SMPBadRequestException ("Failed to parse provided payload as XML", aDataProvider.getCurrentURI ());
     }
 
-    final String sDocumentTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     ESuccess eSuccess = ESuccess.FAILURE;
@@ -82,7 +82,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
         if (aServiceMetadata != null)
         {
           eSuccess = new SMPServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
-                                                                               sDocumentTypeID,
+                                                                               sPathDocumentTypeID,
                                                                                aServiceMetadata,
                                                                                aCredentials);
         }
@@ -95,7 +95,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
         if (aServiceMetadata != null)
         {
           eSuccess = new BDXR1ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
-                                                                                 sDocumentTypeID,
+                                                                                 sPathDocumentTypeID,
                                                                                  aServiceMetadata,
                                                                                  aCredentials);
         }
@@ -108,7 +108,7 @@ public final class APIExecutorServiceMetadataPut extends AbstractSMPAPIExecutor
         if (aServiceMetadata != null)
         {
           eSuccess = new BDXR2ServerAPI (aDataProvider).saveServiceRegistration (sPathServiceGroupID,
-                                                                                 sDocumentTypeID,
+                                                                                 sPathDocumentTypeID,
                                                                                  aServiceMetadata,
                                                                                  aCredentials);
         }

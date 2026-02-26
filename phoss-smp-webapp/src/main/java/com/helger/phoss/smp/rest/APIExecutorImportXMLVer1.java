@@ -84,6 +84,8 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
+    final String sLogPrefix = "[REST API Import-XML-V1] ";
+    final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -92,9 +94,6 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       throw new SMPPreconditionFailedException ("The writable REST API is disabled. importServiceGroups will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
-
-    final String sLogPrefix = "[REST API Import-XML-V1] ";
-    final String sPathUserLoginName = aPathVariables.get (SMPRestFilter.PARAM_USER_ID);
 
     LOGGER.info (sLogPrefix + "Starting Import");
 

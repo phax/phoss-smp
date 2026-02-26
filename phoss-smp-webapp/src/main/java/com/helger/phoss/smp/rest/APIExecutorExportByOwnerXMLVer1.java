@@ -60,7 +60,6 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[REST API Export-ByOwner-XML-V1] ";
-
     final String sPathUserLoginName = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_USER_ID));
     LOGGER.info (sLogPrefix + "Starting Export for all of owner '" + sPathUserLoginName + "'");
 

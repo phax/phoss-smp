@@ -41,7 +41,7 @@ public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -62,7 +62,7 @@ public final class APIExecutorBusinessCardDelete extends AbstractSMPAPIExecutor
 
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
-    new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sServiceGroupID, aCredentials);
+    new BusinessCardServerAPI (aDataProvider).deleteBusinessCard (sPathServiceGroupID, aCredentials);
     aUnifiedResponse.createOk ();
   }
 }

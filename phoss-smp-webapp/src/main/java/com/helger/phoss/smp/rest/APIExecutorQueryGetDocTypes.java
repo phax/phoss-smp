@@ -74,7 +74,6 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sLogPrefix = "[QueryAPI] ";
-
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
@@ -84,6 +83,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
       throw new SMPPreconditionFailedException ("The remote query API is disabled. getRemoteDocTypes will not be executed",
                                                 aDataProvider.getCurrentURI ());
     }
+
     final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
     final ESMPAPIType eAPIType = SMPServerConfiguration.getRESTType ().getAPIType ();
     final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();

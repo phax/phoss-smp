@@ -116,6 +116,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
   {
     final String sLogPrefix = "[QueryAPI] ";
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathDocumentTypeID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the remote query API disabled?
@@ -153,10 +154,9 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
       return;
     }
 
-    final String sDocTypeID = aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID);
-    final IDocumentTypeIdentifier aDocTypeID = aIF.parseDocumentTypeIdentifier (sDocTypeID);
+    final IDocumentTypeIdentifier aDocTypeID = aIF.parseDocumentTypeIdentifier (sPathDocumentTypeID);
     if (aDocTypeID == null)
-      throw SMPBadRequestException.failedToParseDocType (sDocTypeID, null);
+      throw SMPBadRequestException.failedToParseDocType (sPathDocumentTypeID, null);
 
     final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean ("xmlSchemaValidation", true);
     final boolean bVerifySignature = aRequestScope.params ().getAsBoolean ("verifySignature", true);

@@ -57,7 +57,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -71,7 +71,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
 
     LOGGER.info (sLogPrefix +
                  "Cancelling outbound Participant Migration for Service Group ID '" +
-                 sServiceGroupID +
+                 sPathServiceGroupID +
                  "'");
 
     // Only authenticated user may do so
@@ -81,11 +81,11 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sServiceGroupID);
+    final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
     if (aServiceGroupID == null)
     {
       // Invalid identifier
-      throw SMPBadRequestException.failedToParseSG (sServiceGroupID, aDataProvider.getCurrentURI ());
+      throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
     }
 
     // Find matching migration object
@@ -95,7 +95,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
     if (aMigration == null)
     {
       throw new SMPBadRequestException ("Failed to resolve outbound Participant Migration for Service Group ID '" +
-                                        sServiceGroupID +
+                                        sPathServiceGroupID +
                                         "'",
                                         aDataProvider.getCurrentURI ());
     }
@@ -107,7 +107,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                  "' with state " +
                  aMigration.getState () +
                  " for the Service Group ID '" +
-                 sServiceGroupID +
+                 sPathServiceGroupID +
                  "'");
 
     // Change migration state
@@ -124,7 +124,7 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                  "The outbound Participant Migration with ID '" +
                  sMigrationID +
                  "' on Service Group ID '" +
-                 sServiceGroupID +
+                 sPathServiceGroupID +
                  "' was successfully cancelled!");
     aUnifiedResponse.createOk ();
   }

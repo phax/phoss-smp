@@ -47,7 +47,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
                             @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
-    final String sServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     // Is the writable API disabled?
@@ -78,7 +78,7 @@ public final class APIExecutorBusinessCardPut extends AbstractSMPAPIExecutor
       throw new SMPBadRequestException ("Failed to parse XML payload as BusinessCard.", aDataProvider.getCurrentURI ());
     }
 
-    final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sServiceGroupID,
+    final ESuccess eSuccess = new BusinessCardServerAPI (aDataProvider).createBusinessCard (sPathServiceGroupID,
                                                                                             aBC,
                                                                                             aCredentials);
     if (eSuccess.isFailure ())
