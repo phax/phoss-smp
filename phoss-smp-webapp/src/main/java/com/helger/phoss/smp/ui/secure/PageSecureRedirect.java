@@ -451,6 +451,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroupParticipantIdentifier ()
                                                                                       .getURIPercentEncoded () +
                                                                             SMPRestFilter.PATH_SERVICES +
+                                                                            "/" +
                                                                             aCurObject.getDocumentTypeIdentifier ()
                                                                                       .getURIPercentEncoded ());
       aRow.addCell (new HCA (aEditURL).setTitle ("Edit " + sDisplayName).addChild (EDefaultIcon.EDIT.getAsNode ()),

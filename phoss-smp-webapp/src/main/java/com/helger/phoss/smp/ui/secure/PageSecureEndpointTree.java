@@ -138,6 +138,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aServiceInfo).addAll (aParams);
               final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                     SMPRestFilter.PATH_SERVICES +
+                                                                                    "/" +
                                                                                     aDocTypeID.getURIPercentEncoded ());
               aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View endpoint")
                                                            .addChild (EDefaultIcon.MAGNIFIER.getAsNode ()),
@@ -181,6 +182,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                    .addChild (" ")
                                    .addChild (new HCA (LinkHelper.getURLWithServerAndContext (aParticipantID.getURIPercentEncoded () +
                                                                                               SMPRestFilter.PATH_SERVICES +
+                                                                                              "/" +
                                                                                               aDocTypeID.getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
                                                                                                                                   .setTargetBlank ()
                                                                                                                                   .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
