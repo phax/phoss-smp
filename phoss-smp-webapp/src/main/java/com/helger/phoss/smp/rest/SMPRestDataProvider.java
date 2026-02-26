@@ -277,6 +277,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
            m_sQueryPathPrefix +
            aServiceGroupID.getURIPercentEncoded () +
            SMPRestFilter.PATH_SERVICES +
+           "/" +
            aDocTypeID.getURIPercentEncoded ();
   }
 }
