@@ -67,6 +67,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class SMPRestFilter extends AbstractXFilterUnifiedResponse
 {
   public static final String PATH_BUSINESSCARD = "/businesscard/";
+  public static final String PATH_EXT_SPF = "/ext/spf";
   public static final String PATH_COMPLETE = "/complete";
   public static final String PATH_CUSTOM_PROPERTIES = "/customproperties";
   public static final String PATH_LIST = "/list";
@@ -131,6 +132,16 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aPushBusinessCard);
     }
 
+    // SPF4Peppol Extension Endpoint
+    {
+      final APIDescriptor aGetSPFPolicy = new APIDescriptor (APIPath.get ("/{" +
+                                                                          PARAM_SERVICE_GROUP_ID +
+                                                                          "}" +
+                                                                          PATH_EXT_SPF),
+                                                             new APIExecutorSPF4PeppolGet ());
+      aGetSPFPolicy.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aGetSPFPolicy);
+    }
     // CompleteServiceGroup
     {
       final APIDescriptor aGetCompleteServiceGroup = new APIDescriptor (APIPath.get (PATH_COMPLETE +
