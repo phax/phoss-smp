@@ -113,14 +113,14 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>11.2.2</version>
+        <version>11.2.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>10.2.0</version>
+        <version>10.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -134,7 +134,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>12.3.10</version>
+        <version>12.3.11</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

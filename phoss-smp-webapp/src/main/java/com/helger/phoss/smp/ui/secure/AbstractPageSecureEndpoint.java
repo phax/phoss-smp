@@ -18,6 +18,7 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
@@ -31,9 +32,11 @@ import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.period.LocalDatePeriod;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.ext.HCA_MailTo;
 import com.helger.html.hc.html.HC_Target;
@@ -518,6 +521,38 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     aNodeList.addChild (aForm);
   }
 
+  private static final LocalDate LD_MIN = PDTFactory.createLocalDate (0, Month.JANUARY, 1);
+  private static final LocalDate LD_MAX = PDTFactory.createLocalDate (9999, Month.DECEMBER, 31);
+
+  @NonNull
+  private static LocalDatePeriod _createPeriod (@Nullable final LocalDate aNotBeforeDate,
+                                                @Nullable final LocalDate aNotAfterDate)
+  {
+    return new LocalDatePeriod (aNotBeforeDate != null ? aNotBeforeDate : LD_MIN,
+                                aNotAfterDate != null ? aNotAfterDate : LD_MAX);
+  }
+
+  @Nullable
+  protected static String getAsValidityString (@Nullable final LocalDate aNotBefore,
+                                               @Nullable final LocalDate aNotAfter,
+                                               @NonNull final Locale aDisplayLocale)
+  {
+    if (aNotBefore == null && aNotAfter == null)
+      return null;
+
+    String ret;
+    if (aNotBefore == null)
+      ret = "[since forever]";
+    else
+      ret = PDTToString.getAsString (aNotBefore, aDisplayLocale);
+    ret += " - ";
+    if (aNotAfter == null)
+      ret += "[until eternity]";
+    else
+      ret += PDTToString.getAsString (aNotAfter, aDisplayLocale);
+    return ret;
+  }
+
   @Override
   protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPServiceInformation aSelectedObject,
@@ -622,18 +657,60 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       if (aTransportProfile == null)
         aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
                                    "Transport Profile of type '" + sTransportProfileID + "' does not exist!");
-    if (!bEdit &&
-        aServiceGroup != null &&
-        aDocTypeID != null &&
-        aProcessID != null &&
-        aTransportProfile != null &&
-        aServiceInfoMgr.findServiceInformation (aParticipantID, aDocTypeID, aProcessID, sTransportProfileID) != null)
+    if (!bEdit && aServiceGroup != null && aDocTypeID != null && aProcessID != null && aTransportProfile != null)
     {
-      final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile is already present. Some of the identifiers may be treated case insensitive!";
-      aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);
-      aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
-      aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, sMsg);
+      if (aNotBeforeDate == null && aNotAfterDate == null)
+      {
+        // Neither date is set - check without date constraint
+        final ISMPServiceInformation aSI = aServiceInfoMgr.findFirstSMPServiceInformation (aParticipantID,
+                                                                                           aDocTypeID,
+                                                                                           aProcessID,
+                                                                                           sTransportProfileID);
+        if (aSI != null)
+        {
+          final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile is already present. Some of the identifiers may be treated case insensitive!";
+          aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);
+          aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
+          aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, sMsg);
+        }
+      }
+      else
+      {
+        // Any date is set
+        final ICommonsList <ISMPEndpoint> aAllEndpoints = aServiceInfoMgr.getAllSMPEndpoints (aParticipantID,
+                                                                                              aDocTypeID,
+                                                                                              aProcessID,
+                                                                                              sTransportProfileID);
+
+        // Make sure start and end are always non-null to make this work
+        final ICommonsList <LocalDatePeriod> aValidityPeriods = aAllEndpoints.getAllMapped (x -> _createPeriod (x.getServiceActivationDate (),
+                                                                                                                x.getServiceExpirationDate ()));
+        final LocalDatePeriod aRequestedPeriod = _createPeriod (aNotBeforeDate, aNotAfterDate);
+
+        boolean bPeriodCovered = false;
+        for (final var aPeriod : aValidityPeriods)
+          if (aRequestedPeriod.isOverlappingWithIncl (aPeriod))
+          {
+            bPeriodCovered = true;
+            break;
+          }
+
+        if (bPeriodCovered)
+        {
+          final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile valid in the range " +
+                              getAsValidityString (aNotBeforeDate, aNotAfterDate, aDisplayLocale) +
+                              " is already present. Some of the identifiers may be treated case insensitive!";
+          aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);
+          aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
+          aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE, sMsg);
+          if (aNotBeforeDate != null)
+            aFormErrors.addFieldError (FIELD_NOT_BEFORE, sMsg);
+          if (aNotAfterDate != null)
+            aFormErrors.addFieldError (FIELD_NOT_AFTER, sMsg);
+        }
+      }
     }
+
     if (StringHelper.isEmpty (sEndpointReference))
     {
       if (false)
@@ -642,9 +719,11 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     else
       if (URLHelper.getAsURL (sEndpointReference) == null)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "The Endpoint Reference is not a valid URL!");
+
     if (aNotBeforeDate != null && aNotAfterDate != null)
       if (aNotBeforeDate.isAfter (aNotAfterDate))
         aFormErrors.addFieldError (FIELD_NOT_BEFORE, "Not Before Date must not be after Not After Date!");
+
     if (StringHelper.isEmpty (sCertificate))
       aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
     else
@@ -656,11 +735,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aFormErrors.addFieldError (FIELD_CERTIFICATE,
                                    "The provided certificate string is not a valid X509 certificate!");
     }
+
     if (StringHelper.isEmpty (sServiceDescription))
       aFormErrors.addFieldError (FIELD_SERVICE_DESCRIPTION, "Service Description must not be empty!");
 
     if (StringHelper.isEmpty (sTechnicalContact))
       aFormErrors.addFieldError (FIELD_TECHNICAL_CONTACT, "Technical Contact must not be empty!");
+
     if (StringHelper.isNotEmpty (sExtension))
     {
       if (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED)
@@ -675,6 +756,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
           aFormErrors.addFieldError (FIELD_EXTENSION, "The extension must be valid JSON or XML content.");
       }
     }
+
     if (aFormErrors.isEmpty ())
     {
       ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aServiceGroup.getParticipantIdentifier (),
@@ -688,17 +770,21 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aProcess = new SMPProcess (aProcessID, null, null);
         aServiceInfo.addProcess ((SMPProcess) aProcess);
       }
-      aProcess.setEndpoint (new SMPEndpoint (sTransportProfileID,
-                                             sEndpointReference,
-                                             bRequireBusinessLevelSignature,
-                                             sMinimumAuthenticationLevel,
-                                             PDTFactory.createXMLOffsetDateTime (aNotBeforeDate),
-                                             PDTFactory.createXMLOffsetDateTime (aNotAfterDate),
-                                             sCertificate,
-                                             sServiceDescription,
-                                             sTechnicalContact,
-                                             sTechnicalInformation,
-                                             sExtension));
+
+      final SMPEndpoint aNewEndpoint = new SMPEndpoint (sTransportProfileID,
+                                                        sEndpointReference,
+                                                        bRequireBusinessLevelSignature,
+                                                        sMinimumAuthenticationLevel,
+                                                        PDTFactory.createXMLOffsetDateTime (aNotBeforeDate),
+                                                        PDTFactory.createXMLOffsetDateTime (aNotAfterDate),
+                                                        sCertificate,
+                                                        sServiceDescription,
+                                                        sTechnicalContact,
+                                                        sTechnicalInformation,
+                                                        sExtension);
+      // TODO differentiate between create and edit
+      aProcess.setEndpoint (aNewEndpoint);
+
       if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo).isSuccess ())
       {
         if (bEdit)

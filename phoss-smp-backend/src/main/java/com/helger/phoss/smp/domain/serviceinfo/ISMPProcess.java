@@ -59,7 +59,20 @@ public interface ISMPProcess extends ISMPHasExtension
    *         no such endpoint exists.
    */
   @Nullable
+  @Deprecated (forRemoval = true, since = "8.1.2")
   ISMPEndpoint getEndpointOfTransportProfile (@Nullable String sTransportProfileID);
+
+  /**
+   * Find all endpoints with the passed transport profile ID.
+   *
+   * @param sTransportProfileID
+   *        The transport profile ID to search. May be <code>null</code>.
+   * @return A copy of the list of all endpoints associated with this process. Never
+   *         <code>null</code> but maybe empty.
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsList <ISMPEndpoint> getAllEndpointsOfTransportProfile (@Nullable String sTransportProfileID);
 
   /**
    * Check if the passed transport profile is used or not.

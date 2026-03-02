@@ -16,7 +16,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonnegative;
-import com.helger.annotation.misc.ChangeNextMajorRelease;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
@@ -75,12 +74,34 @@ public interface ISMPServiceInformationManager
    * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier,
    *      IDocumentTypeIdentifier)
    */
-  @ChangeNextMajorRelease ("Rename to findSMPServiceInformation")
   @Nullable
-  ISMPServiceInformation findServiceInformation (@Nullable IParticipantIdentifier aParticipantID,
-                                                 @Nullable IDocumentTypeIdentifier aDocTypeID,
-                                                 @Nullable IProcessIdentifier aProcessID,
-                                                 @Nullable String sTransportProfileID);
+  ISMPServiceInformation findFirstSMPServiceInformation (@Nullable IParticipantIdentifier aParticipantID,
+                                                         @Nullable IDocumentTypeIdentifier aDocTypeID,
+                                                         @Nullable IProcessIdentifier aProcessID,
+                                                         @Nullable String sTransportProfileID);
+
+  /**
+   * Find all endpoints matching the passed quadruple of parameters. If one of the parameters is
+   * <code>null</code> no match should be found and an empty list should be returned. .
+   *
+   * @param aParticipantID
+   *        The service group ID to be searched. May be <code>null</code>.
+   * @param aDocTypeID
+   *        The document type ID to search. May be <code>null</code>.
+   * @param aProcessID
+   *        The process ID to search. May be <code>null</code>.
+   * @param sTransportProfileID
+   *        The transport profile ID to search. May be <code>null</code>.
+   * @return A non-<code>null</code> but maybe empty list of matching data.
+   * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier,
+   *      IDocumentTypeIdentifier)
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsList <ISMPEndpoint> getAllSMPEndpoints (@Nullable IParticipantIdentifier aParticipantID,
+                                                  @Nullable IDocumentTypeIdentifier aDocTypeID,
+                                                  @Nullable IProcessIdentifier aProcessID,
+                                                  @Nullable String sTransportProfileID);
 
   /**
    * Delete the provided service information object.

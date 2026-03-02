@@ -46,7 +46,7 @@ import com.helger.xsds.peppol.smp1.ProcessType;
 public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 {
   private IProcessIdentifier m_aProcessIdentifier;
-  private final ICommonsOrderedMap <String, SMPEndpoint> m_aEndpoints = new CommonsLinkedHashMap <> ();
+  private final ICommonsOrderedMap <String, ICommonsList <SMPEndpoint>> m_aEndpoints = new CommonsLinkedHashMap <> ();
 
   public SMPProcess (@NonNull final IProcessIdentifier aProcessIdentifier,
                      @Nullable final List <SMPEndpoint> aEndpoints,
@@ -54,8 +54,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   {
     setProcessIdentifier (aProcessIdentifier);
     if (aEndpoints != null)
-      for (final SMPEndpoint aEndpoint : aEndpoints)
-        addEndpoint (aEndpoint);
+      addEndpoints (aEndpoints);
     getExtensions ().setExtensionAsString (sExtension);
   }
 
@@ -78,18 +77,34 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   }
 
   @Nullable
-  public SMPEndpoint getEndpointOfTransportProfile (@Nullable final String sTransportProfile)
+  public SMPEndpoint getEndpointOfTransportProfile (@Nullable final String sTransportProfileID)
   {
-    if (StringHelper.isEmpty (sTransportProfile))
+    if (StringHelper.isEmpty (sTransportProfileID))
       return null;
-    return m_aEndpoints.get (sTransportProfile);
+    final ICommonsList <SMPEndpoint> aEPs = m_aEndpoints.get (sTransportProfileID);
+    if (aEPs == null)
+      return null;
+    return aEPs.getFirstOrNull ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <ISMPEndpoint> getAllEndpointsOfTransportProfile (@Nullable final String sTransportProfileID)
+  {
+    if (StringHelper.isEmpty (sTransportProfileID))
+      return null;
+    final ICommonsList <SMPEndpoint> aEPs = m_aEndpoints.get (sTransportProfileID);
+    return new CommonsArrayList <> (aEPs);
   }
 
   @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPEndpoint> getAllEndpoints ()
   {
-    return new CommonsArrayList <> (m_aEndpoints.values ());
+    final ICommonsList <ISMPEndpoint> ret = new CommonsArrayList <> ();
+    for (final var aList : m_aEndpoints.values ())
+      ret.addAll (aList);
+    return ret;
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
@@ -101,11 +116,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
-    if (m_aEndpoints.containsKey (sTransportProfile))
-      throw new IllegalStateException ("Another endpoint with transport profile '" +
-                                       sTransportProfile +
-                                       "' is already present");
-    m_aEndpoints.put (sTransportProfile, aEndpoint);
+    m_aEndpoints.computeIfAbsent (sTransportProfile, k -> new CommonsArrayList <> ()).add (aEndpoint);
   }
 
   public final void addEndpoints (@NonNull final Iterable <? extends SMPEndpoint> aEndpoints)
@@ -119,7 +130,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
-    m_aEndpoints.put (sTransportProfile, aEndpoint);
+    m_aEndpoints.computeIfAbsent (sTransportProfile, k -> new CommonsArrayList <> ()).set (aEndpoint);
   }
 
   @NonNull
@@ -142,8 +153,9 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new SimpleProcessIdentifier (m_aProcessIdentifier));
     final com.helger.xsds.peppol.smp1.ServiceEndpointList aEndpointList = new com.helger.xsds.peppol.smp1.ServiceEndpointList ();
-    for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
-      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
+    for (final var aEndpoints : m_aEndpoints.values ())
+      for (final var aEndpoint : aEndpoints)
+        aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
     ret.setServiceEndpointList (aEndpointList);
     ret.setExtension (getExtensions ().getAsPeppolExtension ());
     return ret;
@@ -161,8 +173,9 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     // Explicit constructor call is needed here!
     ret.setProcessIdentifier (new BDXR1ProcessIdentifier (m_aProcessIdentifier));
     final com.helger.xsds.bdxr.smp1.ServiceEndpointList aEndpointList = new com.helger.xsds.bdxr.smp1.ServiceEndpointList ();
-    for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
-      aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR1 ());
+    for (final var aEndpoints : m_aEndpoints.values ())
+      for (final var aEndpoint : aEndpoints)
+        aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectBDXR1 ());
     ret.setServiceEndpointList (aEndpointList);
     ret.setExtension (getExtensions ().getAsBDXRExtensions ());
     return ret;
@@ -186,8 +199,9 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
       ret.addProcess (p);
     }
 
-    for (final ISMPEndpoint aEndpoint : m_aEndpoints.values ())
-      ret.addEndpoint (aEndpoint.getAsJAXBObjectBDXR2 ());
+    for (final var aEndpoints : m_aEndpoints.values ())
+      for (final var aEndpoint : aEndpoints)
+        ret.addEndpoint (aEndpoint.getAsJAXBObjectBDXR2 ());
 
     if (ret.hasNoEndpointEntries ())
     {

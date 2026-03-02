@@ -235,10 +235,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   }
 
   @Nullable
-  public ISMPServiceInformation findServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
-                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
-                                                        @Nullable final IProcessIdentifier aProcessID,
-                                                        @Nullable final String sTransportProfileID)
+  public ISMPServiceInformation findFirstSMPServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
+                                                                @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                                @Nullable final IProcessIdentifier aProcessID,
+                                                                @Nullable final String sTransportProfileID)
   {
     final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
                                                                                                        aDocTypeID);
@@ -253,6 +253,29 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       }
     }
     return null;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <ISMPEndpoint> getAllSMPEndpoints (@Nullable final IParticipantIdentifier aParticipantID,
+                                                         @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                         @Nullable final IProcessIdentifier aProcessID,
+                                                         @Nullable final String sTransportProfileID)
+  {
+    final ICommonsList <ISMPEndpoint> ret = new CommonsArrayList <> ();
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
+                                                                                                       aDocTypeID);
+    if (aServiceInfo != null)
+    {
+      final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
+      if (aProcess != null)
+      {
+        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfileID);
+        if (aEndpoint != null)
+          ret.add (aEndpoint);
+      }
+    }
+    return ret;
   }
 
   @NonNull

@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.html.request.IHCRequestField;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -33,7 +33,6 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 import com.helger.photon.uictrls.select2.HCSelect2;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -92,12 +91,11 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
     }
   }
 
-  private static class ReadonlySelect extends HCEdit implements IHCServiceGroupSelect
+  private static class MyReadOnlySelect extends HCSelect implements IHCServiceGroupSelect
   {
-    public ReadonlySelect (@Nonnull final String sName, @Nonnull final String sValue)
+    public MyReadOnlySelect (@NonNull final IHCRequestField aRF)
     {
-      setName (sName);
-      setValue (sValue);
+      super (aRF);
       setReadOnly (true);
     }
 
@@ -117,12 +115,18 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
     {
       if (bReadOnly)
       {
-        // Less HTML code - show a simple read-only edit instead
+        // Less HTML code
+        // Using a simple read-only edit does not work, because it has no possibility to separate
+        // display text and value
+        // So we create a simple select with a single entry
         final IParticipantIdentifier aSelectedPID = SMPMetaManager.getIdentifierFactory ()
                                                                   .parseParticipantIdentifier (aRF.getRequestValue ());
         final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                              .getSMPServiceGroupOfID (aSelectedPID);
-        return new ReadonlySelect (aRF.getFieldName (), aServiceGroup == null ? "" : getDisplayName (aServiceGroup));
+        final MyReadOnlySelect aSelect = new MyReadOnlySelect (aRF);
+        if (aServiceGroup != null)
+          aSelect.addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup));
+        return aSelect;
       }
 
       final MySelect2 aSelect2 = new MySelect2 (aRF);

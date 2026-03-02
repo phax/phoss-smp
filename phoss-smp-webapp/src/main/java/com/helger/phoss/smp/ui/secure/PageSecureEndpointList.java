@@ -100,6 +100,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                                         new DTCol ("Document Type ID").setDataSort (1, 0, 2, 3),
                                         new DTCol ("Process ID").setDataSort (2, 0, 1, 3),
                                         new DTCol ("Transport Profile").setDataSort (3, 0, 1, 2),
+                                        new DTCol ("Validity").setDataSort (4, 0, 1, 2, 3),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
     for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos)
     {
@@ -125,6 +126,10 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                                                                                                                .addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
                                                                                                                                                              aTPCache.getFromCache (sTransportProfile),
                                                                                                                                                              false)));
+
+          aRow.addCell (getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                             aEndpoint.getServiceExpirationDate (),
+                                             aDisplayLocale));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);

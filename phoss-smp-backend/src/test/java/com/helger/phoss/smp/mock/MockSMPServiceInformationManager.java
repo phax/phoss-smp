@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonnegative;
+import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
@@ -27,6 +28,7 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
@@ -88,10 +90,20 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  public ISMPServiceInformation findServiceInformation (final IParticipantIdentifier aParticpantID,
-                                                        final IDocumentTypeIdentifier aDocTypeID,
-                                                        final IProcessIdentifier aProcessID,
-                                                        final String sTransportProfileID)
+  public ISMPServiceInformation findFirstSMPServiceInformation (final IParticipantIdentifier aParticpantID,
+                                                                final IDocumentTypeIdentifier aDocTypeID,
+                                                                final IProcessIdentifier aProcessID,
+                                                                final String sTransportProfileID)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <ISMPEndpoint> getAllSMPEndpoints (@Nullable final IParticipantIdentifier aParticipantID,
+                                                         @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                         @Nullable final IProcessIdentifier aProcessID,
+                                                         @Nullable final String sTransportProfileID)
   {
     throw new UnsupportedOperationException ();
   }
