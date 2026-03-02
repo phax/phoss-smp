@@ -334,6 +334,11 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     // Handled via the XServletSettings instead
     UnifiedResponseDefaultSettings.setReferrerPolicy (null);
     UnifiedResponseDefaultSettings.setXFrameOptions (null, null);
+    if (StringHelper.startsWith (SMPServerConfiguration.getPublicServerURL (), "http://"))
+    {
+      // Only applicable for https
+      UnifiedResponseDefaultSettings.removeStrictTransportSecurity ();
+    }
 
     // Make sure the nonce attributes are used
     // Required for CSP to work
