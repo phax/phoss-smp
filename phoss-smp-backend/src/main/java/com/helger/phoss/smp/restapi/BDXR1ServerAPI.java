@@ -677,7 +677,8 @@ public final class BDXR1ServerAPI
             final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
             for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
             {
-              final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
+              final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (),
+                                                             aJAXBEndpoint.getTransportProfile (),
                                                              aJAXBEndpoint.getEndpointURI (),
                                                              BooleanHelper.getBooleanValue (aJAXBEndpoint.isRequireBusinessLevelSignature (),
                                                                                             SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),

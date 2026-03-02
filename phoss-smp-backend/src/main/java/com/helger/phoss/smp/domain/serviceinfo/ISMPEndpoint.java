@@ -18,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.CompareHelper;
 import com.helger.base.compare.IComparator;
+import com.helger.base.id.IHasID;
 import com.helger.base.string.StringHelper;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
@@ -27,8 +28,16 @@ import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
  *
  * @author Philip Helger
  */
-public interface ISMPEndpoint extends ISMPHasExtension
+public interface ISMPEndpoint extends ISMPHasExtension, IHasID <String>
 {
+  /**
+   * @return The unique ID of this endpoint. Never <code>null</code> nor empty.
+   * @since 8.1.2
+   */
+  @NonNull
+  @Nonempty
+  String getID ();
+
   /**
    * @return the type of BUSDOX transport that is being used between access points, e.g. the BUSDOX
    *         START profile ("busdox-transport-start"). The list of valid transport protocols is
@@ -212,7 +221,7 @@ public interface ISMPEndpoint extends ISMPHasExtension
     return (aElement1, aElement2) -> {
       int ret = aElement1.getTransportProfile ().compareTo (aElement2.getTransportProfile ());
       if (ret == 0)
-        ret = CompareHelper.compare (aElement1.getEndpointReference (), aElement2.getEndpointReference ());
+        ret = CompareHelper.compare (aElement1.getServiceActivationDate (), aElement2.getServiceActivationDate ());
       return ret;
     };
   }

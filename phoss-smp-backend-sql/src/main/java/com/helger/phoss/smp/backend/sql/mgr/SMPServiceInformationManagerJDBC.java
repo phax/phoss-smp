@@ -180,10 +180,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         {
           aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                             m_sTableNameE +
-                                            " (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier," +
+                                            " (id, businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier," +
                                             " certificate, endpointReference, minimumAuthenticationLevel, requireBusinessLevelSignature, serviceActivationDate, serviceDescription, serviceExpirationDate, technicalContactUrl, technicalInformationUrl, transportProfile," +
-                                            " extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                            new ConstantPreparedStatementDataProvider (aPID.getScheme (),
+                                            " extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            new ConstantPreparedStatementDataProvider (aEndpoint.getID (),
+                                                                                       aPID.getScheme (),
                                                                                        aPID.getValue (),
                                                                                        aDocTypeID.getScheme (),
                                                                                        aDocTypeID.getValue (),
@@ -234,11 +235,13 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ESuccess.SUCCESS;
   }
 
+  @SuppressWarnings ("removal")
   @Nullable
-  public ISMPServiceInformation findFirstSMPServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
-                                                                @Nullable final IDocumentTypeIdentifier aDocTypeID,
-                                                                @Nullable final IProcessIdentifier aProcessID,
-                                                                @Nullable final String sTransportProfileID)
+  @Deprecated (forRemoval = true, since = "8.1.2")
+  public ISMPServiceInformation findServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
+                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                        @Nullable final IProcessIdentifier aProcessID,
+                                                        @Nullable final String sTransportProfileID)
   {
     final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
                                                                                                        aDocTypeID);
@@ -270,9 +273,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfileID);
-        if (aEndpoint != null)
-          ret.add (aEndpoint);
+        ret.addAll (aProcess.getAllEndpointsOfTransportProfile (sTransportProfileID));
       }
     }
     return ret;
@@ -434,7 +435,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                          "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                          "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
                                                                           " FROM " +
@@ -472,16 +473,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         // SMPProcess.equals/hashcode
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (8),
                                                        aDBRow.getAsString (9),
-                                                       aDBRow.getAsBoolean (10,
+                                                       aDBRow.getAsString (10),
+                                                       aDBRow.getAsBoolean (11,
                                                                             SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                       aDBRow.getAsString (11),
-                                                       aDBRow.getAsXMLOffsetDateTime (12),
+                                                       aDBRow.getAsString (12),
                                                        aDBRow.getAsXMLOffsetDateTime (13),
-                                                       aDBRow.getAsString (14),
+                                                       aDBRow.getAsXMLOffsetDateTime (14),
                                                        aDBRow.getAsString (15),
                                                        aDBRow.getAsString (16),
                                                        aDBRow.getAsString (17),
-                                                       aDBRow.getAsString (18));
+                                                       aDBRow.getAsString (18),
+                                                       aDBRow.getAsString (19));
         aGrouping.computeIfAbsent (aParticipantID, k -> new CommonsHashMap <> ())
                  .computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
                                    k -> new CommonsHashMap <> ())
@@ -529,7 +531,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       final ICommonsList <DBResultRow> aDBResult = aExecutor.queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                        "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                       "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                       "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                        "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                        "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
                                                                        " FROM " +
@@ -567,16 +569,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
           // SMPProcess.equals/hashcode
           final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (6),
                                                          aDBRow.getAsString (7),
-                                                         aDBRow.getAsBoolean (8,
+                                                         aDBRow.getAsString (8),
+                                                         aDBRow.getAsBoolean (9,
                                                                               SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                         aDBRow.getAsString (9),
-                                                         aDBRow.getAsXMLOffsetDateTime (10),
+                                                         aDBRow.getAsString (10),
                                                          aDBRow.getAsXMLOffsetDateTime (11),
-                                                         aDBRow.getAsString (12),
+                                                         aDBRow.getAsXMLOffsetDateTime (12),
                                                          aDBRow.getAsString (13),
                                                          aDBRow.getAsString (14),
                                                          aDBRow.getAsString (15),
-                                                         aDBRow.getAsString (16));
+                                                         aDBRow.getAsString (16),
+                                                         aDBRow.getAsString (17));
           aGrouping.computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
                                      k -> new CommonsHashMap <> ())
                    .computeIfAbsent (aProcess, k -> new CommonsArrayList <> ())
@@ -641,7 +644,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                          "   se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                          "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
                                                                           " FROM " +
@@ -677,16 +680,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                     aDBRow.getAsString (3));
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (4),
                                                        aDBRow.getAsString (5),
-                                                       aDBRow.getAsBoolean (6,
+                                                       aDBRow.getAsString (6),
+                                                       aDBRow.getAsBoolean (7,
                                                                             SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                       aDBRow.getAsString (7),
-                                                       aDBRow.getAsXMLOffsetDateTime (8),
+                                                       aDBRow.getAsString (8),
                                                        aDBRow.getAsXMLOffsetDateTime (9),
-                                                       aDBRow.getAsString (10),
+                                                       aDBRow.getAsXMLOffsetDateTime (10),
                                                        aDBRow.getAsString (11),
                                                        aDBRow.getAsString (12),
                                                        aDBRow.getAsString (13),
-                                                       aDBRow.getAsString (14));
+                                                       aDBRow.getAsString (14),
+                                                       aDBRow.getAsString (15));
         aEndpoints.computeIfAbsent (aProcess, k -> new CommonsArrayList <> ()).add (aEndpoint);
       }
 

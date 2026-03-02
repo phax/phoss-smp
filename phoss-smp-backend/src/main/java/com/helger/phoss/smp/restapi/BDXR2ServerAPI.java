@@ -506,7 +506,8 @@ public final class BDXR2ServerAPI
                 if (aJAXBEndpoint.hasCertificateEntries ())
                   aCertBytes = aJAXBEndpoint.getCertificateAtIndex (0).getContentBinaryObjectValue ();
 
-                final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfileIDValue (),
+                final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (),
+                                                               aJAXBEndpoint.getTransportProfileIDValue (),
                                                                aJAXBEndpoint.getAddressURIValue (),
                                                                SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE,
                                                                null,

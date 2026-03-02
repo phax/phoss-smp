@@ -120,6 +120,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   private static final String FIELD_PROCESS_ID_SCHEME = "processidscheme";
   private static final String FIELD_PROCESS_ID_VALUE = "processidvalue";
   private static final String FIELD_TRANSPORT_PROFILE = "transportprofile";
+  private static final String FIELD_ENDPOINT_ID = "endpointid";
   private static final String FIELD_ENDPOINT_REFERENCE = "endpointreference";
   private static final String FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE = "requiresbusinesslevelsignature";
   private static final String FIELD_MINIMUM_AUTHENTICATION_LEVEL = "minimumauthenticationlevel";
@@ -160,7 +161,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                            aSelectedProcess.getProcessIdentifier ().getScheme ()));
         aForm.addChild (new HCHiddenField (FIELD_PROCESS_ID_VALUE,
                                            aSelectedProcess.getProcessIdentifier ().getValue ()));
-        aForm.addChild (new HCHiddenField (FIELD_TRANSPORT_PROFILE, aSelectedEndpoint.getTransportProfile ()));
+        aForm.addChild (new HCHiddenField (FIELD_ENDPOINT_ID, aSelectedEndpoint.getID ()));
 
         aForm.addChild (question ("Are you sure you want to delete the Endpoint for Service Group '" +
                                   aSelectedObject.getServiceGroupID () +
@@ -179,7 +180,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
         if (aSelectedProcess != null &&
             aSelectedEndpoint != null &&
-            aSelectedProcess.deleteEndpoint (aSelectedEndpoint.getTransportProfile ()).isChanged () &&
+            aSelectedProcess.deleteEndpointByID (aSelectedEndpoint.getID ()).isChanged () &&
             aServiceInfoMgr.mergeSMPServiceInformation (aSelectedObject).isSuccess ())
         {
           aWPEC.postRedirectGetInternal (success ("The selected Endpoint was successfully deleted!"));
@@ -329,8 +330,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       final ISMPProcess aProcess = aSelectedObject.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
-        final String sTransportProfile = aWPEC.params ().getAsStringTrimmed (FIELD_TRANSPORT_PROFILE);
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfile);
+        // Try to find endpoint by ID first, then fall back to transport profile
+        final String sEndpointID = aWPEC.params ().getAsStringTrimmed (FIELD_ENDPOINT_ID);
+        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfID (sEndpointID);
         if (aEndpoint != null)
         {
           aWPEC.getRequestScope ().attrs ().putIn (REQUEST_ATTR_PROCESS, aProcess);
@@ -339,8 +341,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         }
         LOGGER.warn ("Action " +
                      eFormAction.getID () +
-                     " is not allowed, because endpoint with transport profile is missing ('" +
-                     sTransportProfile +
+                     " is not allowed, because Endpoint ID is missing ('" +
+                     sEndpointID +
                      "')");
       }
       else
@@ -373,7 +375,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       ret.putIn (FIELD_PROCESS_ID_VALUE, aProcess.getProcessIdentifier ().getValue ());
       if (aEndpoint != null)
       {
-        ret.putIn (FIELD_TRANSPORT_PROFILE, aEndpoint.getTransportProfile ());
+        ret.putIn (FIELD_ENDPOINT_ID, aEndpoint.getID ());
       }
     }
     return ret;
@@ -659,14 +661,15 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                    "Transport Profile of type '" + sTransportProfileID + "' does not exist!");
     if (!bEdit && aServiceGroup != null && aDocTypeID != null && aProcessID != null && aTransportProfile != null)
     {
+      final ICommonsList <ISMPEndpoint> aAllEndpoints = aServiceInfoMgr.getAllSMPEndpoints (aParticipantID,
+                                                                                            aDocTypeID,
+                                                                                            aProcessID,
+                                                                                            sTransportProfileID);
+
       if (aNotBeforeDate == null && aNotAfterDate == null)
       {
         // Neither date is set - check without date constraint
-        final ISMPServiceInformation aSI = aServiceInfoMgr.findFirstSMPServiceInformation (aParticipantID,
-                                                                                           aDocTypeID,
-                                                                                           aProcessID,
-                                                                                           sTransportProfileID);
-        if (aSI != null)
+        if (aAllEndpoints.isNotEmpty ())
         {
           final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile is already present. Some of the identifiers may be treated case insensitive!";
           aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);
@@ -677,10 +680,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       else
       {
         // Any date is set
-        final ICommonsList <ISMPEndpoint> aAllEndpoints = aServiceInfoMgr.getAllSMPEndpoints (aParticipantID,
-                                                                                              aDocTypeID,
-                                                                                              aProcessID,
-                                                                                              sTransportProfileID);
 
         // Make sure start and end are always non-null to make this work
         final ICommonsList <LocalDatePeriod> aValidityPeriods = aAllEndpoints.getAllMapped (x -> _createPeriod (x.getServiceActivationDate (),
@@ -771,7 +770,11 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         aServiceInfo.addProcess ((SMPProcess) aProcess);
       }
 
-      final SMPEndpoint aNewEndpoint = new SMPEndpoint (sTransportProfileID,
+      // For edit, preserve existing endpoint ID; for create/copy, generate a new one
+      final String sEndpointID = bEdit && aSelectedEndpoint != null ? aSelectedEndpoint.getID () : SMPEndpoint
+                                                                                                              .createUniqueEndpointID ();
+      final SMPEndpoint aNewEndpoint = new SMPEndpoint (sEndpointID,
+                                                        sTransportProfileID,
                                                         sEndpointReference,
                                                         bRequireBusinessLevelSignature,
                                                         sMinimumAuthenticationLevel,
@@ -835,6 +838,9 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Endpoint" : "Create new Endpoint"));
 
+    if (bEdit)
+      aForm.addChild (new HCHiddenField (FIELD_ENDPOINT_ID, aSelectedEndpoint.getID ()));
+
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
                                                  .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
                                                                                                           aSelectedObject !=
@@ -865,6 +871,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_DOCTYPE_ID_SCHEME,
                                                                                                FIELD_DOCTYPE_ID_VALUE)));
     }
+
     {
       final BootstrapRow aRow = new BootstrapRow ();
       aRow.createColumn (GS_IDENTIFIER_SCHEME)
@@ -884,6 +891,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PROCESS_ID_SCHEME,
                                                                                                FIELD_PROCESS_ID_VALUE)));
     }
+
     {
       final ESMPTransportProfile eDefault = bIsPeppolMode ? ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2
                                                           : ESMPTransportProfile.TRANSPORT_PROFILE_BDXR_AS4;

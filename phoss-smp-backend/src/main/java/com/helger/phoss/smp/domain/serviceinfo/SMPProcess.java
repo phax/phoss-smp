@@ -33,9 +33,6 @@ import com.helger.peppolid.bdxr.smp1.process.BDXR1ProcessIdentifier;
 import com.helger.peppolid.bdxr.smp2.process.BDXR2ProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
-import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
-import com.helger.xsds.peppol.smp1.EndpointType;
-import com.helger.xsds.peppol.smp1.ProcessType;
 
 /**
  * Default implementation of the {@link ISMPProcess} interface.
@@ -77,6 +74,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   }
 
   @Nullable
+  @Deprecated (forRemoval = true, since = "8.1.2")
   public SMPEndpoint getEndpointOfTransportProfile (@Nullable final String sTransportProfileID)
   {
     if (StringHelper.isEmpty (sTransportProfileID))
@@ -107,6 +105,18 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
     return ret;
   }
 
+  @Nullable
+  public SMPEndpoint getEndpointOfID (@Nullable final String sID)
+  {
+    if (StringHelper.isEmpty (sID))
+      return null;
+    for (final var aList : m_aEndpoints.values ())
+      for (final SMPEndpoint aEndpoint : aList)
+        if (aEndpoint.getID ().equals (sID))
+          return aEndpoint;
+    return null;
+  }
+
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
     return StringHelper.isNotEmpty (sTransportProfileID) && m_aEndpoints.containsKey (sTransportProfileID);
@@ -130,15 +140,48 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();
-    m_aEndpoints.computeIfAbsent (sTransportProfile, k -> new CommonsArrayList <> ()).set (aEndpoint);
+    final ICommonsList <SMPEndpoint> aList = m_aEndpoints.computeIfAbsent (sTransportProfile,
+                                                                           k -> new CommonsArrayList <> ());
+    // Replace by ID if an endpoint with the same ID exists
+    final String sID = aEndpoint.getID ();
+    boolean bReplaced = false;
+    for (int i = 0; i < aList.size (); i++)
+    {
+      if (aList.get (i).getID ().equals (sID))
+      {
+        aList.set (i, aEndpoint);
+        bReplaced = true;
+        break;
+      }
+    }
+    if (!bReplaced)
+      aList.add (aEndpoint);
   }
 
   @NonNull
-  public EChange deleteEndpoint (@Nullable final String sTransportProfile)
+  public EChange deleteAllEndpoints (@Nullable final String sTransportProfile)
   {
     if (StringHelper.isEmpty (sTransportProfile))
       return EChange.UNCHANGED;
     return EChange.valueOf (m_aEndpoints.remove (sTransportProfile) != null);
+  }
+
+  @NonNull
+  public EChange deleteEndpointByID (@Nullable final String sID)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+    for (final var aEntry : m_aEndpoints.entrySet ())
+    {
+      final ICommonsList <SMPEndpoint> aList = aEntry.getValue ();
+      if (aList.removeIf (x -> x.getID ().equals (sID)))
+      {
+        if (aList.isEmpty ())
+          m_aEndpoints.remove (aEntry.getKey ());
+        return EChange.CHANGED;
+      }
+    }
+    return EChange.UNCHANGED;
   }
 
   public com.helger.xsds.peppol.smp1.@Nullable ProcessType getAsJAXBObjectPeppol ()
@@ -242,16 +285,5 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
                             .append ("ProcessIdentifier", m_aProcessIdentifier)
                             .append ("Endpoints", m_aEndpoints)
                             .getToString ();
-  }
-
-  @NonNull
-  public static SMPProcess createFromJAXB (@NonNull final ProcessType aProcess)
-  {
-    final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
-    for (final EndpointType aEndpoint : aProcess.getServiceEndpointList ().getEndpoint ())
-      aEndpoints.add (SMPEndpoint.createFromJAXB (aEndpoint));
-    return new SMPProcess (SimpleProcessIdentifier.wrap (aProcess.getProcessIdentifier ()),
-                           aEndpoints,
-                           SMPExtensionConverter.convertToString (aProcess.getExtension ()));
   }
 }

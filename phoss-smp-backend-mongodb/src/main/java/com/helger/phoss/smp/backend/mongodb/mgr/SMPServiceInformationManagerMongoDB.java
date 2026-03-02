@@ -78,6 +78,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   private static final String BSON_PROCESS_ID = "processid";
   private static final String BSON_ENDPOINTS = "endpoints";
   private static final String BSON_EXTENSIONS = "extensions";
+  private static final String BSON_ENDPOINT_ID = "endpointid";
   private static final String BSON_TRANSPORT_PROFILE = "transportprofile";
   private static final String BSON_ENDPOINT_REFERENCE = "endpointreference";
   private static final String BSON_BUSINESSLEVELSIG = "businesslevelsig";
@@ -109,7 +110,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   @ReturnsMutableCopy
   public static Document toBson (@NonNull final ISMPEndpoint aValue)
   {
-    final Document ret = new Document ().append (BSON_TRANSPORT_PROFILE, aValue.getTransportProfile ());
+    final Document ret = new Document ().append (BSON_ENDPOINT_ID, aValue.getID ())
+                                        .append (BSON_TRANSPORT_PROFILE, aValue.getTransportProfile ());
     if (aValue.hasEndpointReference ())
       ret.append (BSON_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
     ret.append (BSON_BUSINESSLEVELSIG, Boolean.valueOf (aValue.isRequireBusinessLevelSignature ()));
@@ -136,6 +138,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   @ReturnsMutableCopy
   public static SMPEndpoint toEndpoint (@NonNull final Document aDoc)
   {
+    // Migration: generate UUID if endpoint ID is missing
+    String sEndpointID = aDoc.getString (BSON_ENDPOINT_ID);
+    if (sEndpointID == null)
+      sEndpointID = SMPEndpoint.createUniqueEndpointID ();
     final String sTransportProfile = aDoc.getString (BSON_TRANSPORT_PROFILE);
     final String sEndpointReference = aDoc.getString (BSON_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
@@ -150,7 +156,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final String sTechnicalContactUrl = aDoc.getString (BSON_TECHCONTACTURL);
     final String sTechnicalInformationUrl = aDoc.getString (BSON_TECHINFOURL);
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
-    return new SMPEndpoint (sTransportProfile,
+    return new SMPEndpoint (sEndpointID,
+                            sTransportProfile,
                             sEndpointReference,
                             bRequireBusinessLevelSignature,
                             sMinimumAuthenticationLevel,
@@ -229,11 +236,13 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return new SMPServiceInformation (aParticipantID, aDocTypeID, aProcesses, sExtension);
   }
 
+  @SuppressWarnings ("removal")
   @Nullable
-  public ISMPServiceInformation findFirstSMPServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
-                                                                @Nullable final IDocumentTypeIdentifier aDocTypeID,
-                                                                @Nullable final IProcessIdentifier aProcessID,
-                                                                @Nullable final String sTransportProfileID)
+  @Deprecated (forRemoval = true, since = "8.1.2")
+  public ISMPServiceInformation findServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
+                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                        @Nullable final IProcessIdentifier aProcessID,
+                                                        @Nullable final String sTransportProfileID)
   {
     final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
                                                                                                        aDocTypeID);
@@ -265,9 +274,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfileID);
-        if (aEndpoint != null)
-          ret.add (aEndpoint);
+        ret.addAll (aProcess.getAllEndpointsOfTransportProfile (sTransportProfileID));
       }
     }
     return ret;
