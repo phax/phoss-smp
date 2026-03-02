@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.ui.secure.hc;
 
 import com.helger.html.hc.IHCNode;
-import com.helger.photon.uicore.html.select.HCExtSelect;
 
 /**
  * Small helper interface
@@ -27,6 +26,4 @@ import com.helger.photon.uicore.html.select.HCExtSelect;
 public interface IHCServiceGroupSelect extends IHCNode
 {
   boolean containsAnyServiceGroup ();
-
-  HCExtSelect setReadOnly (boolean b);
 }

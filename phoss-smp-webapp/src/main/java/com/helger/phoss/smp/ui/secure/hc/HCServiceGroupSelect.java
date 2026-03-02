@@ -23,7 +23,9 @@ import java.util.function.Predicate;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
+import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.request.IHCRequestField;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -31,6 +33,7 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.html.select.HCExtSelect;
 import com.helger.photon.uictrls.select2.HCSelect2;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 /**
@@ -64,7 +67,8 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
   {
     super (aRF);
 
-    _iterateMatchingSG (aIncludeFilter, aServiceGroup -> addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup)));
+    _iterateMatchingSG (aIncludeFilter,
+                        aServiceGroup -> addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup)));
 
     if (!hasSelectedOption ())
       addOptionPleaseSelect (aDisplayLocale);
@@ -88,6 +92,21 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
     }
   }
 
+  private static class ReadonlySelect extends HCEdit implements IHCServiceGroupSelect
+  {
+    public ReadonlySelect (@Nonnull final String sName, @Nonnull final String sValue)
+    {
+      setName (sName);
+      setValue (sValue);
+      setReadOnly (true);
+    }
+
+    public boolean containsAnyServiceGroup ()
+    {
+      return true;
+    }
+  }
+
   @NonNull
   public static IHCServiceGroupSelect create (@NonNull final RequestField aRF,
                                               @NonNull final Locale aDisplayLocale,
@@ -96,6 +115,16 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
   {
     if (true)
     {
+      if (bReadOnly)
+      {
+        // Less HTML code - show a simple read-only edit instead
+        final IParticipantIdentifier aSelectedPID = SMPMetaManager.getIdentifierFactory ()
+                                                                  .parseParticipantIdentifier (aRF.getRequestValue ());
+        final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
+                                                             .getSMPServiceGroupOfID (aSelectedPID);
+        return new ReadonlySelect (aRF.getFieldName (), aServiceGroup == null ? "" : getDisplayName (aServiceGroup));
+      }
+
       final MySelect2 aSelect2 = new MySelect2 (aRF);
       _iterateMatchingSG (aIncludeFilter,
                           aServiceGroup -> aSelect2.addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup)));
