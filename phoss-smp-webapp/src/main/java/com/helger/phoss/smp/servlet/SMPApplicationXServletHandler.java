@@ -82,11 +82,6 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
       aUnifiedResponse.addCustomResponseHeader (bReportingOnly ? CHttpHeader.CONTENT_SECURITY_POLICY_REPORT_ONLY
                                                                : CHttpHeader.CONTENT_SECURITY_POLICY,
                                                 aPolicy.getAsString ());
-      // IE specific
-      aUnifiedResponse.addCustomResponseHeader (bReportingOnly ? CHttpHeader.X_CONTENT_SECURITY_POLICY_REPORT_ONLY
-                                                               : CHttpHeader.X_CONTENT_SECURITY_POLICY,
-                                                aPolicy.getAsString ());
-
     }
     super.handleRequest (aRequestScope, aUnifiedResponse);
   }
