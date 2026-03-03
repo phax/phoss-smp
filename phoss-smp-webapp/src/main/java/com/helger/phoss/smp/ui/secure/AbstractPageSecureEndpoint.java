@@ -658,9 +658,8 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         final ICommonsList <LocalDatePeriod> aValidityPeriods = aAllEndpoints.getAllMapped (x -> SMPEndpointHelper.createSafePeriod (x.getServiceActivationDate (),
                                                                                                                                      x.getServiceExpirationDate ()));
         final LocalDatePeriod aRequestedPeriod = SMPEndpointHelper.createSafePeriod (aNotBeforeDate, aNotAfterDate);
-        final boolean bPeriodCovered = aValidityPeriods.containsAny (x -> aRequestedPeriod.isOverlappingWithIncl (x));
-
-        if (bPeriodCovered)
+        final boolean bPeriodAlreadyCovered = aValidityPeriods.containsAny (x -> aRequestedPeriod.isOverlappingWithIncl (x));
+        if (bPeriodAlreadyCovered)
         {
           final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile valid in the period " +
                               SMPEndpointHelper.getAsValidityString (aNotBeforeDate, aNotAfterDate, aDisplayLocale) +
@@ -738,7 +737,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
       // For edit, preserve existing endpoint ID; for create/copy, generate a new one
       final String sEndpointID = bEdit && aSelectedEndpoint != null ? aSelectedEndpoint.getID () : SMPEndpointHelper
-                                                                                                              .createUniqueEndpointID ();
+                                                                                                                    .createUniqueEndpointID ();
       final SMPEndpoint aNewEndpoint = new SMPEndpoint (sEndpointID,
                                                         sTransportProfileID,
                                                         sEndpointReference,
