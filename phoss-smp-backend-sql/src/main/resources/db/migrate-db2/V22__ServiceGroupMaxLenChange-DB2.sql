@@ -22,3 +22,10 @@ ALTER TABLE smp_process              ALTER COLUMN businessIdentifier SET DATA TY
 ALTER TABLE smp_endpoint             ALTER COLUMN businessIdentifier SET DATA TYPE varchar(135);
 ALTER TABLE smp_ownership            ALTER COLUMN businessIdentifier SET DATA TYPE varchar(135);
 ALTER TABLE smp_service_metadata_red ALTER COLUMN businessIdentifier SET DATA TYPE varchar(135);
+
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_group');
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_metadata');
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_process');
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_endpoint');
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_ownership');
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_metadata_red');

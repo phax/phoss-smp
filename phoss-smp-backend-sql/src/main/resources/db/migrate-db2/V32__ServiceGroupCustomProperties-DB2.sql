@@ -16,3 +16,5 @@
 --
 
 ALTER TABLE smp_service_group ADD COLUMN customproperties CLOB;
+
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_group');

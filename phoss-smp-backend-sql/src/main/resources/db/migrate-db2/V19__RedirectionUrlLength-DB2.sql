@@ -31,3 +31,4 @@ UPDATE smp_service_metadata_red SET redirectionUrl = old1;
 
 -- delete new column (col1)
 ALTER TABLE smp_service_metadata_red DROP COLUMN old1;
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_metadata_red');

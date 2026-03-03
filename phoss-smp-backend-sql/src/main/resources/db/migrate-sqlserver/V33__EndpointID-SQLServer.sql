@@ -16,7 +16,14 @@
 --
 
 ALTER TABLE smp_endpoint ADD id VARCHAR(45) NOT NULL DEFAULT '';
+GO
+
 UPDATE smp_endpoint SET id = CAST(NEWID() AS VARCHAR(45)) WHERE id = '';
+GO
+
 ALTER TABLE smp_endpoint DROP CONSTRAINT PK_smp_endpoint;
 ALTER TABLE smp_endpoint ADD CONSTRAINT PK_smp_endpoint PRIMARY KEY (id);
+GO
+
 CREATE INDEX IX_smp_endpoint_process ON smp_endpoint (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier);
+GO
