@@ -128,18 +128,18 @@ public final class SMPServiceInformationManagerXMLTest
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
-        aProcess.setEndpoint (new SMPEndpoint ("epid",
-                                               "tp",
-                                               "http://localhost/as2-ver2",
-                                               false,
-                                               "minauth",
-                                               aStartDT,
-                                               aEndDT,
-                                               "cert",
-                                               "sd",
-                                               "tc",
-                                               "ti",
-                                               "<extep />"));
+        aProcess.createOrUpdateEndpoint (new SMPEndpoint ("epid",
+                                                          "tp",
+                                                          "http://localhost/as2-ver2",
+                                                          false,
+                                                          "minauth",
+                                                          aStartDT,
+                                                          aEndDT,
+                                                          "cert",
+                                                          "sd",
+                                                          "tc",
+                                                          "ti",
+                                                          "<extep />"));
         assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
 
         assertEquals (1, aServiceInformationMgr.getSMPServiceInformationCount ());

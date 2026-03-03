@@ -136,7 +136,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
       addEndpoint (aEndpoint);
   }
 
-  public final void setEndpoint (@NonNull final SMPEndpoint aEndpoint)
+  public final void createOrUpdateEndpoint (@NonNull final SMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aEndpoint, "Endpoint");
     final String sTransportProfile = aEndpoint.getTransportProfile ();

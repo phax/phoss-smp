@@ -750,7 +750,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                         sTechnicalContact,
                                                         sTechnicalInformation,
                                                         sExtension);
-      aProcess.setEndpoint (aNewEndpoint);
+      aProcess.createOrUpdateEndpoint (aNewEndpoint);
 
       if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo).isSuccess ())
       {

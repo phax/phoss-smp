@@ -100,7 +100,7 @@ public interface ISMPProcess extends ISMPHasExtension
    * @param aEndpoint
    *        The endpoint to be added. May not be <code>null</code>.
    */
-  void setEndpoint (@NonNull SMPEndpoint aEndpoint);
+  void createOrUpdateEndpoint (@NonNull SMPEndpoint aEndpoint);
 
   /**
    * Find the endpoint with the passed ID.
