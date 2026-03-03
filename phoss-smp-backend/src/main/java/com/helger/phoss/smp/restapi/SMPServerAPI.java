@@ -23,8 +23,8 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
@@ -473,20 +473,23 @@ public final class SMPServerAPI
     STATS_COUNTER_INVOCATION.increment (sAction);
     try
     {
-      // Parse provided identifiers
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+      // Parse provided identifiers
       final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       if (aPathServiceGroupID == null)
       {
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
         throw SMPBadRequestException.failedToParseDocType (sPathDocumentTypeID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       // May be null for a Redirect!
       final ServiceInformationType aServiceInformation = aServiceMetadata.getServiceInformation ();
       if (aServiceInformation != null)
@@ -502,6 +505,7 @@ public final class SMPServerAPI
                                             "'",
                                             m_aAPIDataProvider.getCurrentURI ());
         }
+
         final IParticipantIdentifier aPayloadServiceGroupID;
         if (aServiceInformation.getParticipantIdentifier () == null)
         {
@@ -555,6 +559,7 @@ public final class SMPServerAPI
                                             m_aAPIDataProvider.getCurrentURI ());
         }
       }
+
       // Main save
       final IUser aDataUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aDataUser);
@@ -566,11 +571,13 @@ public final class SMPServerAPI
         // Service group not found
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       if (aServiceMetadata.getRedirect () != null)
       {
         // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        // not available in Peppol mode
+
+        // Certificate not available in Peppol mode
         final X509Certificate aCertificate = null;
         if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroupID,
                                                     aPathDocTypeID,
@@ -595,9 +602,24 @@ public final class SMPServerAPI
           final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
           for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
           {
+            final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (aJAXBProcess.getProcessIdentifier ()
+                                                                                                          .getScheme (),
+                                                                                              aJAXBProcess.getProcessIdentifier ()
+                                                                                                          .getValue ());
+            if (aProcessID == null)
+            {
+              throw new SMPBadRequestException ("Save Service Metadata was called with ServiceInformation that contained an invalid process identifier with scheme '" +
+                                                aJAXBProcess.getProcessIdentifier ().getScheme () +
+                                                "' and value '" +
+                                                aJAXBProcess.getProcessIdentifier ().getValue () +
+                                                "'",
+                                                m_aAPIDataProvider.getCurrentURI ());
+            }
+
             final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
             for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
             {
+              // Always assign a new unique ID, as the JAXB data model has no ID
               final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (),
                                                              aJAXBEndpoint.getTransportProfile (),
                                                              W3CEndpointReferenceHelper.getAddress (aJAXBEndpoint.getEndpointReference ()),
@@ -612,11 +634,11 @@ public final class SMPServerAPI
                                                              SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
               aEndpoints.add (aEndpoint);
             }
-            final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.wrap (aJAXBProcess.getProcessIdentifier ()),
-                                                        aEndpoints,
-                                                        SMPExtensionConverter.convertToString (aJAXBProcess.getExtension ()));
-            aProcesses.add (aProcess);
+            aProcesses.add (new SMPProcess (aProcessID,
+                                            aEndpoints,
+                                            SMPExtensionConverter.convertToString (aJAXBProcess.getExtension ())));
           }
+
           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
           final String sExtensionXML = SMPExtensionConverter.convertToString (aServiceInformation.getExtension ());
           if (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPathServiceGroup.getParticipantIdentifier (),

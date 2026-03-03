@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.ContainsSoftMigration;
+import com.helger.base.string.StringHelper;
 import com.helger.base.string.StringParser;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.xml.microdom.IMicroElement;
@@ -58,7 +59,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     aElement.setAttribute (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE, aValue.isRequireBusinessLevelSignature ());
     if (aValue.hasMinimumAuthenticationLevel ())
       aElement.setAttribute (ATTR_MINIMUM_AUTHENTICATION_LEVEL, aValue.getMinimumAuthenticationLevel ());
-    if (aValue.hasServiceExpirationDateTime ())
+    if (aValue.hasServiceActivationDateTime ())
       aElement.setAttributeWithConversion (ATTR_SERVICE_ACTIVATION_DATE, aValue.getServiceActivationDateTime ());
     if (aValue.hasServiceExpirationDateTime ())
       aElement.setAttributeWithConversion (ATTR_SERVICE_EXPIRATION_DATE, aValue.getServiceExpirationDateTime ());
@@ -78,12 +79,11 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
 
   @NonNull
   @ContainsSoftMigration
-
   public SMPEndpoint convertToNative (@NonNull final IMicroElement aElement)
   {
     // Migration: generate UUID if ID attribute is missing
     String sID = aElement.getAttributeValue (ATTR_ID);
-    if (sID == null)
+    if (StringHelper.isEmpty (sID))
       sID = SMPEndpointHelper.createUniqueEndpointID ();
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
@@ -95,6 +95,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
                                                                                          XMLOffsetDateTime.class);
     if (aServiceActivationDate == null)
     {
+      // Read in old format (without timezone)
       final LocalDateTime aServiceActivationDateLDT = aElement.getAttributeValueWithConversion (ATTR_SERVICE_ACTIVATION_DATE,
                                                                                                 LocalDateTime.class);
       if (aServiceActivationDateLDT != null)
@@ -104,6 +105,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
                                                                                          XMLOffsetDateTime.class);
     if (aServiceExpirationDate == null)
     {
+      // Read in old format (without timezone)
       final LocalDateTime aServiceExpirationDateLDT = aElement.getAttributeValueWithConversion (ATTR_SERVICE_EXPIRATION_DATE,
                                                                                                 LocalDateTime.class);
       if (aServiceExpirationDateLDT != null)

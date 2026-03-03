@@ -23,7 +23,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.xml.microdom.IMicroElement;
-import com.helger.xml.microdom.IMicroQName;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.MicroQName;
 import com.helger.xml.microdom.convert.IMicroTypeConverter;
@@ -39,24 +38,24 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPBusinessCardMicroTypeConverter implements IMicroTypeConverter <SMPBusinessCard>
 {
-  private static final IMicroQName ATTR_SERVICE_GROUP_ID = new MicroQName ("servicegroupid");
+  private static final MicroQName ATTR_SERVICE_GROUP_ID = new MicroQName ("servicegroupid");
   private static final String ELEMENT_ENTITY = "entity";
-  private static final IMicroQName ATTR_ID = new MicroQName ("id");
+  private static final MicroQName ATTR_ID = new MicroQName ("id");
   private static final String ELEMENT_NAME = "name";
-  private static final IMicroQName ATTR_NAME = new MicroQName ("name");
-  private static final IMicroQName ATTR_LANGUAGE_CODE = new MicroQName ("language");
-  private static final IMicroQName ATTR_COUNTRY_CODE = new MicroQName ("country");
+  private static final MicroQName ATTR_NAME = new MicroQName ("name");
+  private static final MicroQName ATTR_LANGUAGE_CODE = new MicroQName ("language");
+  private static final MicroQName ATTR_COUNTRY_CODE = new MicroQName ("country");
   private static final String ELEMENT_GEOGRAPHICAL_INFORMATION = "geoinfo";
   private static final String ELEMENT_IDENTIFIER = "identifier";
-  private static final IMicroQName ATTR_SCHEME = new MicroQName ("scheme");
-  private static final IMicroQName ATTR_VALUE = new MicroQName ("value");
+  private static final MicroQName ATTR_SCHEME = new MicroQName ("scheme");
+  private static final MicroQName ATTR_VALUE = new MicroQName ("value");
   private static final String ELEMENT_WEBSITE_URI = "website";
   private static final String ELEMENT_CONTACT = "contact";
-  private static final IMicroQName ATTR_TYPE = new MicroQName ("type");
-  private static final IMicroQName ATTR_PHONE = new MicroQName ("phone");
-  private static final IMicroQName ATTR_EMAIL = new MicroQName ("email");
+  private static final MicroQName ATTR_TYPE = new MicroQName ("type");
+  private static final MicroQName ATTR_PHONE = new MicroQName ("phone");
+  private static final MicroQName ATTR_EMAIL = new MicroQName ("email");
   private static final String ELEMENT_ADDITIONAL_INFORMATION = "additional";
-  private static final IMicroQName ATTR_REGISTRATION_DATE = new MicroQName ("regdate");
+  private static final MicroQName ATTR_REGISTRATION_DATE = new MicroQName ("regdate");
 
   @NonNull
   public static IMicroElement convertToMicroElement (@NonNull final ISMPBusinessCard aValue,
