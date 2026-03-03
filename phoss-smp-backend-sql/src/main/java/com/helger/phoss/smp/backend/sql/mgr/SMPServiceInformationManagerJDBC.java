@@ -235,29 +235,6 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ESuccess.SUCCESS;
   }
 
-  @SuppressWarnings ("removal")
-  @Nullable
-  @Deprecated (forRemoval = true, since = "8.1.2")
-  public ISMPServiceInformation findServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
-                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
-                                                        @Nullable final IProcessIdentifier aProcessID,
-                                                        @Nullable final String sTransportProfileID)
-  {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
-                                                                                                       aDocTypeID);
-    if (aServiceInfo != null)
-    {
-      final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
-      if (aProcess != null)
-      {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfileID);
-        if (aEndpoint != null)
-          return aServiceInfo;
-      }
-    }
-    return null;
-  }
-
   @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPEndpoint> getAllSMPEndpoints (@Nullable final IParticipantIdentifier aParticipantID,

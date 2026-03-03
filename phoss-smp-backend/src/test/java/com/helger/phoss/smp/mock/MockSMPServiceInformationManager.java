@@ -90,15 +90,6 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     throw new UnsupportedOperationException ();
   }
 
-  @Deprecated (forRemoval = true, since = "8.1.2")
-  public ISMPServiceInformation findServiceInformation (final IParticipantIdentifier aParticpantID,
-                                                        final IDocumentTypeIdentifier aDocTypeID,
-                                                        final IProcessIdentifier aProcessID,
-                                                        final String sTransportProfileID)
-  {
-    throw new UnsupportedOperationException ();
-  }
-
   @NonNull
   @ReturnsMutableCopy
   public ICommonsList <ISMPEndpoint> getAllSMPEndpoints (@Nullable final IParticipantIdentifier aParticipantID,

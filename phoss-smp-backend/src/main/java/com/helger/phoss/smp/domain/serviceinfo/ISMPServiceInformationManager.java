@@ -54,34 +54,6 @@ public interface ISMPServiceInformationManager
   ESuccess mergeSMPServiceInformation (@NonNull ISMPServiceInformation aServiceInformation);
 
   /**
-   * Find the service information matching the passed quadruple of parameters. If one of the
-   * parameters is <code>null</code> no match should be found and <code>null</code> should be
-   * returned. This is a sanity method to find the service information for a certain endpoint and is
-   * a specialization of
-   * {@link #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier, IDocumentTypeIdentifier)}
-   * .
-   *
-   * @param aParticipantID
-   *        The service group ID to be searched. May be <code>null</code>.
-   * @param aDocTypeID
-   *        The document type ID to search. May be <code>null</code>.
-   * @param aProcessID
-   *        The process ID to search. May be <code>null</code>.
-   * @param sTransportProfileID
-   *        The transport profile ID to search. May be <code>null</code>.
-   * @return <code>null</code> if any of the parameters is <code>null</code> or if no such service
-   *         information exists.
-   * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier,
-   *      IDocumentTypeIdentifier)
-   */
-  @Nullable
-  @Deprecated (forRemoval = true, since = "8.1.2")
-  ISMPServiceInformation findServiceInformation (@Nullable IParticipantIdentifier aParticipantID,
-                                                 @Nullable IDocumentTypeIdentifier aDocTypeID,
-                                                 @Nullable IProcessIdentifier aProcessID,
-                                                 @Nullable String sTransportProfileID);
-
-  /**
    * Find all endpoints matching the passed quadruple of parameters. If one of the parameters is
    * <code>null</code> no match should be found and an empty list should be returned. .
    *
@@ -96,6 +68,7 @@ public interface ISMPServiceInformationManager
    * @return A non-<code>null</code> but maybe empty list of matching data.
    * @see #getSMPServiceInformationOfServiceGroupAndDocumentType(IParticipantIdentifier,
    *      IDocumentTypeIdentifier)
+   * @since 8.1.2
    */
   @NonNull
   @ReturnsMutableCopy

@@ -53,6 +53,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
@@ -141,7 +142,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     // Migration: generate UUID if endpoint ID is missing
     String sEndpointID = aDoc.getString (BSON_ENDPOINT_ID);
     if (sEndpointID == null)
-      sEndpointID = SMPEndpoint.createUniqueEndpointID ();
+      sEndpointID = SMPEndpointHelper.createUniqueEndpointID ();
     final String sTransportProfile = aDoc.getString (BSON_TRANSPORT_PROFILE);
     final String sEndpointReference = aDoc.getString (BSON_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
@@ -234,29 +235,6 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     // The ID itself is derived from ServiceGroupID and DocTypeID
     return new SMPServiceInformation (aParticipantID, aDocTypeID, aProcesses, sExtension);
-  }
-
-  @SuppressWarnings ("removal")
-  @Nullable
-  @Deprecated (forRemoval = true, since = "8.1.2")
-  public ISMPServiceInformation findServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
-                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
-                                                        @Nullable final IProcessIdentifier aProcessID,
-                                                        @Nullable final String sTransportProfileID)
-  {
-    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
-                                                                                                       aDocTypeID);
-    if (aServiceInfo != null)
-    {
-      final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
-      if (aProcess != null)
-      {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfileID);
-        if (aEndpoint != null)
-          return aServiceInfo;
-      }
-    }
-    return null;
   }
 
   @NonNull
