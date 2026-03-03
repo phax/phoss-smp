@@ -40,6 +40,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
@@ -506,7 +507,7 @@ public final class BDXR2ServerAPI
                 if (aJAXBEndpoint.hasCertificateEntries ())
                   aCertBytes = aJAXBEndpoint.getCertificateAtIndex (0).getContentBinaryObjectValue ();
 
-                final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (),
+                final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (),
                                                                aJAXBEndpoint.getTransportProfileIDValue (),
                                                                aJAXBEndpoint.getAddressURIValue (),
                                                                SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE,

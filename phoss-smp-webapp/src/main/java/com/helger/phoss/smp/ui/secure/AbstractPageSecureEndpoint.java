@@ -18,7 +18,6 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 
@@ -69,6 +68,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
@@ -523,38 +523,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     aNodeList.addChild (aForm);
   }
 
-  private static final LocalDate LD_MIN = PDTFactory.createLocalDate (0, Month.JANUARY, 1);
-  private static final LocalDate LD_MAX = PDTFactory.createLocalDate (9999, Month.DECEMBER, 31);
-
-  @NonNull
-  private static LocalDatePeriod _createPeriod (@Nullable final LocalDate aNotBeforeDate,
-                                                @Nullable final LocalDate aNotAfterDate)
-  {
-    return new LocalDatePeriod (aNotBeforeDate != null ? aNotBeforeDate : LD_MIN,
-                                aNotAfterDate != null ? aNotAfterDate : LD_MAX);
-  }
-
-  @Nullable
-  protected static String getAsValidityString (@Nullable final LocalDate aNotBefore,
-                                               @Nullable final LocalDate aNotAfter,
-                                               @NonNull final Locale aDisplayLocale)
-  {
-    if (aNotBefore == null && aNotAfter == null)
-      return null;
-
-    String ret;
-    if (aNotBefore == null)
-      ret = "[since forever]";
-    else
-      ret = PDTToString.getAsString (aNotBefore, aDisplayLocale);
-    ret += " - ";
-    if (aNotAfter == null)
-      ret += "[until eternity]";
-    else
-      ret += PDTToString.getAsString (aNotAfter, aDisplayLocale);
-    return ret;
-  }
-
   @Override
   protected void validateAndSaveInputParameters (@NonNull final WebPageExecutionContext aWPEC,
                                                  @Nullable final ISMPServiceInformation aSelectedObject,
@@ -659,12 +627,17 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       if (aTransportProfile == null)
         aFormErrors.addFieldError (FIELD_TRANSPORT_PROFILE,
                                    "Transport Profile of type '" + sTransportProfileID + "' does not exist!");
-    if (!bEdit && aServiceGroup != null && aDocTypeID != null && aProcessID != null && aTransportProfile != null)
+    if (aServiceGroup != null && aDocTypeID != null && aProcessID != null && aTransportProfile != null)
     {
       final ICommonsList <ISMPEndpoint> aAllEndpoints = aServiceInfoMgr.getAllSMPEndpoints (aParticipantID,
                                                                                             aDocTypeID,
                                                                                             aProcessID,
                                                                                             sTransportProfileID);
+      if (bEdit)
+      {
+        // Don't consider the endpoint we're currently editing
+        aAllEndpoints.remove (aSelectedEndpoint);
+      }
 
       if (aNotBeforeDate == null && aNotAfterDate == null)
       {
@@ -682,22 +655,15 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
         // Any date is set
 
         // Make sure start and end are always non-null to make this work
-        final ICommonsList <LocalDatePeriod> aValidityPeriods = aAllEndpoints.getAllMapped (x -> _createPeriod (x.getServiceActivationDate (),
-                                                                                                                x.getServiceExpirationDate ()));
-        final LocalDatePeriod aRequestedPeriod = _createPeriod (aNotBeforeDate, aNotAfterDate);
-
-        boolean bPeriodCovered = false;
-        for (final var aPeriod : aValidityPeriods)
-          if (aRequestedPeriod.isOverlappingWithIncl (aPeriod))
-          {
-            bPeriodCovered = true;
-            break;
-          }
+        final ICommonsList <LocalDatePeriod> aValidityPeriods = aAllEndpoints.getAllMapped (x -> SMPEndpointHelper.createSafePeriod (x.getServiceActivationDate (),
+                                                                                                                                     x.getServiceExpirationDate ()));
+        final LocalDatePeriod aRequestedPeriod = SMPEndpointHelper.createSafePeriod (aNotBeforeDate, aNotAfterDate);
+        final boolean bPeriodCovered = aValidityPeriods.containsAny (x -> aRequestedPeriod.isOverlappingWithIncl (x));
 
         if (bPeriodCovered)
         {
-          final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile valid in the range " +
-                              getAsValidityString (aNotBeforeDate, aNotAfterDate, aDisplayLocale) +
+          final String sMsg = "Another endpoint for the provided service group, document type, process and transport profile valid in the period " +
+                              SMPEndpointHelper.getAsValidityString (aNotBeforeDate, aNotAfterDate, aDisplayLocale) +
                               " is already present. Some of the identifiers may be treated case insensitive!";
           aFormErrors.addFieldError (FIELD_DOCTYPE_ID_VALUE, sMsg);
           aFormErrors.addFieldError (FIELD_PROCESS_ID_VALUE, sMsg);
@@ -771,7 +737,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       }
 
       // For edit, preserve existing endpoint ID; for create/copy, generate a new one
-      final String sEndpointID = bEdit && aSelectedEndpoint != null ? aSelectedEndpoint.getID () : SMPEndpoint
+      final String sEndpointID = bEdit && aSelectedEndpoint != null ? aSelectedEndpoint.getID () : SMPEndpointHelper
                                                                                                               .createUniqueEndpointID ();
       final SMPEndpoint aNewEndpoint = new SMPEndpoint (sEndpointID,
                                                         sTransportProfileID,

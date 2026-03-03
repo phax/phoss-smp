@@ -34,6 +34,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
@@ -597,7 +598,7 @@ public final class SMPServerAPI
             final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
             for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
             {
-              final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (),
+              final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (),
                                                              aJAXBEndpoint.getTransportProfile (),
                                                              W3CEndpointReferenceHelper.getAddress (aJAXBEndpoint.getEndpointReference ()),
                                                              aJAXBEndpoint.isRequireBusinessLevelSignature (),

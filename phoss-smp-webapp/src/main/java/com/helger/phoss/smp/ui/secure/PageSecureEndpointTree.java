@@ -44,6 +44,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
@@ -135,9 +136,9 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                                                                                 aTPCache.getFromCache (sTransportProfile),
                                                                                                 false)));
 
-              aBodyRow.addCell (getAsValidityString (aEndpoint.getServiceActivationDate (),
-                                                     aEndpoint.getServiceExpirationDate (),
-                                                     aDisplayLocale));
+              aBodyRow.addCell (SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                                       aEndpoint.getServiceExpirationDate (),
+                                                                       aDisplayLocale));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());
 

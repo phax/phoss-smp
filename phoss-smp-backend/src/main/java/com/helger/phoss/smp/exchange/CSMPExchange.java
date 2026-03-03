@@ -23,6 +23,7 @@ public final class CSMPExchange
   public static final String ELEMENT_SMP_DATA = "smp-data";
   public static final String VERSION_10 = "1.0";
   public static final String ATTR_VERSION = "version";
+  public static final String ATTR_SMP_VERSION = "smp-version";
   public static final String ELEMENT_SERVICEGROUP = "servicegroup";
   public static final String ELEMENT_SERVICEINFO = "serviceinfo";
   public static final String ELEMENT_REDIRECT = "redirect";

@@ -35,10 +35,10 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPServiceInformationMicroTypeConverter implements IMicroTypeConverter <SMPServiceInformation>
 {
-  private static final MicroQName ATTR_SERVICE_GROUP_ID = new MicroQName ("servicegroupid");
-  private static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
-  private static final String ELEMENT_PROCESS = "process";
-  private static final String ELEMENT_EXTENSION = "extension";
+  public static final MicroQName ATTR_SERVICE_GROUP_ID = new MicroQName ("servicegroupid");
+  public static final String ELEMENT_DOCUMENT_TYPE_IDENTIFIER = "doctypeidentifier";
+  public static final String ELEMENT_PROCESS = "process";
+  public static final String ELEMENT_EXTENSION = "extension";
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPServiceInformation aValue,

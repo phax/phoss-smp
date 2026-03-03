@@ -49,7 +49,7 @@ public final class SMPServiceInformationTest
 
     final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
     final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
-    final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
+    final SMPEndpoint aEP = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (), "tp",
                                              "http://localhost/as2",
                                              false,
                                              "minauth",
@@ -97,7 +97,7 @@ public final class SMPServiceInformationTest
     final IParticipantIdentifier aPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
                                                                         "0088:dummy");
 
-    final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
+    final SMPEndpoint aEP = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (), "tp",
                                              "http://localhost/as2",
                                              false,
                                              (String) null,

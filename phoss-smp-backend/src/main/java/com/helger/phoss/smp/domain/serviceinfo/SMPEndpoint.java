@@ -19,7 +19,6 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
-import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.string.StringHelper;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.datetime.helper.PDTFactory;
@@ -41,7 +40,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 {
   public static final boolean DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE = false;
 
-  private String m_sID;
+  private final String m_sID;
   private String m_sTransportProfile;
   private String m_sEndpointReference;
   private boolean m_bRequireBusinessLevelSignature;
@@ -52,13 +51,6 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   private String m_sServiceDescription;
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
-
-  @NonNull
-  @Nonempty
-  public static String createUniqueEndpointID ()
-  {
-    return GlobalIDFactory.getNewPersistentStringID ();
-  }
 
   public SMPEndpoint (@NonNull @Nonempty final String sID,
                       @NonNull @Nonempty final String sTransportProfile,
@@ -73,7 +65,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sTechnicalInformationUrl,
                       @Nullable final String sExtension)
   {
-    setID (sID);
+    ValueEnforcer.notEmpty (sID, "ID");
+    m_sID = sID;
     setTransportProfile (sTransportProfile);
     setEndpointReference (sEndpointReference);
     setRequireBusinessLevelSignature (bRequireBusinessLevelSignature);
@@ -92,12 +85,6 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   public String getID ()
   {
     return m_sID;
-  }
-
-  public final void setID (@NonNull @Nonempty final String sID)
-  {
-    ValueEnforcer.notEmpty (sID, "ID");
-    m_sID = sID;
   }
 
   @NonNull

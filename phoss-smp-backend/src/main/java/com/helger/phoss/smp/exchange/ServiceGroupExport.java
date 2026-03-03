@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -26,6 +27,9 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointMicroTypeConverter;
+import com.helger.phoss.smp.domain.serviceinfo.SMPProcessMicroTypeConverter;
+import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
@@ -71,6 +75,7 @@ public final class ServiceGroupExport
     final IMicroDocument aDoc = new MicroDocument ();
     final IMicroElement eRoot = aDoc.addElement (CSMPExchange.ELEMENT_SMP_DATA);
     eRoot.setAttribute (CSMPExchange.ATTR_VERSION, CSMPExchange.VERSION_10);
+    eRoot.setAttribute (CSMPExchange.ATTR_SMP_VERSION, CSMPServer.getVersionNumber ());
 
     final ICommonsList <ISMPServiceGroup> aSortedServiceGroups = aServiceGroups.getSorted (ISMPServiceGroup.comparator ());
 
@@ -88,8 +93,15 @@ public final class ServiceGroupExport
       final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aServiceGroup.getParticipantIdentifier ());
       for (final ISMPServiceInformation aServiceInfo : aAllServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
       {
-        eServiceGroup.addChild (MicroTypeConverter.convertToMicroElement (aServiceInfo,
-                                                                          CSMPExchange.ELEMENT_SERVICEINFO));
+        final IMicroElement eServiceInfo = MicroTypeConverter.convertToMicroElement (aServiceInfo,
+                                                                                     CSMPExchange.ELEMENT_SERVICEINFO);
+        // Remove the "id" attribute from all endpoints because we cannot guarantee it's uniqueness
+        // over multiple installations
+        for (final var eProcess : eServiceInfo.getAllChildElements (SMPServiceInformationMicroTypeConverter.ELEMENT_PROCESS))
+          for (final var eEndpoint : eProcess.getAllChildElements (SMPProcessMicroTypeConverter.ELEMENT_ENDPOINT))
+            eEndpoint.removeAttribute (SMPEndpointMicroTypeConverter.ATTR_ID);
+
+        eServiceGroup.addChild (eServiceInfo);
       }
 
       // Add all redirects

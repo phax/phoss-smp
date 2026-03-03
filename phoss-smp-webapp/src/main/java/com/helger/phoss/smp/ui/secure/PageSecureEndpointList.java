@@ -39,6 +39,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
@@ -127,9 +128,9 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                                                                                                                                                              aTPCache.getFromCache (sTransportProfile),
                                                                                                                                                              false)));
 
-          aRow.addCell (getAsValidityString (aEndpoint.getServiceActivationDate (),
-                                             aEndpoint.getServiceExpirationDate (),
-                                             aDisplayLocale));
+          aRow.addCell (SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                               aEndpoint.getServiceExpirationDate (),
+                                                               aDisplayLocale));
 
           final ISimpleURL aEditURL = createEditURL (aWPEC, aServiceInfo).addAll (aParams);
           final ISimpleURL aCopyURL = createCopyURL (aWPEC, aServiceInfo).addAll (aParams);

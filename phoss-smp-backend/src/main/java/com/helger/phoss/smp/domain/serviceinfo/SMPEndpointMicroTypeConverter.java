@@ -32,18 +32,18 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter <SMPEndpoint>
 {
-  private static final MicroQName ATTR_ID = new MicroQName ("id");
-  private static final MicroQName ATTR_TRANSPORT_PROFILE = new MicroQName ("transportprofile");
-  private static final MicroQName ATTR_ENDPOINT_REFERENCE = new MicroQName ("endpointref");
-  private static final MicroQName ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE = new MicroQName ("reqblsig");
-  private static final MicroQName ATTR_MINIMUM_AUTHENTICATION_LEVEL = new MicroQName ("minauthlevel");
-  private static final MicroQName ATTR_SERVICE_ACTIVATION_DATE = new MicroQName ("activation");
-  private static final MicroQName ATTR_SERVICE_EXPIRATION_DATE = new MicroQName ("expiration");
-  private static final String ELEMENT_CERTIFICATE = "certificate";
-  private static final String ELEMENT_SERVICE_DESCRIPTION = "svcdescription";
-  private static final MicroQName ATTR_TECHNICAL_CONTACT_URL = new MicroQName ("techcontacturl");
-  private static final MicroQName ATTR_TECHNICAL_INFORMATION_URL = new MicroQName ("techinfourl");
-  private static final String ELEMENT_EXTENSION = "extension";
+  public static final MicroQName ATTR_ID = new MicroQName ("id");
+  public static final MicroQName ATTR_TRANSPORT_PROFILE = new MicroQName ("transportprofile");
+  public static final MicroQName ATTR_ENDPOINT_REFERENCE = new MicroQName ("endpointref");
+  public static final MicroQName ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE = new MicroQName ("reqblsig");
+  public static final MicroQName ATTR_MINIMUM_AUTHENTICATION_LEVEL = new MicroQName ("minauthlevel");
+  public static final MicroQName ATTR_SERVICE_ACTIVATION_DATE = new MicroQName ("activation");
+  public static final MicroQName ATTR_SERVICE_EXPIRATION_DATE = new MicroQName ("expiration");
+  public static final String ELEMENT_CERTIFICATE = "certificate";
+  public static final String ELEMENT_SERVICE_DESCRIPTION = "svcdescription";
+  public static final MicroQName ATTR_TECHNICAL_CONTACT_URL = new MicroQName ("techcontacturl");
+  public static final MicroQName ATTR_TECHNICAL_INFORMATION_URL = new MicroQName ("techinfourl");
+  public static final String ELEMENT_EXTENSION = "extension";
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPEndpoint aValue,
@@ -84,7 +84,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     // Migration: generate UUID if ID attribute is missing
     String sID = aElement.getAttributeValue (ATTR_ID);
     if (sID == null)
-      sID = SMPEndpoint.createUniqueEndpointID ();
+      sID = SMPEndpointHelper.createUniqueEndpointID ();
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
     final String sRequireBusinessLevelSignature = aElement.getAttributeValue (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE);

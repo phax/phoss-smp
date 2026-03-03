@@ -30,9 +30,9 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPProcessMicroTypeConverter implements IMicroTypeConverter <SMPProcess>
 {
-  private static final String ELEMENT_PROCESS_IDENTIFIER = "processidentifier";
-  private static final String ELEMENT_ENDPOINT = "endpoint";
-  private static final String ELEMENT_EXTENSION = "extension";
+  public static final String ELEMENT_PROCESS_IDENTIFIER = "processidentifier";
+  public static final String ELEMENT_ENDPOINT = "endpoint";
+  public static final String ELEMENT_EXTENSION = "extension";
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPProcess aValue,
