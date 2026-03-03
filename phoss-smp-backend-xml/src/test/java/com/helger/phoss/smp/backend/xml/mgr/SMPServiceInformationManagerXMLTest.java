@@ -41,6 +41,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -91,7 +92,7 @@ public final class SMPServiceInformationManagerXMLTest
 
       {
         // Create a new service information
-        final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
+        final SMPEndpoint aEP = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (), "tp",
                                                  "http://localhost/as2",
                                                  false,
                                                  "minauth",
@@ -127,7 +128,7 @@ public final class SMPServiceInformationManagerXMLTest
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
-        aProcess.setEndpoint (new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
+        aProcess.setEndpoint (new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (), "tp",
                                                "http://localhost/as2-ver2",
                                                false,
                                                "minauth",
@@ -166,7 +167,7 @@ public final class SMPServiceInformationManagerXMLTest
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
-        aProcess.addEndpoint (new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp2",
+        aProcess.addEndpoint (new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (), "tp2",
                                                "http://localhost/as2-tp2",
                                                false,
                                                "minauth",
@@ -196,7 +197,7 @@ public final class SMPServiceInformationManagerXMLTest
         final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
                                                                                                                          aDocTypeID);
         assertNotNull (aSI);
-        final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
+        final SMPEndpoint aEP = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (), "tp",
                                                  "http://localhost/as2",
                                                  false,
                                                  "minauth",
