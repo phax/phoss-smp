@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Month;
 import java.util.Arrays;
 
 import org.jspecify.annotations.NonNull;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.http.CHttpHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.io.resource.FileSystemResource;
@@ -577,6 +579,98 @@ public final class ServiceMetadataInterfaceTest
     {
       // DELETE ServiceGroup
       aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+      _testResponseJerseyClient (aResponseMsg, 200, 404);
+
+      _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+    }
+  }
+
+  @Test
+  public void testOverlappingEndpointValidityPeriods ()
+  {
+    // Lower case
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
+    final String sPI_LC = aPI_LC.getURIEncoded ();
+
+    final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
+    final String sDT = aDT.getURIEncoded ();
+
+    final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+
+    final ServiceGroupType aSG = new ServiceGroupType ();
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
+
+    final ServiceMetadataType aSM = new ServiceMetadataType ();
+    final ServiceInformationType aSI = new ServiceInformationType ();
+    aSI.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+    aSI.setDocumentIdentifier (aDT);
+    {
+      final ProcessListType aPL = new ProcessListType ();
+      final ProcessType aProcess = new ProcessType ();
+      aProcess.setProcessIdentifier (aProcID);
+      final ServiceEndpointList aSEL = new ServiceEndpointList ();
+      {
+        final EndpointType aEndpoint = new EndpointType ();
+        aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
+        aEndpoint.setRequireBusinessLevelSignature (false);
+        aEndpoint.setServiceActivationDate (PDTFactory.createLocalDateTime (2026, Month.JANUARY, 1));
+        aEndpoint.setServiceExpirationDate (PDTFactory.createLocalDateTime (2026, Month.JANUARY, 31));
+        aEndpoint.setCertificate ("blacert");
+        aEndpoint.setServiceDescription ("Unit test service");
+        aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
+        aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
+        aSEL.addEndpoint (aEndpoint);
+      }
+      {
+        final EndpointType aEndpoint = new EndpointType ();
+        aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as3"));
+        aEndpoint.setRequireBusinessLevelSignature (false);
+        // Has an overlap
+        aEndpoint.setServiceActivationDate (PDTFactory.createLocalDateTime (2026, Month.JANUARY, 20));
+        aEndpoint.setServiceExpirationDate (PDTFactory.createLocalDateTime (2026, Month.MARCH, 13));
+        aEndpoint.setCertificate ("blacert");
+        aEndpoint.setServiceDescription ("Unit test service");
+        aEndpoint.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
+        aEndpoint.setTransportProfile (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID ());
+        aSEL.addEndpoint (aEndpoint);
+      }
+      aProcess.setServiceEndpointList (aSEL);
+      aPL.addProcess (aProcess);
+      aSI.setProcessList (aPL);
+    }
+    aSM.setServiceInformation (aSI);
+
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aSIMgr = SMPMetaManager.getServiceInformationMgr ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
+    Response aResponseMsg;
+
+    try
+    {
+      // PUT ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                      .createServiceGroup (aSG)));
+      _testResponseJerseyClient (aResponseMsg, 200);
+
+      // Read both
+      assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+
+      final ISMPServiceGroup aServiceGroup = aSGMgr.getSMPServiceGroupOfID (aPI_LC);
+      assertNotNull (aServiceGroup);
+
+      // PUT 1 ServiceInformation
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).put (Entity.xml (
+                                                                                                                      m_aObjFactory.createServiceMetadata (aSM)));
+      _testResponseJerseyClient (aResponseMsg, 400);
+      assertNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
+    }
+    finally
+    {
+      // DELETE ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+      // May be 500 if no MySQL is running
       _testResponseJerseyClient (aResponseMsg, 200, 404);
 
       _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);

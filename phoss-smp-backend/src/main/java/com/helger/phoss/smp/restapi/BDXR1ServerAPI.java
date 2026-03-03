@@ -734,11 +734,11 @@ public final class BDXR1ServerAPI
               final boolean bPeriodAlreadyCovered = aValidityPeriodsPerTP.containsAny (x -> aEndpointPeriod.isOverlappingWithIncl (x));
               if (bPeriodAlreadyCovered)
               {
-                final String sErrorMsg = "Save Service Metadata was called with ServiceInformation with another endpoint for the provided service group, document type, process ('" +
+                final String sErrorMsg = "Save Service Metadata was called with ServiceInformation for the provided service group, document type, process ('" +
                                          aProcessID.getURIEncoded () +
                                          "') and transport profile ('" +
                                          aEndpoint.getTransportProfile () +
-                                         "') valid in the period " +
+                                         "'): another Endpoint has a validity overlapping this Endpoints validity: " +
                                          SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
                                                                                 aEndpoint.getServiceExpirationDate (),
                                                                                 CSMPServer.DEFAULT_LOCALE) +
