@@ -50,11 +50,19 @@ public final class SMPEndpointHelper
       ret = "[since forever]";
     else
       ret = PDTToString.getAsString (aNotBefore, aDisplayLocale);
-    ret += " - ";
-    if (aNotAfter == null)
-      ret += "[until eternity]";
+
+    if (aNotBefore != null && aNotAfter != null && aNotBefore.equals (aNotAfter))
+    {
+      // Only valid on that one day - no need to add an end date
+    }
     else
-      ret += PDTToString.getAsString (aNotAfter, aDisplayLocale);
+    {
+      ret += " - ";
+      if (aNotAfter == null)
+        ret += "[until eternity]";
+      else
+        ret += PDTToString.getAsString (aNotAfter, aDisplayLocale);
+    }
     return ret;
   }
 
