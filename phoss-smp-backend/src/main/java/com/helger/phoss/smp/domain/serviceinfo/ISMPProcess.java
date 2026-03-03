@@ -102,8 +102,29 @@ public interface ISMPProcess extends ISMPHasExtension
    */
   void setEndpoint (@NonNull SMPEndpoint aEndpoint);
 
+  /**
+   * Find the endpoint with the passed ID.
+   *
+   * @param sID
+   *        The endpoint ID to search. May be <code>null</code>.
+   * @return <code>null</code> if the passed ID is <code>null</code> or empty or if no such
+   *         endpoint exists.
+   */
+  @Nullable
+  ISMPEndpoint getEndpointOfID (@Nullable String sID);
+
   @NonNull
-  EChange deleteEndpoint (@Nullable String sTransportProfile);
+  EChange deleteAllEndpoints (@Nullable String sTransportProfile);
+
+  /**
+   * Delete the endpoint with the given ID.
+   *
+   * @param sID
+   *        The endpoint ID to delete. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the endpoint was found and deleted.
+   */
+  @NonNull
+  EChange deleteEndpointByID (@Nullable String sID);
 
   /**
    * @return This service information object as a Peppol SMP JAXB object for the REST interface. May

@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.ui.secure;
 
 import java.util.Comparator;
+import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
 
@@ -72,6 +73,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
   @Override
   protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
@@ -115,8 +117,10 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                                                     .getSortedInline (ISMPProcess.comparator ());
           for (final ISMPProcess aProcess : aProcesses)
           {
-            final BootstrapTable aEPTable = new BootstrapTable (HCCol.perc (40), HCCol.perc (40), HCCol.perc (20))
-                                                                                                                  .setBordered (true);
+            final BootstrapTable aEPTable = new BootstrapTable (HCCol.star (),
+                                                                HCCol.star (),
+                                                                HCCol.star (),
+                                                                HCCol.star ()).setBordered (true);
             final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ()
                                                                    .getSortedInline (ISMPEndpoint.comparator ());
             for (final ISMPEndpoint aEndpoint : aEndpoints)
@@ -130,6 +134,10 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
               aBodyRow.addCell (new HCA (aViewURL).addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
                                                                                                 aTPCache.getFromCache (sTransportProfile),
                                                                                                 false)));
+
+              aBodyRow.addCell (getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                     aEndpoint.getServiceExpirationDate (),
+                                                     aDisplayLocale));
 
               aBodyRow.addCell (aEndpoint.getEndpointReference ());
 

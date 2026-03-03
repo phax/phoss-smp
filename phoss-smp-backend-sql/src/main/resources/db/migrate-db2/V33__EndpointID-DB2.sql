@@ -15,6 +15,9 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_service_group ADD COLUMN customproperties CLOB;
-
-CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_group');
+ALTER TABLE smp_endpoint ADD COLUMN id VARCHAR(45) NOT NULL DEFAULT '';
+UPDATE smp_endpoint SET id = CAST(GENERATE_UNIQUE() AS VARCHAR(45)) WHERE id = '';
+ALTER TABLE smp_endpoint DROP PRIMARY KEY;
+ALTER TABLE smp_endpoint ADD PRIMARY KEY (id);
+CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_endpoint');
+CREATE INDEX IX_smp_endpoint_process ON smp_endpoint (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier);

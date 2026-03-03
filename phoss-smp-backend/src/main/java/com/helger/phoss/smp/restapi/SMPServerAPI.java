@@ -597,7 +597,8 @@ public final class SMPServerAPI
             final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
             for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
             {
-              final SMPEndpoint aEndpoint = new SMPEndpoint (aJAXBEndpoint.getTransportProfile (),
+              final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (),
+                                                             aJAXBEndpoint.getTransportProfile (),
                                                              W3CEndpointReferenceHelper.getAddress (aJAXBEndpoint.getEndpointReference ()),
                                                              aJAXBEndpoint.isRequireBusinessLevelSignature (),
                                                              aJAXBEndpoint.getMinimumAuthenticationLevel (),

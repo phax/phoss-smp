@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.numeric.mutable.MutableInt;
+import com.helger.base.state.ESuccess;
 import com.helger.base.timing.StopWatch;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsTreeMap;
@@ -39,9 +40,12 @@ import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
+import com.helger.pd.client.PDClient;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.directory.IPeppolDirectoryPushCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
@@ -71,9 +75,16 @@ import com.helger.xml.microdom.serialize.MicroReader;
  */
 public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
 {
-  private static final boolean DEFAULT_OVERWRITE_EXISTING = false;
+  public static final boolean DEFAULT_OVERWRITE_EXISTING = false;
 
   public static final String PARAM_OVERVWRITE_EXISTING = "overwrite-existing";
+
+  public static final IPeppolDirectoryPushCallback PD_PUSH = (@NonNull final IParticipantIdentifier aParticipantID) -> {
+    final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
+    if (aPDClient != null)
+      return aPDClient.addServiceGroupToIndex (aParticipantID);
+    return ESuccess.SUCCESS;
+  };
 
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorImportXMLVer1.class);
 
@@ -165,7 +176,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
                                        aDefaultOwner,
                                        aAllServiceGroupIDs,
                                        aAllBusinessCardIDs,
-                                       PDClientProvider.getInstance ().getPDClient ()::addServiceGroupToIndex,
+                                       PD_PUSH,
                                        aActionList,
                                        aImportSummary);
 

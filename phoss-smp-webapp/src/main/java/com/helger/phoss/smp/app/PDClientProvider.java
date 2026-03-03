@@ -17,10 +17,12 @@
 package com.helger.phoss.smp.app;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.io.stream.StreamHelper;
+import com.helger.base.string.StringHelper;
 import com.helger.pd.client.PDClient;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.scope.IScope;
@@ -73,29 +75,34 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   }
 
   /**
-   * @return The {@link PDClient} to be used with the current settings. Never <code>null</code>.
+   * @return The {@link PDClient} to be used with the current settings. May be <code>null</code> if
+   *         no Directory hostname is configured.
    */
-  @NonNull
+  @Nullable
   public PDClient getPDClient ()
   {
     PDClient ret = m_aRWLock.readLockedGet ( () -> m_aPDClient);
     if (ret == null)
     {
-      m_aRWLock.writeLock ().lock ();
-      try
+      final String sPDHostName = SMPMetaManager.getSettings ().getDirectoryHostName ();
+      if (StringHelper.isNotEmpty (sPDHostName))
       {
-        // Try again in write lock
-        ret = m_aPDClient;
-        if (ret == null)
+        m_aRWLock.writeLock ().lock ();
+        try
         {
-          // Create a new one
-          ret = m_aPDClient = new PDClient (SMPMetaManager.getSettings ().getDirectoryHostName ());
-          // Note: by default a logging exception handler is installed
+          // Try again in write lock
+          ret = m_aPDClient;
+          if (ret == null)
+          {
+            // Create a new one
+            ret = m_aPDClient = new PDClient (sPDHostName);
+            // Note: by default a logging exception handler is installed
+          }
         }
-      }
-      finally
-      {
-        m_aRWLock.writeLock ().unlock ();
+        finally
+        {
+          m_aRWLock.writeLock ().unlock ();
+        }
       }
     }
     return ret;

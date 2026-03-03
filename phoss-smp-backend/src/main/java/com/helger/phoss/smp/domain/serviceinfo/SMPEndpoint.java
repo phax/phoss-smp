@@ -18,8 +18,8 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.base.enforce.ValueEnforcer;
-import com.helger.base.equals.EqualsHelper;
 import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.string.StringHelper;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.datetime.helper.PDTFactory;
@@ -28,7 +28,6 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
-import com.helger.smpclient.peppol.utils.SMPExtensionConverter;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
 
@@ -42,6 +41,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 {
   public static final boolean DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE = false;
 
+  private String m_sID;
   private String m_sTransportProfile;
   private String m_sEndpointReference;
   private boolean m_bRequireBusinessLevelSignature;
@@ -53,7 +53,15 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
 
-  public SMPEndpoint (@NonNull @Nonempty final String sTransportProfile,
+  @NonNull
+  @Nonempty
+  public static String createUniqueEndpointID ()
+  {
+    return GlobalIDFactory.getNewPersistentStringID ();
+  }
+
+  public SMPEndpoint (@NonNull @Nonempty final String sID,
+                      @NonNull @Nonempty final String sTransportProfile,
                       @Nullable final String sEndpointReference,
                       final boolean bRequireBusinessLevelSignature,
                       @Nullable final String sMinimumAuthenticationLevel,
@@ -65,6 +73,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sTechnicalInformationUrl,
                       @Nullable final String sExtension)
   {
+    setID (sID);
     setTransportProfile (sTransportProfile);
     setEndpointReference (sEndpointReference);
     setRequireBusinessLevelSignature (bRequireBusinessLevelSignature);
@@ -76,6 +85,19 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     setTechnicalContactUrl (sTechnicalContactUrl);
     setTechnicalInformationUrl (sTechnicalInformationUrl);
     getExtensions ().setExtensionAsString (sExtension);
+  }
+
+  @NonNull
+  @Nonempty
+  public String getID ()
+  {
+    return m_sID;
+  }
+
+  public final void setID (@NonNull @Nonempty final String sID)
+  {
+    ValueEnforcer.notEmpty (sID, "ID");
+    m_sID = sID;
   }
 
   @NonNull
@@ -266,43 +288,27 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   {
     if (o == this)
       return true;
-    if (!super.equals (o))
+
+    // Ignore super.equals
+    if (o == null || !getClass ().equals (o.getClass ()))
       return false;
 
     final SMPEndpoint rhs = ((SMPEndpoint) o);
-    return EqualsHelper.equals (m_sTransportProfile, rhs.m_sTransportProfile) &&
-           EqualsHelper.equals (m_sEndpointReference, rhs.m_sEndpointReference) &&
-           m_bRequireBusinessLevelSignature == rhs.m_bRequireBusinessLevelSignature &&
-           EqualsHelper.equals (m_sMinimumAuthenticationLevel, rhs.m_sMinimumAuthenticationLevel) &&
-           EqualsHelper.equals (m_aServiceActivationDT, rhs.m_aServiceActivationDT) &&
-           EqualsHelper.equals (m_aServiceExpirationDT, rhs.m_aServiceExpirationDT) &&
-           EqualsHelper.equals (m_sCertificate, rhs.m_sCertificate) &&
-           EqualsHelper.equals (m_sServiceDescription, rhs.m_sServiceDescription) &&
-           EqualsHelper.equals (m_sTechnicalContactUrl, rhs.m_sTechnicalContactUrl) &&
-           EqualsHelper.equals (m_sTechnicalInformationUrl, rhs.m_sTechnicalInformationUrl);
+    return m_sID.equals (rhs.m_sID);
   }
 
   @Override
   public int hashCode ()
   {
-    return HashCodeGenerator.getDerived (super.hashCode ())
-                            .append (m_sTransportProfile)
-                            .append (m_sEndpointReference)
-                            .append (m_bRequireBusinessLevelSignature)
-                            .append (m_sMinimumAuthenticationLevel)
-                            .append (m_aServiceActivationDT)
-                            .append (m_aServiceExpirationDT)
-                            .append (m_sCertificate)
-                            .append (m_sServiceDescription)
-                            .append (m_sTechnicalContactUrl)
-                            .append (m_sTechnicalInformationUrl)
-                            .getHashCode ();
+    // Ignore super.hashCode
+    return new HashCodeGenerator (this).append (m_sID).getHashCode ();
   }
 
   @Override
   public String toString ()
   {
     return ToStringGenerator.getDerived (super.toString ())
+                            .append ("ID", m_sID)
                             .append ("TransportProfile", m_sTransportProfile)
                             .append ("EndpointReference", m_sEndpointReference)
                             .append ("RequireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
@@ -314,21 +320,5 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                             .append ("TechnicalContactUrl", m_sTechnicalContactUrl)
                             .append ("TechnicalInformationUrl", m_sTechnicalInformationUrl)
                             .getToString ();
-  }
-
-  @NonNull
-  public static SMPEndpoint createFromJAXB (final com.helger.xsds.peppol.smp1.@NonNull EndpointType aEndpoint)
-  {
-    return new SMPEndpoint (aEndpoint.getTransportProfile (),
-                            W3CEndpointReferenceHelper.getAddress (aEndpoint.getEndpointReference ()),
-                            aEndpoint.isRequireBusinessLevelSignature (),
-                            aEndpoint.getMinimumAuthenticationLevel (),
-                            aEndpoint.getServiceActivationDate (),
-                            aEndpoint.getServiceExpirationDate (),
-                            aEndpoint.getCertificate (),
-                            aEndpoint.getServiceDescription (),
-                            aEndpoint.getTechnicalContactUrl (),
-                            aEndpoint.getTechnicalInformationUrl (),
-                            SMPExtensionConverter.convertToString (aEndpoint.getExtension ()));
   }
 }

@@ -32,6 +32,7 @@ import com.helger.xml.microdom.util.MicroHelper;
  */
 public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter <SMPEndpoint>
 {
+  private static final MicroQName ATTR_ID = new MicroQName ("id");
   private static final MicroQName ATTR_TRANSPORT_PROFILE = new MicroQName ("transportprofile");
   private static final MicroQName ATTR_ENDPOINT_REFERENCE = new MicroQName ("endpointref");
   private static final MicroQName ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE = new MicroQName ("reqblsig");
@@ -50,6 +51,7 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
                                               @NonNull @Nonempty final String sTagName)
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
+    aElement.setAttribute (ATTR_ID, aValue.getID ());
     aElement.setAttribute (ATTR_TRANSPORT_PROFILE, aValue.getTransportProfile ());
     if (aValue.hasEndpointReference ())
       aElement.setAttribute (ATTR_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
@@ -79,6 +81,10 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
 
   public SMPEndpoint convertToNative (@NonNull final IMicroElement aElement)
   {
+    // Migration: generate UUID if ID attribute is missing
+    String sID = aElement.getAttributeValue (ATTR_ID);
+    if (sID == null)
+      sID = SMPEndpoint.createUniqueEndpointID ();
     final String sTransportProfile = aElement.getAttributeValue (ATTR_TRANSPORT_PROFILE);
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
     final String sRequireBusinessLevelSignature = aElement.getAttributeValue (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE);
@@ -109,7 +115,8 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final String sTechnicalInformationUrl = aElement.getAttributeValue (ATTR_TECHNICAL_INFORMATION_URL);
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    return new SMPEndpoint (sTransportProfile,
+    return new SMPEndpoint (sID,
+                            sTransportProfile,
                             sEndpointReference,
                             bRequireBusinessLevelSignature,
                             sMinimumAuthenticationLevel,

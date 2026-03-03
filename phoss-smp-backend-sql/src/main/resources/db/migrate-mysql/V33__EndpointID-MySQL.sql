@@ -15,6 +15,10 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_service_group ADD COLUMN customproperties CLOB;
+ALTER TABLE `smp_endpoint` ADD COLUMN `id` varchar(45) NOT NULL DEFAULT '' FIRST;
+UPDATE `smp_endpoint` SET `id` = UUID() WHERE `id` = '';
+ALTER TABLE `smp_endpoint` DROP PRIMARY KEY;
+ALTER TABLE `smp_endpoint` ADD PRIMARY KEY (`id`);
 
-CALL SYSPROC.ADMIN_CMD('REORG TABLE smp_service_group');
+-- No need for the additional index, as this is already covered in the foreign constraints
+-- ALTER TABLE `smp_endpoint` ADD INDEX `IX_smp_endpoint_process` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`);

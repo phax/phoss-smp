@@ -91,7 +91,7 @@ public final class SMPServiceInformationManagerXMLTest
 
       {
         // Create a new service information
-        final SMPEndpoint aEP = new SMPEndpoint ("tp",
+        final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
                                                  "http://localhost/as2",
                                                  false,
                                                  "minauth",
@@ -127,7 +127,7 @@ public final class SMPServiceInformationManagerXMLTest
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
-        aProcess.setEndpoint (new SMPEndpoint ("tp",
+        aProcess.setEndpoint (new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
                                                "http://localhost/as2-ver2",
                                                false,
                                                "minauth",
@@ -166,7 +166,7 @@ public final class SMPServiceInformationManagerXMLTest
         assertNotNull (aSI);
         final ISMPProcess aProcess = aSI.getProcessOfID (aProcessID);
         assertNotNull (aProcess);
-        aProcess.addEndpoint (new SMPEndpoint ("tp2",
+        aProcess.addEndpoint (new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp2",
                                                "http://localhost/as2-tp2",
                                                false,
                                                "minauth",
@@ -196,7 +196,7 @@ public final class SMPServiceInformationManagerXMLTest
         final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
                                                                                                                          aDocTypeID);
         assertNotNull (aSI);
-        final SMPEndpoint aEP = new SMPEndpoint ("tp",
+        final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (), "tp",
                                                  "http://localhost/as2",
                                                  false,
                                                  "minauth",

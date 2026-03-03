@@ -81,11 +81,13 @@ public final class SMPServiceInformationManagerXML extends
     return m_aCBs;
   }
 
+  @SuppressWarnings ("removal")
   @Nullable
-  public ISMPServiceInformation findFirstSMPServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
-                                                                @Nullable final IDocumentTypeIdentifier aDocTypeID,
-                                                                @Nullable final IProcessIdentifier aProcessID,
-                                                                @Nullable final String sTransportProfileID)
+  @Deprecated (forRemoval = true, since = "8.1.2")
+  public ISMPServiceInformation findServiceInformation (@Nullable final IParticipantIdentifier aParticipantID,
+                                                        @Nullable final IDocumentTypeIdentifier aDocTypeID,
+                                                        @Nullable final IProcessIdentifier aProcessID,
+                                                        @Nullable final String sTransportProfileID)
   {
     final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
                                                                                                        aDocTypeID);
@@ -117,9 +119,7 @@ public final class SMPServiceInformationManagerXML extends
       final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aProcessID);
       if (aProcess != null)
       {
-        final ISMPEndpoint aEndpoint = aProcess.getEndpointOfTransportProfile (sTransportProfileID);
-        if (aEndpoint != null)
-          ret.add (aEndpoint);
+        ret.addAll (aProcess.getAllEndpointsOfTransportProfile (sTransportProfileID));
       }
     }
     return ret;

@@ -18,7 +18,7 @@
 CREATE TABLE tomcat_sessions (
   session_id     varchar(100) NOT NULL,
   valid_session  char(1)      NOT NULL DEFAULT '1',
-  max_inactive   intege       NOT NULL,
+  max_inactive   integer      NOT NULL,
   last_access    bigint       NOT NULL,
   app_name       varchar(255),
   session_data   blob(16M),

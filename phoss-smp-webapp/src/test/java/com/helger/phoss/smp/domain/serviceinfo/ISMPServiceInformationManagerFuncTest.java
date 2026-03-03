@@ -75,7 +75,8 @@ public final class ISMPServiceInformationManagerFuncTest
     {
       final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
       final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
-      final SMPEndpoint aEP = new SMPEndpoint ("tp",
+      final SMPEndpoint aEP = new SMPEndpoint (SMPEndpoint.createUniqueEndpointID (),
+                                               "tp",
                                                "http://localhost/as2",
                                                false,
                                                "minauth",

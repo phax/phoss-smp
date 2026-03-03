@@ -32,7 +32,6 @@ import com.helger.diagnostics.error.level.IErrorLevel;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -41,6 +40,7 @@ import com.helger.phoss.smp.exchange.CSMPExchange;
 import com.helger.phoss.smp.exchange.ImportActionItem;
 import com.helger.phoss.smp.exchange.ImportSummary;
 import com.helger.phoss.smp.exchange.ServiceGroupImport;
+import com.helger.phoss.smp.rest.APIExecutorImportXMLVer1;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -141,7 +141,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                                                aDefaultOwner,
                                                aAllServiceGroupIDs,
                                                aAllBusinessCardIDs,
-                                               PDClientProvider.getInstance ().getPDClient ()::addServiceGroupToIndex,
+                                               APIExecutorImportXMLVer1.PD_PUSH,
                                                aActionList,
                                                aImportSummary);
             for (final ImportActionItem aAction : aActionList)

@@ -75,10 +75,11 @@ public interface ISMPServiceInformationManager
    *      IDocumentTypeIdentifier)
    */
   @Nullable
-  ISMPServiceInformation findFirstSMPServiceInformation (@Nullable IParticipantIdentifier aParticipantID,
-                                                         @Nullable IDocumentTypeIdentifier aDocTypeID,
-                                                         @Nullable IProcessIdentifier aProcessID,
-                                                         @Nullable String sTransportProfileID);
+  @Deprecated (forRemoval = true, since = "8.1.2")
+  ISMPServiceInformation findServiceInformation (@Nullable IParticipantIdentifier aParticipantID,
+                                                 @Nullable IDocumentTypeIdentifier aDocTypeID,
+                                                 @Nullable IProcessIdentifier aProcessID,
+                                                 @Nullable String sTransportProfileID);
 
   /**
    * Find all endpoints matching the passed quadruple of parameters. If one of the parameters is
