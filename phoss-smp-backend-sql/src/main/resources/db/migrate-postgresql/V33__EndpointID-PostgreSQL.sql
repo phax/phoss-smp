@@ -19,4 +19,4 @@ ALTER TABLE smp_endpoint ADD COLUMN id varchar(45) NOT NULL DEFAULT '';
 UPDATE smp_endpoint SET id = gen_random_uuid()::varchar WHERE id = '';
 ALTER TABLE smp_endpoint DROP CONSTRAINT smp_endpoint_pkey;
 ALTER TABLE smp_endpoint ADD PRIMARY KEY (id);
-CREATE INDEX IX_smp_endpoint_process ON smp_endpoint ("businessIdentifierScheme", "businessIdentifier", "documentIdentifierScheme", "documentIdentifier", "processIdentifierType", "processIdentifier");
+CREATE INDEX IX_smp_endpoint_process ON smp_endpoint (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier);
