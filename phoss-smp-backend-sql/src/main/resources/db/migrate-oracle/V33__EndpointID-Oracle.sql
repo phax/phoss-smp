@@ -15,8 +15,9 @@
 -- limitations under the License.
 --
 
-ALTER TABLE smp_endpoint ADD id VARCHAR2(45) DEFAULT '' NOT NULL;
-UPDATE smp_endpoint SET id = RAWTOHEX(SYS_GUID()) WHERE id = '';
+ALTER TABLE smp_endpoint ADD id VARCHAR2(45);
+UPDATE smp_endpoint SET id = RAWTOHEX(SYS_GUID()) WHERE id IS NULL;
+ALTER TABLE smp_endpoint MODIFY id NOT NULL;
 ALTER TABLE smp_endpoint DROP PRIMARY KEY;
 ALTER TABLE smp_endpoint ADD PRIMARY KEY (id);
 CREATE INDEX IX_smp_endpoint_process ON smp_endpoint (businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier);
