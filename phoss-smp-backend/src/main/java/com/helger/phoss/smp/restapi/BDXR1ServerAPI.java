@@ -26,11 +26,14 @@ import com.helger.base.rt.BooleanHelper;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
+import com.helger.datetime.period.LocalDatePeriod;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -125,8 +128,8 @@ public final class BDXR1ServerAPI
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         // No such service group
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
@@ -157,7 +160,7 @@ public final class BDXR1ServerAPI
         aRefCollection.addServiceMetadataReference (aMetadataReference);
       }
 
-      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
+      final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectBDXR1 ();
       aSG.setServiceMetadataReferenceCollection (aRefCollection);
 
       // a CompleteSG may be empty
@@ -256,16 +259,17 @@ public final class BDXR1ServerAPI
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
       // Retrieve the service group
-      final ISMPServiceGroup aServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
-      if (aServiceGroup == null)
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
       {
         // No such service group
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
-      // Then add the service metadata references
-      final ServiceGroupType aSG = aServiceGroup.getAsJAXBObjectBDXR1 ();
+      final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectBDXR1 ();
       final ServiceMetadataReferenceCollectionType aRefCollection = new ServiceMetadataReferenceCollectionType ();
+
+      // Then add the service metadata references
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
@@ -556,8 +560,9 @@ public final class BDXR1ServerAPI
 
     try
     {
-      // Parse provided identifiers
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+      // Parse provided identifiers
       final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       if (aPathServiceGroupID == null)
       {
@@ -588,10 +593,20 @@ public final class BDXR1ServerAPI
                                             "'",
                                             m_aAPIDataProvider.getCurrentURI ());
         }
-        final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceInformation.getParticipantIdentifier ()
-                                                                                                                                 .getScheme (),
-                                                                                                              aServiceInformation.getParticipantIdentifier ()
-                                                                                                                                 .getValue ());
+
+        final IParticipantIdentifier aPayloadServiceGroupID;
+        if (aServiceInformation.getParticipantIdentifier () == null)
+        {
+          // Can happen when tampering with the input data
+          aPayloadServiceGroupID = null;
+        }
+        else
+        {
+          aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceInformation.getParticipantIdentifier ()
+                                                                                                      .getScheme (),
+                                                                                   aServiceInformation.getParticipantIdentifier ()
+                                                                                                      .getValue ());
+        }
 
         if (!aPathServiceGroupID.hasSameContent (aPayloadServiceGroupID))
         {
@@ -635,7 +650,7 @@ public final class BDXR1ServerAPI
         }
       }
 
-      // Main save
+      // Verify credentials
       final IUser aDataUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aDataUser);
 
@@ -647,11 +662,12 @@ public final class BDXR1ServerAPI
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
+      // Main save
       if (aServiceMetadata.getRedirect () != null)
       {
         // Handle redirect
         final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        // not available in OASIS BDXR SMP v1 mode
+        // Certificate not available in OASIS BDXR SMP v1 mode
         final X509Certificate aCertificate = null;
         if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroupID,
                                                     aPathDocTypeID,
@@ -675,9 +691,26 @@ public final class BDXR1ServerAPI
           final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
           for (final ProcessType aJAXBProcess : aJAXBProcesses.getProcess ())
           {
+            final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (aJAXBProcess.getProcessIdentifier ()
+                                                                                                          .getScheme (),
+                                                                                              aJAXBProcess.getProcessIdentifier ()
+                                                                                                          .getValue ());
+            if (aProcessID == null)
+            {
+              final String sErrorMsg = "Save Service Metadata was called with ServiceInformation that contained an invalid process identifier with scheme '" +
+                                       aJAXBProcess.getProcessIdentifier ().getScheme () +
+                                       "' and value '" +
+                                       aJAXBProcess.getProcessIdentifier ().getValue () +
+                                       "'";
+              throw new SMPBadRequestException (sErrorMsg, m_aAPIDataProvider.getCurrentURI ());
+            }
+
             final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+            // Map from TransportProfileID to list of validity periods
+            final ICommonsMap <String, ICommonsList <LocalDatePeriod>> aValidityPeriods = new CommonsHashMap <> ();
             for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
             {
+              // Always assign a new unique ID, as the JAXB data model has no ID
               final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (),
                                                              aJAXBEndpoint.getTransportProfile (),
                                                              aJAXBEndpoint.getEndpointURI (),
@@ -691,12 +724,36 @@ public final class BDXR1ServerAPI
                                                              aJAXBEndpoint.getTechnicalContactUrl (),
                                                              aJAXBEndpoint.getTechnicalInformationUrl (),
                                                              convertToJsonString (aJAXBEndpoint.getExtension ()));
+
+              final LocalDatePeriod aEndpointPeriod = SMPEndpointHelper.createSafePeriod (aEndpoint.getServiceActivationDate (),
+                                                                                          aEndpoint.getServiceExpirationDate ());
+
+              // Period must not be overlapping per Transport Profile
+              final ICommonsList <LocalDatePeriod> aValidityPeriodsPerTP = aValidityPeriods.computeIfAbsent (aEndpoint.getTransportProfile (),
+                                                                                                             k -> new CommonsArrayList <> ());
+              final boolean bPeriodAlreadyCovered = aValidityPeriodsPerTP.containsAny (x -> aEndpointPeriod.isOverlappingWithIncl (x));
+              if (bPeriodAlreadyCovered)
+              {
+                final String sErrorMsg = "Save Service Metadata was called with ServiceInformation with another endpoint for the provided service group, document type, process ('" +
+                                         aProcessID.getURIEncoded () +
+                                         "') and transport profile ('" +
+                                         aEndpoint.getTransportProfile () +
+                                         "') valid in the period " +
+                                         SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                                                aEndpoint.getServiceExpirationDate (),
+                                                                                CSMPServer.DEFAULT_LOCALE) +
+                                         ".";
+                throw new SMPBadRequestException (sErrorMsg, m_aAPIDataProvider.getCurrentURI ());
+              }
+              // Remember period
+              aValidityPeriodsPerTP.add (aEndpointPeriod);
+
               aEndpoints.add (aEndpoint);
             }
-            final SMPProcess aProcess = new SMPProcess (SimpleProcessIdentifier.wrap (aJAXBProcess.getProcessIdentifier ()),
-                                                        aEndpoints,
-                                                        convertToJsonString (aJAXBProcess.getExtension ()));
-            aProcesses.add (aProcess);
+
+            aProcesses.add (new SMPProcess (aProcessID,
+                                            aEndpoints,
+                                            convertToJsonString (aJAXBProcess.getExtension ())));
           }
 
           final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();

@@ -27,6 +27,7 @@ import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.datetime.helper.PDTFactory;
+import com.helger.datetime.period.LocalDatePeriod;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -122,8 +123,9 @@ public final class BDXR2ServerAPI
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
 
-      // Then add the service metadata references
       final ServiceGroupType aSG = aPathServiceGroup.getAsJAXBObjectBDXR2 ();
+
+      // Then add the service metadata references
       for (final IDocumentTypeIdentifier aDocTypeID : aServiceInfoMgr.getAllSMPDocumentTypesOfServiceGroup (aPathServiceGroupID))
       {
         // Ignore all service information without endpoints
@@ -363,8 +365,9 @@ public final class BDXR2ServerAPI
     STATS_COUNTER_INVOCATION.increment (sAction);
     try
     {
-      // Parse provided identifiers
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+      // Parse provided identifiers
       final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       if (aPathServiceGroupID == null)
       {
@@ -389,10 +392,21 @@ public final class BDXR2ServerAPI
                                           "'",
                                           m_aAPIDataProvider.getCurrentURI ());
       }
-      final IParticipantIdentifier aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceMetadata.getParticipantID ()
-                                                                                                                            .getSchemeID (),
-                                                                                                            aServiceMetadata.getParticipantID ()
-                                                                                                                            .getValue ());
+
+      final IParticipantIdentifier aPayloadServiceGroupID;
+      if (aServiceMetadata.getParticipantID () == null)
+      {
+        // Can happen when tampering with the input data
+        aPayloadServiceGroupID = null;
+      }
+      else
+      {
+        aPayloadServiceGroupID = aIdentifierFactory.createParticipantIdentifier (aServiceMetadata.getParticipantID ()
+                                                                                                 .getSchemeID (),
+                                                                                 aServiceMetadata.getParticipantID ()
+                                                                                                 .getValue ());
+      }
+
       if (!aPathServiceGroupID.hasSameContent (aPayloadServiceGroupID))
       {
         // Participant ID in URL must match the one in XML structure
@@ -452,7 +466,7 @@ public final class BDXR2ServerAPI
         {
           // Handle redirect
           final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-          // not available in OASIS BDXR SMP v2 mode
+          // Certificate UID not available in OASIS BDXR SMP v2 mode
           final String sCertificateUID = null;
           final X509Certificate aCertificate = null;
           if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroupID,
@@ -499,7 +513,11 @@ public final class BDXR2ServerAPI
             final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
             for (final Map.Entry <IProcessIdentifier, String> aProcIDEntry : aProcIDs.entrySet ())
             {
+              final IProcessIdentifier aProcessID = aProcIDEntry.getKey ();
+
               final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+              // Map from TransportProfileID to list of validity periods
+              final ICommonsMap <String, ICommonsList <LocalDatePeriod>> aValidityPeriods = new CommonsHashMap <> ();
               for (final EndpointType aJAXBEndpoint : aPM.getEndpoint ())
               {
                 // TODO BDXR2 use first cert only
@@ -520,10 +538,33 @@ public final class BDXR2ServerAPI
                                                                aJAXBEndpoint.getContactValue (),
                                                                null,
                                                                convertToJsonString (aJAXBEndpoint.getSMPExtensions ()));
+
+                final LocalDatePeriod aEndpointPeriod = SMPEndpointHelper.createSafePeriod (aEndpoint.getServiceActivationDate (),
+                                                                                            aEndpoint.getServiceExpirationDate ());
+
+                // Period must not be overlapping per Transport Profile
+                final ICommonsList <LocalDatePeriod> aValidityPeriodsPerTP = aValidityPeriods.computeIfAbsent (aEndpoint.getTransportProfile (),
+                                                                                                               k -> new CommonsArrayList <> ());
+                final boolean bPeriodAlreadyCovered = aValidityPeriodsPerTP.containsAny (x -> aEndpointPeriod.isOverlappingWithIncl (x));
+                if (bPeriodAlreadyCovered)
+                {
+                  final String sErrorMsg = "Save Service Metadata was called with ServiceInformation with another endpoint for the provided service group, document type, process ('" +
+                                           aProcessID.getURIEncoded () +
+                                           "') and transport profile ('" +
+                                           aEndpoint.getTransportProfile () +
+                                           "') valid in the period " +
+                                           SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                                                  aEndpoint.getServiceExpirationDate (),
+                                                                                  CSMPServer.DEFAULT_LOCALE) +
+                                           ".";
+                  throw new SMPBadRequestException (sErrorMsg, m_aAPIDataProvider.getCurrentURI ());
+                }
+                // Remember period
+                aValidityPeriodsPerTP.add (aEndpointPeriod);
+
                 aEndpoints.add (aEndpoint);
               }
-              final SMPProcess aProcess = new SMPProcess (aProcIDEntry.getKey (), aEndpoints, aProcIDEntry.getValue ());
-              aProcesses.add (aProcess);
+              aProcesses.add (new SMPProcess (aProcessID, aEndpoints, aProcIDEntry.getValue ()));
             }
             final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
             final String sExtensionXML = convertToJsonString (aServiceMetadata.getSMPExtensions ());
@@ -544,8 +585,8 @@ public final class BDXR2ServerAPI
                                               m_aAPIDataProvider.getCurrentURI ());
           }
       }
-      if (false)
 
+      if (false)
         LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;

@@ -20,7 +20,10 @@ import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsMap;
+import com.helger.datetime.period.LocalDatePeriod;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -102,6 +105,7 @@ public final class SMPServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
@@ -144,12 +148,14 @@ public final class SMPServerAPI
       // a CompleteSG may be empty
       final CompleteServiceGroupType aCompleteServiceGroup = new CompleteServiceGroupType ();
       aCompleteServiceGroup.setServiceGroup (aSG);
+      
       for (final ISMPServiceInformation aServiceInfo : aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aPathServiceGroupID))
       {
         final ServiceMetadataType aSM = aServiceInfo.getAsJAXBObjectPeppol ();
         if (aSM != null)
           aCompleteServiceGroup.addServiceMetadata (aSM);
       }
+      
       LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return aCompleteServiceGroup;
@@ -498,6 +504,7 @@ public final class SMPServerAPI
         // metadata (body) must equal path
         if (aServiceInformation.getParticipantIdentifier () == null)
         {
+          // Can happen when tampering with the input data
           throw new SMPBadRequestException ("Save Service Metadata has inconsistent values.\n" +
                                             "Service Information Participant ID: <none>\n" +
                                             "URL Parameter value: '" +
@@ -608,15 +615,17 @@ public final class SMPServerAPI
                                                                                                           .getValue ());
             if (aProcessID == null)
             {
-              throw new SMPBadRequestException ("Save Service Metadata was called with ServiceInformation that contained an invalid process identifier with scheme '" +
-                                                aJAXBProcess.getProcessIdentifier ().getScheme () +
-                                                "' and value '" +
-                                                aJAXBProcess.getProcessIdentifier ().getValue () +
-                                                "'",
-                                                m_aAPIDataProvider.getCurrentURI ());
+              final String sErrorMsg = "Save Service Metadata was called with ServiceInformation that contained an invalid process identifier with scheme '" +
+                                       aJAXBProcess.getProcessIdentifier ().getScheme () +
+                                       "' and value '" +
+                                       aJAXBProcess.getProcessIdentifier ().getValue () +
+                                       "'";
+              throw new SMPBadRequestException (sErrorMsg, m_aAPIDataProvider.getCurrentURI ());
             }
 
             final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
+            // Map from TransportProfileID to list of validity periods
+            final ICommonsMap <String, ICommonsList <LocalDatePeriod>> aValidityPeriods = new CommonsHashMap <> ();
             for (final EndpointType aJAXBEndpoint : aJAXBProcess.getServiceEndpointList ().getEndpoint ())
             {
               // Always assign a new unique ID, as the JAXB data model has no ID
@@ -632,6 +641,30 @@ public final class SMPServerAPI
                                                              aJAXBEndpoint.getTechnicalContactUrl (),
                                                              aJAXBEndpoint.getTechnicalInformationUrl (),
                                                              SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
+
+              final LocalDatePeriod aEndpointPeriod = SMPEndpointHelper.createSafePeriod (aEndpoint.getServiceActivationDate (),
+                                                                                          aEndpoint.getServiceExpirationDate ());
+
+              // Period must not be overlapping per Transport Profile
+              final ICommonsList <LocalDatePeriod> aValidityPeriodsPerTP = aValidityPeriods.computeIfAbsent (aEndpoint.getTransportProfile (),
+                                                                                                             k -> new CommonsArrayList <> ());
+              final boolean bPeriodAlreadyCovered = aValidityPeriodsPerTP.containsAny (x -> aEndpointPeriod.isOverlappingWithIncl (x));
+              if (bPeriodAlreadyCovered)
+              {
+                final String sErrorMsg = "Save Service Metadata was called with ServiceInformation with another endpoint for the provided service group, document type, process ('" +
+                                         aProcessID.getURIEncoded () +
+                                         "') and transport profile ('" +
+                                         aEndpoint.getTransportProfile () +
+                                         "') valid in the period " +
+                                         SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                                                aEndpoint.getServiceExpirationDate (),
+                                                                                CSMPServer.DEFAULT_LOCALE) +
+                                         ".";
+                throw new SMPBadRequestException (sErrorMsg, m_aAPIDataProvider.getCurrentURI ());
+              }
+              // Remember period
+              aValidityPeriodsPerTP.add (aEndpointPeriod);
+
               aEndpoints.add (aEndpoint);
             }
             aProcesses.add (new SMPProcess (aProcessID,
@@ -657,6 +690,7 @@ public final class SMPServerAPI
           throw new SMPBadRequestException ("Save Service Metadata was called with neither a Redirect nor a ServiceInformation",
                                             m_aAPIDataProvider.getCurrentURI ());
         }
+
       if (false)
         LOGGER.info (sLog + " SUCCESS");
       STATS_COUNTER_SUCCESS.increment (sAction);
@@ -688,12 +722,14 @@ public final class SMPServerAPI
         // Invalid identifier
         throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
       if (aPathDocTypeID == null)
       {
         // Invalid identifier
         throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
       SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
 
@@ -703,6 +739,7 @@ public final class SMPServerAPI
       {
         throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
       }
+
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
                                                                                                                          aPathDocTypeID);
@@ -733,6 +770,7 @@ public final class SMPServerAPI
                                                      sPathDocTypeID,
                                                      m_aAPIDataProvider.getCurrentURI ());
         }
+
         // Handle redirect
         final EChange eChange = aRedirectMgr.deleteSMPRedirect (aRedirect);
         if (eChange.isUnchanged ())
