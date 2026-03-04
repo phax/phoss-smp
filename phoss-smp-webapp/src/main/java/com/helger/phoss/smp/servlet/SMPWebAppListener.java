@@ -358,6 +358,12 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
         throw new InitializationException ("The SMP ID is missing. It must match the regular expression '" +
                                            CSMPServer.PATTERN_SMP_ID +
                                            "'!");
+      if (sSMPID.length () > CSMPServer.MAX_LEN_SMP_ID)
+        throw new InitializationException ("The SMP ID length (" +
+                                           sSMPID.length () +
+                                           ") exceeds the maximum length of " +
+                                           CSMPServer.MAX_LEN_SMP_ID +
+                                           " characters");
       if (!RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, sSMPID))
         throw new InitializationException ("The provided SMP ID '" +
                                            sSMPID +

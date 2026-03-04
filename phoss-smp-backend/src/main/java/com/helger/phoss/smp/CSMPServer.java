@@ -37,6 +37,7 @@ public final class CSMPServer
    * not more then one consecutive dot.
    */
   public static final String PATTERN_SMP_ID = "^[a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+)*$";
+  public static final int MAX_LEN_SMP_ID = 64;
 
   /** A regular expression pattern to validate HR OIBs. */
   public static final String PATTERN_HR_OIB = "[0-9]{11}";
