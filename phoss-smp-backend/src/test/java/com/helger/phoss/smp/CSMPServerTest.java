@@ -10,7 +10,9 @@
  */
 package com.helger.phoss.smp;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -31,16 +33,23 @@ public final class CSMPServerTest
                                           "aaaa",
                                           "1234",
                                           "a123",
-                                          "-",
                                           "a-b",
-                                          "-1",
                                           "smptest.intercenter.it",
+                                          "s-----t.i-----r.i-----t",
                                           "smp.bla",
                                           "smp.Bla",
                                           "a.b",
                                           "a.b.c.d.e.f.g" })
       assertTrue ("Pattern: '" + s + "'", RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
     for (final String s : new String [] { "",
+                                          "-",
+                                          "-1",
+                                          "1-",
+                                          "a.-b",
+                                          "a-.b",
+                                          "a.b.-c",
+                                          "a.b.-c",
+                                          "a.-b.c",
                                           "_",
                                           "_aaaa",
                                           ".1",
@@ -56,6 +65,14 @@ public final class CSMPServerTest
                                           "a.b.",
                                           "a.b.c..d.e.f" })
       assertFalse ("Pattern: '" + s + "'", RegExHelper.stringMatchesPattern (CSMPServer.PATTERN_SMP_ID, s));
+
+    final String [] aGroups = RegExHelper.getAllMatchingGroupValues (CSMPServer.PATTERN_SMP_ID,
+                                                                     "smptest.intercenter.it");
+    assertNotNull (aGroups);
+    assertEquals (2, aGroups.length);
+    assertEquals ("smptest", aGroups[0]);
+    // Only the last match for "*" is retained!
+    assertEquals ("it", aGroups[1]);
   }
 
   @Test
