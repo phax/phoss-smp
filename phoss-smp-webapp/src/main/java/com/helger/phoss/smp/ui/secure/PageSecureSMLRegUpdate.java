@@ -183,6 +183,8 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     if (bShowInput)
     {
       // Get default from configuration
+      // Priority to "sml.smp.hostname" is on purpose to have a preset, even if public URL is not
+      // set
       String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
       if (StringHelper.isEmpty (sLogicalAddress))
         sLogicalAddress = SMPServerConfiguration.getPublicServerURL ();
