@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.base.text.TextFormatter;
 import com.helger.base.url.URLHelper;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.impl.HCNodeList;
@@ -184,21 +183,9 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     if (bShowInput)
     {
       // Get default from configuration
-      final String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
-      String sDefaultLogicalAddress = "";
-
-      if (StringHelper.isNotEmpty (SMPServerConfiguration.getPublicServerURL ()))
-        sDefaultLogicalAddress = SMPServerConfiguration.getPublicServerURL ();
-      else
-        try
-        {
-          final InetAddress aLocalHost = InetAddress.getLocalHost ();
-          sDefaultLogicalAddress = "https://" + aLocalHost.getCanonicalHostName ();
-        }
-        catch (final UnknownHostException ex)
-        {
-          LOGGER.error ("Error determining localhost address", ex);
-        }
+      String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
+      if (StringHelper.isEmpty (sLogicalAddress))
+        sLogicalAddress = SMPServerConfiguration.getPublicServerURL ();
 
       final Predicate <ISMLInfo> aSMLFilter = null;
 
@@ -220,8 +207,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                      .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
                                                                                              sLogicalAddress)).setPlaceholder ("The domain name of your SMP server. E.g. https://smp.example.org"))
-                                                     .setHelpText (TextFormatter.getFormattedText (HELPTEXT_LOGICAL_ADDRESS,
-                                                                                                   sDefaultLogicalAddress))
+                                                     .setHelpText (HELPTEXT_LOGICAL_ADDRESS)
                                                      .setErrorList (aFormErrors.getListOfField (FIELD_LOGICAL_ADDRESS)));
 
         final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
