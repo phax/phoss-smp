@@ -191,15 +191,18 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       final String sLogicalAddress = SMPServerConfiguration.getSMLSMPHostname ();
       String sDefaultLogicalAddress = "";
 
-      try
-      {
-        final InetAddress aLocalHost = InetAddress.getLocalHost ();
-        sDefaultLogicalAddress = "https://" + aLocalHost.getCanonicalHostName ();
-      }
-      catch (final UnknownHostException ex)
-      {
-        LOGGER.error ("Error determining localhost address", ex);
-      }
+      if (StringHelper.isNotEmpty (SMPServerConfiguration.getPublicServerURL ()))
+        sDefaultLogicalAddress = SMPServerConfiguration.getPublicServerURL ();
+      else
+        try
+        {
+          final InetAddress aLocalHost = InetAddress.getLocalHost ();
+          sDefaultLogicalAddress = "https://" + aLocalHost.getCanonicalHostName ();
+        }
+        catch (final UnknownHostException ex)
+        {
+          LOGGER.error ("Error determining localhost address", ex);
+        }
 
       final Predicate <ISMLInfo> aSMLFilter = null;
 
