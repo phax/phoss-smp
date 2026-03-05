@@ -150,6 +150,7 @@ public final class MenuSecure
                  .setDisplayFilter (aFilterSMLConnectionActive);
       }
       aMenuTree.createItem (aAdmin, new PageSecureSMPSettings (CMenuSecure.MENU_SMP_SETTINGS));
+      aMenuTree.createItem (aAdmin, new PageSecureSMPConfiguration (CMenuSecure.MENU_SMP_CONFIGURATION));
       aMenuTree.createItem (aAdmin, new PageSecureSMPIdentifierMappings (CMenuSecure.MENU_SMP_IDENTIFIER_MAPPINGS));
       aMenuTree.createItem (aAdmin, new PageSecureTransportProfiles (CMenuSecure.MENU_TRANSPORT_PROFILES));
       aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <> (CMenuSecure.MENU_CHANGE_PASSWORD));
