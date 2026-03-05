@@ -121,6 +121,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
     final IConfig aPDConfig = PDClientConfiguration.getConfig ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+    final boolean bReloadConfig = ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ());
 
     {
 
@@ -135,8 +136,12 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       aNodeList.addChild (aToolbar);
     }
 
-    if (ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ()))
+    if (bReloadConfig)
+    {
       m_aLastReload = PDTFactory.getCurrentLocalDateTime ();
+      aNodeList.addChild (warn ("Please note that some configuration properties have been read prior to rendering this part of the page." +
+                                " This means that some configuration changes only take effect when you switch to another page inside the SMP."));
+    }
 
     // Just informational
     if (m_aLastReload != null)
@@ -155,7 +160,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       aNodeList.addChild (aOL);
     }
 
-    if (ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ()))
+    if (bReloadConfig)
     {
       aNodeList.addChild (h4 ("Reloading Configuration Sources"));
       {
@@ -179,7 +184,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
         aNodeList.addChild (aOL);
       }
 
-      if (ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ()))
+      if (bReloadConfig)
       {
         aNodeList.addChild (h4 ("Reloading Configuration Sources"));
         {
