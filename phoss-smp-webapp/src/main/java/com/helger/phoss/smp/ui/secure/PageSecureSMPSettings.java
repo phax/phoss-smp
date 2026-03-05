@@ -49,6 +49,11 @@ import com.helger.photon.uicore.page.EWebPageSimpleFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.url.validate.URLValidator;
 
+/**
+ * This page lets you edit the SMP settings on the fly.
+ * 
+ * @author Philip Helger
+ */
 public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <ISMPSettings>
 {
   private static final String FIELD_SMP_REST_WRITABLE_API_DISABLED = "smprwad";
