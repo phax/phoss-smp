@@ -60,12 +60,13 @@ public final class V25__MigrateSMLInfoToDB extends BaseJavaMigration
           final SMLInfoManagerJDBC aMgrNew = new SMLInfoManagerJDBC (SMPDBExecutor::new,
                                                                      SMPDBExecutor.TABLE_NAME_PREFIX);
           for (final ISMLInfo aSMLInfo : aSMLInfos)
-            aMgrNew.createSMLInfo (aSMLInfo.getDisplayName (),
-                                   aSMLInfo.getDNSZone (),
-                                   aSMLInfo.getManagementServiceURL (),
-                                   aSMLInfo.getURLSuffixManageSMP (),
-                                   aSMLInfo.getURLSuffixManageParticipant (),
-                                   aSMLInfo.isClientCertificateRequired ());
+            aMgrNew.internalCreateSMLInfo (aSMLInfo.getID (),
+                                           aSMLInfo.getDisplayName (),
+                                           aSMLInfo.getDNSZone (),
+                                           aSMLInfo.getManagementServiceURL (),
+                                           aSMLInfo.getURLSuffixManageSMP (),
+                                           aSMLInfo.getURLSuffixManageParticipant (),
+                                           aSMLInfo.isClientCertificateRequired ());
         }
 
         // Rename to avoid later inconsistencies

@@ -23,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.numeric.mutable.MutableLong;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
@@ -67,15 +68,16 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
   }
 
   @NonNull
-  public ISMLInfo createSMLInfo (@NonNull @Nonempty final String sDisplayName,
-                                 @NonNull @Nonempty final String sDNSZone,
-                                 @NonNull @Nonempty final String sManagementServiceURL,
-                                 @NonNull final String sURLSuffixManageSMP,
-                                 @NonNull final String sURLSuffixManageParticipant,
-                                 final boolean bClientCertificateRequired)
+  public ISMLInfo internalCreateSMLInfo (@NonNull @Nonempty final String sID,
+                                         @NonNull @Nonempty final String sDisplayName,
+                                         @NonNull @Nonempty final String sDNSZone,
+                                         @NonNull @Nonempty final String sManagementServiceURL,
+                                         @NonNull final String sURLSuffixManageSMP,
+                                         @NonNull final String sURLSuffixManageParticipant,
+                                         final boolean bClientCertificateRequired)
   {
     final SMLInfo aSMLInfo = SMLInfo.builder ()
-                                    .idNewPersistent ()
+                                    .id (sID)
                                     .displayName (sDisplayName)
                                     .dnsZone (sDNSZone)
                                     .managementServiceURL (sManagementServiceURL)
@@ -119,6 +121,23 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                                       sURLSuffixManageParticipant,
                                       Boolean.valueOf (bClientCertificateRequired));
     return aSMLInfo;
+  }
+
+  @NonNull
+  public ISMLInfo createSMLInfo (@NonNull @Nonempty final String sDisplayName,
+                                 @NonNull @Nonempty final String sDNSZone,
+                                 @NonNull @Nonempty final String sManagementServiceURL,
+                                 @NonNull final String sURLSuffixManageSMP,
+                                 @NonNull final String sURLSuffixManageParticipant,
+                                 final boolean bClientCertificateRequired)
+  {
+    return internalCreateSMLInfo (GlobalIDFactory.getNewPersistentStringID (),
+                                  sDisplayName,
+                                  sDNSZone,
+                                  sManagementServiceURL,
+                                  sURLSuffixManageSMP,
+                                  sURLSuffixManageParticipant,
+                                  bClientCertificateRequired);
   }
 
   @NonNull
