@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.state.ESuccess;
@@ -105,6 +107,8 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
 
   public static final String ACTION_RELOAD_CONFIG = "reloadconfig";
 
+  private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMPConfiguration.class);
+
   private LocalDateTime m_aLastReload = null;
 
   public PageSecureSMPConfiguration (@NonNull @Nonempty final String sID)
@@ -163,13 +167,13 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
     if (bReloadConfig)
     {
       aNodeList.addChild (h4 ("Reloading Configuration Sources"));
-      {
-        final HCOL aOL = new HCOL ();
-        aSMLConfig.forEachConfigurationValueProvider (new Reload (aOL));
-        if (aOL.hasNoChildren ())
-          aOL.addItem ("No reloadable configuration source present");
-        aNodeList.addChild (aOL);
-      }
+
+      final HCOL aOL = new HCOL ();
+      LOGGER.info ("Reloading SMP configuration sources");
+      aSMLConfig.forEachConfigurationValueProvider (new Reload (aOL));
+      if (aOL.hasNoChildren ())
+        aOL.addItem ("No reloadable configuration source present");
+      aNodeList.addChild (aOL);
     }
 
     if (aSettings.isDirectoryIntegrationEnabled ())
@@ -187,13 +191,12 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       if (bReloadConfig)
       {
         aNodeList.addChild (h4 ("Reloading Configuration Sources"));
-        {
-          final HCOL aOL = new HCOL ();
-          aPDConfig.forEachConfigurationValueProvider (new Reload (aOL));
-          if (aOL.hasNoChildren ())
-            aOL.addItem ("No reloadable configuration source present");
-          aNodeList.addChild (aOL);
-        }
+        final HCOL aOL = new HCOL ();
+        LOGGER.info ("Reloading PDClient configuration sources");
+        aPDConfig.forEachConfigurationValueProvider (new Reload (aOL));
+        if (aOL.hasNoChildren ())
+          aOL.addItem ("No reloadable configuration source present");
+        aNodeList.addChild (aOL);
       }
     }
   }
