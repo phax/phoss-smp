@@ -41,7 +41,10 @@ CREATE TABLE `smp_service_metadata` (
   `extension`                longtext,
   PRIMARY KEY (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`),
   KEY `FK_smp_service_metadata_id` (`businessIdentifierScheme`,`businessIdentifier`),
-  CONSTRAINT `FK_smp_service_metadata_businessIdentifier` FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`) REFERENCES `smp_service_group` (`businessIdentifierScheme`, `businessIdentifier`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_smp_service_metadata_businessIdentifier`
+    FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`)
+    REFERENCES `smp_service_group` (`businessIdentifierScheme`, `businessIdentifier`)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `smp_process` (
@@ -54,7 +57,10 @@ CREATE TABLE `smp_process` (
   `extension`                longtext,
   PRIMARY KEY (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`,`processIdentifierType`,`processIdentifier`),
   KEY `FK_smp_process_id` (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`),
-  CONSTRAINT `FK_smp_process_documentIdentifierScheme` FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`) REFERENCES `smp_service_metadata` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_smp_process_documentIdentifierScheme` 
+    FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`)
+    REFERENCES `smp_service_metadata` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- MUST use latin1 otherwise the key in this table is too long
@@ -78,7 +84,10 @@ CREATE TABLE `smp_endpoint` (
   `extension`                     longtext,
   PRIMARY KEY (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`,`processIdentifierType`,`processIdentifier`,`transportProfile`),
   KEY `FK_smp_endpoint_id` (`businessIdentifierScheme`,`businessIdentifier`,`documentIdentifierScheme`,`documentIdentifier`,`processIdentifierType`,`processIdentifier`),
-  CONSTRAINT `FK_smp_endpoint_documentIdentifierScheme` FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) REFERENCES `smp_process` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_smp_endpoint_documentIdentifierScheme` 
+    FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) 
+    REFERENCES `smp_process` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) 
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `smp_ownership` (
@@ -87,8 +96,14 @@ CREATE TABLE `smp_ownership` (
   `username`                 varchar(256) NOT NULL,
   PRIMARY KEY (`businessIdentifierScheme`,`businessIdentifier`,`username`),
   KEY `FK_smp_ownership_username` (`username`),
-  CONSTRAINT `FK_smp_ownership_id` FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`) REFERENCES `smp_service_group` (`businessIdentifierScheme`, `businessIdentifier`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_smp_ownership_username` FOREIGN KEY (`username`) REFERENCES `smp_user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_smp_ownership_id`
+    FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`)
+    REFERENCES `smp_service_group` (`businessIdentifierScheme`, `businessIdentifier`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_smp_ownership_username`
+    FOREIGN KEY (`username`)
+    REFERENCES `smp_user` (`username`)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `smp_service_metadata_redirection` (
@@ -102,7 +117,10 @@ CREATE TABLE `smp_service_metadata_redirection` (
   `certificate`              longtext,
   PRIMARY KEY (`documentIdentifierScheme`,`businessIdentifier`,`businessIdentifierScheme`,`documentIdentifier`),
   KEY `FK_smp_redirect_businessIdentifier` (`businessIdentifierScheme`,`businessIdentifier`),
-  CONSTRAINT `FK_smp_redirect_businessIdentifier` FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`) REFERENCES `smp_service_group` (`businessIdentifierScheme`, `businessIdentifier`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_smp_redirect_businessIdentifier`
+    FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`)
+    REFERENCES `smp_service_group` (`businessIdentifierScheme`, `businessIdentifier`)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `smp_bce` (
