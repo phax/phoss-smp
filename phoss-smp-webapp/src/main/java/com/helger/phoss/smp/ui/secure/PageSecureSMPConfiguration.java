@@ -38,6 +38,8 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPConfigProvider;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap4.badge.BootstrapBadge;
 import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
@@ -117,6 +119,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final IConfig aSMLConfig = SMPConfigProvider.getConfig ();
     final IConfig aPDConfig = PDClientConfiguration.getConfig ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 
     {
@@ -135,10 +138,12 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
     if (ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ()))
       m_aLastReload = PDTFactory.getCurrentLocalDateTime ();
 
+    // Just informational
     if (m_aLastReload != null)
       aNodeList.addChild (info ("Last configuration reload: " +
                                 PDTToString.getAsString (m_aLastReload, aDisplayLocale)));
 
+    // Show SMP main configuration
     aNodeList.addChild (h2 ("Current configuration sources registered"));
     {
       aNodeList.addChild (h3 ("SMP Server Configuration"));
@@ -162,25 +167,28 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       }
     }
 
+    if (aSettings.isDirectoryIntegrationEnabled ())
     {
-      aNodeList.addChild (h3 (sDirectoryName + " Client Configuration"));
-      final HCOL aOL = new HCOL ();
-      // This is a recursive iteration
-      aPDConfig.forEachConfigurationValueProvider (new List (aOL));
-      if (aOL.hasNoChildren ())
-        aOL.addItem ("No configuration source present");
-      aNodeList.addChild (aOL);
-    }
-
-    if (ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ()))
-    {
-      aNodeList.addChild (h4 ("Reloading Configuration Sources"));
       {
+        aNodeList.addChild (h3 (sDirectoryName + " Client Configuration"));
         final HCOL aOL = new HCOL ();
-        aPDConfig.forEachConfigurationValueProvider (new Reload (aOL));
+        // This is a recursive iteration
+        aPDConfig.forEachConfigurationValueProvider (new List (aOL));
         if (aOL.hasNoChildren ())
-          aOL.addItem ("No reloadable configuration source present");
+          aOL.addItem ("No configuration source present");
         aNodeList.addChild (aOL);
+      }
+
+      if (ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ()))
+      {
+        aNodeList.addChild (h4 ("Reloading Configuration Sources"));
+        {
+          final HCOL aOL = new HCOL ();
+          aPDConfig.forEachConfigurationValueProvider (new Reload (aOL));
+          if (aOL.hasNoChildren ())
+            aOL.addItem ("No reloadable configuration source present");
+          aNodeList.addChild (aOL);
+        }
       }
     }
   }
