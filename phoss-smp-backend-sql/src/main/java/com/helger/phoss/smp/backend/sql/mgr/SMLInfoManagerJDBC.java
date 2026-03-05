@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.misc.DevelopersNote;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.numeric.mutable.MutableLong;
@@ -68,6 +69,7 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
   }
 
   @NonNull
+  @DevelopersNote ("For internal use only")
   public ISMLInfo internalCreateSMLInfo (@NonNull @Nonempty final String sID,
                                          @NonNull @Nonempty final String sDisplayName,
                                          @NonNull @Nonempty final String sDNSZone,
