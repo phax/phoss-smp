@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -48,14 +46,12 @@ import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.grouping.HCUL;
-import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.pd.client.PDClientConfiguration;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -79,7 +75,6 @@ import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
-import com.helger.url.SimpleURL;
 
 public class PageSecureTasksProblems extends AbstractSMPWebPage
 {
@@ -355,8 +350,6 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   private void _checkSMLConfiguration (@NonNull final HCOL aOL)
   {
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
-    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
 
     if (aSMPSettings.isSMLEnabled ())
     {
@@ -365,29 +358,6 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       {
         aOL.addItem (_createError ("No SML is selected in the SMP settings."),
                      div ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
-      }
-      else
-      {
-        if (eRESTType.isPeppol ())
-        {
-          // Check if this SMP is already registered
-          final String sPublisherDNSName = sSMPID + "." + aSMLInfo.getPublisherDNSZone ();
-          try
-          {
-            InetAddress.getByName (sPublisherDNSName);
-            // On success, ignore
-          }
-          catch (final UnknownHostException ex)
-          {
-            // continue
-            aOL.addItem (_createWarning ("It seems like this SMP was not yet registered to the SML."),
-                         div ("This is a one-time action that should be performed once. It requires a valid SMP certificate to work."),
-                         div ("The registration check was performed with the URL ").addChild (new HCA ().setHref (new SimpleURL ("http://" +
-                                                                                                                                 sPublisherDNSName))
-                                                                                                        .setTargetBlank ()
-                                                                                                        .addChild (code (sPublisherDNSName))));
-          }
-        }
       }
     }
     else

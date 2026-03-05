@@ -35,8 +35,6 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.CSMPServer;
-import com.helger.phoss.smp.ESMPRESTType;
-import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
@@ -130,7 +128,6 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of SML configuration '" +
                                                             aSelectedObject.getDisplayName () +
@@ -139,11 +136,6 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     final BootstrapViewForm aForm = new BootstrapViewForm ();
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Name").setCtrl (aSelectedObject.getDisplayName ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("DNS Zone").setCtrl (aSelectedObject.getDNSZone ()));
-    if (eRESTType.isPeppol ())
-    {
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Publisher DNS Zone")
-                                                   .setCtrl (aSelectedObject.getPublisherDNSZone ()));
-    }
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Management Service URL")
                                                  .setCtrl (HCA.createLinkedWebsite (aSelectedObject.getManagementServiceURL ())));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("URL suffix to manage SMPs")

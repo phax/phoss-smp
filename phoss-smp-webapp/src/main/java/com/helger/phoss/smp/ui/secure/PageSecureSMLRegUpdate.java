@@ -16,9 +16,7 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.net.InetAddress;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.function.Predicate;
 
@@ -153,26 +151,6 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
     if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
     {
       aNodeList.addChild (warn (HR_EXT_WARNING));
-    }
-
-    if (aDefaultSML != null)
-    {
-      // Check if this SMP is already registered
-      final String sPublisherDNSName = sSMPID + "." + aDefaultSML.getPublisherDNSZone ();
-      try
-      {
-        final InetAddress aIA = InetAddress.getByName (sPublisherDNSName);
-        aNodeList.addChild (success (div ("An SMP is already registered at the configured SML using the DNS name '" +
-                                          sPublisherDNSName +
-                                          "'. The determined IP address is " +
-                                          aIA.getHostAddress ())).addChild (div ("Note: this can be a different machine than this one, if another SMP uses the same ID as this one (" +
-                                                                                 sSMPID +
-                                                                                 ")")));
-      }
-      catch (final UnknownHostException ex)
-      {
-        // continue
-      }
     }
 
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
