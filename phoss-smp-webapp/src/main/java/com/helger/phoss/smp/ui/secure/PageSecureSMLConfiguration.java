@@ -71,7 +71,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
   public PageSecureSMLConfiguration (@NonNull @Nonempty final String sID)
   {
-    super (sID, "SML configuration");
+    super (sID, "SML Configuration");
     setDeleteHandler (new AbstractBootstrapWebPageActionHandlerDelete <ISMLInfo, WebPageExecutionContext> ()
     {
       @Override

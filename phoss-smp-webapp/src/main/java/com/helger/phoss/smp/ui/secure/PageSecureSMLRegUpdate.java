@@ -57,7 +57,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
 
   public PageSecureSMLRegUpdate (@NonNull @Nonempty final String sID)
   {
-    super (sID, "Update SML registration");
+    super (sID, "Update SML Registration");
   }
 
   private void _updateSMPatSML (@NonNull final WebPageExecutionContext aWPEC, @NonNull final FormErrorList aFormErrors)
