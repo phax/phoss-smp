@@ -113,7 +113,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
 
   public PageSecureSMPConfiguration (@NonNull @Nonempty final String sID)
   {
-    super (sID, "SMP Configuration");
+    super (sID, "SMP Configuration (new)");
   }
 
   @Override
@@ -125,15 +125,16 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
     final IConfig aPDConfig = PDClientConfiguration.getConfig ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+    final boolean bDirectoryEnabled = aSettings.isDirectoryIntegrationEnabled ();
     final boolean bReloadConfig = ACTION_RELOAD_CONFIG.equals (aWPEC.getAction ());
 
     {
-
+      final int nTotalReloadableSources = (aSMLConfig.getResourceBasedConfigurationValueProviderCount () +
+                                           (bDirectoryEnabled ? aPDConfig.getResourceBasedConfigurationValueProviderCount ()
+                                                              : 0));
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addChild (new BootstrapButton ().addChild ("Reload Configuration Sources")
-                                               .setDisabled ((aSMLConfig.getResourceBasedConfigurationValueProviderCount () +
-                                                              aPDConfig.getResourceBasedConfigurationValueProviderCount ()) ==
-                                                             0)
+                                               .setDisabled (nTotalReloadableSources == 0)
                                                .setOnClick (aWPEC.getSelfHref ()
                                                                  .add (CPageParam.PARAM_ACTION, ACTION_RELOAD_CONFIG))
                                                .setIcon (EDefaultIcon.REFRESH));
@@ -176,7 +177,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       aNodeList.addChild (aOL);
     }
 
-    if (aSettings.isDirectoryIntegrationEnabled ())
+    if (bDirectoryEnabled)
     {
       {
         aNodeList.addChild (h3 (sDirectoryName + " Client Configuration"));
