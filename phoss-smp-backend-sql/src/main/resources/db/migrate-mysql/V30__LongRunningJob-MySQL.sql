@@ -18,6 +18,7 @@
 CREATE TABLE `smp_long_running_job` (
   `id`       varchar(45) NOT NULL COMMENT 'Internal ID',
   `start_dt` datetime    NOT NULL COMMENT 'Job start date and time',
-  `job_data` text        NOT NULL COMMENT 'Serialized job data',
+-- The original version used "text" only
+  `job_data` mediumtext  NOT NULL COMMENT 'Serialized job data',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Long Running Job Results';

@@ -15,4 +15,5 @@
 -- limitations under the License.
 --
 
+-- In case somebody used the "V30" migration with the original "text" column
 ALTER TABLE `smp_long_running_job` MODIFY `job_data` MEDIUMTEXT NOT NULL;
