@@ -1,7 +1,7 @@
 ![Logo](https://github.com/phax/phoss-smp/blob/master/docs/logo/phoss-smp-272-100.png)
 
 <!-- ph-badge-start -->
-[![Maven Central](https://img.shields.io/maven-central/v/com.helger/phoss-smp-parent-pom)](https://img.shields.io/maven-central/v/com.helger/phoss-smp-parent-pom)
+[![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.helger/phoss-smp-parent-pom/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.helger/phoss-smp-parent-pom/)
 [![javadoc](https://javadoc.io/badge2/com.helger/phoss-smp-backend/javadoc.svg)](https://javadoc.io/doc/com.helger/phoss-smp-backend)
 <!-- ph-badge-end -->
 
