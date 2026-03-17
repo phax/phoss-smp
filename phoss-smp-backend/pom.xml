@@ -136,7 +136,7 @@
           <instructions>
             <Automatic-Module-Name>com.helger.phoss.smp</Automatic-Module-Name>
             <Export-Package>com.helger.phoss.smp.*</Export-Package>
-            <Import-Package>!jakarta.annotation.*,*</Import-Package>
+            <Import-Package>!org.jspecify.annotations.*,*</Import-Package>
             <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)",
 osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
 osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple; resolution:=optional</Require-Capability>
