@@ -16,11 +16,21 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.io.ByteArrayInputStream;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.util.Base64;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
@@ -58,6 +68,9 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 
+import static java.time.LocalTime.MIDNIGHT;
+import static java.time.ZoneOffset.UTC;
+
 public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMLCertificateUpdate.class);
@@ -83,14 +96,14 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     if (!SMPKeyManager.isKeyStoreValid ())
     {
       aWPEC.getNodeList ()
-           .addChild (warn ("This page cannot be shown because the overall keystore configuration is invalid."));
+              .addChild (warn ("This page cannot be shown because the overall keystore configuration is invalid."));
       return EValidity.INVALID;
     }
     return super.isValidToDisplayPage (aWPEC);
   }
 
   private void _updateSMPCertAtSML (@NonNull final WebPageExecutionContext aWPEC,
-                                    @NonNull final FormErrorList aFormErrors)
+          @NonNull final FormErrorList aFormErrors)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
@@ -105,10 +118,10 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     {
       if (aMigrationDate == null)
         aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE,
-                                   "The provided certificate migration date '" + sMigrationDate + "' is invalid!");
+                "The provided certificate migration date '" + sMigrationDate + "' is invalid!");
       else
-        if (aMigrationDate.compareTo (aNow) <= 0)
-          aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE, "The certificate migration date must be in the future!");
+      if (aMigrationDate.compareTo (aNow) <= 0)
+        aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE, "The certificate migration date must be in the future!");
     }
 
     if (StringHelper.isEmpty (sMigrationPublicCert))
@@ -118,12 +131,12 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     else
     {
       aMigrationPublicCert = new CertificateDecodeHelper ().source (sMigrationPublicCert)
-                                                           .pemEncoded (true)
-                                                           .getDecodedOrNull ();
+              .pemEncoded (true)
+              .getDecodedOrNull ();
       if (aMigrationPublicCert == null)
       {
         aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
-                                   "The provided public certificate cannot be parsed as a X.509 certificate.");
+                "The provided public certificate cannot be parsed as a X.509 certificate.");
       }
       else
       {
@@ -144,16 +157,16 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         if (!sMigrationPublicCert.startsWith (CertificateHelper.BEGIN_CERTIFICATE))
         {
           aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
-                                     "The provided public certificate value must start with '" +
-                                                           CertificateHelper.BEGIN_CERTIFICATE +
-                                                           "' (without the quotes)");
+                  "The provided public certificate value must start with '" +
+                          CertificateHelper.BEGIN_CERTIFICATE +
+                          "' (without the quotes)");
         }
         if (!sMigrationPublicCert.endsWith (CertificateHelper.END_CERTIFICATE))
         {
           aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
-                                     "The provided public certificate value must end with '" +
-                                                           CertificateHelper.END_CERTIFICATE +
-                                                           "' (without the quotes)");
+                  "The provided public certificate value must end with '" +
+                          CertificateHelper.END_CERTIFICATE +
+                          "' (without the quotes)");
         }
       }
     }
@@ -168,27 +181,27 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       {
         if (aMigrationDate.isBefore (aNotBefore))
           aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE,
-                                     "The provided certificate migration date " +
-                                                              PDTToString.getAsString (aMigrationDate, aDisplayLocale) +
-                                                              " must not be before the certificate NotBefore date " +
-                                                              PDTToString.getAsString (aNotBefore, aDisplayLocale) +
-                                                              "!");
+                  "The provided certificate migration date " +
+                          PDTToString.getAsString (aMigrationDate, aDisplayLocale) +
+                          " must not be before the certificate NotBefore date " +
+                          PDTToString.getAsString (aNotBefore, aDisplayLocale) +
+                          "!");
 
         if (aMigrationDate.isAfter (aNotAfter))
           aFormErrors.addFieldError (FIELD_PM_MIGRATION_DATE,
-                                     "The provided certificate migration date " +
-                                                              PDTToString.getAsString (aMigrationDate, aDisplayLocale) +
-                                                              " must not be after the certificate NotAfter date " +
-                                                              PDTToString.getAsString (aNotAfter, aDisplayLocale) +
-                                                              "!");
+                  "The provided certificate migration date " +
+                          PDTToString.getAsString (aMigrationDate, aDisplayLocale) +
+                          " must not be after the certificate NotAfter date " +
+                          PDTToString.getAsString (aNotAfter, aDisplayLocale) +
+                          "!");
       }
       else
       {
         if (aNotBefore.compareTo (aNow) <= 0)
           aFormErrors.addFieldError (FIELD_PM_PUBLIC_CERT,
-                                     "The effective certificate migration date (" +
-                                                           PDTToString.getAsString (aNotBefore, aDisplayLocale) +
-                                                           " - taken from the new public certificate) must be in the future!");
+                  "The effective certificate migration date (" +
+                          PDTToString.getAsString (aNotBefore, aDisplayLocale) +
+                          " - taken from the new public certificate) must be in the future!");
       }
     }
 
@@ -200,42 +213,51 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
         aCaller.prepareChangeCertificate (sMigrationPublicCert, aMigrationDate);
 
+        String sMigrationPrivateKey = "base64 of key from UI form";
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        byte[] certificateBytes = Base64.getDecoder().decode(sMigrationPublicCert);
+        byte[] keyBytes = Base64.getDecoder().decode(sMigrationPrivateKey);
+        PrivateKey migrationKey = KeyFactory.getInstance("RSA")
+                .generatePrivate(new PKCS8EncodedKeySpec(keyBytes));
+        X509Certificate migrationCertificate = (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(certificateBytes));
+        SMPKeyManager.getInstance().setFutureKeyEntry(aMigrationDate.atTime(OffsetTime.of(MIDNIGHT, UTC)), migrationCertificate, migrationKey);
+
         final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
         final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aMigrationPublicCert.getNotBefore ());
 
         final LocalDate aEffectiveMigrationDate = aMigrationDate != null ? aMigrationDate : aNotBefore.toLocalDate ();
         final String sMsg = "Successfully prepared migration of SMP certificate at SML '" +
-                            aSMLInfo.getManagementServiceURL () +
-                            "'" +
-                            " to be exchanged at " +
-                            PDTToString.getAsString (aEffectiveMigrationDate, aDisplayLocale) +
-                            ".";
+                aSMLInfo.getManagementServiceURL () +
+                "'" +
+                " to be exchanged at " +
+                PDTToString.getAsString (aEffectiveMigrationDate, aDisplayLocale) +
+                ".";
         LOGGER.info (sMsg);
 
         aNodeList.addChild (success ().addChild (div (sMsg))
-                                      .addChild (CertificateUI.createCertificateDetailsTable (null,
-                                                                                              aMigrationPublicCert,
-                                                                                              aNowDT,
-                                                                                              aDisplayLocale)));
+                .addChild (CertificateUI.createCertificateDetailsTable (null,
+                        aMigrationPublicCert,
+                        aNowDT,
+                        aDisplayLocale)));
 
         AuditHelper.onAuditExecuteSuccess ("smp-sml-update-cert",
-                                           aSMLInfo.getManagementServiceURL (),
-                                           sMigrationPublicCert,
-                                           aMigrationDate);
+                aSMLInfo.getManagementServiceURL (),
+                sMigrationPublicCert,
+                aMigrationDate);
       }
       catch (final Exception ex)
       {
         final String sMsg = "Error preparing migration of SMP certificate at SML '" +
-                            aSMLInfo.getManagementServiceURL () +
-                            "'.";
+                aSMLInfo.getManagementServiceURL () +
+                "'.";
         LOGGER.error (sMsg, ex);
         aNodeList.addChild (error (sMsg).addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
         AuditHelper.onAuditExecuteFailure ("smp-sml-update-cert",
-                                           aSMLInfo.getManagementServiceURL (),
-                                           sMigrationPublicCert,
-                                           aMigrationDate,
-                                           ex.getClass (),
-                                           ex.getMessage ());
+                aSMLInfo.getManagementServiceURL (),
+                sMigrationPublicCert,
+                aMigrationDate,
+                ex.getClass (),
+                ex.getMessage ());
       }
     }
     else
@@ -255,7 +277,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     }
 
     aNodeList.addChild (info ().addChildren (div ("Prepare the update of your SMP certificate in the future."),
-                                             div ("Note: this is a custom SML extension that only works with the EC SML instances!")));
+            div ("Note: this is a custom SML extension that only works with the EC SML instances!")));
 
     aNodeList.addChild (warn ("This step MUST be performed with the old SMP certificate installed, as long as it is valid!"));
 
@@ -269,22 +291,22 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         {
           aEntry.checkValidity ();
           aNodeList.addChild (success ("Your SMP certificate is still valid until " +
-                                       PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
-                                                                aDisplayLocale) +
-                                       "."));
+                  PDTToString.getAsString (PDTFactory.createLocalDateTime (aEntry.getNotAfter ()),
+                          aDisplayLocale) +
+                  "."));
         }
         catch (final CertificateExpiredException ex)
         {
           aNodeList.addChild (error ("Your SMP certificate is already expired." +
-                                     " This functionality works only if your SMP certificate is NOT expired yet." +
-                                     " Please contact EC-EDELIVERY-SUPPORT@ec.europa.eu with your SMP ID, the new certificate and the requested exchange date!"));
+                  " This functionality works only if your SMP certificate is NOT expired yet." +
+                  " Please contact EC-EDELIVERY-SUPPORT@ec.europa.eu with your SMP ID, the new certificate and the requested exchange date!"));
           bShowForm = false;
         }
         catch (final CertificateNotYetValidException ex)
         {
           aNodeList.addChild (warn ("Your SMP certificate is not valid yet." +
-                                    " For this page to work you need to have your old certificate (the one that will expire soon) configured." +
-                                    " Most likely the certificate change will not work."));
+                  " For this page to work you need to have your old certificate (the one that will expire soon) configured." +
+                  " Most likely the certificate change will not work."));
         }
       }
     }
@@ -303,24 +325,24 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       aForm.addChild (warn ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
-                                                                           (LocalDate) null,
-                                                                           aDisplayLocale);
+              (LocalDate) null,
+              aDisplayLocale);
       aDTP.setMinDate (PDTFactory.getCurrentLocalDate ().plusDays (1));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate migration date")
-                                                   .setCtrl (aDTP)
-                                                   .setHelpText ("The SML will replace the certificate at this date at 02:00am Brussels Time." +
-                                                                 " It must be in the future and within the validity period of the provided new public certificate." +
-                                                                 " If not provided, the 'valid from' part of the new certificate is used.")
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_PM_MIGRATION_DATE)));
+              .setCtrl (aDTP)
+              .setHelpText ("The SML will replace the certificate at this date at 02:00am Brussels Time." +
+                      " It must be in the future and within the validity period of the provided new public certificate." +
+                      " If not provided, the 'valid from' part of the new certificate is used.")
+              .setErrorList (aFormErrors.getListOfField (FIELD_PM_MIGRATION_DATE)));
 
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("New public certificate")
-                                                   .setCtrl (new HCTextArea (new RequestField (FIELD_PM_PUBLIC_CERT)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
-                                                   .setHelpText (span ("Paste the public part of your new certificate here (using PEM encoding)." +
-                                                                       " Do NOT paste your new private key here." +
-                                                                       " Must start with ").addChild (code (CertificateHelper.BEGIN_CERTIFICATE))
-                                                                                           .addChild (" and end with ")
-                                                                                           .addChild (code (CertificateHelper.END_CERTIFICATE)))
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_PM_PUBLIC_CERT)));
+              .setCtrl (new HCTextArea (new RequestField (FIELD_PM_PUBLIC_CERT)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
+              .setHelpText (span ("Paste the public part of your new certificate here (using PEM encoding)." +
+                      " Do NOT paste your new private key here." +
+                      " Must start with ").addChild (code (CertificateHelper.BEGIN_CERTIFICATE))
+                      .addChild (" and end with ")
+                      .addChild (code (CertificateHelper.END_CERTIFICATE)))
+              .setErrorList (aFormErrors.getListOfField (FIELD_PM_PUBLIC_CERT)));
 
       final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
       aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
