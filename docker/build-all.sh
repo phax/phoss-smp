@@ -18,8 +18,8 @@
 
 version=8.1.3
 
-echo Docker login
-docker login --username phelger
+#echo Docker login
+#echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
 
 echo Starting buildx
 docker buildx create --name phoss-smp node-amd64
