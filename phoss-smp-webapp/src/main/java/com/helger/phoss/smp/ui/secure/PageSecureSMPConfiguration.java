@@ -81,10 +81,12 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
   private static final class List implements IConfigurationValueProviderWithPriorityCallback
   {
     private final HCOL m_aOL;
+    private final Locale m_aDisplayLocale;
 
-    public List (@NonNull final HCOL aOL)
+    public List (@NonNull final HCOL aOL, @NonNull final Locale aDisplayLocale)
     {
       m_aOL = aOL;
+      m_aDisplayLocale = aDisplayLocale;
     }
 
     public void onConfigurationValueProvider (@NonNull final IConfigurationValueProvider aCVP, final int nPriority)
@@ -99,8 +101,10 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       else
         if (aCVP instanceof final IConfigurationSource aSrc)
         {
-          // use getDisplayText instead of name in ph-commons 12.1.4+
-          m_aOL.addItem (aSrc.getSourceType ().name () + " (priority " + nPriority + ")");
+          m_aOL.addItem (aSrc.getSourceType ().getDisplayText (m_aDisplayLocale) +
+                         " (priority " +
+                         nPriority +
+                         ") (not reloadable)");
         }
     }
   }
@@ -113,7 +117,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
 
   public PageSecureSMPConfiguration (@NonNull @Nonempty final String sID)
   {
-    super (sID, "SMP Configuration (new)");
+    super (sID, "SMP Configuration");
   }
 
   @Override
@@ -159,7 +163,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
       aNodeList.addChild (h3 ("SMP Server Configuration"));
       final HCOL aOL = new HCOL ();
       // This is a recursive iteration
-      aSMLConfig.forEachConfigurationValueProvider (new List (aOL));
+      aSMLConfig.forEachConfigurationValueProvider (new List (aOL, aDisplayLocale));
       if (aOL.hasNoChildren ())
         aOL.addItem ("No configuration source present");
       aNodeList.addChild (aOL);
@@ -183,7 +187,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
         aNodeList.addChild (h3 (sDirectoryName + " Client Configuration"));
         final HCOL aOL = new HCOL ();
         // This is a recursive iteration
-        aPDConfig.forEachConfigurationValueProvider (new List (aOL));
+        aPDConfig.forEachConfigurationValueProvider (new List (aOL, aDisplayLocale));
         if (aOL.hasNoChildren ())
           aOL.addItem ("No configuration source present");
         aNodeList.addChild (aOL);
