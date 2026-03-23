@@ -47,8 +47,8 @@ import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
@@ -395,8 +395,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       {
         try
         {
-          final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
-          aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+          final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSettings.getSMLInfo ());
 
           // Create a random migration key,
           // Than call SML

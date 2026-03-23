@@ -10,20 +10,11 @@
  */
 package com.helger.phoss.smp.smlhook;
 
-import java.net.URL;
-import java.util.Locale;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSocketFactory;
-
-import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.NotThreadSafe;
-import com.helger.base.exception.InitializationException;
-import com.helger.http.security.HostnameVerifierVerifyAll;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.participant.NotFoundFault;
@@ -32,7 +23,6 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.security.SMPKeyManager;
 
 /**
  * An implementation of the RegistrationHook that informs the SML of updates to this SMP's
@@ -60,53 +50,8 @@ public class RegistrationHookWriteToSML implements IRegistrationHook
     final ISMLInfo aSMLInfo = SMPMetaManager.getSettings ().getSMLInfo ();
     if (aSMLInfo == null)
       throw new IllegalStateException ("Failed to get SML manage participant endpoint URL");
-    final URL aSMLEndpointURL = aSMLInfo.getManageParticipantIdentifierEndpointAddress ();
-    final String sEndpointURL = aSMLEndpointURL.toExternalForm ();
-    final String sLowerURL = sEndpointURL.toLowerCase (Locale.US);
 
-    LOGGER.info ("Performing SML query to '" + sEndpointURL + "'");
-
-    // SSL socket factory
-    final SSLSocketFactory aSocketFactory;
-    if (sLowerURL.startsWith ("https://"))
-    {
-      // https connection
-      if (!SMPKeyManager.isKeyStoreValid ())
-        throw new InitializationException ("Cannot init registration hook to SML, because private key/certificate setup has errors: " +
-                                           SMPKeyManager.getInitializationError ());
-      try
-      {
-        aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-      }
-      catch (final Exception ex)
-      {
-        throw new IllegalStateException ("Failed to init SSLContext for SML access", ex);
-      }
-    }
-    else
-    {
-      // Local, http only access - no socket factory
-      aSocketFactory = null;
-    }
-    // Hostname verifier
-    final HostnameVerifier aHostnameVerifier;
-    if (sLowerURL.contains ("//localhost") || sLowerURL.contains ("//127.0.0.1"))
-    {
-      // Accept all hostnames
-      aHostnameVerifier = new HostnameVerifierVerifyAll (false);
-    }
-    else
-      aHostnameVerifier = null;
-    // Build WS client
-    final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (aSMLEndpointURL);
-    ret.setSSLSocketFactory (aSocketFactory);
-    ret.setHostnameVerifier (aHostnameVerifier);
-    final Timeout aConnectionTimeout = SMPServerConfiguration.getSMLConnectionTimeout ();
-    if (aConnectionTimeout != null)
-      ret.setConnectionTimeoutMS (aConnectionTimeout.toMillisecondsIntBound ());
-    final Timeout aRequestTimeout = SMPServerConfiguration.getSMLRequestTimeout ();
-    ret.setRequestTimeoutMS (aRequestTimeout.toMillisecondsIntBound ());
-    return ret;
+    return SmpSmlHelper.createSMLCallerPI (aSMLInfo);
   }
 
   public void createServiceGroup (@NonNull final IParticipantIdentifier aBusinessIdentifier) throws RegistrationHookException

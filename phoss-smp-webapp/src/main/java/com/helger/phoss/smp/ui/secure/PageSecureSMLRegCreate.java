@@ -20,8 +20,6 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-import javax.net.ssl.SSLSocketFactory;
-
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +33,7 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.security.SMPKeyManager;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.audit.AuditHelper;
@@ -97,8 +95,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
       try
       {
-        final SSLSocketFactory aSocketFactory = SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ();
-        final ManageServiceMetadataServiceCaller aCaller = createSMLCaller (aSMLInfo, aSocketFactory);
+        final ManageServiceMetadataServiceCaller aCaller = SmpSmlHelper.createSMLCallerSMP (aSMLInfo);
         aCaller.create (sSMPID, DEFAULT_PHYSICAL_ADDRESS, sLogicalAddress);
 
         final String sMsg = "Successfully registered SMP '" +

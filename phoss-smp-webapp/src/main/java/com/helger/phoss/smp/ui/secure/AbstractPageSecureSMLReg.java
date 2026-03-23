@@ -16,14 +16,10 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import javax.net.ssl.SSLSocketFactory;
-
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.peppol.sml.ISMLInfo;
-import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
@@ -57,14 +53,5 @@ public abstract class AbstractPageSecureSMLReg extends AbstractSMPWebPage
       return false;
     }
     return true;
-  }
-
-  @NonNull
-  protected static ManageServiceMetadataServiceCaller createSMLCaller (@NonNull final ISMLInfo aSML,
-                                                                       @NonNull final SSLSocketFactory aSocketFactory)
-  {
-    final ManageServiceMetadataServiceCaller ret = new ManageServiceMetadataServiceCaller (aSML);
-    ret.setSSLSocketFactory (aSocketFactory);
-    return ret;
   }
 }

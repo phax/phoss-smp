@@ -44,8 +44,8 @@ import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
-import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -133,8 +133,7 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     String sMigrationKey = null;
     try
     {
-      final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSMLInfo);
-      aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+      final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSMLInfo);
 
       // Create a random migration key,
       // Than call SML
@@ -146,7 +145,9 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
     }
     catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault | ClientTransportException ex)
     {
-      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" + sPathServiceGroupID + "'",
+      throw new SMPSMLException ("Failed to call prepareToMigrate on SML for Service Group '" +
+                                 sPathServiceGroupID +
+                                 "'",
                                  ex);
     }
 

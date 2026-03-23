@@ -43,6 +43,7 @@ import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.audit.AuditHelper;
@@ -196,8 +197,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     {
       try
       {
-        final BDMSLClient aCaller = new BDMSLClient (aSMLInfo);
-        aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+        final BDMSLClient aCaller = SmpSmlHelper.createSMLCallerBDMSL (aSMLInfo);
         aCaller.prepareChangeCertificate (sMigrationPublicCert, aMigrationDate);
 
         final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();

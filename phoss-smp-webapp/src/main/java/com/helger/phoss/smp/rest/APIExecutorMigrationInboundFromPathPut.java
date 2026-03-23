@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.security.GeneralSecurityException;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
@@ -46,8 +45,8 @@ import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
-import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.user.IUser;
@@ -71,8 +70,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
                                        @NonNull final String sMigrationKey,
                                        @NonNull final String sLogPrefix,
                                        @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                                       @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws SMPServerException,
-                                                                                              GeneralSecurityException
+                                       @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws SMPServerException
   {
     LOGGER.info (sLogPrefix +
                  "Starting inbound migration for Service Group ID '" +
@@ -135,8 +133,7 @@ public final class APIExecutorMigrationInboundFromPathPut extends AbstractSMPAPI
     // create the Service Group locally
     try
     {
-      final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
-      aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+      final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSettings.getSMLInfo ());
 
       // SML call
       aCaller.migrate (aParticipantID, sMigrationKey, SMPServerConfiguration.getSMLSMPID ());

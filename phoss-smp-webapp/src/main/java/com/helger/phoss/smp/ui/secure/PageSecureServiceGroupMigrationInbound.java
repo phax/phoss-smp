@@ -53,8 +53,8 @@ import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
-import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
@@ -332,8 +332,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       // create the Service Group locally
       try
       {
-        final ManageParticipantIdentifierServiceCaller aCaller = new ManageParticipantIdentifierServiceCaller (aSettings.getSMLInfo ());
-        aCaller.setSSLSocketFactory (SMPKeyManager.getInstance ().createSSLContext ().getSocketFactory ());
+        final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSettings.getSMLInfo ());
 
         // SML call
         aCaller.migrate (aParticipantID, sMigrationKey, SMPServerConfiguration.getSMLSMPID ());
