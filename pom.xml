@@ -68,10 +68,10 @@
 
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
-    <flyway.version>12.1.1</flyway.version>
+    <flyway.version>12.2.0</flyway.version>
     <log4j.version>2.25.3</log4j.version>
     <mongodb.version>5.6.4</mongodb.version>
-    <protobuf.version>4.34.0</protobuf.version>
+    <protobuf.version>4.34.1</protobuf.version>
     <ph-db.version>8.1.2</ph-db.version>
   </properties>
   
@@ -99,7 +99,7 @@
       <dependency>
         <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>8.1.0</version>
+        <version>8.1.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -113,7 +113,7 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>11.2.4</version>
+        <version>11.2.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -159,9 +159,9 @@
       </dependency>
       <!-- Used by Flyway -->
       <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
+        <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>2.21.1</version>
+        <version>3.1.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
