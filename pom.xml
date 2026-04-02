@@ -152,6 +152,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
@@ -164,6 +165,12 @@
         <version>3.1.0</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <!-- 4.0.7 has a regression! -->
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>4.0.6</version>
       </dependency>
       
       <dependency>
