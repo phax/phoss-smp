@@ -64,8 +64,3 @@
 .invalid-feedback {
   display: block;
 }
-
-.sticky-bottom {
-  position: sticky;
-  bottom: 0;
-}
