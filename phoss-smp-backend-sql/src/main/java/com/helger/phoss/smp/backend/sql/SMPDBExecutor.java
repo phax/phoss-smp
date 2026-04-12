@@ -22,6 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.db.api.config.IJdbcConfiguration;
+import com.helger.db.api.config.JdbcConfigurationConfig;
 import com.helger.db.api.helper.DBSystemHelper;
 import com.helger.db.jdbc.executor.DBExecutor;
 
@@ -34,11 +36,13 @@ import com.helger.db.jdbc.executor.DBExecutor;
 public final class SMPDBExecutor extends DBExecutor
 {
   public static final @NonNull String TABLE_NAME_PREFIX;
+  /** Special table name customizer for ph-oton based JDBC managers */
   public static final @NonNull Function <String, String> TABLE_NAME_CUSTOMIZER;
   static
   {
+    final IJdbcConfiguration aJdbcConfig = SMPDataSourceSingleton.getJdbcConfiguration ();
     TABLE_NAME_PREFIX = DBSystemHelper.getTableNamePrefix (SMPDataSourceSingleton.getDatabaseType (),
-                                                           SMPJDBCConfiguration.getJdbcSchema ());
+                                                           aJdbcConfig.getJdbcSchema ());
     if (TABLE_NAME_PREFIX.length () > 0)
     {
       final String sRealPrefix = TABLE_NAME_PREFIX + "smp_";
@@ -54,20 +58,22 @@ public final class SMPDBExecutor extends DBExecutor
   {
     super (SMPDataSourceSingleton.getInstance ().getDataSourceProvider ());
 
-    // This is ONLY for debugging
-    setDebugConnections (SMPJDBCConfiguration.isJdbcDebugConnections ());
-    setDebugTransactions (SMPJDBCConfiguration.isJdbcDebugTransaction ());
-    setDebugSQLStatements (SMPJDBCConfiguration.isJdbcDebugSQL ());
+    final IJdbcConfiguration aJdbcConfig = SMPDataSourceSingleton.getJdbcConfiguration ();
 
-    if (SMPJDBCConfiguration.isJdbcExecutionTimeWarningEnabled ())
+    // This is ONLY for debugging
+    setDebugConnections (aJdbcConfig.isJdbcDebugConnections ());
+    setDebugTransactions (aJdbcConfig.isJdbcDebugTransactions ());
+    setDebugSQLStatements (aJdbcConfig.isJdbcDebugSQL ());
+
+    if (aJdbcConfig.isJdbcExecutionTimeWarningEnabled ())
     {
-      final long nMillis = SMPJDBCConfiguration.getJdbcExecutionTimeWarningMilliseconds ();
+      final long nMillis = aJdbcConfig.getJdbcExecutionTimeWarningMilliseconds ();
       if (nMillis > 0)
         setExecutionDurationWarnMS (nMillis);
       else
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("Ignoring setting '" +
-                        SMPJDBCConfiguration.CONFIG_JDBC_EXECUTION_TIME_WARNING_MS +
+                        SMPJdbcConfiguration.CONFIG_PREFIX + JdbcConfigurationConfig.SUFFIX_EXECUTION_TIME_WARNING_MS +
                         "' because it is invalid.");
     }
     else

@@ -31,7 +31,7 @@ import com.helger.db.api.jdbc.JDBCHelper;
 import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
-import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
+import com.helger.phoss.smp.backend.sql.SMPJdbcConfiguration;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
 
 /**
@@ -77,24 +77,24 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
   public ICommonsOrderedMap <String, ?> getAdditionalStatusData (final boolean bDisableLongRunningOperations)
   {
     final ICommonsOrderedMap <String, Object> ret = new CommonsLinkedHashMap <> ();
-    if (SMPJDBCConfiguration.isStatusEnabled ())
+    final SMPJdbcConfiguration aJdbcConfig = (SMPJdbcConfiguration) SMPDataSourceSingleton.getJdbcConfiguration ();
+    if (aJdbcConfig.isStatusEnabled ())
     {
       // Since 5.3.0-RC5
-      ret.put ("smp.sql.target-database", SMPJDBCConfiguration.getTargetDatabaseType ());
+      ret.put ("smp.sql.target-database", aJdbcConfig.getJdbcDatabaseType ());
 
       // All smp.sql.pooling since 8.0.11
-      ret.put ("smp.sql.pooling.max-connections",
-               Integer.valueOf (SMPJDBCConfiguration.getJdbcPoolingMaxConnections ()));
+      ret.put ("smp.sql.pooling.max-connections", Integer.valueOf (aJdbcConfig.getJdbcPoolingMaxConnections ()));
       ret.put ("smp.sql.pooling.max-wait.duration",
-               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMaxWaitMillis ()).toString ());
+               Duration.ofMillis (aJdbcConfig.getJdbcPoolingMaxWaitMillis ()).toString ());
       ret.put ("smp.sql.pooling.between-evictions-runs.duration",
-               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingBetweenEvictionRunsMillis ()).toString ());
+               Duration.ofMillis (aJdbcConfig.getJdbcPoolingBetweenEvictionRunsMillis ()).toString ());
       ret.put ("smp.sql.pooling.min-evictable-idle",
-               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingMinEvictableIdleMillis ()).toString ());
+               Duration.ofMillis (aJdbcConfig.getJdbcPoolingMinEvictableIdleMillis ()).toString ());
       ret.put ("smp.sql.pooling.remove-abandoned-timeout",
-               Duration.ofMillis (SMPJDBCConfiguration.getJdbcPoolingRemoveAbandonedTimeoutMillis ()).toString ());
+               Duration.ofMillis (aJdbcConfig.getJdbcPoolingRemoveAbandonedTimeoutMillis ()).toString ());
       // since 8.0.12
-      ret.put ("smp.sql.pooling.test-on-borrow", Boolean.toString (SMPJDBCConfiguration.isJdbcPoolingTestOnBorrow ()));
+      ret.put ("smp.sql.pooling.test-on-borrow", Boolean.toString (aJdbcConfig.isJdbcPoolingTestOnBorrow ()));
 
       if (!bDisableLongRunningOperations)
       {

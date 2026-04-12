@@ -64,6 +64,11 @@
       <version>${ph-db.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.helger.db</groupId>
+      <artifactId>ph-db-flyway</artifactId>
+      <version>${ph-db.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-core</artifactId>
     </dependency>

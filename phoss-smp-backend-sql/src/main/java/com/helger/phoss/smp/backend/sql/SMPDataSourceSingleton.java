@@ -25,6 +25,9 @@ import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.string.StringImplode;
 import com.helger.db.api.EDatabaseSystemType;
+import com.helger.db.api.config.IJdbcConfiguration;
+import com.helger.db.jdbc.DataSourceProviderFromJdbcConfiguration;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 
@@ -41,13 +44,15 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
                                                                                     EDatabaseSystemType.ORACLE,
                                                                                     EDatabaseSystemType.POSTGRESQL,
                                                                                     EDatabaseSystemType.SQLSERVER);
+  private static final IJdbcConfiguration JDBC_CONFIG = new SMPJdbcConfiguration (SMPConfigProvider.getConfig ());
   private static final EDatabaseSystemType DB_TYPE;
 
   static
   {
-    final String sDBType = SMPJDBCConfiguration.getTargetDatabaseType ();
+    final String sDBType = JDBC_CONFIG.getJdbcDatabaseType ();
     DB_TYPE = EDatabaseSystemType.getFromIDCaseInsensitiveOrNull (sDBType);
     if (DB_TYPE == null || !ALLOWED_DB_TYPES.contains (DB_TYPE))
+    {
       throw new IllegalStateException ("The database type MUST be provided and MUST be one of " +
                                        StringImplode.imploder ()
                                                     .source (ALLOWED_DB_TYPES, EDatabaseSystemType::getID)
@@ -56,6 +61,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
                                        " - provided value is '" +
                                        sDBType +
                                        "'");
+    }
   }
 
   /**
@@ -67,7 +73,18 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
     return DB_TYPE;
   }
 
-  private final SMPDataSourceProvider m_aDSP = new SMPDataSourceProvider ();
+  /**
+   * @return The {@link IJdbcConfiguration} instance for the SMP SQL backend. Never
+   *         <code>null</code>.
+   * @since 8.1.4
+   */
+  @NonNull
+  public static IJdbcConfiguration getJdbcConfiguration ()
+  {
+    return JDBC_CONFIG;
+  }
+
+  private final DataSourceProviderFromJdbcConfiguration m_aDSP = new DataSourceProviderFromJdbcConfiguration (JDBC_CONFIG);
 
   /**
    * @deprecated Only called via reflection
@@ -95,7 +112,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
    *         settings.
    */
   @NonNull
-  public SMPDataSourceProvider getDataSourceProvider ()
+  public DataSourceProviderFromJdbcConfiguration getDataSourceProvider ()
   {
     return m_aDSP;
   }

@@ -16,29 +16,22 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.BaseCallback;
 import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.callback.Context;
 import org.flywaydb.core.api.callback.Event;
-import org.flywaydb.core.api.configuration.FluentConfiguration;
-import org.flywaydb.core.api.logging.LogFactory;
-import org.flywaydb.core.api.logging.LogLevel;
+import org.flywaydb.core.api.migration.JavaMigration;
 import org.flywaydb.core.api.resolver.ResolvedMigration;
 import org.flywaydb.core.internal.info.MigrationInfoImpl;
-import org.flywaydb.core.internal.jdbc.DriverDataSource;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
-import com.helger.base.string.StringHelper;
 import com.helger.db.api.EDatabaseSystemType;
-import com.helger.phoss.smp.backend.sql.SMPFlywayConfiguration;
-import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
+import com.helger.db.api.config.IJdbcConfiguration;
+import com.helger.db.flyway.FlywayMigrationRunner;
+import com.helger.db.flyway.IFlywayConfiguration;
 import com.helger.phoss.smp.backend.sql.migration.V10__MigrateRolesToDB;
 import com.helger.phoss.smp.backend.sql.migration.V11__MigrateUsersToDB;
 import com.helger.phoss.smp.backend.sql.migration.V12__MigrateUserGroupsToDB;
@@ -61,8 +54,6 @@ import com.helger.photon.audit.AuditHelper;
  */
 final class FlywayMigrator
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (FlywayMigrator.Singleton.class);
-
   // Indirection level to not load org.flyway classes by default
   @Immutable
   public static final class Singleton
@@ -76,38 +67,22 @@ final class FlywayMigrator
   private FlywayMigrator ()
   {}
 
-  void runFlyway (@NonNull final EDatabaseSystemType eDBType)
+  void runFlyway (@NonNull final EDatabaseSystemType eDBType,
+                  @NonNull final IJdbcConfiguration aJdbcConfig,
+                  @NonNull final IFlywayConfiguration aFlywayConfig)
   {
     ValueEnforcer.notNull (eDBType, "DBType");
+    ValueEnforcer.notNull (aJdbcConfig, "JdbcConfig");
+    ValueEnforcer.notNull (aFlywayConfig, "FlywayConfig");
 
-    LOGGER.info ("Starting to run Flyway for DB type " + eDBType);
-
-    final Callback aCallbackLogging = new BaseCallback ()
-    {
-      public void handle (@NonNull final Event aEvent, @Nullable final Context aContext)
-      {
-        if (LOGGER.isDebugEnabled ())
-          LOGGER.debug ("Flyway: Event " + aEvent.getId ());
-
-        if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
-        {
-          final MigrationInfo aMI = aContext.getMigrationInfo ();
-          if (aMI instanceof final MigrationInfoImpl aMII)
-          {
-            final ResolvedMigration aRM = aMII.getResolvedMigration ();
-            if (aRM != null)
-              LOGGER.info ("  Performed migration: " + aRM);
-          }
-        }
-      }
-    };
+    // SMP-specific audit callback
     final Callback aCallbackAudit = new BaseCallback ()
     {
       public void handle (@NonNull final Event aEvent, @Nullable final Context aContext)
       {
         if (aEvent == Event.AFTER_EACH_MIGRATE && aContext != null)
         {
-          final MigrationInfo aMI = aContext.getMigrationInfo ();
+          final var aMI = aContext.getMigrationInfo ();
           if (aMI instanceof final MigrationInfoImpl aMII)
           {
             final ResolvedMigration aRM = aMII.getResolvedMigration ();
@@ -125,73 +100,24 @@ final class FlywayMigrator
       }
     };
 
-    // The JDBC driver is the same as for main connection
-    final FluentConfiguration aFlywayConfig = Flyway.configure ()
-                                                    .dataSource (new DriverDataSource (FlywayMigrator.class.getClassLoader (),
-                                                                                       SMPJDBCConfiguration.getJdbcDriver (),
-                                                                                       SMPFlywayConfiguration.getFlywayJdbcUrl (),
-                                                                                       SMPFlywayConfiguration.getFlywayJdbcUser (),
-                                                                                       SMPFlywayConfiguration.getFlywayJdbcPassword ()));
+    // Avoid scanning the ClassPath by enumerating Java migrations explicitly
+    final JavaMigration [] aJavaMigrations = { new V2__MigrateDBUsersToPhotonUsers (),
+                                               new V5__MigrateTransportProfilesToDB (),
+                                               new V10__MigrateRolesToDB (),
+                                               new V11__MigrateUsersToDB (),
+                                               new V12__MigrateUserGroupsToDB (),
+                                               new V14__MigrateSettingsToDB (),
+                                               new V15__MigrateDBUsersToPhotonUsers (),
+                                               new V21__MigrateUserTokensToDB (),
+                                               new V25__MigrateSMLInfoToDB (),
+                                               new V27__MigrateSystemMigrationsToDB (),
+                                               new V29__MigrateSystemMessageToDB (),
+                                               new V31__MigrateLongRunningJobsToDB () };
 
-    // Required for creating DB tables
-    aFlywayConfig.baselineOnMigrate (true);
-
-    // Disable validation, because DDL comments are also taken into
-    // consideration
-    aFlywayConfig.validateOnMigrate (false);
-
-    // Version 1 is the baseline
-    aFlywayConfig.baselineVersion (Integer.toString (SMPFlywayConfiguration.getFlywayBaselineVersion ()))
-                 .baselineDescription ("SMP 5.2.x database layout, MySQL only");
-
-    // Separate directory per DB type
-    aFlywayConfig.locations ("db/migrate-" + eDBType.getID ());
-
-    // Avoid scanning the ClassPath by enumerating them explicitly
-    aFlywayConfig.javaMigrations (new V2__MigrateDBUsersToPhotonUsers (),
-                                  new V5__MigrateTransportProfilesToDB (),
-                                  new V10__MigrateRolesToDB (),
-                                  new V11__MigrateUsersToDB (),
-                                  new V12__MigrateUserGroupsToDB (),
-                                  new V14__MigrateSettingsToDB (),
-                                  new V15__MigrateDBUsersToPhotonUsers (),
-                                  new V21__MigrateUserTokensToDB (),
-                                  new V25__MigrateSMLInfoToDB (),
-                                  new V27__MigrateSystemMigrationsToDB (),
-                                  new V29__MigrateSystemMessageToDB (),
-                                  new V31__MigrateLongRunningJobsToDB ());
-
-    // Callbacks
-    aFlywayConfig.callbacks (aCallbackLogging, aCallbackAudit);
-
-    // Flyway to handle the DB schema?
-    final String sSchema = SMPJDBCConfiguration.getJdbcSchema ();
-    if (StringHelper.isNotEmpty (sSchema))
-    {
-      // Use the schema only, if it is explicitly configured
-      // The default schema name is ["$user", public] and as such unusable
-      aFlywayConfig.schemas (sSchema);
-    }
-    // If no schema is specified, schema create should also be disabled
-    aFlywayConfig.createSchemas (SMPJDBCConfiguration.isJdbcSchemaCreate ());
-
-    // Enable for more verbosity
-    if (false)
-      LogFactory.setLogLevel (LogLevel.DEBUG);
-
-    final Flyway aFlyway = aFlywayConfig.load ();
-    if (false)
-      aFlyway.validate ();
-
-    // In case of a failed migration only
-    if (false)
-    {
-      aFlyway.info ();
-      aFlyway.repair ();
-    }
-
-    aFlyway.migrate ();
-
-    LOGGER.info ("Finished running Flyway");
+    FlywayMigrationRunner.runFlyway (aJdbcConfig,
+                                     aFlywayConfig,
+                                     "db/migrate-" + eDBType.getID (),
+                                     aJavaMigrations,
+                                     new Callback [] { FlywayMigrationRunner.CALLBACK_LOGGING, aCallbackAudit });
   }
 }

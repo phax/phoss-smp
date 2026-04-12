@@ -24,12 +24,15 @@ import org.slf4j.LoggerFactory;
 import com.helger.base.state.ETriState;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.db.api.EDatabaseSystemType;
+import com.helger.db.api.config.IJdbcConfiguration;
+import com.helger.db.flyway.FlywayConfiguration;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
-import com.helger.phoss.smp.backend.sql.SMPFlywayConfiguration;
-import com.helger.phoss.smp.backend.sql.SMPJDBCConfiguration;
+import com.helger.phoss.smp.backend.sql.SMPFlywayConfigurationBuilder;
+import com.helger.phoss.smp.backend.sql.SMPJdbcConfiguration;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -71,12 +74,19 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     // Must be before Flyway, so that auditing of Flyway actions (may) work
     PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
+    // Build Flyway configuration with fallback to main JDBC settings
+    final IJdbcConfiguration aJdbcConfig = SMPDataSourceSingleton.getJdbcConfiguration ();
+    final SMPFlywayConfigurationBuilder aFlywayBuilder = new SMPFlywayConfigurationBuilder (SMPConfigProvider.getConfig (),
+                                                                                            aJdbcConfig);
+    final FlywayConfiguration aFlywayConfig = aFlywayBuilder.build ();
+
     // Flyway migration is enabled by default
-    if (SMPFlywayConfiguration.isFlywayEnabled ())
-      FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType);
+    if (aFlywayConfig.isFlywayEnabled ())
+      FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType, aJdbcConfig, aFlywayConfig);
     else
-      LOGGER.warn ("Flyway Migration is disabled according to the configuration item " +
-                   SMPFlywayConfiguration.CONFIG_SMP_FLYWAY_ENABLED);
+      LOGGER.warn ("Flyway Migration is disabled according to the configuration key '" +
+                   aFlywayBuilder.getConfigKeyEnabled () +
+                   "'");
 
     // Register this here, so that the SMPMetaManager is available
     DBExecutor.setConnectionStatusChangeCallback ( (eOld, eNew) ->
@@ -118,7 +128,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     final SMPServiceGroupManagerJDBC ret = new SMPServiceGroupManagerJDBC (SMPDBExecutor::new,
                                                                            SMPDBExecutor.TABLE_NAME_PREFIX);
     // Enable cache by default
-    ret.setCacheEnabled (SMPJDBCConfiguration.isJdbcServiceGroupCacheEnabled ());
+    ret.setCacheEnabled (((SMPJdbcConfiguration) SMPDataSourceSingleton.getJdbcConfiguration ()).isJdbcServiceGroupCacheEnabled ());
     return ret;
   }
 
