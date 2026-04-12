@@ -82,12 +82,12 @@
       <artifactId>flyway-core</artifactId>
       <version>${flyway.version}</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-db2</artifactId>
       <version>${flyway.version}</version>
     </dependency>
-   <dependency>
+    <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-mysql</artifactId>
       <version>${flyway.version}</version>
