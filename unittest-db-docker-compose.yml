@@ -21,7 +21,7 @@
 # docker compose -f unittest-db-docker-compose.yml down
 services:
   mysql:
-    image: mysql:8
+    image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: smp
