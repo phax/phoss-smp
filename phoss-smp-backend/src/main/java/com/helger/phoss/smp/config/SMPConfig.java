@@ -30,7 +30,7 @@ public class SMPConfig extends ConfigWithFallback
   {
     super (aValueProvider);
     setReplaceVariables (true);
-    setOutdatedNotifier ( (sOld, sNew) -> {
+    setOutdatedNotifier ( (aConfigSrc, sOld, sNew) -> {
       LOGGER.warn ("Please rename the configuration property '" +
                    sOld +
                    "' to '" +
