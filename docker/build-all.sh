@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-version=8.1.3
+version=8.1.4
 
 #echo Docker login
 #echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
