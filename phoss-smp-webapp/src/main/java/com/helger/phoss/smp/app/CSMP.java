@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
@@ -27,6 +28,7 @@ import com.helger.annotation.style.CodingStyleguideUnaware;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.photon.security.CSecurity;
 
@@ -109,5 +111,21 @@ public final class CSMP
   public static String getApplicationTitleAndVersion ()
   {
     return StringHelper.getConcatenatedOnDemand (getApplicationTitle (), " ", CSMPServer.getVersionNumber ());
+  }
+
+  public static boolean isOldPeppolSml (@Nullable final ISMLInfo aSmlInfo)
+  {
+    // Old European Commission URLs - works for Prod and Test
+    return aSmlInfo != null && aSmlInfo.getDNSZone ().toLowerCase (Locale.US).contains ("edelivery.tech.ec.europa.eu");
+  }
+
+  public static boolean isNewPeppolSml (@Nullable final ISMLInfo aSmlInfo)
+  {
+    if (aSmlInfo == null)
+      return false;
+    // New OpenPeppol SML - Prod and Test
+    final String sDnsZone = StringHelper.trimEnd (aSmlInfo.getDNSZone ().toLowerCase (Locale.US), '.');
+    return sDnsZone.equals ("participant.sml.prod.tech.peppol.org") ||
+           sDnsZone.equals ("participant.sml.test.tech.peppol.org");
   }
 }

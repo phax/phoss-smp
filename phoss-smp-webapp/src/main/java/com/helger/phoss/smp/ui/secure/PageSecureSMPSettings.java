@@ -27,9 +27,11 @@ import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
+import com.helger.phoss.smp.ESMPRESTType;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -47,6 +49,7 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.uicore.page.EWebPageSimpleFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.url.SimpleURL;
 import com.helger.url.validate.URLValidator;
 
 /**
@@ -84,6 +87,11 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+    final ISMLInfo aSmlInfo = aObject.getSMLInfo ();
+
+    final boolean bIsPeppol = SMPServerConfiguration.getRESTType () == ESMPRESTType.PEPPOL;
+    final boolean bIsOldSml = bIsPeppol && CSMP.isOldPeppolSml (aSmlInfo);
+    final boolean bIsNewSml = bIsPeppol && CSMP.isNewPeppolSml (aSmlInfo);
 
     {
       final BootstrapCard aCard = aNodeList.addAndReturnChild (new BootstrapCard ());
@@ -111,10 +119,17 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLEnabled (),
                                                                                           aDisplayLocale)));
 
-      final ISMLInfo aSMLInfo = aObject.getSMLInfo ();
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
-                                                    .setCtrl (aSMLInfo == null ? em ("none") : HCSMLSelect
-                                                                                                          .getDisplayNameNode (aSMLInfo)));
+                                                    .setCtrl (aSmlInfo == null ? em ("none") : HCSMLSelect
+                                                                                                          .getDisplayNameNode (aSmlInfo))
+                                                    .setHelpText (bIsOldSml ? div (badgeDanger ("You are still using an old Peppol SML based on the European Comission SMK/SML offering. Please modify it."))
+                                                                            : null,
+                                                                  bIsNewSml ? div (badgeSuccess ("You are using the new OpenPeppol SML. Great!"))
+                                                                            : null,
+                                                                  bIsPeppol ? div ("Details on the Peppol SML Insourcing 2026 can be found in ").addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp/discussions/445"))
+                                                                                                                                                               .setTargetBlank ()
+                                                                                                                                                               .addChild ("GitHub Discussions"))
+                                                                            : null));
     }
 
     {
@@ -214,6 +229,20 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
   {
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final boolean bIsPeppol = SMPServerConfiguration.getRESTType () == ESMPRESTType.PEPPOL;
+    final boolean bIsOldSml;
+    final boolean bIsNewSml;
+    if (bIsPeppol)
+    {
+      final ISMLInfo aSmlInfo = aObject.getSMLInfo ();
+      bIsOldSml = CSMP.isOldPeppolSml (aSmlInfo);
+      bIsNewSml = CSMP.isNewPeppolSml (aSmlInfo);
+    }
+    else
+    {
+      bIsOldSml = false;
+      bIsNewSml = false;
+    }
 
     aForm.setLeft (3);
     aForm.addChild (getUIHandler ().createDataGroupHeader ("REST API"));
@@ -239,9 +268,17 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                               aObject.getSMLInfoID ()),
                                                                             aDisplayLocale,
                                                                             null))
-                                                 .setHelpText (new HCTextNode ("Select the SML to operate on. The list of available configurations can be "),
-                                                               new HCA (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SML_CONFIGURATION)).addChild ("customized"),
-                                                               new HCTextNode ("."))
+                                                 .setHelpText (div ().addChild ("Select the SML to operate on. The list of available configurations can be ")
+                                                                     .addChild (a (aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SML_CONFIGURATION)).addChild ("customized"))
+                                                                     .addChild ("."),
+                                                               bIsOldSml ? div (badgeDanger ("You are still using an old Peppol SML based on the European Comission SMK/SML offering. Please modify it."))
+                                                                         : null,
+                                                               bIsNewSml ? div (badgeSuccess ("You are using the new OpenPeppol SML. Great!"))
+                                                                         : null,
+                                                               bIsPeppol ? div ("Details on the Peppol SML Insourcing 2026 can be found in ").addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp/discussions/445"))
+                                                                                                                                                            .setTargetBlank ()
+                                                                                                                                                            .addChild ("GitHub Discussions"))
+                                                                         : null)
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SML_INFO)));
 
     aForm.addChild (getUIHandler ().createDataGroupHeader (sDirectoryName));

@@ -35,6 +35,9 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.ESMPRESTType;
+import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
@@ -341,6 +344,7 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMLInfoManager aSMLInfoMgr = SMPMetaManager.getSMLInfoMgr ();
+    final boolean bIsPeppol = SMPServerConfiguration.getRESTType () == ESMPRESTType.PEPPOL;
 
     aNodeList.addChild (info ("This page lets you create custom SML configurations that can be used for registration."));
 
@@ -356,9 +360,13 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     for (final ISMLInfo aCurObject : aSMLInfoMgr.getAllSMLInfos ())
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
+      final boolean bIsOldSml = bIsPeppol && CSMP.isOldPeppolSml (aCurObject);
+      final boolean bIsNewSml = bIsPeppol && CSMP.isNewPeppolSml (aCurObject);
 
       final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (new HCA (aViewLink).addChild (aCurObject.getDisplayName ()));
+      aRow.addCell (div (new HCA (aViewLink).addChild (aCurObject.getDisplayName ())),
+                    bIsOldSml ? div (badgeDanger ("Deprecated. Use the OpenPeppol SML instead.")) : null,
+                    bIsNewSml ? div (badgeSuccess ("This is the new OpenPeppol SML. Great!")) : null);
       aRow.addCell (aCurObject.getDNSZone ());
       aRow.addCell (aCurObject.getManagementServiceURL ());
       aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.isClientCertificateRequired (), aDisplayLocale));

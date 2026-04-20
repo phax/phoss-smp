@@ -28,6 +28,7 @@ import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -191,17 +192,31 @@ public final class SMPRendererSecure
         aBox.addChild (new HCDiv ().addChild (EDefaultIcon.INFO.getAsNode ()).addChild (" HTTPS proxy is enabled"));
     }
 
-    final String sPublicURL = SMPServerConfiguration.getPublicServerURL ();
-    if (StringHelper.isNotEmpty (sPublicURL))
+    final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
+    if (eRESTType == ESMPRESTType.PEPPOL)
     {
-      final ESMPRESTType eRESTType = SMPServerConfiguration.getRESTType ();
-      if (eRESTType == ESMPRESTType.PEPPOL &&
-          !EURLProtocol.HTTPS.isUsedInURL (sPublicURL) &&
-          !GlobalDebug.isDebugMode ())
+      final String sPublicURL = SMPServerConfiguration.getPublicServerURL ();
+      if (StringHelper.isNotEmpty (sPublicURL))
       {
-        aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
-                                   .addChild (" Server is not configured with https"));
-        aBox.setType (EBootstrapAlertType.DANGER);
+        if (!EURLProtocol.HTTPS.isUsedInURL (sPublicURL) && !GlobalDebug.isDebugMode ())
+        {
+          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                     .addChild (" Server is not configured with https"));
+          aBox.setType (EBootstrapAlertType.DANGER);
+        }
+      }
+
+      // Check for SML Insourcing 2026
+      final ISMLInfo aSmlInfo = aSettings.getSMLInfo ();
+      if (aSmlInfo != null && aSettings.isSMLEnabled ())
+      {
+        if (CSMP.isOldPeppolSml (aSmlInfo))
+        {
+          aBox.addChild (new HCDiv ().addChild (EDefaultIcon.NO.getAsNode ())
+                                     .addChild (" SML still uses old EC DNS Zone. ")
+                                     .addChild (new HCA (aLEC.getLinkToMenuItem (CMenuSecure.MENU_SMP_SETTINGS)).addChild ("Fix me")));
+          aBox.setType (EBootstrapAlertType.DANGER);
+        }
       }
     }
 
