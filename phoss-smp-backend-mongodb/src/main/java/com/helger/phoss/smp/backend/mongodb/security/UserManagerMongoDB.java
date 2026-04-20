@@ -146,7 +146,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   @Nullable
   private User _internalCreateNewUser (@NonNull final User aUser, final boolean bPredefined)
   {
-    if (getCollection ().find (new Document ().append (BSON_ID, aUser.getID ())).first () != null)
+    if (getCollection ().find (whereID (aUser.getID ())).first () != null)
     {
       AuditHelper.onAuditCreateFailure (User.OT,
                                         aUser.getID (),

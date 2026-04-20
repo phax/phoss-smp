@@ -121,7 +121,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   @Nullable
   private UserGroup _internalCreateNewUserGroup (@NonNull final UserGroup aUserGroup, final boolean bPredefined)
   {
-    if (getCollection ().find (new Document ().append (BSON_ID, aUserGroup.getID ())).first () != null)
+    if (getCollection ().find (whereID (aUserGroup.getID ())).first () != null)
     {
       AuditHelper.onAuditCreateFailure (UserGroup.OT,
                                         aUserGroup.getID (),

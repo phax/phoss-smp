@@ -76,7 +76,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @NonNull
-  private Bson _whereID (@NonNull final String sID)
+  protected static Bson whereID (@NonNull final String sID)
   {
     return Filters.eq (BSON_ID, sID);
   }
@@ -95,7 +95,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (StringHelper.isEmpty (sID))
       return EChange.UNCHANGED;
 
-    final UpdateResult aUpdateResult = getCollection ().updateOne (_whereID (sID), aUpdate);
+    final UpdateResult aUpdateResult = getCollection ().updateOne (whereID (sID), aUpdate);
 
     // Was an element changed?
     if (aUpdateResult.getModifiedCount () == 0)
@@ -135,7 +135,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (StringHelper.isEmpty (sID))
       return null;
 
-    return findFirst (_whereID (sID));
+    return findFirst (whereID (sID));
   }
 
   @ReturnsMutableCopy
@@ -186,7 +186,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (StringHelper.isEmpty (sID))
       return false;
 
-    return getCollection ().find (_whereID (sID)).first () != null;
+    return getCollection ().find (whereID (sID)).first () != null;
   }
 
   public boolean containsAllIDs (@Nullable final Iterable <String> aIDs)

@@ -90,7 +90,7 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
   @NonNull
   private Role _internalCreateNewRole (@NonNull final Role aRole, final boolean bPredefined)
   {
-    if (getCollection ().find (new Document ().append (BSON_ID, aRole.getID ())).first () != null)
+    if (getCollection ().find (whereID (aRole.getID ())).first () != null)
     {
       AuditHelper.onAuditCreateFailure (Role.OT,
                                         aRole.getID (),
