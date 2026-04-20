@@ -22,10 +22,11 @@ import static org.junit.Assert.assertNotNull;
 import org.bson.Document;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
-import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link SMPParticipantMigrationManagerMongoDB}.
@@ -35,7 +36,7 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 public final class SMPParticipantMigrationManagerMongoDBTest
 {
   @Rule
-  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
+  public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
   @Test
   public void testConversion ()

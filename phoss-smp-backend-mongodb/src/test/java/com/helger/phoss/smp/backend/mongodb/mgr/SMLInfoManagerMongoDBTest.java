@@ -23,14 +23,15 @@ import static org.junit.Assert.assertTrue;
 import org.bson.Document;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
-import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link SMLInfoManagerMongoDB}
@@ -40,7 +41,7 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 public final class SMLInfoManagerMongoDBTest
 {
   @Rule
-  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
+  public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
   @Test
   public void testBasic ()

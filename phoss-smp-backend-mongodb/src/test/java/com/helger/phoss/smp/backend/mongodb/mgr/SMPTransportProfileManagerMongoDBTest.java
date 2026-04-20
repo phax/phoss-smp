@@ -22,14 +22,15 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
  * Test class for class {@link SMPTransportProfileManagerMongoDB}.
@@ -39,7 +40,7 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 public final class SMPTransportProfileManagerMongoDBTest
 {
   @Rule
-  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
+  public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
   @Test
   public void testBasic ()

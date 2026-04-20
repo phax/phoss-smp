@@ -27,8 +27,9 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
-import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.IUserTokenManager;
@@ -38,7 +39,7 @@ import com.helger.photon.security.user.IUserManager;
 public final class UserTokenManagerMongoDBTest
 {
   @Rule
-  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
+  public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
   @Test
   public void testUserTokenManagerCrud ()

@@ -25,8 +25,9 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
-import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRole;
 import com.helger.photon.security.role.IRoleManager;
@@ -34,7 +35,7 @@ import com.helger.photon.security.role.IRoleManager;
 public final class RoleManagerMongoDBTest
 {
   @Rule
-  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
+  public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
   @Test
   public void testRoleManagerCrud ()

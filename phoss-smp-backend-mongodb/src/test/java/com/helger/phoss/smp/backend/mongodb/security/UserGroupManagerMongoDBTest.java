@@ -25,10 +25,11 @@ import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestRule;
 
 import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.usergroup.IUserGroup;
 import com.helger.photon.security.usergroup.IUserGroupManager;
@@ -36,13 +37,14 @@ import com.helger.photon.security.usergroup.IUserGroupManager;
 public final class UserGroupManagerMongoDBTest
 {
   @Rule
-  public final SMPServerTestRule m_aRule = new SMPServerTestRule ();
+  public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
   @Test
   public void testUserGroupManagerCrud ()
   {
     final IUserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
 
+    // Make sure it's not existing
     final IUserGroup aUserGroup1 = aUserGroupMgr.createNewUserGroup ("group1", "description", Map.of ("foo", "bar"));
     assertNotNull (aUserGroup1);
     final String sUserGroup1ID = aUserGroup1.getID ();
