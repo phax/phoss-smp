@@ -172,12 +172,7 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   {
     if (getCollection ().find (whereID (aUserToken.getID ())).first () != null)
     {
-      AuditHelper.onAuditCreateFailure (UserToken.OT,
-                                        aUserToken.getID (),
-                                        aUserToken.attrs (),
-                                        aUserToken.getUserID (),
-                                        aUserToken.getDescription (),
-                                        "id-already-in-use");
+      AuditHelper.onAuditCreateFailure (UserToken.OT, aUserToken.getID (), "id-already-in-use");
       return null;
     }
 

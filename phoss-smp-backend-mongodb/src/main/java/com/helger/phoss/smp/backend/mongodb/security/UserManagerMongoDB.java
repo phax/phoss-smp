@@ -148,18 +148,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   {
     if (getCollection ().find (whereID (aUser.getID ())).first () != null)
     {
-      AuditHelper.onAuditCreateFailure (User.OT,
-                                        aUser.getID (),
-                                        aUser.getLoginName (),
-                                        aUser.getEmailAddress (),
-                                        aUser.getFirstName (),
-                                        aUser.getLastName (),
-                                        aUser.getDescription (),
-                                        aUser.getDesiredLocale (),
-                                        aUser.attrs (),
-                                        Boolean.valueOf (aUser.isDisabled ()),
-                                        bPredefined ? "predefined" : "custom",
-                                        "id-already-in-use");
+      AuditHelper.onAuditCreateFailure (User.OT, aUser.getID (), "id-already-in-use");
       return null;
     }
 

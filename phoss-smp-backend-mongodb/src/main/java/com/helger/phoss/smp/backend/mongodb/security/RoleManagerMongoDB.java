@@ -92,12 +92,7 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
   {
     if (getCollection ().find (whereID (aRole.getID ())).first () != null)
     {
-      AuditHelper.onAuditCreateFailure (Role.OT,
-                                        aRole.getID (),
-                                        aRole.getName (),
-                                        aRole.getDescription (),
-                                        bPredefined ? "predefined" : "custom",
-                                        "id-already-in-use");
+      AuditHelper.onAuditCreateFailure (Role.OT, aRole.getID (), "id-already-in-use");
       return null;
     }
 
