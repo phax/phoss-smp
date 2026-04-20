@@ -170,6 +170,17 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
 
   private @Nullable UserToken _internalCreateUserToken (@NonNull final UserToken aUserToken)
   {
+    if (getCollection ().find (new Document ().append (BSON_ID, aUserToken.getID ())).first () != null)
+    {
+      AuditHelper.onAuditCreateFailure (UserToken.OT,
+                                        aUserToken.getID (),
+                                        aUserToken.attrs (),
+                                        aUserToken.getUserID (),
+                                        aUserToken.getDescription (),
+                                        "id-already-in-use");
+      return null;
+    }
+
     if (!getCollection ().insertOne (toBson (aUserToken)).wasAcknowledged ())
     {
       AuditHelper.onAuditCreateFailure (UserToken.OT,

@@ -121,6 +121,18 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   @Nullable
   private UserGroup _internalCreateNewUserGroup (@NonNull final UserGroup aUserGroup, final boolean bPredefined)
   {
+    if (getCollection ().find (new Document ().append (BSON_ID, aUserGroup.getID ())).first () != null)
+    {
+      AuditHelper.onAuditCreateFailure (UserGroup.OT,
+                                        aUserGroup.getID (),
+                                        aUserGroup.getName (),
+                                        aUserGroup.getDescription (),
+                                        aUserGroup.attrs (),
+                                        bPredefined ? "predefined" : "custom",
+                                        "id-already-in-use");
+      return null;
+    }
+
     if (!getCollection ().insertOne (toBson (aUserGroup)).wasAcknowledged ())
     {
       AuditHelper.onAuditCreateFailure (UserGroup.OT,
