@@ -67,6 +67,7 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
   @Override
   protected void onBeforeDestroy (final IScope aScopeToBeDestroyed) throws Exception
   {
+    LOGGER.info ("Now closing MongoClient Provider");
     StreamHelper.close (m_aProvider);
   }
 
