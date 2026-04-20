@@ -13,6 +13,7 @@ package com.helger.phoss.smp.mock;
 import java.util.Locale;
 import java.util.Map;
 
+import com.helger.annotation.OverridingMethodsMustInvokeSuper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.app.mock.PhotonAppWebTestRule;
 import com.helger.photon.security.CSecurity;
@@ -30,6 +31,7 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
   {}
 
   @Override
+  @OverridingMethodsMustInvokeSuper
   public void before ()
   {
     super.before ();
@@ -51,6 +53,7 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
   }
 
   @Override
+  @OverridingMethodsMustInvokeSuper
   public void after ()
   {
     // Reset for next run
