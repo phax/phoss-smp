@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.OverridingMethodsMustInvokeSuper;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -40,7 +39,7 @@ import com.mongodb.client.MongoCollection;
  *
  * @author Philip Helger
  */
-public abstract class AbstractManagerMongoDB implements AutoCloseable
+public abstract class AbstractManagerMongoDB
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractManagerMongoDB.class);
 
@@ -58,10 +57,6 @@ public abstract class AbstractManagerMongoDB implements AutoCloseable
                                         .getCollection (sCollectionName)
                                         .withWriteConcern (WriteConcern.MAJORITY.withJournal (Boolean.TRUE));
   }
-
-  @OverridingMethodsMustInvokeSuper
-  public void close ()
-  {}
 
   /**
    * @return The name of the collection as provided in the constructor. Neither <code>null</code>

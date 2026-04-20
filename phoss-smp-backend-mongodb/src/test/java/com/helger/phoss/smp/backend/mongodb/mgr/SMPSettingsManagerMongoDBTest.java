@@ -30,6 +30,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
 /**
  * Test class for class {@link SMPSettingsManagerMongoDB}.
@@ -54,8 +55,9 @@ public final class SMPSettingsManagerMongoDBTest
                                                          true);
     assertNotNull (aSMLInfo);
 
-    try (final SMPSettingsManagerMongoDB aMgr = new SMPSettingsManagerMongoDB ())
+    try
     {
+      final ISMPSettingsManager aMgr = SMPMetaManager.getSettingsMgr ();
       final ISMPSettings aSettings = aMgr.getSettings ();
       assertNotNull (aSettings);
       aMgr.updateSettings (true, true, true, true, "v1", true, true, aSMLInfo.getID ());

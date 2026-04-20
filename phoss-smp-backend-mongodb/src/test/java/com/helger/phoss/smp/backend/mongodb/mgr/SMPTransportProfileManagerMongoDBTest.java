@@ -27,6 +27,8 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
@@ -42,35 +44,35 @@ public final class SMPTransportProfileManagerMongoDBTest
   @Test
   public void testBasic ()
   {
-    try (final SMPTransportProfileManagerMongoDB aMgr = new SMPTransportProfileManagerMongoDB ())
+    final ISMPTransportProfileManager aMgr = SMPMetaManager.getTransportProfileMgr ();
+    assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
+
+    final ICommonsList <ISMPTransportProfile> aCreated = aMgr.getAllSMPTransportProfiles ();
+    for (final ESMPTransportProfile e : ESMPTransportProfile.values ())
     {
-      assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
-      final ICommonsList <ISMPTransportProfile> aCreated = aMgr.getAllSMPTransportProfiles ();
-      for (final ESMPTransportProfile e : ESMPTransportProfile.values ())
-      {
-        final ISMPTransportProfile aCreate = aMgr.createSMPTransportProfile (e.getID (),
-                                                                             e.getName (),
-                                                                             e.getState () == ESMPTransportProfileState.DEPRECATED);
-        aCreated.add (aCreate);
-      }
-      final ICommonsList <ISMPTransportProfile> aAll = aMgr.getAllSMPTransportProfiles ();
-      assertEquals (ESMPTransportProfile.values ().length, aAll.size ());
-      for (final ISMPTransportProfile aCreate : aCreated)
-        assertTrue (aAll.contains (aCreate));
-      for (final ISMPTransportProfile aCreate : aCreated)
-        assertTrue (aMgr.updateSMPTransportProfile (aCreate.getID (),
-                                                    "bla " + aCreate.getName (),
-                                                    aCreate.getState () == ESMPTransportProfileState.DEPRECATED)
-                        .isChanged ());
-      for (final ISMPTransportProfile aCreate : aCreated)
-      {
-        final ISMPTransportProfile aInfo = aMgr.getSMPTransportProfileOfID (aCreate.getID ());
-        assertNotNull (aInfo);
-        assertTrue (aInfo.getName ().startsWith ("bla "));
-      }
-      for (final ISMPTransportProfile aCreate : aCreated)
-        assertTrue (aMgr.deleteSMPTransportProfile (aCreate.getID ()).isChanged ());
-      assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
+      final ISMPTransportProfile aCreate = aMgr.createSMPTransportProfile (e.getID (),
+                                                                           e.getName (),
+                                                                           e.getState () ==
+                                                                                         ESMPTransportProfileState.DEPRECATED);
+      aCreated.add (aCreate);
     }
+    final ICommonsList <ISMPTransportProfile> aAll = aMgr.getAllSMPTransportProfiles ();
+    assertEquals (ESMPTransportProfile.values ().length, aAll.size ());
+    for (final ISMPTransportProfile aCreate : aCreated)
+      assertTrue (aAll.contains (aCreate));
+    for (final ISMPTransportProfile aCreate : aCreated)
+      assertTrue (aMgr.updateSMPTransportProfile (aCreate.getID (),
+                                                  "bla " + aCreate.getName (),
+                                                  aCreate.getState () == ESMPTransportProfileState.DEPRECATED)
+                      .isChanged ());
+    for (final ISMPTransportProfile aCreate : aCreated)
+    {
+      final ISMPTransportProfile aInfo = aMgr.getSMPTransportProfileOfID (aCreate.getID ());
+      assertNotNull (aInfo);
+      assertTrue (aInfo.getName ().startsWith ("bla "));
+    }
+    for (final ISMPTransportProfile aCreate : aCreated)
+      assertTrue (aMgr.deleteSMPTransportProfile (aCreate.getID ()).isChanged ());
+    assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
   }
 }

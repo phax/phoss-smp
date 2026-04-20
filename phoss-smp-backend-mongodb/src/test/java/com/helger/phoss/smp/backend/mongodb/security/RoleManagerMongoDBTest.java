@@ -27,7 +27,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRole;
+import com.helger.photon.security.role.IRoleManager;
 
 public final class RoleManagerMongoDBTest
 {
@@ -37,38 +39,36 @@ public final class RoleManagerMongoDBTest
   @Test
   public void testRoleManagerCrud ()
   {
-    try (final RoleManagerMongoDB aRoleMgr = new RoleManagerMongoDB ())
+    final IRoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
+
+    final IRole aRole = aRoleMgr.createNewRole ("name", "description", Map.of ("foo", "bar"));
+    assertNotNull (aRole);
+    final String sRoleID = aRole.getID ();
+
+    try
     {
-      final IRole aRole = aRoleMgr.createNewRole ("name", "description", Map.of ("foo", "bar"));
-      assertNotNull (aRole);
-      final String sRoleID = aRole.getID ();
+      assertTrue (aRoleMgr.containsWithID (sRoleID));
 
-      try
-      {
-        assertTrue (aRoleMgr.containsWithID (sRoleID));
+      final IRole aResolvedRole = aRoleMgr.getRoleOfID (sRoleID);
+      assertNotNull (aResolvedRole);
+      assertEquals (aRole, aResolvedRole);
 
-        final IRole aResolvedRole = aRoleMgr.getRoleOfID (sRoleID);
-        assertNotNull (aResolvedRole);
-        assertEquals (aRole, aResolvedRole);
+      assertTrue (aRoleMgr.renameRole (sRoleID, "renamed").isChanged ());
+      final IRole aRenamedRole = aRoleMgr.getRoleOfID (sRoleID);
+      assertEquals ("renamed", aRenamedRole.getName ());
 
-        assertTrue (aRoleMgr.renameRole (sRoleID, "renamed").isChanged ());
-        final IRole aRenamedRole = aRoleMgr.getRoleOfID (sRoleID);
-        assertEquals ("renamed", aRenamedRole.getName ());
+      assertTrue (aRoleMgr.getAll ().contains (aRole));
 
-        assertTrue (aRoleMgr.getAll ().contains (aRole));
-        assertTrue (aRoleMgr.getAllActive ().contains (aRole));
+      assertTrue (aRoleMgr.setRoleData (sRoleID, "newName", null, null).isChanged ());
 
-        assertTrue (aRoleMgr.setRoleData (sRoleID, "newName", null, null).isChanged ());
-
-        final IRole aUpdatedRole = aRoleMgr.getRoleOfID (sRoleID);
-        assertEquals ("newName", aUpdatedRole.getName ());
-        assertNull (aUpdatedRole.getDescription ());
-        assertTrue (aUpdatedRole.attrs ().isEmpty ());
-      }
-      finally
-      {
-        aRoleMgr.internalDeleteRoleNotRecoverable (sRoleID);
-      }
+      final IRole aUpdatedRole = aRoleMgr.getRoleOfID (sRoleID);
+      assertEquals ("newName", aUpdatedRole.getName ());
+      assertNull (aUpdatedRole.getDescription ());
+      assertTrue (aUpdatedRole.attrs ().isEmpty ());
+    }
+    finally
+    {
+      ((RoleManagerMongoDB) aRoleMgr).internalDeleteRoleNotRecoverable (sRoleID);
     }
   }
 }

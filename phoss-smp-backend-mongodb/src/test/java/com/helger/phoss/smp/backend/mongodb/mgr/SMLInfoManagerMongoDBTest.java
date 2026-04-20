@@ -28,6 +28,8 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.sml.ESML;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.sml.SMLInfo;
+import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 
 /**
@@ -43,42 +45,40 @@ public final class SMLInfoManagerMongoDBTest
   @Test
   public void testBasic ()
   {
-    try (final SMLInfoManagerMongoDB aMgr = new SMLInfoManagerMongoDB ())
+    final ISMLInfoManager aMgr = SMPMetaManager.getSMLInfoMgr ();
+    assertEquals (0, aMgr.getAllSMLInfos ().size ());
+    final ICommonsList <ISMLInfo> aCreated = aMgr.getAllSMLInfos ();
+    for (final ESML e : ESML.values ())
     {
-      assertEquals (0, aMgr.getAllSMLInfos ().size ());
-      final ICommonsList <ISMLInfo> aCreated = aMgr.getAllSMLInfos ();
-      for (final ESML e : ESML.values ())
-      {
-        final ISMLInfo aCreate = aMgr.createSMLInfo (e.getDisplayName (),
-                                                     e.getDNSZone (),
-                                                     e.getManagementServiceURL (),
-                                                     e.getURLSuffixManageSMP (),
-                                                     e.getURLSuffixManageParticipant (),
-                                                     e.isClientCertificateRequired ());
-        aCreated.add (aCreate);
-      }
-      final ICommonsList <ISMLInfo> aAll = aMgr.getAllSMLInfos ();
-      assertEquals (ESML.values ().length, aAll.size ());
-      for (final ISMLInfo aCreate : aCreated)
-        assertTrue (aAll.contains (aCreate));
-      for (final ISMLInfo aCreate : aCreated)
-        assertTrue (aMgr.updateSMLInfo (aCreate.getID (),
-                                        "bla " + aCreate.getDisplayName (),
-                                        aCreate.getDNSZone (),
-                                        aCreate.getManagementServiceURL (),
-                                        aCreate.getURLSuffixManageSMP (),
-                                        aCreate.getURLSuffixManageParticipant (),
-                                        aCreate.isClientCertificateRequired ()).isChanged ());
-      for (final ISMLInfo aCreate : aCreated)
-      {
-        final ISMLInfo aInfo = aMgr.getSMLInfoOfID (aCreate.getID ());
-        assertNotNull (aInfo);
-        assertTrue (aInfo.getDisplayName ().startsWith ("bla "));
-      }
-      for (final ISMLInfo aCreate : aCreated)
-        assertTrue (aMgr.deleteSMLInfo (aCreate.getID ()).isChanged ());
-      assertEquals (0, aMgr.getAllSMLInfos ().size ());
+      final ISMLInfo aCreate = aMgr.createSMLInfo (e.getDisplayName (),
+                                                   e.getDNSZone (),
+                                                   e.getManagementServiceURL (),
+                                                   e.getURLSuffixManageSMP (),
+                                                   e.getURLSuffixManageParticipant (),
+                                                   e.isClientCertificateRequired ());
+      aCreated.add (aCreate);
     }
+    final ICommonsList <ISMLInfo> aAll = aMgr.getAllSMLInfos ();
+    assertEquals (ESML.values ().length, aAll.size ());
+    for (final ISMLInfo aCreate : aCreated)
+      assertTrue (aAll.contains (aCreate));
+    for (final ISMLInfo aCreate : aCreated)
+      assertTrue (aMgr.updateSMLInfo (aCreate.getID (),
+                                      "bla " + aCreate.getDisplayName (),
+                                      aCreate.getDNSZone (),
+                                      aCreate.getManagementServiceURL (),
+                                      aCreate.getURLSuffixManageSMP (),
+                                      aCreate.getURLSuffixManageParticipant (),
+                                      aCreate.isClientCertificateRequired ()).isChanged ());
+    for (final ISMLInfo aCreate : aCreated)
+    {
+      final ISMLInfo aInfo = aMgr.getSMLInfoOfID (aCreate.getID ());
+      assertNotNull (aInfo);
+      assertTrue (aInfo.getDisplayName ().startsWith ("bla "));
+    }
+    for (final ISMLInfo aCreate : aCreated)
+      assertTrue (aMgr.deleteSMLInfo (aCreate.getID ()).isChanged ());
+    assertEquals (0, aMgr.getAllSMLInfos ().size ());
   }
 
   @Test
