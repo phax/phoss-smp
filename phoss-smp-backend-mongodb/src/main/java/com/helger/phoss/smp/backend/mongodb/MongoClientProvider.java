@@ -16,13 +16,18 @@
  */
 package com.helger.phoss.smp.backend.mongodb;
 
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonempty;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.io.stream.StreamHelper;
@@ -52,7 +57,7 @@ public class MongoClientProvider implements AutoCloseable
 {
   private static final class LoggingCommandListener implements CommandListener
   {
-    private static final Logger LOGGER = LoggerFactory.getLogger (MongoClientProvider.LoggingCommandListener.class);
+    private final AtomicInteger m_aTotalCount = new AtomicInteger (0);
     private final ICommonsMap <String, MutableInt> m_aCommands = new CommonsHashMap <> ();
 
     @Override
@@ -60,7 +65,8 @@ public class MongoClientProvider implements AutoCloseable
     {
       final String sCommandName = event.getCommandName ();
       final int nCount = m_aCommands.computeIfAbsent (sCommandName, k -> new MutableInt (0)).inc ();
-      LOGGER.info ("Successfully executed '" + sCommandName + "' [" + nCount + "]");
+      final int nTotal = m_aTotalCount.incrementAndGet ();
+      LOGGER.info ("Successfully executed '" + sCommandName + "' [" + nCount + "/" + nTotal + "]");
     }
 
     @Override
@@ -72,23 +78,24 @@ public class MongoClientProvider implements AutoCloseable
 
   private static class IsWriteable implements ClusterListener
   {
-    private static final Logger LOGGER = LoggerFactory.getLogger (MongoClientProvider.IsWriteable.class);
     private final AtomicBoolean m_aIsWritable = new AtomicBoolean (false);
+    private final CountDownLatch m_aReadyLatch = new CountDownLatch (1);
 
     @Override
-    public void clusterDescriptionChanged (final ClusterDescriptionChangedEvent event)
+    public void clusterDescriptionChanged (final ClusterDescriptionChangedEvent aEvent)
     {
       if (!m_aIsWritable.get ())
       {
-        if (event.getNewDescription ().hasWritableServer ())
+        if (aEvent.getNewDescription ().hasWritableServer ())
         {
           m_aIsWritable.set (true);
+          m_aReadyLatch.countDown ();
           LOGGER.info ("Able to write to server");
         }
       }
       else
       {
-        if (!event.getNewDescription ().hasWritableServer ())
+        if (!aEvent.getNewDescription ().hasWritableServer ())
         {
           m_aIsWritable.set (false);
           LOGGER.error ("Unable to write to server");
@@ -96,14 +103,29 @@ public class MongoClientProvider implements AutoCloseable
       }
     }
 
-    public boolean isWritable ()
+    boolean isWritable ()
     {
       return m_aIsWritable.get ();
     }
+
+    void setWritable (final boolean bWritable)
+    {
+      m_aIsWritable.set (bWritable);
+    }
+
+    boolean awaitReady (final long nTimeoutMillis) throws InterruptedException
+    {
+      return m_aReadyLatch.await (nTimeoutMillis, TimeUnit.MILLISECONDS);
+    }
   }
+
+  /** Default timeout for waiting until the MongoDB server is writable (in milliseconds). */
+  public static final long DEFAULT_READY_TIMEOUT_MILLIS = Duration.ofSeconds (10).toMillis ();
 
   public static final Integer SORT_ASCENDING = Integer.valueOf (1);
   public static final Integer SORT_DESCENDING = Integer.valueOf (-1);
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (MongoClientProvider.class);
 
   private final MongoClient m_aMongoClient;
   private final MongoDatabase m_aDatabase;
@@ -111,6 +133,13 @@ public class MongoClientProvider implements AutoCloseable
 
   public MongoClientProvider (@NonNull @Nonempty final String sConnectionString,
                               @NonNull @Nonempty final String sDBName)
+  {
+    this (sConnectionString, sDBName, DEFAULT_READY_TIMEOUT_MILLIS);
+  }
+
+  public MongoClientProvider (@NonNull @Nonempty final String sConnectionString,
+                              @NonNull @Nonempty final String sDBName,
+                              @CheckForSigned final long nReadyTimeoutMillis)
   {
     ValueEnforcer.notEmpty (sConnectionString, "ConnectionString");
     ValueEnforcer.notEmpty (sDBName, "DBName");
@@ -123,10 +152,28 @@ public class MongoClientProvider implements AutoCloseable
                                                                    .build ();
     m_aMongoClient = MongoClients.create (aClientSettings);
     m_aDatabase = m_aMongoClient.getDatabase (sDBName);
+
+    // Block until MongoDB is writable or timeout expires
+    if (nReadyTimeoutMillis > 0)
+    {
+      try
+      {
+        if (!m_aClusterListener.awaitReady (nReadyTimeoutMillis))
+        {
+          LOGGER.warn ("MongoDB did not become writable within " + nReadyTimeoutMillis + " ms");
+        }
+      }
+      catch (final InterruptedException ex)
+      {
+        Thread.currentThread ().interrupt ();
+        LOGGER.error ("Interrupted while waiting for MongoDB to become writable");
+      }
+    }
   }
 
   public void close ()
   {
+    m_aClusterListener.setWritable (false);
     StreamHelper.close (m_aMongoClient);
   }
 
