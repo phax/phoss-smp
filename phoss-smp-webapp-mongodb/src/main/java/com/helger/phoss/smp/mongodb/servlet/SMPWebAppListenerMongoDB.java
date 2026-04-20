@@ -48,7 +48,7 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
     {
       final String sContent = SimpleFileIO.getFileAsString (aOldFile, StandardCharsets.ISO_8859_1);
       nInitialCount = sContent != null ? StringParser.parseLong (sContent.trim (), 0) : 0;
-      LOGGER.info ("Using " + nInitialCount + " as the based ID for MongoDBIDFactory");
+      LOGGER.info ("Using " + nInitialCount + " as the based ID for IDFactoryMongoDB");
     }
     else
       nInitialCount = 0;
