@@ -27,6 +27,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.bson.Document;
+import org.bson.RawBsonDocument;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.DocumentCodec;
 import org.jspecify.annotations.NonNull;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,20 +39,105 @@ import org.junit.rules.TestRule;
 import com.helger.annotation.Nonempty;
 import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
+import com.helger.photon.security.password.GlobalPasswordSettings;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.user.IUserModificationCallback;
+import com.helger.photon.security.user.User;
+import com.helger.security.password.salt.PasswordSalt;
 
 public final class UserManagerMongoDBTest
 {
   @Rule
   public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
 
+  @NonNull
+  private static IUser _serializeAndReRead (@NonNull final IUser aUser)
+  {
+    final UserManagerMongoDB aUserMgr = (UserManagerMongoDB) PhotonSecurityManager.getUserMgr ();
+
+    final Document aDoc = aUserMgr.toBson (aUser);
+    assertNotNull (aDoc);
+
+    // Fully serialize the document as BsonDocument and re-read as user document to simulate the
+    // data as retrieved from the DB
+    final Document aDocAsReadFromDbSimulated = new DocumentCodec ().decode (new RawBsonDocument (aDoc,
+                                                                                                 new DocumentCodec ()).asBsonReader (),
+                                                                            DecoderContext.builder ().build ());
+
+    final User aUser2 = aUserMgr.toEntity (aDocAsReadFromDbSimulated);
+    assertNotNull (aUser2);
+
+    return aUser2;
+  }
+
+  @Test
+  public void testMinimalUserConversion ()
+  {
+    IUser aUser = new User ("minimalLogin",
+                            null,
+                            GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                                  "testPassword"),
+                            null,
+                            null,
+                            null,
+                            Locale.US,
+                            null,
+                            false);
+
+    IUser aUser2 = _serializeAndReRead (aUser);
+    assertNotNull (aUser2);
+
+    assertEquals (aUser.getID (), aUser2.getID ());
+    assertEquals ("minimalLogin", aUser2.getLoginName ());
+    assertNull (aUser2.getEmailAddress ());
+    assertEquals (aUser.getPasswordHash (), aUser2.getPasswordHash ());
+    assertNull (aUser2.getFirstName ());
+    assertNull (aUser2.getLastName ());
+    assertNull (aUser2.getDescription ());
+    assertEquals (Locale.US, aUser2.getDesiredLocale ());
+    assertNull (aUser2.getLastLoginDateTime ());
+    assertEquals (0, aUser2.getLoginCount ());
+    assertEquals (0, aUser2.getConsecutiveFailedLoginCount ());
+    assertFalse (aUser2.isDisabled ());
+
+    // Without locale
+    aUser = new User ("minimalLogin",
+                      null,
+                      GlobalPasswordSettings.createUserDefaultPasswordHash (PasswordSalt.createRandom (),
+                                                                            "testPassword"),
+                      null,
+                      null,
+                      null,
+                      null,
+                      null,
+                      false);
+
+    aUser2 = _serializeAndReRead (aUser);
+    assertNotNull (aUser2);
+
+    assertEquals (aUser.getID (), aUser2.getID ());
+    assertEquals ("minimalLogin", aUser2.getLoginName ());
+    assertNull (aUser2.getEmailAddress ());
+    assertEquals (aUser.getPasswordHash (), aUser2.getPasswordHash ());
+    assertNull (aUser2.getFirstName ());
+    assertNull (aUser2.getLastName ());
+    assertNull (aUser2.getDescription ());
+    assertNull (aUser2.getDesiredLocale ());
+    assertNull (aUser2.getLastLoginDateTime ());
+    assertEquals (0, aUser2.getLoginCount ());
+    assertEquals (0, aUser2.getConsecutiveFailedLoginCount ());
+    assertFalse (aUser2.isDisabled ());
+  }
+
   @Test
   public void testUserManagerCrud ()
   {
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
 
+    final var aOldUser = aUserMgr.getUserOfLoginName ("UserMgrTest");
+    if (aOldUser != null)
+      ((UserManagerMongoDB) aUserMgr).internalDeleteUserNotRecoverable (aOldUser.getID ());
     final IUser aUser = aUserMgr.createNewUser ("UserMgrTest",
                                                 "usermgr@smp.localhost",
                                                 "im a super secure password",
@@ -165,7 +254,7 @@ public final class UserManagerMongoDBTest
       assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
       assertTrue (aUserMgr.containsAnyActiveUser ());
 
-      final IUser aNewLoginNameUser = aUserMgr.getUserOfLoginName ("newloginName");
+      IUser aNewLoginNameUser = aUserMgr.getUserOfLoginName ("newloginName");
       assertNotNull (aNewLoginNameUser);
       assertEquals (aUser, aNewLoginNameUser);
 
@@ -175,6 +264,24 @@ public final class UserManagerMongoDBTest
       assertEquals ("NewLN", aNewLoginNameUser.getLastName ());
       assertEquals ("NewDescription", aNewLoginNameUser.getDescription ());
       assertEquals (Locale.US, aNewLoginNameUser.getDesiredLocale ());
+
+      assertTrue (aUserMgr.setUserData (sUserID, "newloginName2", null, null, null, null, null, null, true)
+                          .isChanged ());
+      assertTrue (aUserMgr.getAllDisabledUsers ().contains (aUser));
+      assertFalse (aUserMgr.getAllActiveUsers ().contains (aUser));
+      assertTrue (aUserMgr.enableUser (sUserID).isChanged ());
+      assertTrue (aUserMgr.containsAnyActiveUser ());
+
+      aNewLoginNameUser = aUserMgr.getUserOfLoginName ("newloginName2");
+      assertNotNull (aNewLoginNameUser);
+      assertEquals (aUser, aNewLoginNameUser);
+
+      assertEquals ("newloginName2", aNewLoginNameUser.getLoginName ());
+      assertNull (aNewLoginNameUser.getEmailAddress ());
+      assertNull (aNewLoginNameUser.getFirstName ());
+      assertNull (aNewLoginNameUser.getLastName ());
+      assertNull (aNewLoginNameUser.getDescription ());
+      assertNull (aNewLoginNameUser.getDesiredLocale ());
     }
     finally
     {

@@ -43,6 +43,7 @@ import com.helger.photon.security.user.IUserModificationCallback;
 import com.helger.photon.security.user.User;
 import com.helger.security.password.hash.PasswordHash;
 import com.helger.security.password.salt.PasswordSalt;
+import com.helger.text.locale.LocaleCache;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
@@ -96,8 +97,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                              .append (BSON_USER_FIRST_NAME, aUser.getFirstName ())
                                              .append (BSON_USER_LAST_NAME, aUser.getLastName ())
                                              .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
-                                             .append (BSON_USER_PREFERRED_LOCALE,
-                                                      aUser.getDesiredLocaleAsString())
+                                             .append (BSON_USER_PREFERRED_LOCALE, aUser.getDesiredLocaleAsString ())
                                              .append (BSON_USER_LAST_LOGIN,
                                                       TypeConverter.convert (aUser.getLastLoginDateTime (), Date.class))
                                              .append (BSON_USER_LOGIN_COUNT, Integer.valueOf (aUser.getLoginCount ()))
@@ -124,7 +124,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                      aDoc.getString (BSON_USER_FIRST_NAME),
                      aDoc.getString (BSON_USER_LAST_NAME),
                      aDoc.getString (BSON_USER_DESCRIPTION),
-                     Locale.forLanguageTag (aDoc.getString (BSON_USER_PREFERRED_LOCALE)),
+                     LocaleCache.getInstance ().getLocale (aDoc.getString (BSON_USER_PREFERRED_LOCALE)),
                      TypeConverter.convert (aDoc.getDate (BSON_USER_LAST_LOGIN), LocalDateTime.class),
                      aDoc.getInteger (BSON_USER_LOGIN_COUNT).intValue (),
                      aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT).intValue (),
@@ -366,7 +366,9 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                                                                    Updates.set (BSON_USER_DESCRIPTION,
                                                                                                 sNewDescription),
                                                                                    Updates.set (BSON_USER_PREFERRED_LOCALE,
-                                                                                                aNewDesiredLocale.toLanguageTag ()),
+                                                                                                aNewDesiredLocale ==
+                                                                                                                            null ? null
+                                                                                                                                 : aNewDesiredLocale.toString ()),
                                                                                    Updates.set (BSON_USER_DISABLED,
                                                                                                 Boolean.valueOf (bNewDisabled)),
                                                                                    Updates.set (BSON_ATTRIBUTES,
