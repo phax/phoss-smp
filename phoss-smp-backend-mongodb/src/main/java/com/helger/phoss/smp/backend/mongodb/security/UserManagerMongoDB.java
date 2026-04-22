@@ -97,7 +97,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                              .append (BSON_USER_LAST_NAME, aUser.getLastName ())
                                              .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
                                              .append (BSON_USER_PREFERRED_LOCALE,
-                                                      aUser.getDesiredLocale ().toLanguageTag ())
+                                                      aUser.getDesiredLocaleAsString())
                                              .append (BSON_USER_LAST_LOGIN,
                                                       TypeConverter.convert (aUser.getLastLoginDateTime (), Date.class))
                                              .append (BSON_USER_LOGIN_COUNT, Integer.valueOf (aUser.getLoginCount ()))
