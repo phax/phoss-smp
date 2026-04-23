@@ -654,7 +654,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
             }
         }
       if (bDocChanged)
-        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+        getCollection ().replaceOne (Filters.eq (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
     }
     return nEndpointsChanged;
   }
@@ -665,7 +665,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       return false;
 
     // As simple as it can be
-    return getCollection ().find (new Document (BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_TRANSPORT_PROFILE,
-                                                sTransportProfileID)).iterator ().hasNext ();
+    return getCollection ().find (Filters.eq (BSON_PROCESSES + "." + BSON_ENDPOINTS + "." + BSON_TRANSPORT_PROFILE,
+                                              sTransportProfileID)).iterator ().hasNext ();
   }
 }
