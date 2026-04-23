@@ -18,19 +18,18 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion> 
+  <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>phoss-smp-parent-pom</artifactId>
     <version>8.1.5-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend-sql</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>phoss-smp-backend-sql</name>
   <description>SMP SQL backend</description>
   <url>https://github.com/phax/phoss-smp/phoss-smp-backend-sql</url>
   <inceptionYear>2015</inceptionYear>
-
   <licenses>
     <license>
       <name>MPL 2.0</name>
@@ -38,12 +37,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
   <organization>
     <name>Philip Helger</name>
     <url>https://www.helger.com</url>
   </organization>
-
   <developers>
     <developer>
       <id>philip</id>
@@ -52,7 +49,6 @@
       <url>https://www.helger.com</url>
     </developer>
   </developers>
-  
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
@@ -76,7 +72,6 @@
       <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-jdbc</artifactId>
     </dependency>
-        
     <dependency>
       <groupId>net.jodah</groupId>
       <artifactId>expiringmap</artifactId>
@@ -112,36 +107,15 @@
       <artifactId>flyway-sqlserver</artifactId>
       <version>${flyway.version}</version>
     </dependency>
-    
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Automatic-Module-Name>com.helger.phoss.smp.backend.sql</Automatic-Module-Name>
-            <Export-Package>com.helger.phoss.smp.backend.sql.*</Export-Package>
-            <Import-Package>!org.jspecify.annotations.*,*</Import-Package>
-            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI</Provide-Capability>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

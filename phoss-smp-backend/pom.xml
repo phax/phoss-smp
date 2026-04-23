@@ -19,7 +19,7 @@
     <version>8.1.5-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>phoss-smp-backend</name>
   <description>SMP backend library with all common parts used for a full SMP server web application</description>
   <url>https://github.com/phax/phoss-smp/phoss-smp-backend</url>
@@ -112,7 +112,8 @@
   </dependencies>
   <build>
     <resources>
-      <!-- Hack to filter only properties files -->      <resource>
+      <!-- Hack to filter only properties files -->
+      <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
         <includes>
@@ -127,25 +128,5 @@
         </excludes>
       </resource>
     </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Automatic-Module-Name>com.helger.phoss.smp</Automatic-Module-Name>
-            <Export-Package>com.helger.phoss.smp.*</Export-Package>
-            <Import-Package>!org.jspecify.annotations.*,*</Import-Package>
-            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)",
-osgi.extender; filter:="(osgi.extender=osgi.serviceloader.processor)",
-osgi.serviceloader; filter:="(osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI)"; cardinality:=multiple; resolution:=optional</Require-Capability>
-            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.typeconvert.ITypeConverterRegistrarSPI,
-osgi.serviceloader; osgi.serviceloader=com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI</Provide-Capability>
-            <Include-Resource>{maven-resources},smp-server-version.properties=target/classes/smp-server-version.properties</Include-Resource>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 </project>

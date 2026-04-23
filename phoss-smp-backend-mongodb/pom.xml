@@ -25,12 +25,11 @@
     <version>8.1.5-SNAPSHOT</version>
   </parent>
   <artifactId>phoss-smp-backend-mongodb</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <name>phoss-smp-backend-mongodb</name>
   <description>SMP MongoDB backend</description>
   <url>https://github.com/phax/phoss-smp/phoss-smp-backend-mongodb</url>
   <inceptionYear>2019</inceptionYear>
-
   <licenses>
     <license>
       <name>Apache 2</name>
@@ -38,12 +37,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
   <organization>
     <name>Philip Helger</name>
     <url>https://www.helger.com</url>
   </organization>
-
   <developers>
     <developer>
       <id>philip</id>
@@ -52,7 +49,6 @@
       <url>https://www.helger.com</url>
     </developer>
   </developers>
-
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
@@ -67,36 +63,15 @@
       <groupId>com.helger.photon</groupId>
       <artifactId>ph-oton-audit</artifactId>
     </dependency>
-
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Automatic-Module-Name>com.helger.phoss.smp.backend.mongodb</Automatic-Module-Name>
-            <Export-Package>com.helger.phoss.smp.backend.mongodb.*</Export-Package>
-            <Import-Package>!org.jspecify.annotations.*,*</Import-Package>
-            <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"</Require-Capability>
-            <Provide-Capability>osgi.serviceloader; osgi.serviceloader=com.helger.phoss.smp.backend.ISMPBackendRegistrarSPI</Provide-Capability>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
