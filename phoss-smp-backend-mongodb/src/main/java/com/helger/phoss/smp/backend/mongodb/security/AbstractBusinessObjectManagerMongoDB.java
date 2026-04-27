@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 import org.bson.Document;
@@ -207,13 +206,14 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   {
     return new Document ().append (BSON_ID, aBusinessObject.getID ())
                           .append (BSON_CREATION_TIME,
-                                   TypeConverter.convert (aBusinessObject.getCreationDateTime (), Date.class))
+                                   TypeConverter.convert (aBusinessObject.getCreationDateTime (), LocalDateTime.class))
                           .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
                           .append (BSON_LAST_MOD_TIME,
-                                   TypeConverter.convert (aBusinessObject.getLastModificationDateTime (), Date.class))
+                                   TypeConverter.convert (aBusinessObject.getLastModificationDateTime (),
+                                                          LocalDateTime.class))
                           .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
                           .append (BSON_DELETED_TIME,
-                                   TypeConverter.convert (aBusinessObject.getDeletionDateTime (), Date.class))
+                                   TypeConverter.convert (aBusinessObject.getDeletionDateTime (), LocalDateTime.class))
                           .append (BSON_DELETED_USER_ID, aBusinessObject.getDeletionUserID ())
                           // auto cast to Map<String, String>
                           .append (BSON_ATTRIBUTES, aBusinessObject.attrs ());

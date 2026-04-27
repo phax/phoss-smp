@@ -98,10 +98,12 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
                                          aDoc.getString (BSON_USER_GROUP_DESCRIPTION));
 
     final List <String> aRoles = aDoc.getList (BSON_USER_GROUP_ROLES, String.class);
-    ret.assignRoles (aRoles);
+    if (aRoles != null)
+      ret.assignRoles (aRoles);
 
     final List <String> aUsers = aDoc.getList (BSON_USER_GROUP_USERS, String.class);
-    ret.assignUsers (aUsers);
+    if (aUsers != null)
+      ret.assignUsers (aUsers);
 
     return ret;
   }
@@ -326,7 +328,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   public @NonNull EChange unassignUserFromUserGroup (@Nullable final String sUserGroupID,
                                                      @Nullable final String sUserID)
   {
-    if (StringHelper.isEmpty (sUserGroupID))
+    if (StringHelper.isEmpty (sUserGroupID) || StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,

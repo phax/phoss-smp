@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -35,6 +34,7 @@ import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.password.GlobalPasswordSettings;
 import com.helger.photon.security.user.IUser;
@@ -77,14 +77,15 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   {
     super (USER_COLLECTION_NAME);
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    getCollection ().createIndex (Indexes.ascending (BSON_USER_LOGIN_NAME));
   }
 
   @NonNull
-  private Document _passwordHashToDocument (@NonNull final PasswordHash passwordHash)
+  private Document _passwordHashToDocument (@NonNull final PasswordHash aPWHash)
   {
-    return new Document ().append (BSON_USER_PASSWORD_ALGO, passwordHash.getAlgorithmName ())
-                          .append (BSON_USER_PASSWORD_SALT, passwordHash.getSaltAsString ())
-                          .append (BSON_USER_PASSWORD_HASH, passwordHash.getPasswordHashValue ());
+    return new Document ().append (BSON_USER_PASSWORD_ALGO, aPWHash.getAlgorithmName ())
+                          .append (BSON_USER_PASSWORD_SALT, aPWHash.getSaltAsString ())
+                          .append (BSON_USER_PASSWORD_HASH, aPWHash.getPasswordHashValue ());
   }
 
   @Override
@@ -99,7 +100,8 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                              .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
                                              .append (BSON_USER_PREFERRED_LOCALE, aUser.getDesiredLocaleAsString ())
                                              .append (BSON_USER_LAST_LOGIN,
-                                                      TypeConverter.convert (aUser.getLastLoginDateTime (), Date.class))
+                                                      TypeConverter.convert (aUser.getLastLoginDateTime (),
+                                                                             LocalDateTime.class))
                                              .append (BSON_USER_LOGIN_COUNT, Integer.valueOf (aUser.getLoginCount ()))
                                              .append (BSON_USER_FAILED_LOGIN_COUNT,
                                                       Integer.valueOf (aUser.getConsecutiveFailedLoginCount ()))
@@ -126,9 +128,9 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                      aDoc.getString (BSON_USER_DESCRIPTION),
                      LocaleCache.getInstance ().getLocale (aDoc.getString (BSON_USER_PREFERRED_LOCALE)),
                      TypeConverter.convert (aDoc.getDate (BSON_USER_LAST_LOGIN), LocalDateTime.class),
-                     aDoc.getInteger (BSON_USER_LOGIN_COUNT).intValue (),
-                     aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT).intValue (),
-                     aDoc.getBoolean (BSON_USER_DISABLED).booleanValue ());
+                     aDoc.getInteger (BSON_USER_LOGIN_COUNT, 0),
+                     aDoc.getInteger (BSON_USER_FAILED_LOGIN_COUNT, 0),
+                     aDoc.getBoolean (BSON_USER_DISABLED, false));
   }
 
   @Override
@@ -438,7 +440,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
 
     final EChange eChange = genericUpdateOne (sUserID,
                                               addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_LAST_LOGIN,
-                                                                                                LocalDateTime.now ()),
+                                                                                                PDTFactory.getCurrentLocalDateTime ()),
                                                                                    Updates.inc (BSON_USER_LOGIN_COUNT,
                                                                                                 Integer.valueOf (1)),
                                                                                    Updates.set (BSON_USER_FAILED_LOGIN_COUNT,
