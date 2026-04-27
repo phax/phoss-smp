@@ -19,15 +19,20 @@ package com.helger.phoss.smp.mongodb.servlet;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.annotation.OverridingMethodsMustInvokeSuper;
 import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.base.id.factory.MemoryLongIDFactory;
 import com.helger.base.string.StringParser;
 import com.helger.io.file.SimpleFileIO;
 import com.helger.phoss.smp.backend.mongodb.audit.IDFactoryMongoDB;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.io.WebFileIO;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Special SMP web app listener for MongoDB
@@ -56,5 +61,14 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
     // Set persistent ID provider: MongoDB based
     GlobalIDFactory.setPersistentLongIDFactory (new IDFactoryMongoDB (nInitialCount));
     GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
+  }
+
+  @Override
+  @OverridingMethodsMustInvokeSuper
+  protected void beforeContextDestroyed (@NonNull final ServletContext aSC)
+  {
+    // Revert to old ID factory to ensure no MongoDBClient stays open
+    GlobalIDFactory.setPersistentLongIDFactory (new MemoryLongIDFactory ());
+    super.beforeContextDestroyed (aSC);
   }
 }

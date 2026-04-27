@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.helger.annotation.OverridingMethodsMustInvokeSuper;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.exception.InitializationException;
@@ -536,6 +537,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  @OverridingMethodsMustInvokeSuper
   protected void beforeContextDestroyed (@NonNull final ServletContext aSC)
   {
     // Explicitly unregister all proxy setting providers
