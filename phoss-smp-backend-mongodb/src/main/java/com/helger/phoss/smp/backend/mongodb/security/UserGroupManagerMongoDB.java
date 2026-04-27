@@ -33,6 +33,7 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.security.object.StubObject;
 import com.helger.photon.security.role.IRoleManager;
 import com.helger.photon.security.user.IUserManager;
 import com.helger.photon.security.usergroup.IUserGroup;
@@ -166,7 +167,9 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
                                                          @Nullable final String sDescription,
                                                          @Nullable final Map <String, String> aCustomAttrs)
   {
-    final UserGroup aUserGroup = new UserGroup (sName, sDescription, aCustomAttrs);
+    final UserGroup aUserGroup = new UserGroup (StubObject.createForCurrentUserAndID (sID, aCustomAttrs),
+                                                sName,
+                                                sDescription);
     return _internalCreateNewUserGroup (aUserGroup, true);
   }
 
