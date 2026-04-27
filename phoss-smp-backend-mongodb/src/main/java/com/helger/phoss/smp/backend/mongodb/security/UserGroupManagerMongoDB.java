@@ -237,7 +237,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   @Override
   public @NonNull ICommonsList <IUserGroup> getAllActiveUserGroups ()
   {
-    return getAllActive ();
+    return getAllNotDeleted ();
   }
 
   @Override

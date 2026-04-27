@@ -68,7 +68,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   private static final String BSON_USER_FAILED_LOGIN_COUNT = "failedLoginCount";
   private static final String BSON_USER_DISABLED = "disabled";
 
-  private static final Bson ACTIVE_FILTER = Filters.and (Filters.eq (BSON_USER_DISABLED, Boolean.FALSE),
+  private static final Bson FILTER_ACTIVE = Filters.and (Filters.eq (BSON_USER_DISABLED, Boolean.FALSE),
                                                          Filters.eq (BSON_DELETED_TIME, null));
 
   private final CallbackList <IUserModificationCallback> m_aCallbacks = new CallbackList <> ();
@@ -99,9 +99,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                              .append (BSON_USER_LAST_NAME, aUser.getLastName ())
                                              .append (BSON_USER_DESCRIPTION, aUser.getDescription ())
                                              .append (BSON_USER_PREFERRED_LOCALE, aUser.getDesiredLocaleAsString ())
-                                             .append (BSON_USER_LAST_LOGIN,
-                                                      TypeConverter.convert (aUser.getLastLoginDateTime (),
-                                                                             LocalDateTime.class))
+                                             .append (BSON_USER_LAST_LOGIN, asBsonDate (aUser.getLastLoginDateTime ()))
                                              .append (BSON_USER_LOGIN_COUNT, Integer.valueOf (aUser.getLoginCount ()))
                                              .append (BSON_USER_FAILED_LOGIN_COUNT,
                                                       Integer.valueOf (aUser.getConsecutiveFailedLoginCount ()))
@@ -309,13 +307,19 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   @Override
   public @NonNull ICommonsList <IUser> getAllActiveUsers ()
   {
-    return findAll (ACTIVE_FILTER);
+    return findAll (FILTER_ACTIVE);
   }
 
   @Override
   public long getActiveUserCount ()
   {
-    return getCollection ().countDocuments (ACTIVE_FILTER);
+    return getCollection ().countDocuments (FILTER_ACTIVE);
+  }
+
+  @Override
+  public boolean containsAnyActiveUser ()
+  {
+    return findFirst (FILTER_ACTIVE) != null;
   }
 
   @Override
@@ -327,19 +331,13 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
   @Override
   public @NonNull ICommonsList <IUser> getAllNotDeletedUsers ()
   {
-    return findAll (Filters.eq (BSON_DELETED_TIME, null));
+    return getAllNotDeleted ();
   }
 
   @Override
   public @NonNull ICommonsList <IUser> getAllDeletedUsers ()
   {
-    return findAll (Filters.ne (BSON_DELETED_TIME, null));
-  }
-
-  @Override
-  public boolean containsAnyActiveUser ()
-  {
-    return findFirst (ACTIVE_FILTER) != null;
+    return getAllDeleted ();
   }
 
   @Override
@@ -440,7 +438,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
 
     final EChange eChange = genericUpdateOne (sUserID,
                                               addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_LAST_LOGIN,
-                                                                                                PDTFactory.getCurrentLocalDateTime ()),
+                                                                                                asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
                                                                                    Updates.inc (BSON_USER_LOGIN_COUNT,
                                                                                                 Integer.valueOf (1)),
                                                                                    Updates.set (BSON_USER_FAILED_LOGIN_COUNT,

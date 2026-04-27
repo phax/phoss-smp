@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 import org.bson.Document;
@@ -80,11 +81,19 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     return Filters.eq (BSON_ID, sID);
   }
 
+  @Nullable
+  protected static Date asBsonDate (@Nullable final LocalDateTime aLDT)
+  {
+    // Must be a Date to make sure the same timezone is used everywhere
+    // When internall storing as LocalDateTime, some conversion to UTC would take place
+    return TypeConverter.convert (aLDT, Date.class);
+  }
+
   @NonNull
   protected final Bson addLastModToUpdate (@NonNull final Bson aBson)
   {
     return Updates.combine (aBson,
-                            Updates.set (BSON_LAST_MOD_TIME, PDTFactory.getCurrentLocalDateTime ()),
+                            Updates.set (BSON_LAST_MOD_TIME, asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
                             Updates.set (BSON_LAST_MOD_USER_ID, BusinessObjectHelper.getUserIDOrFallback ()));
   }
 
@@ -107,7 +116,8 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   public EChange deleteEntity (@Nullable final String sID)
   {
     return genericUpdateOne (sID,
-                             Updates.combine (Updates.set (BSON_DELETED_TIME, PDTFactory.getCurrentLocalDateTime ()),
+                             Updates.combine (Updates.set (BSON_DELETED_TIME,
+                                                           asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
                                               Updates.set (BSON_DELETED_USER_ID,
                                                            BusinessObjectHelper.getUserIDOrFallback ())));
   }
@@ -160,21 +170,21 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   }
 
   @ReturnsMutableCopy
-  public @NonNull ICommonsList <@NonNull TINT> getAll ()
+  public final @NonNull ICommonsList <@NonNull TINT> getAll ()
   {
     // do not filter
     return findAll (null);
   }
 
   @ReturnsMutableCopy
-  protected @NonNull ICommonsList <@NonNull TINT> getAllActive ()
+  protected final @NonNull ICommonsList <@NonNull TINT> getAllNotDeleted ()
   {
     // get all documents where deleted is null
     return findAll (Filters.eq (BSON_DELETED_TIME, null));
   }
 
   @ReturnsMutableCopy
-  protected @NonNull ICommonsList <@NonNull TINT> getAllDeleted ()
+  protected final @NonNull ICommonsList <@NonNull TINT> getAllDeleted ()
   {
     // get all documents where deleted is not null
     return findAll (Filters.ne (BSON_DELETED_TIME, null));
@@ -205,15 +215,11 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   protected static Document getDefaultBusinessDocument (@NonNull final IBusinessObject aBusinessObject)
   {
     return new Document ().append (BSON_ID, aBusinessObject.getID ())
-                          .append (BSON_CREATION_TIME,
-                                   TypeConverter.convert (aBusinessObject.getCreationDateTime (), LocalDateTime.class))
+                          .append (BSON_CREATION_TIME, asBsonDate (aBusinessObject.getCreationDateTime ()))
                           .append (BSON_CREATION_USER_ID, aBusinessObject.getCreationUserID ())
-                          .append (BSON_LAST_MOD_TIME,
-                                   TypeConverter.convert (aBusinessObject.getLastModificationDateTime (),
-                                                          LocalDateTime.class))
+                          .append (BSON_LAST_MOD_TIME, asBsonDate (aBusinessObject.getLastModificationDateTime ()))
                           .append (BSON_LAST_MOD_USER_ID, aBusinessObject.getLastModificationUserID ())
-                          .append (BSON_DELETED_TIME,
-                                   TypeConverter.convert (aBusinessObject.getDeletionDateTime (), LocalDateTime.class))
+                          .append (BSON_DELETED_TIME, asBsonDate (aBusinessObject.getDeletionDateTime ()))
                           .append (BSON_DELETED_USER_ID, aBusinessObject.getDeletionUserID ())
                           // auto cast to Map<String, String>
                           .append (BSON_ATTRIBUTES, aBusinessObject.attrs ());

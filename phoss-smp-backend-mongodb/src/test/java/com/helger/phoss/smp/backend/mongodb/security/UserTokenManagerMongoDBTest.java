@@ -21,7 +21,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 
@@ -29,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.token.user.IUserToken;
@@ -83,14 +83,16 @@ public final class UserTokenManagerMongoDBTest
 
         assertTrue (aUserTokenMgr.createNewAccessToken (aResolvedUserToken.getID (),
                                                         aUser.getID (),
-                                                        LocalDateTime.now (),
+                                                        PDTFactory.getCurrentLocalDateTime (),
                                                         "reason",
                                                         "tokenString").isChanged ());
         final IUserToken aUserTokenOfString = aUserTokenMgr.getUserTokenOfTokenString ("tokenString");
         assertNotNull (aUserTokenOfString);
 
-        assertTrue (aUserTokenMgr.revokeAccessToken (sUserTokenID, aUser.getID (), LocalDateTime.now (), "revoked")
-                                 .isChanged ());
+        assertTrue (aUserTokenMgr.revokeAccessToken (sUserTokenID,
+                                                     aUser.getID (),
+                                                     PDTFactory.getCurrentLocalDateTime (),
+                                                     "revoked").isChanged ());
         assertFalse (aUserTokenMgr.isAccessTokenUsed (aResolvedUserToken.getID ()));
       }
       finally

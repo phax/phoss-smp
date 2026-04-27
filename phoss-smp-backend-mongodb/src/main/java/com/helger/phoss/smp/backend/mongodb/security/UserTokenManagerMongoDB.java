@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.mongodb.security;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -84,17 +83,24 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   }
 
   @NonNull
+  private static Document _revocationToDocument (@NonNull final IRevocationStatus aRevocationStatus)
+  {
+    return new Document ().append (BSON_USER_TOKEN_REVOCATION_REVOKED, Boolean.valueOf (aRevocationStatus.isRevoked ()))
+                          .append (BSON_USER_TOKEN_REVOCATION_USER_ID, aRevocationStatus.getRevocationUserID ())
+                          .append (BSON_USER_TOKEN_REVOCATION_TIME, aRevocationStatus.getRevocationDateTime ())
+                          .append (BSON_USER_TOKEN_REVOCATION_REASON, aRevocationStatus.getRevocationReason ());
+  }
+
+  @NonNull
   private ICommonsList <Document> _userTokenToDocument (@NonNull final IAccessTokenList aAccessTokenList)
   {
     return new CommonsArrayList <> (aAccessTokenList.getAllAccessTokens (),
                                     aItem -> new Document ().append (BSON_USER_TOKEN_TOKEN_STRING,
                                                                      aItem.getTokenString ())
                                                             .append (BSON_USER_TOKEN_TOKEN_NOT_BEORE,
-                                                                     TypeConverter.convert (aItem.getNotBefore (),
-                                                                                            Date.class))
+                                                                     asBsonDate (aItem.getNotBefore ()))
                                                             .append (BSON_USER_TOKEN_TOKEN_NOT_AFTER,
-                                                                     TypeConverter.convert (aItem.getNotAfter (),
-                                                                                            Date.class))
+                                                                     asBsonDate (aItem.getNotAfter ()))
                                                             .append (BSON_USER_TOKEN_TOKEN_REVOCATION,
                                                                      _revocationToDocument (aItem.getRevocationStatus ())));
   }
@@ -106,16 +112,6 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
                                                   .append (BSON_USER_TOKEN_TOKENS,
                                                            _userTokenToDocument (aUserToken.getAccessTokenList ()))
                                                   .append (BSON_USER_TOKEN_DESCRIPTION, aUserToken.getDescription ());
-  }
-
-  @NonNull
-  private Document _revocationToDocument (@NonNull final IRevocationStatus revocationStatus)
-  {
-    return new Document ().append (BSON_USER_TOKEN_REVOCATION_REVOKED, Boolean.valueOf (revocationStatus.isRevoked ()))
-                          .append (BSON_USER_TOKEN_REVOCATION_USER_ID, revocationStatus.getRevocationUserID ())
-                          .append (BSON_USER_TOKEN_REVOCATION_TIME,
-                                   TypeConverter.convert (revocationStatus.getRevocationDateTime (), Date.class))
-                          .append (BSON_USER_TOKEN_REVOCATION_REASON, revocationStatus.getRevocationReason ());
   }
 
   @Nullable
@@ -345,7 +341,7 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
   @ReturnsMutableCopy
   public @NonNull ICommonsList <IUserToken> getAllActiveUserTokens ()
   {
-    return getAllActive ();
+    return getAllNotDeleted ();
   }
 
   @Override
