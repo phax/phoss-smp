@@ -72,23 +72,29 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
   private enum EPredefinedCA
   {
     // PEPPOL PKI G1 2010
-    PEPPOL_PILOT_G1 ("Peppol Pilot CA G1 (2010)",
-                     "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
-                     3,
-                     true),
-    PEPPOL_PRODUCTION_G1 ("Peppol Production CA G1 (2010)",
-                          "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
-                          3,
-                          true),
+    @Deprecated (forRemoval = false)
+    PEPPOL_PILOT_G1("Peppol Pilot CA G1 (2010)",
+                    "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA,OU=FOR TEST PURPOSES ONLY,O=NATIONAL IT AND TELECOM AGENCY,C=DK",
+                    3,
+                    true),
+    @Deprecated (forRemoval = false)
+    PEPPOL_PRODUCTION_G1("Peppol Production CA G1 (2010)",
+                         "CN=PEPPOL SERVICE METADATA PUBLISHER CA, O=NATIONAL IT AND TELECOM AGENCY, C=DK",
+                         3,
+                         true),
+
     // PEPPOL PKI G2 2018
-    PEPPOL_PILOT_G2 ("Peppol Pilot CA G2 (2018)",
-                     "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
-                     3,
-                     false),
-    PEPPOL_PRODUCTION_G2 ("Peppol Production CA G2 (2018)",
-                          "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
-                          3,
-                          false),
+    @Deprecated (forRemoval = false)
+    PEPPOL_PILOT_G2("Peppol Pilot CA G2 (2018)",
+                    "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G2,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
+                    3,
+                    true),
+    @Deprecated (forRemoval = false)
+    PEPPOL_PRODUCTION_G2("Peppol Production CA G2 (2018)",
+                         "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G2,O=OpenPEPPOL AISBL,C=BE",
+                         3,
+                         true),
+
     // PEPPOL PKI G3 2025
     PEPPOL_PILOT_G3 ("Peppol Pilot CA G3 (2025)",
                      "CN=PEPPOL SERVICE METADATA PUBLISHER TEST CA - G3,OU=FOR TEST ONLY,O=OpenPEPPOL AISBL,C=BE",
@@ -98,6 +104,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
                           "CN=PEPPOL SERVICE METADATA PUBLISHER CA - G3,O=OpenPEPPOL AISBL,C=BE",
                           3,
                           false),
+
     // TOOP Pilot PKI
     @Deprecated (forRemoval = false)
     TOOP_PILOT_SMP("TOOP Pilot CA", "CN=TOOP PILOTS TEST SMP CA,OU=CCTF,O=TOOP,ST=Belgium,C=EU", 3, true),
@@ -118,7 +125,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
     @Deprecated (forRemoval = false)
     DE4A_COMMISSIGN_2("DE4A CommisSign", "CN=CommisSign - 2,O=European Commission", 3, true),
 
-    // DBNA
+    // DBN Alliance
     DBNA_PRODUCTION ("DBNA Production CA",
                      "CN=Digital Business Networks Alliance Intermediate CA,O=Digital Business Networks Alliance,C=US",
                      3,
