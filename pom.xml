@@ -69,7 +69,7 @@
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
     <flyway.version>12.5.0</flyway.version>
-    <log4j.version>2.25.4</log4j.version>
+    <log4j.version>2.26.0</log4j.version>
     <mongodb.version>5.7.0</mongodb.version>
     <protobuf.version>4.34.1</protobuf.version>
     
@@ -82,7 +82,7 @@
       <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-bom</artifactId>
-        <version>4.0.6</version>
+        <version>4.0.8</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
