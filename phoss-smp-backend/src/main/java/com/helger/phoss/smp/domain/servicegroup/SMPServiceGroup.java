@@ -12,6 +12,8 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
@@ -39,6 +41,8 @@ import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServiceGroup
 {
   public static final ObjectType OT = new ObjectType ("smpservicegroup");
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroup.class);
 
   private final String m_sID;
   private String m_sOwnerID;
@@ -73,7 +77,14 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   @Nonempty
   public static String createSMPServiceGroupID (@NonNull final IParticipantIdentifier aParticipantIdentifier)
   {
-    return _createUnifiedParticipantIdentifier (aParticipantIdentifier).getURIEncoded ();
+    // This will fail in awkward situations where invalid participant IDs are present:
+    final IParticipantIdentifier aUnifiedPI = _createUnifiedParticipantIdentifier (aParticipantIdentifier);
+    if (aUnifiedPI != null)
+      return aUnifiedPI.getURIEncoded ();
+
+    // Old sins ;-)
+    LOGGER.warn ("Failed to unify participant ID '" + aParticipantIdentifier + "' - get rid of it.");
+    return aParticipantIdentifier.getURIEncoded ();
   }
 
   public SMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
