@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.string.StringHelper;
+import com.helger.config.fallback.IConfigWithFallback;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -31,6 +32,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
@@ -262,7 +264,13 @@ public final class SMPRendererSecure
       aCol2.addChild (BootstrapPageRenderer.getPageContent (aLEC));
     }
 
-    aOuterContainer.addChild (SMPRendererPublic.createDefaultFooter (true, true, true));
+    final IConfigWithFallback aConfig = SMPConfigProvider.getConfig ();
+    aOuterContainer.addChild (SMPRendererPublic.createDefaultFooter (aConfig.getAsBoolean ("webapp.secure.showappname",
+                                                                                           true),
+                                                                     aConfig.getAsBoolean ("webapp.secure.showsource",
+                                                                                           true),
+                                                                     aConfig.getAsBoolean ("webapp.secure.showauthor",
+                                                                                           true)));
 
     return ret;
   }

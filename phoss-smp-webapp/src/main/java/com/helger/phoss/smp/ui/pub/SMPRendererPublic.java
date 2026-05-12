@@ -275,7 +275,8 @@ public final class SMPRendererPublic
 
       // Author
       if (bShowAuthor)
-        aBy.addChild ("Created by ").addChild (HCA_MailTo.createLinkedEmail ("philip@helger.com", "Philip Helger"));
+        aBy.addChild ("Created by ")
+           .addChild (HCA_MailTo.createLinkedEmail (CSMP.getAuthorEmail (), CSMP.getAuthor ()));
 
       // Source
       if (bShowSource)
@@ -289,6 +290,7 @@ public final class SMPRendererPublic
       if (aBy.hasChildren ())
         aContainer.addChild (aBy);
     }
+
     // Imprint
     if (SMPWebAppConfiguration.isImprintEnabled ())
     {

@@ -41,6 +41,8 @@ import com.helger.photon.security.CSecurity;
 public final class CSMP
 {
   public static final String APPLICATION_TITLE = "phoss SMP";
+  public static final String AUTHOR = "Philip Helger";
+  public static final String AUTHOR_EMAIL = "philip@helger.com";
 
   // Security roles
   public static final String ROLE_CONFIG_ID = "config";
@@ -90,6 +92,11 @@ public final class CSMP
 
   public static final boolean ENABLE_ISSUE_56 = false;
 
+  private static String s_sAppTitle = APPLICATION_TITLE + getApplicationSuffix ();
+  private static String s_sAppVersion = CSMPServer.getVersionNumber ();
+  private static String s_sAuthor = AUTHOR;
+  private static String s_sAuthorEmail = AUTHOR_EMAIL;
+
   private CSMP ()
   {}
 
@@ -103,14 +110,55 @@ public final class CSMP
   @Nonempty
   public static String getApplicationTitle ()
   {
-    return APPLICATION_TITLE + getApplicationSuffix ();
+    return s_sAppTitle;
+  }
+
+  public static void setApplicationTitle (@NonNull @Nonempty final String s)
+  {
+    s_sAppTitle = s;
+  }
+
+  @NonNull
+  @Nonempty
+  public static String getApplicationVersion ()
+  {
+    return s_sAppVersion;
+  }
+
+  public static void setApplicationVersion (@NonNull @Nonempty final String s)
+  {
+    s_sAppVersion = s;
+  }
+
+  @NonNull
+  @Nonempty
+  public static String getAuthor ()
+  {
+    return s_sAuthor;
+  }
+
+  public static void setAuthor (@NonNull @Nonempty final String s)
+  {
+    s_sAuthor = s;
+  }
+
+  @NonNull
+  @Nonempty
+  public static String getAuthorEmail ()
+  {
+    return s_sAuthorEmail;
+  }
+
+  public static void setAuthorEmail (@NonNull @Nonempty final String s)
+  {
+    s_sAuthorEmail = s;
   }
 
   @NonNull
   @Nonempty
   public static String getApplicationTitleAndVersion ()
   {
-    return StringHelper.getConcatenatedOnDemand (getApplicationTitle (), " ", CSMPServer.getVersionNumber ());
+    return StringHelper.getConcatenatedOnDemand (getApplicationTitle (), " ", getApplicationVersion ());
   }
 
   public static boolean isOldPeppolSml (@Nullable final ISMLInfo aSmlInfo)

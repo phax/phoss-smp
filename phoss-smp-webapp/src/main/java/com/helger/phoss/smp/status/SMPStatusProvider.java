@@ -95,12 +95,12 @@ public final class SMPStatusProvider
     aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (aNow));
     aStatusData.add ("status.datetime.utc",
                      PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentOffsetDateTimeUTC ()));
-    aStatusData.add ("version.smp", CSMPServer.getVersionNumber ());
+    aStatusData.add ("version.smp", CSMP.getApplicationVersion ());
     aStatusData.add ("version.java", SystemProperties.getJavaVersion ());
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());
     aStatusData.add ("global.production", GlobalDebug.isProductionMode ());
     // Since 5.7.0
-    aStatusData.add ("smp.application", CSMP.APPLICATION_TITLE);
+    aStatusData.add ("smp.application", CSMP.getApplicationTitle ());
     aStatusData.add ("smp.backend", SMPServerConfiguration.getBackend ());
     aStatusData.add ("smp.mode", SMPWebAppConfiguration.isTestVersion () ? "test" : "production");
     aStatusData.add ("smp.resttype", SMPServerConfiguration.getRESTType ().getID ());
