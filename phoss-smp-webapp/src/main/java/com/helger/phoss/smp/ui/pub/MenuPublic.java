@@ -17,18 +17,24 @@
 package com.helger.phoss.smp.ui.pub;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.spi.ServiceLoaderHelper;
+import com.helger.phoss.smp.ui.ISMPMenuExtensionSPI;
 import com.helger.photon.core.menu.IMenuTree;
 
 /**
  * This class contains the menu structure for the public application.
- * 
+ *
  * @author Philip Helger
  */
 @Immutable
 public final class MenuPublic
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (MenuPublic.class);
+
   private MenuPublic ()
   {}
 
@@ -38,5 +44,13 @@ public final class MenuPublic
 
     // Set default
     aMenuTree.setDefaultMenuItemID (CMenuPublic.MENU_START);
+
+    // Invoke registered menu extensions
+    for (final ISMPMenuExtensionSPI aSPI : ServiceLoaderHelper.getAllSPIImplementations (ISMPMenuExtensionSPI.class))
+    {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Calling extendPublicMenu on " + aSPI.getClass ().getName ());
+      aSPI.customizePublicMenu (aMenuTree);
+    }
   }
 }

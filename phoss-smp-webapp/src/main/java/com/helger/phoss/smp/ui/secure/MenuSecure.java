@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.UsedViaReflection;
+import com.helger.base.spi.ServiceLoaderHelper;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.phoss.smp.CSMPServer;
@@ -29,6 +30,7 @@ import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.ui.ISMPMenuExtensionSPI;
 import com.helger.photon.bootstrap4.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap4.pages.security.BasePageSecurityChangePassword;
 import com.helger.photon.core.menu.IMenuItemPage;
@@ -170,5 +172,13 @@ public final class MenuSecure
 
     // Default menu item
     aMenuTree.setDefaultMenuItemID (CMenuSecure.MENU_HOME);
+
+    // Invoke registered menu extensions
+    for (final ISMPMenuExtensionSPI aSPI : ServiceLoaderHelper.getAllSPIImplementations (ISMPMenuExtensionSPI.class))
+    {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Calling extendSecureMenu on " + aSPI.getClass ().getName ());
+      aSPI.customizeSecureMenu (aMenuTree);
+    }
   }
 }
