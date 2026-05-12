@@ -55,6 +55,7 @@ import com.helger.network.port.NetworkOnlineStatusDeterminator;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPInternalErrorHandler;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
@@ -946,117 +947,132 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
     final boolean bShowBusinessCardName = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
 
-    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-
-    final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-    aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
-    aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (aSettings.isSMLRequired () || aSettings.isSMLEnabled ())
+    try
     {
-      // Disable button if no SML URL is configured
-      // Disable button if no service group is present
-      final boolean bTooMany = aAllServiceGroups.size () > 10_000;
-      aToolbar.addAndReturnButton ("Check DNS state" + (bTooMany ? " (too many entries)" : ""),
-                                   aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
-                                   EDefaultIcon.MAGNIFIER)
-              .setDisabled (aSettings.getSMLDNSZone () == null ||
-                            aAllServiceGroups.isEmpty () ||
-                            bTooMany ||
-                            !aSettings.isSMLEnabled ());
-    }
-    aNodeList.addChild (aToolbar);
+      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
-    final boolean bShowDetails = aAllServiceGroups.size () <= 1_000;
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+      if (aSettings.isSMLRequired () || aSettings.isSMLEnabled ())
+      {
+        // Disable button if no SML URL is configured
+        // Disable button if no service group is present
+        final boolean bTooMany = aAllServiceGroups.size () > 10_000;
+        aToolbar.addAndReturnButton ("Check DNS state" + (bTooMany ? " (too many entries)" : ""),
+                                     aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
+                                     EDefaultIcon.MAGNIFIER)
+                .setDisabled (aSettings.getSMLDNSZone () == null ||
+                              aAllServiceGroups.isEmpty () ||
+                              bTooMany ||
+                              !aSettings.isSMLEnabled ());
+      }
+      aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Owner"),
-                                        bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
-                                        new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle (
-                                                                                                           "Is an Extension present?")),
-                                        new DTCol ("Properties").setDisplayType (EDTColType.INT, aDisplayLocale),
-                                        bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
-                                                                                                                                                aDisplayLocale)
-                                                     : null,
-                                        bShowDetails ? new DTCol (span ("Procs").setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
+      final boolean bShowDetails = aAllServiceGroups.size () <= 1_000;
+
+      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
+                                          new DTCol ("Owner"),
+                                          bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
+                                          new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle (
+                                                                                                             "Is an Extension present?")),
+                                          new DTCol ("Properties").setDisplayType (EDTColType.INT, aDisplayLocale),
+                                          bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
+                                                                                                                                                  aDisplayLocale)
+                                                       : null,
+                                          bShowDetails ? new DTCol (span ("Procs").setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
+                                                                                                                                              aDisplayLocale)
+                                                       : null,
+                                          bShowDetails ? new DTCol (span ("EPs").setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
                                                                                                                                             aDisplayLocale)
-                                                     : null,
-                                        bShowDetails ? new DTCol (span ("EPs").setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
-                                                                                                                                          aDisplayLocale)
-                                                     : null,
-                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
+                                                       : null,
+                                          new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
 
-    // Use a username cache to avoid too many DB queries
-    final SMPOwnerNameCache aOwnerNameCache = new SMPOwnerNameCache ();
-    final SMPRestDataProvider aRDP = new SMPRestDataProvider (aRequestScope);
+      // Use a username cache to avoid too many DB queries
+      final SMPOwnerNameCache aOwnerNameCache = new SMPOwnerNameCache ();
+      final SMPRestDataProvider aRDP = new SMPRestDataProvider (aRequestScope);
 
-    for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
-    {
-      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject.getID ());
-      final IParticipantIdentifier aCurPI = aCurObject.getParticipantIdentifier ();
-      final String sDisplayName = aCurPI.getURIEncoded ();
-
-      final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (aOwnerNameCache.getFromCache (aCurObject.getOwnerID ()));
-      if (bShowBusinessCardName)
+      for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
       {
-        IHCNode aName = null;
-        final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aCurPI);
-        if (aBC != null)
+        final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject.getID ());
+        final IParticipantIdentifier aCurPI = aCurObject.getParticipantIdentifier ();
+        final String sDisplayName = aCurPI.getURIEncoded ();
+
+        final HCRow aRow = aTable.addBodyRow ();
+        aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
+        aRow.addCell (aOwnerNameCache.getFromCache (aCurObject.getOwnerID ()));
+        if (bShowBusinessCardName)
         {
-          final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);
-          if (aEntity != null && aEntity.names ().isNotEmpty ())
-            aName = HCTextNode.createOnDemand (aEntity.names ().getFirstOrNull ().getName ());
+          IHCNode aName = null;
+          final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aCurPI);
+          if (aBC != null)
+          {
+            final SMPBusinessCardEntity aEntity = aBC.getEntityAtIndex (0);
+            if (aEntity != null && aEntity.names ().isNotEmpty ())
+              aName = HCTextNode.createOnDemand (aEntity.names ().getFirstOrNull ().getName ());
+          }
+          aRow.addCell (aName);
         }
-        aRow.addCell (aName);
-      }
-      if (bShowExtensionDetails)
-      {
-        if (aCurObject.getExtensions ().extensions ().isNotEmpty ())
-          aRow.addCell (SMPExtensionUI.getSerializedExtensions (aCurObject.getExtensions ()));
+        if (bShowExtensionDetails)
+        {
+          if (aCurObject.getExtensions ().extensions ().isNotEmpty ())
+            aRow.addCell (SMPExtensionUI.getSerializedExtensions (aCurObject.getExtensions ()));
+          else
+            aRow.addCell ();
+        }
         else
-          aRow.addCell ();
-      }
-      else
-      {
-        aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.getExtensions ().extensions ().isNotEmpty (),
-                                                  aDisplayLocale));
-      }
-
-      aRow.addCell (Integer.toString (aCurObject.getCustomPropertyCount ()));
-
-      if (bShowDetails)
-      {
-        int nProcesses = 0;
-        int nEndpoints = 0;
-        final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurPI);
-        for (final ISMPServiceInformation aSI : aSIs)
         {
-          nProcesses += aSI.getProcessCount ();
-          nEndpoints += aSI.getTotalEndpointCount ();
+          aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.getExtensions ().extensions ().isNotEmpty (),
+                                                    aDisplayLocale));
         }
 
-        aRow.addCell (Integer.toString (aSIs.size ()));
-        aRow.addCell (Integer.toString (nProcesses));
-        aRow.addCell (Integer.toString (nEndpoints));
+        aRow.addCell (Integer.toString (aCurObject.getCustomPropertyCount ()));
+
+        if (bShowDetails)
+        {
+          int nProcesses = 0;
+          int nEndpoints = 0;
+          final ICommonsList <ISMPServiceInformation> aSIs = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aCurPI);
+          for (final ISMPServiceInformation aSI : aSIs)
+          {
+            nProcesses += aSI.getProcessCount ();
+            nEndpoints += aSI.getTotalEndpointCount ();
+          }
+
+          aRow.addCell (Integer.toString (aSIs.size ()));
+          aRow.addCell (Integer.toString (nProcesses));
+          aRow.addCell (Integer.toString (nEndpoints));
+        }
+
+        // Add the action cell
+        final HCNodeList aActions = new HCNodeList ();
+        aActions.addChildren (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),
+                              new HCTextNode (" "),
+                              createCopyLink (aWPEC, aCurObject, "Copy " + sDisplayName),
+                              new HCTextNode (" "),
+                              createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
+                              new HCTextNode (" "),
+                              new HCA (new SimpleURL (aRDP.getServiceGroupHref (aCurPI))).setTitle ("Perform SMP query on " +
+                                                                                                    sDisplayName)
+                                                                                         .setTargetBlank ()
+                                                                                         .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+        aRow.addCell (aActions);
       }
 
-      // Add the action cell
-      final HCNodeList aActions = new HCNodeList ();
-      aActions.addChildren (createEditLink (aWPEC, aCurObject, "Edit " + sDisplayName),
-                            new HCTextNode (" "),
-                            createCopyLink (aWPEC, aCurObject, "Copy " + sDisplayName),
-                            new HCTextNode (" "),
-                            createDeleteLink (aWPEC, aCurObject, "Delete " + sDisplayName),
-                            new HCTextNode (" "),
-                            new HCA (new SimpleURL (aRDP.getServiceGroupHref (aCurPI))).setTitle ("Perform SMP query on " +
-                                                                                                  sDisplayName)
-                                                                                       .setTargetBlank ()
-                                                                                       .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-      aRow.addCell (aActions);
+      final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+      aNodeList.addChild (aTable).addChild (aDataTables);
     }
-
-    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-    aNodeList.addChild (aTable).addChild (aDataTables);
+    catch (final RuntimeException ex)
+    {
+      // E.g. MongoDB having invalid Participant IDs in the DB
+      final String sError = "Internal Error listing all Service Groups";
+      LOGGER.error (sError, ex);
+      aNodeList.addChild (error (sError));
+      SMPInternalErrorHandler.createInternalErrorBuilder ()
+                             .addErrorMessage (sError)
+                             .setFromWebExecutionContext (aWPEC)
+                             .setThrowable (ex)
+                             .handle ();
+    }
   }
 }

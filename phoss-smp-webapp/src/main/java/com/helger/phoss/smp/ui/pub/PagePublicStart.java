@@ -20,6 +20,8 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
@@ -29,6 +31,7 @@ import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.phoss.smp.app.SMPInternalErrorHandler;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -55,6 +58,8 @@ import jakarta.annotation.Nullable;
  */
 public final class PagePublicStart extends AbstractSMPWebPage
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (PagePublicStart.class);
+
   public PagePublicStart (@NonNull @Nonempty final String sID)
   {
     super (sID, "Start page");
@@ -82,76 +87,91 @@ public final class PagePublicStart extends AbstractSMPWebPage
     else
     {
       final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
-
-      // Use dynamic or static table?
-      final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
-      final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
-
-      AbstractHCTable <?> aFinalTable;
-      if (bUseDataTables)
+      try
       {
-        // Dynamic
-        final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                            new DTCol (bShowExtensionDetails ? "Extension" : "Extension?").setDataSort (
-                                                                                                                        1,
-                                                                                                                        0),
-                                            new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-        aFinalTable = aTable;
-      }
-      else
-      {
-        // Static
-        final BootstrapTable aTable = new BootstrapTable ();
-        aTable.setBordered (true);
-        aTable.setCondensed (true);
-        aTable.setStriped (true);
-        aTable.addHeaderRow ()
-              .addCell ("Participant ID")
-              .addCell (bShowExtensionDetails ? "Extension" : "Extension?")
-              .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
-        aFinalTable = aTable;
+        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
 
-        // Sort manually
-        aServiceGroups.sort (Comparator.comparing (x -> x.getParticipantIdentifier ().getURIEncoded ()));
-      }
+        // Use dynamic or static table?
+        final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
+        final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
 
-      for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
-      {
-        final String sDisplayName = aServiceGroup.getParticipantIdentifier ().getURIEncoded ();
-
-        final HCRow aRow = aFinalTable.addBodyRow ();
-        aRow.addCell (sDisplayName);
-        if (bShowExtensionDetails)
+        AbstractHCTable <?> aFinalTable;
+        if (bUseDataTables)
         {
-          if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
-            aRow.addCell (SMPExtensionUI.getSerializedExtensions (aServiceGroup.getExtensions ()));
-          else
-            aRow.addCell ();
+          // Dynamic
+          final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
+                                              new DTCol (bShowExtensionDetails ? "Extension" : "Extension?")
+                                                                                                            .setDataSort (1,
+                                                                                                                          0),
+                                              new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
+          aFinalTable = aTable;
         }
         else
         {
-          aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
-                                                    aDisplayLocale));
-        }
-        final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
-        aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
-                                                                                                                              sDisplayName)
-                                                                                                                   .setTargetBlank ()
-                                                                                                                   .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
-      }
-      if (aFinalTable.hasBodyRows ())
-      {
-        aNodeList.addChild (aFinalTable);
+          // Static
+          final BootstrapTable aTable = new BootstrapTable ();
+          aTable.setBordered (true);
+          aTable.setCondensed (true);
+          aTable.setStriped (true);
+          aTable.addHeaderRow ()
+                .addCell ("Participant ID")
+                .addCell (bShowExtensionDetails ? "Extension" : "Extension?")
+                .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
+          aFinalTable = aTable;
 
-        if (bUseDataTables)
-        {
-          final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
-          aNodeList.addChild (aDataTables);
+          // Sort manually
+          aServiceGroups.sort (Comparator.comparing (x -> x.getParticipantIdentifier ().getURIEncoded ()));
         }
+
+        for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
+        {
+          final String sDisplayName = aServiceGroup.getParticipantIdentifier ().getURIEncoded ();
+
+          final HCRow aRow = aFinalTable.addBodyRow ();
+          aRow.addCell (sDisplayName);
+          if (bShowExtensionDetails)
+          {
+            if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
+              aRow.addCell (SMPExtensionUI.getSerializedExtensions (aServiceGroup.getExtensions ()));
+            else
+              aRow.addCell ();
+          }
+          else
+          {
+            aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
+                                                      aDisplayLocale));
+          }
+          final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
+          aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
+                                                                                                                                sDisplayName)
+                                                                                                                     .setTargetBlank ()
+                                                                                                                     .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+        }
+        if (aFinalTable.hasBodyRows ())
+        {
+          aNodeList.addChild (aFinalTable);
+
+          if (bUseDataTables)
+          {
+            final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
+            aNodeList.addChild (aDataTables);
+          }
+        }
+        else
+          aNodeList.addChild (info ("This SMP does not manage any participant yet."));
       }
-      else
-        aNodeList.addChild (info ("This SMP does not manage any participant yet."));
+      catch (final RuntimeException ex)
+      {
+        // E.g. MongoDB having invalid Participant IDs in the DB
+        final String sError = "Internal Error listing all Service Groups";
+        LOGGER.error (sError, ex);
+        aNodeList.addChild (error (sError));
+        SMPInternalErrorHandler.createInternalErrorBuilder ()
+                               .addErrorMessage (sError)
+                               .setFromWebExecutionContext (aWPEC)
+                               .setThrowable (ex)
+                               .handle ();
+      }
     }
   }
 }
