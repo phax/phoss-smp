@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.time.Duration;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
@@ -67,19 +68,20 @@ public final class SMPDBExecutor extends DBExecutor
 
     if (aJdbcConfig.isJdbcExecutionTimeWarningEnabled ())
     {
-      final long nMillis = aJdbcConfig.getJdbcExecutionTimeWarningMilliseconds ();
-      if (nMillis > 0)
-        setExecutionDurationWarnMS (nMillis);
+      final Duration aWaiting = aJdbcConfig.getJdbcExecutionTimeWarning ();
+      if (aWaiting.compareTo (Duration.ZERO) > 0)
+        setExecutionWarnDuration (aWaiting);
       else
         if (LOGGER.isDebugEnabled ())
           LOGGER.debug ("Ignoring setting '" +
-                        SMPJdbcConfiguration.CONFIG_PREFIX + JdbcConfigurationConfig.SUFFIX_EXECUTION_TIME_WARNING_MS +
+                        SMPJdbcConfiguration.CONFIG_PREFIX +
+                        JdbcConfigurationConfig.SUFFIX_EXECUTION_TIME_WARNING +
                         "' because it is invalid.");
     }
     else
     {
       // Zero means none
-      setExecutionDurationWarnMS (0);
+      setExecutionWarnDuration (Duration.ZERO);
     }
   }
 }

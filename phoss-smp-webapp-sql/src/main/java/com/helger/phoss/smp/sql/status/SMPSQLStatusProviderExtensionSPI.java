@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.sql.status;
 
 import java.sql.Connection;
-import java.time.Duration;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.jspecify.annotations.NonNull;
@@ -85,14 +84,12 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
 
       // All smp.sql.pooling since 8.0.11
       ret.put ("smp.sql.pooling.max-connections", Integer.valueOf (aJdbcConfig.getJdbcPoolingMaxConnections ()));
-      ret.put ("smp.sql.pooling.max-wait.duration",
-               Duration.ofMillis (aJdbcConfig.getJdbcPoolingMaxWaitMillis ()).toString ());
+      ret.put ("smp.sql.pooling.max-wait.duration", aJdbcConfig.getJdbcPoolingMaxWait ().toString ());
       ret.put ("smp.sql.pooling.between-evictions-runs.duration",
-               Duration.ofMillis (aJdbcConfig.getJdbcPoolingBetweenEvictionRunsMillis ()).toString ());
-      ret.put ("smp.sql.pooling.min-evictable-idle",
-               Duration.ofMillis (aJdbcConfig.getJdbcPoolingMinEvictableIdleMillis ()).toString ());
+               aJdbcConfig.getJdbcPoolingBetweenEvictionRuns ().toString ());
+      ret.put ("smp.sql.pooling.min-evictable-idle", aJdbcConfig.getJdbcPoolingMinEvictableIdle ().toString ());
       ret.put ("smp.sql.pooling.remove-abandoned-timeout",
-               Duration.ofMillis (aJdbcConfig.getJdbcPoolingRemoveAbandonedTimeoutMillis ()).toString ());
+               aJdbcConfig.getJdbcPoolingRemoveAbandonedTimeout ().toString ());
       // since 8.0.12
       ret.put ("smp.sql.pooling.test-on-borrow", Boolean.toString (aJdbcConfig.isJdbcPoolingTestOnBorrow ()));
 
