@@ -69,6 +69,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PATH_BUSINESSCARD = "/businesscard/";
   public static final String PATH_COMPLETE = "/complete";
   public static final String PATH_CUSTOM_PROPERTIES = "/customproperties";
+  public static final String PATH_ENDPOINTS = "/endpoints";
   public static final String PATH_LIST = "/list";
   public static final String PATH_SERVICE_GROUP_IDS = "/servicegroupids";
   public static final String PATH_SERVICES = "/services";
@@ -229,6 +230,16 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                          new APIExecutorServiceMetadataDeleteAll ());
       aDeleteAllServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteAllServiceMetadata);
+    }
+
+    // Endpoint operations
+    {
+      final APIDescriptor aBulkChangeEndpointCertificate = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
+                                                                                            "/certificates/bulk-change"),
+                                                                              new APIExecutorEndpointCertificateBulkChangePost ());
+      aBulkChangeEndpointCertificate.allowedMimeTypes ().add (CMimeType.APPLICATION_JSON.getAsString ());
+      aBulkChangeEndpointCertificate.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aBulkChangeEndpointCertificate);
     }
 
     // Custom Properties API since 8.1.0
