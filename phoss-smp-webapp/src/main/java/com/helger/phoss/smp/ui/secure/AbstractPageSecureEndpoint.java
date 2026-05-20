@@ -538,6 +538,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final boolean bIsPeppolMode = SMPServerConfiguration.getRESTType ().isPeppol ();
 
     final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ()
                                                                                        .getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
@@ -677,7 +678,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     if (StringHelper.isEmpty (sEndpointReference))
     {
-      if (false)
+      if (bIsPeppolMode)
         aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
     }
     else
