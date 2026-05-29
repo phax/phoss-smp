@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>3.0.3</version>
+    <version>3.0.5</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
   <version>8.1.6-SNAPSHOT</version>
@@ -68,10 +68,10 @@
 
   <properties>
     <expiringmap.version>0.5.11</expiringmap.version>
-    <flyway.version>12.6.1</flyway.version>
+    <flyway.version>12.6.2</flyway.version>
     <log4j.version>2.26.0</log4j.version>
-    <mongodb.version>5.7.0</mongodb.version>
-    <protobuf.version>4.34.1</protobuf.version>
+    <mongodb.version>5.8.0</mongodb.version>
+    <protobuf.version>4.35.0</protobuf.version>
     
     <ph-db.version>8.4.0</ph-db.version>
   </properties>
@@ -114,7 +114,7 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>11.4.0</version>
+        <version>11.4.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
