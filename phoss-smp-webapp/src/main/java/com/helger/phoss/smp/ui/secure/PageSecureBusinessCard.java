@@ -482,7 +482,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       final EFamFamFlagIcon eIcon = aCountry == null ? null : EFamFamFlagIcon.getFromIDOrNull (aCountry.getCountry ());
       if (eIcon != null)
         aCtrl.addChild (eIcon.getAsNode ()).addChild (" ");
-      aCtrl.addChild (aCountry.getDisplayCountry (aDisplayLocale) + " [" + aEntity.getCountryCode () + "]");
+      if (aCountry != null)
+        aCtrl.addChild (aCountry.getDisplayCountry (aDisplayLocale) + " [" + aEntity.getCountryCode () + "]");
+      else
+        aCtrl.addChild ("[" + aEntity.getCountryCode () + "]");
+
       aForm2.addFormGroup (new BootstrapFormGroup ().setLabel ("Country code").setCtrl (aCtrl));
     }
     if (aEntity.hasGeographicalInformation ())
@@ -1307,8 +1311,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           final EFamFamFlagIcon eIcon = aCountry == null ? null : EFamFamFlagIcon.getFromIDOrNull (aCountry
                                                                                                            .getCountry ());
           if (eIcon != null)
-            aCountryCell.addChild (eIcon.getAsNode ()).addChild (" ");
-          aCountryCell.addChild (aCountry.getDisplayCountry (aDisplayLocale));
+            aCountryCell.addChild (eIcon.getAsNode ());
+          if (aCountry != null)
+          {
+            if (eIcon != null)
+              aCountryCell.addChild (" ");
+            aCountryCell.addChild (aCountry.getDisplayCountry (aDisplayLocale));
+          }
 
           aRow.addCell (HCExtHelper.nl2divList (aEntity.getGeographicalInformation ()));
           {
