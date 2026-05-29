@@ -143,7 +143,7 @@ public final class ImportActionItem implements IHasErrorLevel
   public static ImportActionItem createSuccess (@NonNull @Nonempty final String sPI,
                                                 @NonNull @Nonempty final String sMsg)
   {
-    return new ImportActionItem (EErrorLevel.SUCCESS, sPI, sMsg, null);
+    return new ImportActionItem (EErrorLevel.INFO, sPI, sMsg, null);
   }
 
   @NonNull
