@@ -3,6 +3,8 @@
 <!-- ph-badge-start -->
 [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.helger/phoss-smp-parent-pom/badge.svg)](https://maven-badges.sml.io/sonatype-central/com.helger/phoss-smp-parent-pom/)
 [![javadoc](https://javadoc.io/badge2/com.helger/phoss-smp-backend/javadoc.svg)](https://javadoc.io/doc/com.helger/phoss-smp-backend)
+
+> If this project saved you some time or made your day a little easier, a star would mean a lot — it helps others find it too.
 <!-- ph-badge-end -->
 
 phoss SMP is a complete SMP server that supports both the Peppol SMP 1.x specification as well as the OASIS BDXR SMP 1.0 and 2.0 specifications.
