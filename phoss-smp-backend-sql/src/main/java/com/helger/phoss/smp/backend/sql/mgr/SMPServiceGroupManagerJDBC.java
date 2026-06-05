@@ -37,7 +37,6 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
-import com.helger.cache.impl.CacheBuilder;
 import com.helger.cache.impl.ManualCache;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
@@ -47,6 +46,8 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
+import com.helger.json.IJsonArray;
+import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
@@ -55,8 +56,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
-import com.helger.json.IJsonArray;
-import com.helger.json.serialize.JsonReader;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
@@ -109,9 +108,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   public void setCacheEnabled (final boolean bEnabled)
   {
     if (bEnabled)
-      m_aCache = new CacheBuilder <String, SMPServiceGroup> ().name (CACHE_NAME)
-                                                              .expireAfterWrite (CACHE_TTL)
-                                                              .buildManualCache ();
+      m_aCache = ManualCache.<String, SMPServiceGroup> builder ()
+                            .name (CACHE_NAME)
+                            .expireAfterWrite (CACHE_TTL)
+                            .build ();
     else
       m_aCache = null;
   }
