@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
@@ -37,6 +37,8 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
+import com.helger.cache.impl.CacheBuilder;
+import com.helger.cache.impl.ManualCache;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
@@ -64,9 +66,6 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
 
-import net.jodah.expiringmap.ExpirationPolicy;
-import net.jodah.expiringmap.ExpiringMap;
-
 /**
  * A JDBC based implementation of the {@link ISMPServiceGroupManager} interface.
  *
@@ -77,10 +76,13 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerJDBC.class);
 
+  private static final String CACHE_NAME = "phoss.smp.servicegroup";
+  private static final Duration CACHE_TTL = Duration.ofSeconds (60);
+
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
   private final String m_sTableNameSG;
   private final String m_sTableNameO;
-  private ExpiringMap <String, SMPServiceGroup> m_aCache;
+  private ManualCache <String, SMPServiceGroup> m_aCache;
 
   /**
    * Constructor
@@ -107,10 +109,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   public void setCacheEnabled (final boolean bEnabled)
   {
     if (bEnabled)
-      m_aCache = ExpiringMap.builder ()
-                            .expiration (60, TimeUnit.SECONDS)
-                            .expirationPolicy (ExpirationPolicy.CREATED)
-                            .build ();
+      m_aCache = new CacheBuilder <String, SMPServiceGroup> ().name (CACHE_NAME)
+                                                              .expireAfterWrite (CACHE_TTL)
+                                                              .buildManualCache ();
     else
       m_aCache = null;
   }
@@ -245,7 +246,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension, aCustomProperties);
     if (m_aCache != null)
-      m_aCache.put (aParticipantID.getURIEncoded (), aServiceGroup);
+      m_aCache.putInCache (aParticipantID.getURIEncoded (), aServiceGroup);
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupCreated (aServiceGroup, bCreateInSML));
     return aServiceGroup;
@@ -442,7 +443,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       AuditHelper.onAuditDeleteSuccess (SMPServiceGroup.OT, aParticipantID.getURIEncoded ());
 
       if (m_aCache != null)
-        m_aCache.remove (aParticipantID.getURIEncoded ());
+        m_aCache.removeFromCache (aParticipantID.getURIEncoded ());
       m_aCBs.forEach (x -> x.onSMPServiceGroupDeleted (aParticipantID, bDeleteInSML));
     }
 
@@ -550,7 +551,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return null;
 
     // Use cache
-    SMPServiceGroup ret = m_aCache == null ? null : m_aCache.get (aParticipantID.getURIEncoded ());
+    SMPServiceGroup ret = m_aCache == null ? null : m_aCache.getFromCache (aParticipantID.getURIEncoded ());
     if (ret != null)
       return ret;
 
@@ -575,7 +576,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                aResult.get ().getAsString (0),
                                _getCustomPropertiesFromJsonString (aResult.get ().getAsString (2)));
     if (m_aCache != null)
-      m_aCache.put (aParticipantID.getURIEncoded (), ret);
+      m_aCache.putInCache (aParticipantID.getURIEncoded (), ret);
     return ret;
   }
 
@@ -596,7 +597,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       return false;
 
     // Cache check first
-    if (m_aCache != null && m_aCache.containsKey (aParticipantID.getURIEncoded ()))
+    if (m_aCache != null && m_aCache.isInCache (aParticipantID.getURIEncoded ()))
       return true;
 
     return 1 ==
