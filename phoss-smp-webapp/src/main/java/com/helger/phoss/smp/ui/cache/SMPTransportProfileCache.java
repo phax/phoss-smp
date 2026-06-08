@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.ui.cache;
 
-import com.helger.cache.impl.Cache;
+import com.helger.cache.impl.ProviderCache;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 
@@ -25,14 +25,16 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
  *
  * @author Philip Helger
  */
-public final class SMPTransportProfileCache extends Cache <String, ISMPTransportProfile>
+public final class SMPTransportProfileCache extends ProviderCache <String, ISMPTransportProfile>
 {
   public SMPTransportProfileCache ()
   {
     // Allow null values!
-    super (x -> SMPMetaManager.getTransportProfileMgr ().getSMPTransportProfileOfID (x),
-           -1,
-           "Transport Profile cache",
-           true);
+    super ("Transport Profile cache",
+           NO_MAX_SIZE,
+           true,
+           null,
+           DEFAULT_CLOCK_SUPPLIER,
+           x -> SMPMetaManager.getTransportProfileMgr ().getSMPTransportProfileOfID (x));
   }
 }

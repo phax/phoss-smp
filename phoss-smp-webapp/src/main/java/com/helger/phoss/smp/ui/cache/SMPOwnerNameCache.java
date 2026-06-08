@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.ui.cache;
 
-import com.helger.cache.impl.Cache;
+import com.helger.cache.impl.ProviderCache;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 
 /**
@@ -24,10 +24,15 @@ import com.helger.phoss.smp.ui.SMPCommonUI;
  *
  * @author Philip Helger
  */
-public final class SMPOwnerNameCache extends Cache <String, String>
+public final class SMPOwnerNameCache extends ProviderCache <String, String>
 {
   public SMPOwnerNameCache ()
   {
-    super (SMPCommonUI::getOwnerName, -1, "SMP Owner Name");
+    super ("SMP Owner Name",
+           NO_MAX_SIZE,
+           DEFAULT_ALLOW_NULL_VALUES,
+           null,
+           DEFAULT_CLOCK_SUPPLIER,
+           SMPCommonUI::getOwnerName);
   }
 }
