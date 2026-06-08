@@ -28,11 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonnegative;
+import com.helger.annotation.misc.ContainsSoftMigration;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.equals.EqualsHelper;
+import com.helger.base.numeric.mutable.MutableBoolean;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
@@ -136,13 +138,17 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   }
 
   @NonNull
+  @ContainsSoftMigration
   @ReturnsMutableCopy
-  public static SMPEndpoint toEndpoint (@NonNull final Document aDoc)
+  public static SMPEndpoint toEndpoint (@NonNull final Document aDoc, @NonNull final MutableBoolean aChange)
   {
     // Migration: generate UUID if endpoint ID is missing
     String sEndpointID = aDoc.getString (BSON_ENDPOINT_ID);
     if (sEndpointID == null)
+    {
       sEndpointID = SMPEndpointHelper.createUniqueEndpointID ();
+      aChange.set (true);
+    }
     final String sTransportProfile = aDoc.getString (BSON_TRANSPORT_PROFILE);
     final String sEndpointReference = aDoc.getString (BSON_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
@@ -187,7 +193,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   @Nullable
   @ReturnsMutableCopy
-  public static SMPProcess toProcess (@NonNull final Document aDoc)
+  public static SMPProcess toProcess (@NonNull final Document aDoc, @NonNull final MutableBoolean aChange)
   {
     final IProcessIdentifier aProcessID = toProcessID ((Document) aDoc.get (BSON_PROCESS_ID));
     final List <Document> aEndpointDocs = aDoc.getList (BSON_ENDPOINTS, Document.class);
@@ -196,7 +202,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     final ICommonsList <SMPEndpoint> aEndpoints = new CommonsArrayList <> ();
     for (final Document aDocEP : aEndpointDocs)
-      aEndpoints.add (toEndpoint (aDocEP));
+      aEndpoints.add (toEndpoint (aDocEP, aChange));
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
     return new SMPProcess (aProcessID, aEndpoints, sExtension);
   }
@@ -221,20 +227,30 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   @ReturnsMutableCopy
   public SMPServiceInformation toServiceInformation (@NonNull final Document aDoc, final boolean bNeedProcesses)
   {
+    final MutableBoolean aChange = new MutableBoolean (false);
     final IParticipantIdentifier aParticipantID = m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
     final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aDoc.get (BSON_DOCTYPE_ID, Document.class));
     final ICommonsList <SMPProcess> aProcesses = new CommonsArrayList <> ();
     if (bNeedProcesses)
+    {
       for (final Document aDocP : aDoc.getList (BSON_PROCESSES, Document.class))
       {
-        final SMPProcess aProcess = toProcess (aDocP);
+        final SMPProcess aProcess = toProcess (aDocP, aChange);
         if (aProcess != null)
           aProcesses.add (aProcess);
       }
+
+    }
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
 
     // The ID itself is derived from ServiceGroupID and DocTypeID
-    return new SMPServiceInformation (aParticipantID, aDocTypeID, aProcesses, sExtension);
+    final var ret = new SMPServiceInformation (aParticipantID, aDocTypeID, aProcesses, sExtension);
+    if (aChange.booleanValue ())
+    {
+      // Store back (since 8.1.7)
+      getCollection ().replaceOne (new Document (BSON_ID, ret.getID ()), toBson (ret));
+    }
+    return ret;
   }
 
   @NonNull
