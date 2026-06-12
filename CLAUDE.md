@@ -169,7 +169,7 @@ Key properties:
 smp.backend = sql   # or: xml, mongodb
 
 # Identifier scheme
-smp.identifiertype = peppol   # peppol, peppol-lax, simple, bdxr1, bdxr2
+smp.identifiertype = peppol   # peppol, peppol-lax, simple, bdxr1, bdxr2, dbnalliance
 smp.rest.type = peppol         # peppol or bdxr
 
 # PKI — keystore must contain exactly one certificate; key and keystore passwords must match
