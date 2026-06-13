@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.spf.ISMPSPF4PeppolPolicyManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -117,4 +118,19 @@ public interface ISMPManagerProvider
   @Nullable
   ISMPBusinessCardManager createBusinessCardMgr (@NonNull IIdentifierFactory aIdentifierFactory,
                                                  @NonNull ISMPServiceGroupManager aServiceGroupMgr);
+
+  /**
+   * @param aIdentifierFactory
+   *        The identifier factory to be used. May not be <code>null</code>.
+   * @param aServiceGroupMgr
+   *        The service group manager to use. May not be <code>null</code>.
+   * @return A new SMP SPF4Peppol policy manager. May be <code>null</code>!
+   * @since 8.0.13
+   */
+  @Nullable
+  default ISMPSPF4PeppolPolicyManager createSPFPolicyMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                          @NonNull final ISMPServiceGroupManager aServiceGroupMgr)
+  {
+    return null;
+  }
 }
