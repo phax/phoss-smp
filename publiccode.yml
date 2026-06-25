@@ -21,8 +21,8 @@ name: phoss-smp
 url: https://github.com/phax/phoss-smp
 landingURL: https://github.com/phax/phoss-smp/wiki
 
-softwareVersion: "8.1.6"
-releaseDate: "2026-05-29"
+softwareVersion: "8.1.7"
+releaseDate: "2026-06-25"
 
 platforms:
   - web
