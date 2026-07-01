@@ -111,6 +111,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       m_aCache = ManualCache.<String, SMPServiceGroup> builder ()
                             .name (CACHE_NAME)
                             .expireAfterWrite (CACHE_TTL)
+                            .evictionInterval (Duration.ofMinutes (1))
                             .build ();
     else
       m_aCache = null;
@@ -168,7 +169,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Check if the passed service group ID is already in use
       final SMPServiceGroup aDBServiceGroup = _getSMPServiceGroupOfID (aExecutor, aParticipantID);
       if (aDBServiceGroup != null)
@@ -273,7 +274,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Check if the passed service group ID is already in use
       final SMPServiceGroup aDBServiceGroup = _getSMPServiceGroupOfID (aExecutor, aParticipantID);
       if (aDBServiceGroup == null)
@@ -378,7 +379,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Check if the passed service group ID is already in use
       final SMPServiceGroup aDBServiceGroup = _getSMPServiceGroupOfID (aExecutor, aParticipantID);
       if (aDBServiceGroup == null)
