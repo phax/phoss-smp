@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>3.0.5</version>
+    <version>3.1.0</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
   <version>8.1.8-SNAPSHOT</version>
@@ -67,9 +67,9 @@
   </developers>
 
   <properties>
-    <flyway.version>12.10.0</flyway.version>
+    <flyway.version>12.11.0</flyway.version>
     <log4j.version>2.26.1</log4j.version>
-    <mongodb.version>5.8.0</mongodb.version>
+    <mongodb.version>5.9.0</mongodb.version>
     <protobuf.version>4.35.1</protobuf.version>
     
     <ph-db.version>8.4.0</ph-db.version>
@@ -134,7 +134,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>12.5.4</version>
+        <version>12.5.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -162,7 +162,7 @@
       <dependency>
         <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
