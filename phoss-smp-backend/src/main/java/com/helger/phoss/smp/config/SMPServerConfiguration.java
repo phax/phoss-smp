@@ -10,9 +10,15 @@
  */
 package com.helger.phoss.smp.config;
 
+import java.time.Duration;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.ThreadSafe;
@@ -32,6 +38,11 @@ import com.helger.security.keystore.EKeyStoreType;
 @ThreadSafe
 public final class SMPServerConfiguration
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPServerConfiguration.class);
+  // Remember the legacy keys for which a deprecation warning was already logged, so it is emitted
+  // only once per key
+  private static final Set <String> WARNED_DEPRECATED_KEYS = ConcurrentHashMap.newKeySet ();
+
   public static final String KEY_SMP_BACKEND = "smp.backend";
 
   public static final String KEY_SMP_KEYSTORE_TYPE = "smp.keystore.type";
@@ -66,7 +77,19 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
+  public static final String KEY_SML_CONNECTION_TIMEOUT = "sml.connection.timeout";
+  public static final String KEY_SML_REQUEST_TIMEOUT = "sml.request.timeout";
+  /**
+   * @deprecated Since 8.1.8; use {@link #KEY_SML_CONNECTION_TIMEOUT} with the duration grammar (e.g.
+   *             <code>5s</code>, <code>1m 30s</code>) instead.
+   */
+  @Deprecated (forRemoval = true, since = "8.1.8")
   public static final String KEY_SML_CONNECTION_TIMEOUT_MS = "sml.connection.timeout.ms";
+  /**
+   * @deprecated Since 8.1.8; use {@link #KEY_SML_REQUEST_TIMEOUT} with the duration grammar (e.g.
+   *             <code>5s</code>, <code>1m 30s</code>) instead.
+   */
+  @Deprecated (forRemoval = true, since = "8.1.8")
   public static final String KEY_SML_REQUEST_TIMEOUT_MS = "sml.request.timeout.ms";
 
   public static final String KEY_SMP_HREDELIVERY_EXTENSION = "smp.hredelivery.extension";
@@ -390,17 +413,61 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The connection timeout in milliseconds used for connecting to the SML server. May be
-   *         <code>null</code> in which case the system default timeout should be used.
+   * Resolve an SML timeout, preferring the duration-grammar key over the legacy millisecond-typed
+   * key. The duration-grammar key accepts compound expressions like <code>5s</code> or
+   * <code>1m 30s</code> via {@link IConfig#getAsConfigDuration(String, java.util.function.Consumer)}.
+   * If it is missing, blank, or fails to parse, the legacy <code>.ms</code> key is read as a
+   * <code>long</code> (with a deprecation warning); if it too is absent the supplied default is
+   * returned.
+   *
+   * @param sDurationKey
+   *        The duration-grammar configuration key. May not be <code>null</code>.
+   * @param sLegacyMsKey
+   *        The legacy millisecond-typed configuration key. May not be <code>null</code>.
+   * @param aDefault
+   *        The default value if neither key is configured. May be <code>null</code>.
+   * @return The resolved timeout or the default value.
+   */
+  @Nullable
+  private static Timeout _getSMLTimeout (@NonNull final String sDurationKey,
+                                         @NonNull final String sLegacyMsKey,
+                                         @Nullable final Timeout aDefault)
+  {
+    final IConfig aConfig = _getConfig ();
+
+    final Duration aDuration = aConfig.getAsConfigDuration (sDurationKey,
+                                                            sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                                 sDurationKey +
+                                                                                 "' as duration: " +
+                                                                                 sMsg));
+    if (aDuration != null)
+      return Timeout.of (aDuration);
+
+    if (aConfig.containsConfiguredValue (sLegacyMsKey))
+    {
+      if (WARNED_DEPRECATED_KEYS.add (sLegacyMsKey))
+        LOGGER.warn ("Configuration key '" +
+                     sLegacyMsKey +
+                     "' is deprecated; please use '" +
+                     sDurationKey +
+                     "' with the duration grammar (e.g. '5s', '1m 30s') instead.");
+      final long ret = aConfig.getAsLong (sLegacyMsKey, -1L);
+      if (ret >= 0)
+        return Timeout.ofMilliseconds (ret);
+    }
+
+    return aDefault;
+  }
+
+  /**
+   * @return The connection timeout used for connecting to the SML server. May be <code>null</code>
+   *         in which case the system default timeout should be used.
    * @since 6.0.0
    */
   @Nullable
   public static Timeout getSMLConnectionTimeout ()
   {
-    final long ret = _getConfig ().getAsLong (KEY_SML_CONNECTION_TIMEOUT_MS, -1L);
-    if (ret >= 0)
-      return Timeout.ofMilliseconds (ret);
-    return null;
+    return _getSMLTimeout (KEY_SML_CONNECTION_TIMEOUT, KEY_SML_CONNECTION_TIMEOUT_MS, null);
   }
 
   /**
@@ -411,10 +478,7 @@ public final class SMPServerConfiguration
   @NonNull
   public static Timeout getSMLRequestTimeout ()
   {
-    final long ret = _getConfig ().getAsLong (KEY_SML_REQUEST_TIMEOUT_MS, -1L);
-    if (ret >= 0)
-      return Timeout.ofMilliseconds (ret);
-    return DEFAULT_SML_REQUEST_TIMEOUT;
+    return _getSMLTimeout (KEY_SML_REQUEST_TIMEOUT, KEY_SML_REQUEST_TIMEOUT_MS, DEFAULT_SML_REQUEST_TIMEOUT);
   }
 
   /**
