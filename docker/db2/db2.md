@@ -2,7 +2,7 @@
 docker volume create db2_data
 ```
 
-* DB2 is memory hungy
+* DB2 is memory hungry
 
 ```shell
 docker run -itd --name db2-dev --platform=linux/amd64 --privileged=true --memory=4g -p 50000:50000 -e LICENSE=accept -e DB2INST1_PASSWORD=smp -e DBNAME=smp -v db2_data:/database icr.io/db2_community/db2
@@ -24,4 +24,3 @@ After some troubles, DB2 refused to start up - this helped:
 ```shell
 docker exec -ti db2-dev bash -c "chown root:db2iadm1 /database/config/db2inst1/sqllib/adm/fencedid"
 ```
-`

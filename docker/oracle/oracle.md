@@ -10,14 +10,15 @@ Login first (with Oracle username and token):
 docker login container-registry.oracle.com
 ``` 
 
+Oracle 19 enterprise:
+```
+docker pull container-registry.oracle.com/database/enterprise:19.19.0.0
+```
+
+
 Run it like this, with a persistent volume:
 ```
 docker run -d --name orcl19c -p 1521:1521 -p 5500:5500 -e ORACLE_PWD=password -v OracleDBData:/opt/oracle/oradata container-registry.oracle.com/database/enterprise:19.19.0.0
-```
-
-Oracle 26 enterprise:
-```
-docker pull container-registry.oracle.com/database/enterprise:19.19.0.0
 ```
 
 Oracle 26 Free:
