@@ -77,6 +77,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_SERVICE_GROUP_ID = "ServiceGroupId";
   public static final String PARAM_USER_ID = "UserId";
   public static final String PARAM_DOCUMENT_TYPE_ID = "DocumentTypeId";
+  public static final String PARAM_PROCESS_ID = "ProcessId";
   public static final String PARAM_MIGRATION_ID = "MigrationId";
   public static final String PARAM_MIGRATION_KEY = "MigrationKey";
   public static final String PARAM_CUSTOM_PROPERTY_NAME = "PropertyName";
@@ -229,6 +230,21 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                          new APIExecutorServiceMetadataDeleteAll ());
       aDeleteAllServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteAllServiceMetadata);
+    }
+    // Delete a single process of a ServiceMetadata since 8.1.8
+    {
+      final APIDescriptor aDeleteServiceMetadataProcess = new APIDescriptor (APIPath.delete ("/{" +
+                                                                                             PARAM_SERVICE_GROUP_ID +
+                                                                                             "}" +
+                                                                                             PATH_SERVICES +
+                                                                                             "/{" +
+                                                                                             PARAM_DOCUMENT_TYPE_ID +
+                                                                                             "}/{" +
+                                                                                             PARAM_PROCESS_ID +
+                                                                                             "}"),
+                                                                             new APIExecutorServiceMetadataProcessDelete ());
+      aDeleteServiceMetadataProcess.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aDeleteServiceMetadataProcess);
     }
 
     // Custom Properties API since 8.1.0

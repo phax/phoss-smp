@@ -49,4 +49,11 @@ public class SMPBadRequestException extends SMPServerException
   {
     return new SMPBadRequestException ("Failed to parse Document Type ID '" + sDocTypeID + "'", aEffectedURI);
   }
+
+  @NonNull
+  public static SMPBadRequestException failedToParseProcess (@NonNull final String sProcessID,
+                                                             @Nullable final URI aEffectedURI)
+  {
+    return new SMPBadRequestException ("Failed to parse Process ID '" + sProcessID + "'", aEffectedURI);
+  }
 }

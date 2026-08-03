@@ -91,4 +91,20 @@ public class SMPNotFoundException extends SMPServerException
                                      "' is not registered on this SMP",
                                      aEffectedURI);
   }
+
+  @NonNull
+  public static SMPNotFoundException unknownProcess (@NonNull final String sServiceGroupID,
+                                                     @NonNull final String sDocTypeID,
+                                                     @NonNull final String sProcessID,
+                                                     @Nullable final URI aEffectedURI)
+  {
+    return new SMPNotFoundException ("Process '" +
+                                     sProcessID +
+                                     "' for '" +
+                                     sServiceGroupID +
+                                     "' and '" +
+                                     sDocTypeID +
+                                     "' is not registered on this SMP",
+                                     aEffectedURI);
+  }
 }

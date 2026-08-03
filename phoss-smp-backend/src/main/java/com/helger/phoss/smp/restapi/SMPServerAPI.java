@@ -34,6 +34,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
@@ -783,6 +784,95 @@ public final class SMPServerAPI
         LOGGER.info (sLog + " SUCCESS - Redirect");
         STATS_COUNTER_SUCCESS.increment (sAction);
       }
+    }
+    catch (final SMPServerException ex)
+    {
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      STATS_COUNTER_ERROR.increment (sAction);
+      throw ex;
+    }
+  }
+
+  public void deleteServiceRegistrationProcess (@NonNull final String sPathServiceGroupID,
+                                                @NonNull final String sPathDocTypeID,
+                                                @NonNull final String sPathProcessID,
+                                                @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
+  {
+    final String sLog = LOG_PREFIX +
+                        "DELETE /" +
+                        sPathServiceGroupID +
+                        "/services/" +
+                        sPathDocTypeID +
+                        "/" +
+                        sPathProcessID;
+    final String sAction = "deleteServiceRegistrationProcess";
+
+    LOGGER.info (sLog);
+    STATS_COUNTER_INVOCATION.increment (sAction);
+    try
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocTypeID);
+      if (aPathDocTypeID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseDocType (sPathDocTypeID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final IProcessIdentifier aPathProcessID = aIdentifierFactory.parseProcessIdentifier (sPathProcessID);
+      if (aPathProcessID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseProcess (sPathProcessID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aSMPUser);
+
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
+      {
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
+                                                                                                                        aPathDocTypeID);
+      if (aServiceInfo == null)
+      {
+        throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,
+                                                              sPathDocTypeID,
+                                                              m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final ISMPProcess aProcess = aServiceInfo.getProcessOfID (aPathProcessID);
+      if (aProcess == null)
+      {
+        throw SMPNotFoundException.unknownProcess (sPathServiceGroupID,
+                                                   sPathDocTypeID,
+                                                   sPathProcessID,
+                                                   m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final EChange eChange = aServiceInfoMgr.deleteSMPProcess (aServiceInfo, aProcess);
+      if (eChange.isUnchanged ())
+      {
+        // Most likely an internal error or an inconsistency
+        throw SMPNotFoundException.unknownProcess (sPathServiceGroupID,
+                                                   sPathDocTypeID,
+                                                   sPathProcessID,
+                                                   m_aAPIDataProvider.getCurrentURI ());
+      }
+      LOGGER.info (sLog + " SUCCESS");
+      STATS_COUNTER_SUCCESS.increment (sAction);
     }
     catch (final SMPServerException ex)
     {
