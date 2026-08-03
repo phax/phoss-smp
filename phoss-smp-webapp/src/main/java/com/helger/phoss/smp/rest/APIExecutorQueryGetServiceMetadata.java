@@ -257,6 +257,8 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
         }
         break;
       }
+      default:
+        throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
 
     aSW.stop ();

@@ -62,6 +62,7 @@ public final class APIExecutorServiceMetadataDeleteAll extends AbstractSMPAPIExe
                                                                                            aCredentials);
       case OASIS_BDXR_V2 -> new BDXR2ServerAPI (aDataProvider).deleteServiceRegistrations (sPathServiceGroupID,
                                                                                            aCredentials);
+      default -> throw new UnsupportedOperationException ("Unsupported REST type specified!");
     }
     aUnifiedResponse.createOk ();
   }

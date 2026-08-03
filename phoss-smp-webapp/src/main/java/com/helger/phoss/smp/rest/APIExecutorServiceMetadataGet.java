@@ -98,7 +98,7 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         if (SMPServerConfiguration.isHREdeliveryExtensionMode ())
         {
           // Special namespace prefix to identify phoss SMP instances
-          var aSpecialNSCtx = BDXR1NamespaceContext.getInstance ().getClone ();
+          final var aSpecialNSCtx = BDXR1NamespaceContext.getInstance ().getClone ();
           aSpecialNSCtx.removeMapping (CBDXRSMP1.DEFAULT_PREFIX);
           aSpecialNSCtx.addMapping (CBDXRSMP1.DEFAULT_PREFIX + "hr", CBDXRSMP1.NAMESPACE_URI);
           // Has no impact in reality
@@ -144,35 +144,15 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
       LOGGER.info ("Running post-signing XML Schema validation in debug mode");
 
       // Run the XML Schema validation after the signing
-      switch (SMPServerConfiguration.getRESTType ())
+      final Object aSM = switch (SMPServerConfiguration.getRESTType ())
       {
-        case PEPPOL:
-        {
-          // Verify DOM document
-          final SMPMarshallerSignedServiceMetadataType aMarshaller = new SMPMarshallerSignedServiceMetadataType ();
-          if (aMarshaller.read (aDoc) == null)
-            LOGGER.error ("Signed response document is not XML Schema compliant");
-          break;
-        }
-        case OASIS_BDXR_V1:
-        {
-          // Verify DOM document
-          final BDXR1MarshallerSignedServiceMetadataType aMarshaller = new BDXR1MarshallerSignedServiceMetadataType ();
-          if (aMarshaller.read (aDoc) == null)
-            LOGGER.error ("Signed response document is not XML Schema compliant");
-          break;
-        }
-        case OASIS_BDXR_V2:
-        {
-          // Verify DOM document
-          final BDXR2MarshallerServiceMetadata aMarshaller = new BDXR2MarshallerServiceMetadata ();
-          if (aMarshaller.read (aDoc) == null)
-            LOGGER.error ("Signed response document is not XML Schema compliant");
-          break;
-        }
-        default:
-          throw new UnsupportedOperationException ("Unsupported REST type specified!");
-      }
+        case PEPPOL -> new SMPMarshallerSignedServiceMetadataType ().read (aDoc);
+        case OASIS_BDXR_V1 -> new BDXR1MarshallerSignedServiceMetadataType ().read (aDoc);
+        case OASIS_BDXR_V2 -> new BDXR2MarshallerServiceMetadata ().read (aDoc);
+        default -> throw new UnsupportedOperationException ("Unsupported REST type specified!");
+      };
+      if (aSM == null)
+        LOGGER.error ("Signed response document is not XML Schema compliant");
     }
 
     // Serialize the signed document
