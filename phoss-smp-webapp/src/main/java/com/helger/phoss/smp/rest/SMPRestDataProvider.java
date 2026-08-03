@@ -34,7 +34,6 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
-import com.helger.servlet.ServletHelper;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.servlet.request.RequestHelper;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -63,14 +62,14 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     /**
      * Use the information from the "X-Forwarded-*" HTTP headers including fallback to
      * {@link IRequestWebScopeWithoutResponse} data
-     * 
+     *
      * @since 7.2.8
      */
     X_FORWARDED_HEADER ("x-forwarded-header"),
     /**
      * Use the information from the "Forwarded" HTTP header including fallback to
      * {@link IRequestWebScopeWithoutResponse} data
-     * 
+     *
      * @since 7.2.8
      */
     FORWARDED_HEADER ("forwarded-header");
@@ -143,21 +142,21 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     if (StringHelper.isNotEmpty (sScheme))
       bFallbackToLocalPort = false;
     else
-      sScheme = ServletHelper.getRequestScheme (aHttpRequest);
+      sScheme = aHttpRequest.getScheme ();
 
     // Host
     String sHost = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_HOST);
     if (StringHelper.isNotEmpty (sHost))
       bFallbackToLocalPort = false;
     else
-      sHost = ServletHelper.getRequestServerName (aHttpRequest);
+      sHost = aHttpRequest.getServerName ();
 
     // Port
     int nPort = StringParser.parseInt (m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_PORT), -1);
     // If no fallback to local port should be performed, the default port of the selected scheme
     // is used
     if (nPort < 0 && bFallbackToLocalPort)
-      nPort = ServletHelper.getRequestServerPort (aHttpRequest);
+      nPort = aHttpRequest.getServerPort ();
 
     // Build result string
     return RequestHelper.getFullServerName (sScheme, sHost, nPort);
@@ -184,7 +183,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
           break;
       }
     if (!StringHelper.isNotEmpty (sScheme))
-      sScheme = ServletHelper.getRequestScheme (aHttpRequest);
+      sScheme = aHttpRequest.getScheme ();
 
     // Host and port
     String sHost = null;
@@ -208,8 +207,8 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
       }
     if (!StringHelper.isNotEmpty (sHost))
     {
-      sHost = ServletHelper.getRequestServerName (aHttpRequest);
-      nPort = ServletHelper.getRequestServerPort (aHttpRequest);
+      sHost = aHttpRequest.getServerName ();
+      nPort = aHttpRequest.getServerPort ();
     }
 
     // Build result string
