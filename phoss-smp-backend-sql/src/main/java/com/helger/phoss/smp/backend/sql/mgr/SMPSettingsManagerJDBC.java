@@ -51,6 +51,7 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettings;
 import com.helger.typeconvert.collection.IStringMap;
 import com.helger.typeconvert.collection.StringMap;
+import com.helger.web.scope.mgr.WebScopeManager;
 import com.helger.web.scope.singleton.AbstractRequestWebSingleton;
 
 public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implements ISMPSettingsManager
@@ -126,14 +127,11 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     ValueEnforcer.notEmpty (aEntries, "Entries");
 
     final DBExecutor aExecutor = newExecutor ();
-    return aExecutor.performInTransaction ( () -> {
-      for (final Map.Entry <String, String> aEntry : aEntries.entrySet ())
-      {
-        final String sKey = aEntry.getKey ();
-        final String sValue = aEntry.getValue ();
 
-        setSettingsValueInDB (aExecutor, sKey, sValue);
-      }
+    // Store all at once
+    return aExecutor.performInTransaction (() -> {
+      for (final var aEntry : aEntries.entrySet ())
+        setSettingsValueInDB (aExecutor, aEntry.getKey (), aEntry.getValue ());
     });
   }
 
@@ -174,6 +172,31 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     return getSettingsValueFromDB (newExecutor (), sKey);
   }
 
+  @NonNull
+  private static ISMPSettings _createSettingsFromDB (@NonNull final SMPSettingsManagerJDBC aMgr)
+  {
+    // Queries DB
+    final ICommonsMap <String, String> aValues = aMgr.getAllSettingsValuesFromDB ();
+
+    final SMPSettings ret = SMPSettings.createInitializedFromConfiguration ();
+    ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
+                                                            ret.isRESTWritableAPIDisabled ()));
+    ret.setDirectoryIntegrationEnabled (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_ENABLED),
+                                                                ret.isDirectoryIntegrationEnabled ()));
+    ret.setDirectoryIntegrationRequired (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_REQUIRED),
+                                                                 ret.isDirectoryIntegrationRequired ()));
+    ret.setDirectoryIntegrationAutoUpdate (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_AUTO_UPDATE),
+                                                                   ret.isDirectoryIntegrationAutoUpdate ()));
+    String sDirectoryHostName = aValues.get (DIRECTORY_HOSTNAME);
+    if (StringHelper.isEmpty (sDirectoryHostName))
+      sDirectoryHostName = ret.getDirectoryHostName ();
+    ret.setDirectoryHostName (sDirectoryHostName);
+    ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), ret.isSMLEnabled ()));
+    ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), ret.isSMLRequired ()));
+    ret.setSMLInfoID (aValues.get (SML_INFO_ID));
+    return ret;
+  }
+
   public static class SettingsSingleton extends AbstractRequestWebSingleton
   {
     private static final Logger LOGGER = LoggerFactory.getLogger (SMPSettingsManagerJDBC.SettingsSingleton.class);
@@ -188,31 +211,6 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     public static SettingsSingleton getInstance ()
     {
       return getRequestSingleton (SettingsSingleton.class);
-    }
-
-    @NonNull
-    private static ISMPSettings _createSettingsFromDB (@NonNull final SMPSettingsManagerJDBC aMgr)
-    {
-      // Queries DB
-      final ICommonsMap <String, String> aValues = aMgr.getAllSettingsValuesFromDB ();
-
-      final SMPSettings ret = SMPSettings.createInitializedFromConfiguration ();
-      ret.setRESTWritableAPIDisabled (StringParser.parseBool (aValues.get (SMP_REST_WRITABLE_API_DISABLED),
-                                                              ret.isRESTWritableAPIDisabled ()));
-      ret.setDirectoryIntegrationEnabled (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_ENABLED),
-                                                                  ret.isDirectoryIntegrationEnabled ()));
-      ret.setDirectoryIntegrationRequired (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_REQUIRED),
-                                                                   ret.isDirectoryIntegrationRequired ()));
-      ret.setDirectoryIntegrationAutoUpdate (StringParser.parseBool (aValues.get (DIRECTORY_INTEGRATION_AUTO_UPDATE),
-                                                                     ret.isDirectoryIntegrationAutoUpdate ()));
-      String sDirectoryHostName = aValues.get (DIRECTORY_HOSTNAME);
-      if (StringHelper.isEmpty (sDirectoryHostName))
-        sDirectoryHostName = ret.getDirectoryHostName ();
-      ret.setDirectoryHostName (sDirectoryHostName);
-      ret.setSMLEnabled (StringParser.parseBool (aValues.get (SML_ENABLED), ret.isSMLEnabled ()));
-      ret.setSMLRequired (StringParser.parseBool (aValues.get (SML_REQUIRED), ret.isSMLRequired ()));
-      ret.setSMLInfoID (aValues.get (SML_INFO_ID));
-      return ret;
     }
 
     @NonNull
@@ -231,6 +229,20 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
           LOGGER.debug ("Reusing SMP settings of request");
       }
       return ret;
+    }
+
+    /**
+     * Set the settings cached in the current request. This is needed after the settings were
+     * changed, so that the remainder of the request sees the new settings.
+     *
+     * @param aSettings
+     *        The new settings to be used. May not be <code>null</code>.
+     */
+    void setSettings (@NonNull final ISMPSettings aSettings)
+    {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Updating the SMP settings of the current request");
+      m_aSMPSettings = aSettings;
     }
   }
 
@@ -264,6 +276,17 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     // Save
     if (setSettingsValuesInDB (aMap).isFailure ())
       return EChange.UNCHANGED;
+
+    // Re-read the settings from the DB
+    final ISMPSettings aNewSettings = _createSettingsFromDB (this);
+
+    // Ensure the settings cached in the current request are up to date as well
+    if (WebScopeManager.isRequestScopePresent ())
+      SettingsSingleton.getInstance ().setSettings (aNewSettings);
+
+    // Invoke callbacks (e.g. to recreate the Directory client)
+    m_aCallbacks.forEach (x -> x.onSMPSettingsChanged (aNewSettings));
+
     return EChange.CHANGED;
   }
 }
