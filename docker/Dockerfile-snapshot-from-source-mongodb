@@ -16,7 +16,7 @@
 #
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:10.1-jdk21
+FROM tomcat:10.1-jdk25
 
 # Use non-blocking random
 ENV CATALINA_OPTS="-Djava.security.egd=file:/dev/urandom"
