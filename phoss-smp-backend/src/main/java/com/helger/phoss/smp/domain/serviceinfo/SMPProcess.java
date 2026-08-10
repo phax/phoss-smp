@@ -70,7 +70,10 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   @Nonnegative
   public int getEndpointCount ()
   {
-    return m_aEndpoints.size ();
+    int ret = 0;
+    for (final var aEndpoints : m_aEndpoints.values ())
+      ret += aEndpoints.size ();
+    return ret;
   }
 
   @Nullable
