@@ -15,13 +15,7 @@
 # limitations under the License.
 #
 
-FROM adoptopenjdk:11-hotspot AS build
-
-# Install git and maven
-RUN apt-get update \
-  && apt-get upgrade -y \
-  && apt-get install -y git maven \
-  && rm -rf /var/lib/apt/lists/*
+FROM maven:3.9-eclipse-temurin-17 AS build
 
 ARG SMP_VERSION
 
