@@ -94,8 +94,9 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
   {
     if (StringHelper.isEmpty (sTransportProfileID))
       return new CommonsArrayList <> ();
+
     final ICommonsList <SMPEndpoint> aEPs = m_aEndpoints.get (sTransportProfileID);
-    return aEPs == null ? new CommonsArrayList <> () : new CommonsArrayList <> (aEPs);
+    return new CommonsArrayList <> (aEPs);
   }
 
   @NonNull
