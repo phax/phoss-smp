@@ -19,7 +19,7 @@
 FROM tomcat:10.1-jdk21
 
 # Use non-blocking random
-ENV CATALINA_OPTS="$CATALINA_OPTS -Djava.security.egd=file:/dev/urandom -Dorg.apache.catalina.session.StandardSession.ACTIVITY_CHECK=true"
+ENV CATALINA_OPTS="-Djava.security.egd=file:/dev/urandom -Dorg.apache.catalina.session.StandardSession.ACTIVITY_CHECK=true"
 
 # MinRAMPercentage - for low memory containers (<250MB)
 # MaxRAMPercentage - for large memory containers (>250MB)
