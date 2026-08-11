@@ -38,7 +38,7 @@ RUN echo Downloading phoss SMP $SMP_VERSION \
 FROM tomcat:10.1-jdk25
 
 # Use non-blocking random
-ENV CATALINA_OPTS="-Djava.security.egd=file:/dev/urandom"
+ENV CATALINA_OPTS="--enable-native-access=ALL-UNNAMED -Djava.security.egd=file:/dev/urandom"
 
 # Special encoded slash handling for SMP
 #   Tomcat 10 removed: org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
