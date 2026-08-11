@@ -35,7 +35,7 @@ RUN echo Downloading phoss SMP $SMP_VERSION \
 
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:10.1-jdk25
+FROM tomcat:10.1-jre25
 
 # Use non-blocking random
 ENV CATALINA_OPTS="-Djava.security.egd=file:/dev/urandom"
