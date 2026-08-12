@@ -69,7 +69,7 @@
   <properties>
     <flyway.version>13.2.0</flyway.version>
     <log4j.version>2.26.1</log4j.version>
-    <mongodb.version>5.9.1</mongodb.version>
+    <mongodb.version>5.9.2</mongodb.version>
     <protobuf.version>4.35.1</protobuf.version>
     
     <ph-db.version>8.4.1</ph-db.version>
@@ -99,7 +99,7 @@
       <dependency>
         <groupId>com.helger.masterdata</groupId>
         <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>8.1.1</version>
+        <version>8.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -120,7 +120,7 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>10.3.0</version>
+        <version>10.3.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
