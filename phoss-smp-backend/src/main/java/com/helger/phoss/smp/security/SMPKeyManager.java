@@ -13,9 +13,12 @@ package com.helger.phoss.smp.security;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
+import java.security.KeyStore.Entry;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.OffsetDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -60,6 +63,8 @@ import com.helger.security.keystore.KeyStoreHelper;
 import com.helger.security.keystore.LoadedKey;
 import com.helger.security.keystore.LoadedKeyStore;
 
+import static java.time.OffsetDateTime.now;
+
 /**
  * This class holds the private key for signing and the certificate for checking.
  *
@@ -75,6 +80,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
   private KeyStore m_aKeyStore;
   private KeyStore.PrivateKeyEntry m_aKeyEntry;
+  private OffsetDateTime m_futureKeyEntryTimestamp;
+  private KeyStore.PrivateKeyEntry m_futureKeyEntry;
 
   private static void _setKeyStoreValid (final boolean bValid)
   {
@@ -97,8 +104,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     // Load the key store and get the signing key
     final LoadedKeyStore aLoadedKeyStore = KeyStoreHelper.loadKeyStore (SMPServerConfiguration.getKeyStoreType (),
-                                                                        SMPServerConfiguration.getKeyStorePath (),
-                                                                        SMPServerConfiguration.getKeyStorePassword ());
+            SMPServerConfiguration.getKeyStorePath (),
+            SMPServerConfiguration.getKeyStorePassword ());
     if (aLoadedKeyStore.isFailure ())
     {
       _loadError (aLoadedKeyStore.getError (), LoadedKeyStore.getLoadError (aLoadedKeyStore));
@@ -107,9 +114,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     m_aKeyStore = aLoadedKeyStore.getKeyStore ();
 
     final LoadedKey <KeyStore.PrivateKeyEntry> aLoadedKey = KeyStoreHelper.loadPrivateKey (m_aKeyStore,
-                                                                                           SMPServerConfiguration.getKeyStorePath (),
-                                                                                           SMPServerConfiguration.getKeyStoreKeyAlias (),
-                                                                                           SMPServerConfiguration.getKeyStoreKeyPassword ());
+            SMPServerConfiguration.getKeyStorePath (),
+            SMPServerConfiguration.getKeyStoreKeyAlias (),
+            SMPServerConfiguration.getKeyStoreKeyPassword ());
     if (aLoadedKey.isFailure ())
     {
       _loadError (aLoadedKey.getError (), LoadedKey.getLoadError (aLoadedKey));
@@ -118,11 +125,13 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
     m_aKeyEntry = aLoadedKey.getKeyEntry ();
     LOGGER.info ("SMPKeyManager successfully initialized with keystore '" +
-                 SMPServerConfiguration.getKeyStorePath () +
-                 "' and alias '" +
-                 SMPServerConfiguration.getKeyStoreKeyAlias () +
-                 "'");
+            SMPServerConfiguration.getKeyStorePath () +
+            "' and alias '" +
+            SMPServerConfiguration.getKeyStoreKeyAlias () +
+            "'");
     _setKeyStoreValid (true);
+
+    // TODO: Load future entry timestamp and certificate-key-pair from persistence
   }
 
   /**
@@ -157,19 +166,40 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    */
   public KeyStore.@Nullable PrivateKeyEntry getPrivateKeyEntry ()
   {
-    return m_aKeyEntry;
+    return isNonFutureKeyEntry()
+            ? m_aKeyEntry
+            : m_futureKeyEntry;
+  }
+
+  private boolean isNonFutureKeyEntry() {
+    return m_futureKeyEntryTimestamp == null || m_futureKeyEntryTimestamp.isBefore(now());
   }
 
   @Nullable
   public X509Certificate getPrivateKeyCertificate ()
   {
-    if (m_aKeyEntry != null)
+    KeyStore.PrivateKeyEntry keyEntry = isNonFutureKeyEntry()
+            ? m_aKeyEntry
+            : m_futureKeyEntry;
+
+    if (keyEntry != null)
     {
-      final Certificate aCert = m_aKeyEntry.getCertificate ();
+      final Certificate aCert = keyEntry.getCertificate ();
       if (aCert instanceof X509Certificate)
         return (X509Certificate) aCert;
     }
     return null;
+  }
+
+  public void setFutureKeyEntry(OffsetDateTime timestamp, X509Certificate certificate, PrivateKey key) {
+    if (timestamp == null) {
+      m_futureKeyEntryTimestamp = null;
+      m_futureKeyEntry = null;
+    } else {
+      m_futureKeyEntryTimestamp = timestamp;
+      m_futureKeyEntry = new KeyStore.PrivateKeyEntry(key, new X509Certificate[]{certificate});
+    }
+    // TODO: Persist future entry timestamp and certificate-key-pair
   }
 
   /**
@@ -228,10 +258,10 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    *         Some XMLDSig specific stuff failed
    */
   public void signXML (@NonNull final Element aElementToSign, @NonNull final ESMPRESTType eRESTType)
-                                                                                                     throws NoSuchAlgorithmException,
-                                                                                                     InvalidAlgorithmParameterException,
-                                                                                                     MarshalException,
-                                                                                                     XMLSignatureException
+          throws NoSuchAlgorithmException,
+          InvalidAlgorithmParameterException,
+          MarshalException,
+          XMLSignatureException
   {
     ValueEnforcer.notNull (aElementToSign, "ElementToSign");
     ValueEnforcer.notNull (eRESTType, "RESTType");
@@ -247,11 +277,11 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // * Peppol SMP Spec 1.3.0 changed from SHA-1 to SHA-256
     final String sDigestAlgo = DigestMethod.SHA256;
     final Reference aReference = aSignatureFactory.newReference ("",
-                                                                 aSignatureFactory.newDigestMethod (sDigestAlgo, null),
-                                                                 new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
-                                                                                                                          (TransformParameterSpec) null)),
-                                                                 (String) null,
-                                                                 (String) null);
+            aSignatureFactory.newDigestMethod (sDigestAlgo, null),
+            new CommonsArrayList <> (aSignatureFactory.newTransform (Transform.ENVELOPED,
+                    (TransformParameterSpec) null)),
+            (String) null,
+            (String) null);
 
     // Create the SignedInfo.
     // * Before Peppol SMP Spec 1.2.0 this was EXCLUSIVE, since 1.2.0 it is
@@ -281,21 +311,21 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
       default -> throw new IllegalStateException ("Unsupported REST type");
     };
     final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (sC18N,
-                                                                                                                 (C14NMethodParameterSpec) null),
-                                                                    aSignatureFactory.newSignatureMethod (sSignatureMethod,
-                                                                                                          (SignatureMethodParameterSpec) null),
-                                                                    new CommonsArrayList <> (aReference));
+                    (C14NMethodParameterSpec) null),
+            aSignatureFactory.newSignatureMethod (sSignatureMethod,
+                    (SignatureMethodParameterSpec) null),
+            new CommonsArrayList <> (aReference));
 
     // Create the KeyInfo containing the X509Data.
     final KeyInfoFactory aKeyInfoFactory = aSignatureFactory.getKeyInfoFactory ();
-    final X509Certificate aCert = (X509Certificate) m_aKeyEntry.getCertificate ();
+    final X509Certificate aCert = getPrivateKeyCertificate ();
     final X509Data aX509Data = aKeyInfoFactory.newX509Data (new CommonsArrayList <> (aCert.getSubjectX500Principal ()
-                                                                                          .getName (), aCert));
+            .getName (), aCert));
     final KeyInfo aKeyInfo = aKeyInfoFactory.newKeyInfo (new CommonsArrayList <> (aX509Data));
 
     // Create a DOMSignContext and specify the RSA PrivateKey and
     // location of the resulting XMLSignature's parent element.
-    final DOMSignContext aSignContext = new DOMSignContext (m_aKeyEntry.getPrivateKey (), aElementToSign);
+    final DOMSignContext aSignContext = new DOMSignContext (getPrivateKeyEntry ().getPrivateKey (), aElementToSign);
 
     // Create the XMLSignature, but don't sign it yet.
     final XMLSignature aSignature = aSignatureFactory.newXMLSignature (aSingedInfo, aKeyInfo);
