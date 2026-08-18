@@ -36,7 +36,7 @@ ENV CATALINA_OPTS="$CATALINA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercenta
 LABEL vendor="Philip Helger"
 LABEL version="HEAD"
 
-# Install vim, Java 11 JDK, Maven and Git
+# Install vim, Maven and Git - Maven builds with the Java 25 of the base image
 RUN apt-get update \
   && apt-get upgrade -y \
   && apt-get install -y vim git maven \

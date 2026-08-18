@@ -16,7 +16,7 @@
 #
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:10.1-jdk25
+FROM tomcat:10.1-jre25
 
 # Use non-blocking random
 ENV CATALINA_OPTS="--enable-native-access=ALL-UNNAMED -Djava.security.egd=file:/dev/urandom -Dorg.apache.catalina.session.StandardSession.ACTIVITY_CHECK=true"

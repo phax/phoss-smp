@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 
 ARG SMP_VERSION
 
@@ -30,7 +30,7 @@ RUN echo Building phoss SMP $SMP_VERSION \
 
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:10.1-jdk25
+FROM tomcat:10.1-jre25
 
 # Use non-blocking random
 ENV CATALINA_OPTS="--enable-native-access=ALL-UNNAMED -Djava.security.egd=file:/dev/urandom"

@@ -1,7 +1,7 @@
 # phoss SMP Docker configuration
 
 This folder contains the Docker configuration files for phoss SMP.
-It is based on the official `tomcat:10.1-jdk25` image.
+It is based on the official `tomcat:10.1-jre25` image. Only the Dockerfiles that build phoss SMP from source inside the container use `tomcat:10.1-jdk25`.
 It is recommended to run production Docker images with at least 4GB of RAM.
 
 Prebuild images are available from:
