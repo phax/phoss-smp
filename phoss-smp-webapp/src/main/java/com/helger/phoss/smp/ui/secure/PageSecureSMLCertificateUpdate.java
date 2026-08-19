@@ -50,6 +50,7 @@ import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.bootstrap5.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.form.FormErrorList;
@@ -299,7 +300,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
     if (bShowForm)
     {
       final BootstrapForm aForm = getUIHandler ().createFormFileUploadSelf (aWPEC);
-      aForm.setLeft (-1, -1, 12, -1, 2, 2);
+      aForm.setLeft (BootstrapGridSpec.builder ().md (12).xl (2).build ());
       aForm.addChild (warn ("It is your responsibility to actually perform the update of the certificate in this SMP at the specified time! This does NOT happen automatically."));
 
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,

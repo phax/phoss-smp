@@ -45,9 +45,13 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
                                              AbstractBootstrapWebPageForm <DATATYPE, WebPageExecutionContext>
 {
   /** Grid spec for identifier schemes */
-  protected static final BootstrapGridSpec GS_IDENTIFIER_SCHEME = BootstrapGridSpec.create (6, 6, 6, 4, 3, 3);
+  protected static final BootstrapGridSpec GS_IDENTIFIER_SCHEME = BootstrapGridSpec.builder ()
+                                                                                   .xs (6)
+                                                                                   .lg (4)
+                                                                                   .xl (3)
+                                                                                   .build ();
   /** Grid spec for identifier values */
-  protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = BootstrapGridSpec.create (6, 6, 6, 8, 9, 9);
+  protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = GS_IDENTIFIER_SCHEME.getInverse ();
 
   protected static final String HR_EXT_WARNING = AbstractSMPWebPage.HR_EXT_WARNING;
 

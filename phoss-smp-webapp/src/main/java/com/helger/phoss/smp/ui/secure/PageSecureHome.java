@@ -79,13 +79,11 @@ public class PageSecureHome extends AbstractSMPWebPage
 
     final BootstrapContainer aContainer = aNodeList.addAndReturnChild (new BootstrapContainer (true));
     final BootstrapRow aRow = aContainer.addAndReturnChild (new BootstrapRow ());
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
-        .addChild (fAndChildren.apply (CMenuSecure.MENU_SERVICE_GROUPS));
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
-        .addChild (fAndChildren.apply (CMenuSecure.MENU_ENDPOINTS));
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
-        .addChild (fLinkToPage.apply (CMenuSecure.MENU_REDIRECTS));
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
-        .addChild (fLinkToPage.apply (CMenuSecure.MENU_BUSINESS_CARDS));
+
+    final var aColGrid = BootstrapGridSpec.builder ().lg (3).build ();
+    aRow.createColumn (aColGrid).addChild (fAndChildren.apply (CMenuSecure.MENU_SERVICE_GROUPS));
+    aRow.createColumn (aColGrid).addChild (fAndChildren.apply (CMenuSecure.MENU_ENDPOINTS));
+    aRow.createColumn (aColGrid).addChild (fLinkToPage.apply (CMenuSecure.MENU_REDIRECTS));
+    aRow.createColumn (aColGrid).addChild (fLinkToPage.apply (CMenuSecure.MENU_BUSINESS_CARDS));
   }
 }

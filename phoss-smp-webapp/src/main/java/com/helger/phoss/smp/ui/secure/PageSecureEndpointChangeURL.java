@@ -51,6 +51,7 @@ import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
@@ -268,7 +269,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
-      aForm.setLeft (-1, 12, -1, -1, 2, 2);
+      aForm.setLeft (BootstrapGridSpec.builder ().sm (12).xl (2).build ());
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
 
@@ -334,7 +335,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                                                                             aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      aURLUsage.forEach ( (sURL, aUsageInfo) -> {
+      aURLUsage.forEach ((sURL, aUsageInfo) -> {
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (sURL);
 

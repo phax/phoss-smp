@@ -96,6 +96,7 @@ import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap5.form.BootstrapFormHelper;
 import com.helger.photon.bootstrap5.form.BootstrapViewForm;
+import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.grid.BootstrapRow;
 import com.helger.photon.bootstrap5.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandler;
@@ -326,7 +327,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
   static
   {
-    AJAX_CREATE_CUSTPROP = CAjax.addAjaxWithLogin ( (aRequestScope, aAjaxResponse) -> {
+    AJAX_CREATE_CUSTPROP = CAjax.addAjaxWithLogin ((aRequestScope, aAjaxResponse) -> {
       final LayoutExecutionContext aLEC = LayoutExecutionContext.createForAjaxOrAction (aRequestScope);
       final IHCNode aNode = _createCustomPropertyInputForm (aLEC,
                                                             (SGCustomProperty) null,
@@ -514,7 +515,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                             "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
-    aForm.setLeft (-1, 12, 4, 3, 2, 2);
+    aForm.setLeft (BootstrapGridSpec.builder ().sm (12).md (4).lg (3).xl (2).build ());
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
                                                  .setCtrl (aSelectedObject.getParticipantIdentifier ()

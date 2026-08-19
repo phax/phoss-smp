@@ -40,6 +40,7 @@ import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -168,7 +169,8 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
 
       // Update SMP at SML
       {
-        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2, 2);
+        final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC)
+                                                   .setLeft (BootstrapGridSpec.builder ().xs (3).md (2).build ());
         aForm.addChild (info ("Update this SMP at the SML. This must only be done when the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
