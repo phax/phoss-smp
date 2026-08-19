@@ -26,9 +26,9 @@ import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.bootstrap4.grid.BootstrapGridSpec;
-import com.helger.photon.bootstrap4.grid.BootstrapRow;
-import com.helger.photon.bootstrap4.layout.BootstrapContainer;
+import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
+import com.helger.photon.bootstrap5.grid.BootstrapRow;
+import com.helger.photon.bootstrap5.layout.BootstrapContainer;
 import com.helger.photon.core.menu.IMenuItemPage;
 import com.helger.photon.core.menu.IMenuObject;
 import com.helger.photon.core.menu.IMenuTree;
@@ -79,13 +79,13 @@ public class PageSecureHome extends AbstractSMPWebPage
 
     final BootstrapContainer aContainer = aNodeList.addAndReturnChild (new BootstrapContainer (true));
     final BootstrapRow aRow = aContainer.addAndReturnChild (new BootstrapRow ());
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1))
+    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
         .addChild (fAndChildren.apply (CMenuSecure.MENU_SERVICE_GROUPS));
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1))
+    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
         .addChild (fAndChildren.apply (CMenuSecure.MENU_ENDPOINTS));
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1))
+    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
         .addChild (fLinkToPage.apply (CMenuSecure.MENU_REDIRECTS));
-    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1))
+    aRow.createColumn (BootstrapGridSpec.create (-1, -1, -1, 3, -1, -1))
         .addChild (fLinkToPage.apply (CMenuSecure.MENU_BUSINESS_CARDS));
   }
 }

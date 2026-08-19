@@ -28,9 +28,10 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.ui.ajax.CAjax;
-import com.helger.photon.bootstrap4.ext.BootstrapSystemMessage;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapTechnicalUI;
+import com.helger.photon.bootstrap5.ext.BootstrapSystemMessage;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapTechnicalUI;
+import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.uictrls.datatables.DataTablesLengthMenu;
@@ -61,6 +62,10 @@ public final class SMPCommonUI
 
   public static void init ()
   {
+    // Use FontAwesome 6 for all default icons
+    EFontAwesome6Icon.setAsDefault ();
+    EFontAwesome6Icon.registerResourcesForGlobal ();
+
     BootstrapDataTables.setConfigurator ( (aLEC, aTable, aDataTables) -> {
       final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
       aDataTables.setAutoWidth (false)

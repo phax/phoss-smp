@@ -49,12 +49,12 @@ import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.table.BootstrapTable;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.table.BootstrapTable;
+import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
 
@@ -163,7 +163,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                          new HCTextNode (" "),
                                          new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
                                                               .setTargetBlank ()
-                                                              .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()))
+                                                              .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()))
                       .addClass (CSS_CLASS_RIGHT);
             }
 
@@ -194,7 +194,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
                                                                                               "/" +
                                                                                               aDocTypeID.getURIPercentEncoded ())).setTitle ("Perform SMP query on document type ")
                                                                                                                                   .setTargetBlank ()
-                                                                                                                                  .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                                                                  .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
           aLI.addChild (aDiv);
           if (aProcesses.isEmpty ())
           {

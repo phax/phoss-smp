@@ -25,7 +25,7 @@ import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.peppol.EPeppolCodeListItemState;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
 
 import jakarta.annotation.Nullable;
 

@@ -29,7 +29,7 @@ import com.helger.json.JsonObject;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.app.PhotonUnifiedResponse;
-import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
+import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.login.CLogin;
@@ -41,7 +41,7 @@ import com.helger.photon.security.login.LoggedInUserManager;
  *
  * @author Philip Helger
  */
-public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor implements IHCBootstrap4Trait
+public final class AjaxExecutorPublicLogin extends AbstractSMPAjaxExecutor implements IHCBootstrap5Trait
 {
   public static final String JSON_LOGGEDIN = "loggedin";
   public static final String JSON_HTML = "html";

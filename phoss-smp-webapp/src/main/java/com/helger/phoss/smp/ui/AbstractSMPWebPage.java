@@ -19,7 +19,7 @@ package com.helger.phoss.smp.ui;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPage;
+import com.helger.photon.bootstrap5.pages.AbstractBootstrapWebPage;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**

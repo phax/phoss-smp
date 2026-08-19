@@ -84,29 +84,30 @@ import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.CBootstrapCSS;
-import com.helger.photon.bootstrap4.alert.BootstrapErrorBox;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.button.EBootstrapButtonSize;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.card.BootstrapCard;
-import com.helger.photon.bootstrap4.card.BootstrapCardBody;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.form.BootstrapFormHelper;
-import com.helger.photon.bootstrap4.form.BootstrapViewForm;
-import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
-import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap4.table.BootstrapTable;
-import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.bootstrap4.uictrls.datetimepicker.BootstrapDateTimePicker;
+import com.helger.photon.bootstrap5.CBootstrapCSS;
+import com.helger.photon.bootstrap5.alert.BootstrapErrorBox;
+import com.helger.photon.bootstrap5.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.button.EBootstrapButtonSize;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.card.BootstrapCard;
+import com.helger.photon.bootstrap5.card.BootstrapCardBody;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.form.BootstrapFormHelper;
+import com.helger.photon.bootstrap5.form.BootstrapViewForm;
+import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandler;
+import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap5.table.BootstrapTable;
+import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap5.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
@@ -121,7 +122,6 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamFlagIcon;
-import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.servlet.request.IRequestParamMap;
 import com.helger.servlet.request.RequestParamMap;
 import com.helger.smtp.util.EmailAddressValidator;
@@ -210,7 +210,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
    * @author Philip Helger
    */
   private static final class PushAllBusinessCardsToDirectory extends AbstractLongRunningJobRunnable implements
-                                                             IHCBootstrap4Trait
+                                                             IHCBootstrap5Trait
   {
     private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
@@ -1228,7 +1228,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                             .getURIPercentEncoded ())).setTitle ("Perform SMP query on " +
                                                                                                                  sDisplayName)
                                                                                                       .setTargetBlank ()
-                                                                                                      .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                                      .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
 
     // When auto update is enabled, there is no need for a manual update
     // Change: update possibility always, in case document type was changed
@@ -1239,7 +1239,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                      .add (CPageParam.PARAM_OBJECT, aCurObject.getID ())).setTitle (
                                                                                                     "Update Business Card in " +
                                                                                                     SMPWebAppConfiguration.getDirectoryName ())
-                                                                                         .addChild (EFamFamIcon.ARROW_RIGHT.getAsNode ()));
+                                                                                         .addChild (EFontAwesome6Icon.ARROW_RIGHT.getAsNode ()));
     }
 
     return ret;
@@ -1261,7 +1261,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       aToolbar.addChild (new BootstrapButton ().setOnClick (aWPEC.getSelfHref ()
                                                                  .add (CPageParam.PARAM_ACTION,
                                                                        ACTION_PUBLISH_ALL_TO_INDEXER))
-                                               .setIcon (EFamFamIcon.ARROW_REDO)
+                                               .setIcon (EFontAwesome6Icon.ARROW_ROTATE_RIGHT)
                                                .addChild ("Update all Business Cards in " + sDirectoryName)
                                                .setDisabled (aAllBusinessCards.isEmpty ()));
 

@@ -84,31 +84,32 @@ import com.helger.phoss.smp.ui.secure.hc.HCSMPCustomPropertyTypeSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.app.PhotonUnifiedResponse;
-import com.helger.photon.bootstrap4.CBootstrapCSS;
-import com.helger.photon.bootstrap4.alert.BootstrapQuestionBox;
-import com.helger.photon.bootstrap4.badge.BootstrapBadge;
-import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
-import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.button.EBootstrapButtonSize;
-import com.helger.photon.bootstrap4.button.EBootstrapButtonType;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.form.BootstrapFormHelper;
-import com.helger.photon.bootstrap4.form.BootstrapViewForm;
-import com.helger.photon.bootstrap4.grid.BootstrapRow;
-import com.helger.photon.bootstrap4.pages.BootstrapPagesMenuConfigurator;
-import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandler;
-import com.helger.photon.bootstrap4.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
-import com.helger.photon.bootstrap4.table.BootstrapTable;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap5.CBootstrapCSS;
+import com.helger.photon.bootstrap5.alert.BootstrapQuestionBox;
+import com.helger.photon.bootstrap5.badge.BootstrapBadge;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.button.EBootstrapButtonSize;
+import com.helger.photon.bootstrap5.button.EBootstrapButtonType;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.form.BootstrapFormHelper;
+import com.helger.photon.bootstrap5.form.BootstrapViewForm;
+import com.helger.photon.bootstrap5.grid.BootstrapRow;
+import com.helger.photon.bootstrap5.pages.BootstrapPagesMenuConfigurator;
+import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandler;
+import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap5.table.BootstrapTable;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
+import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -122,7 +123,6 @@ import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
-import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.servlet.request.IRequestParamMap;
 import com.helger.servlet.request.RequestParamMap;
 import com.helger.smpclient.extension.SMPExtensionList;
@@ -514,7 +514,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                             "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
-    aForm.setLeft (-1, 12, 4, 3, 2);
+    aForm.setLeft (-1, 12, 4, 3, 2, 2);
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
                                                  .setCtrl (aSelectedObject.getParticipantIdentifier ()
@@ -1055,7 +1055,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                               new HCA (new SimpleURL (aRDP.getServiceGroupHref (aCurPI))).setTitle ("Perform SMP query on " +
                                                                                                     sDisplayName)
                                                                                          .setTargetBlank ()
-                                                                                         .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                         .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
         aRow.addCell (aActions);
       }
 

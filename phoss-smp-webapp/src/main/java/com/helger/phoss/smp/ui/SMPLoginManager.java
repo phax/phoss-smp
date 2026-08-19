@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.app.html.IHTMLProvider;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapLoginManager;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapLoginManager;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 import com.helger.servlet.StaticServerInfo;

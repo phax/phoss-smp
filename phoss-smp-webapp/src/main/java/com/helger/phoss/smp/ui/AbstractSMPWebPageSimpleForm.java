@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.id.IHasID;
-import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageSimpleForm;
+import com.helger.photon.bootstrap5.pages.AbstractBootstrapWebPageSimpleForm;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**

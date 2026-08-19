@@ -50,16 +50,16 @@ import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.servlet.SMPLogoutServlet;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.CBootstrapCSS;
-import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumb;
-import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
-import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.layout.BootstrapContainer;
-import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
-import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRenderer;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRendererHorz;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapPageRenderer;
+import com.helger.photon.bootstrap5.CBootstrapCSS;
+import com.helger.photon.bootstrap5.breadcrumb.BootstrapBreadcrumb;
+import com.helger.photon.bootstrap5.breadcrumb.BootstrapBreadcrumbProvider;
+import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.layout.BootstrapContainer;
+import com.helger.photon.bootstrap5.navbar.BootstrapNavbar;
+import com.helger.photon.bootstrap5.navbar.BootstrapNavbarToggleable;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapMenuItemRenderer;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapMenuItemRendererHorz;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapPageRenderer;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.appid.CApplicationID;
 import com.helger.photon.core.appid.PhotonGlobalState;
@@ -112,8 +112,8 @@ public final class SMPRendererPublic
     if (aUser != null)
     {
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-      aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.ML_AUTO)
-                                                  .addClass (CBootstrapCSS.MR_2)
+      aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.MS_AUTO)
+                                                  .addClass (CBootstrapCSS.ME_2)
                                                   .addChild ("Goto Administration")
                                                   .setOnClick (LinkHelper.getURLWithContext (AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                              "/")));

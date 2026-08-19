@@ -33,10 +33,10 @@ import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.audit.AuditHelper;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.pages.BootstrapWebPageUIHandler;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
@@ -127,7 +127,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       final Predicate <ISMLInfo> aSMLFilter = null;
 
       // Delete SMP from SML
-      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);
+      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2, 2);
       aForm.addChild (info ("Delete this SMP from the SML."));
       aForm.addChild (error ("This will remove ALL participants / Service Groups from the network! Your local Service Groups will become unreachable."));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")

@@ -37,10 +37,10 @@ import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.audit.AuditHelper;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.pages.BootstrapWebPageUIHandler;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.css.CPageParam;
@@ -171,7 +171,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       final Predicate <ISMLInfo> aSMLFilter = null;
 
       // Register SMP at SML
-      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2);
+      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (3, 3, 2, 2, 2, 2);
       aForm.addChild (info ("Register this SMP to the SML. This must only be done once per SMP!"));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
