@@ -65,6 +65,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_PAYLOAD_ON_ERROR = "smp.rest.payload.on.error";
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
   public static final String KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK = "smp.rest.delete.notfound.as.ok";
+  public static final String KEY_SMP_REST_AUTH_ERRORDETAILS = "smp.rest.auth.errordetails";
 
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
@@ -102,6 +103,7 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
   public static final boolean DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK = false;
+  public static final boolean DEFAULT_SMP_REST_AUTH_ERRORDETAILS = true;
 
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
@@ -336,6 +338,20 @@ public final class SMPServerConfiguration
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK,
                                        DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK);
+  }
+
+  /**
+   * @return <code>true</code> if the details of failed REST API authentications (like "Unknown
+   *         user" or "User is disabled") should be returned to the caller, <code>false</code> if a
+   *         generic error message should be used instead. By default it is enabled (for backwards
+   *         compatibility), but for security reasons it should be disabled, because otherwise it
+   *         can be determined, whether a specific user exists or not. The detailed reason is always
+   *         logged on the server, independent of this setting.
+   * @since 8.1.9
+   */
+  public static boolean isRestAuthErrorDetails ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_AUTH_ERRORDETAILS, DEFAULT_SMP_REST_AUTH_ERRORDETAILS);
   }
 
   /**
