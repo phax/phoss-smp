@@ -55,7 +55,6 @@ import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
@@ -298,7 +297,6 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
-      aForm.setLeft (BootstrapGridSpec.builder ().md (12).xl (2).build ());
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
       aForm.addChild (new HCHiddenField (FIELD_OLD_CERTIFICATE, sOldUnifiedCert));

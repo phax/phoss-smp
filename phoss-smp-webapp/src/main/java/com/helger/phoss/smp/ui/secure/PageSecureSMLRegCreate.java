@@ -40,7 +40,6 @@ import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -172,7 +171,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       final Predicate <ISMLInfo> aSMLFilter = null;
 
       // Register SMP at SML
-      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC).setLeft (BootstrapGridSpec.builder ().xs (3).md (2).build ());
+      final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
       aForm.addChild (info ("Register this SMP to the SML. This must only be done once per SMP!"));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,

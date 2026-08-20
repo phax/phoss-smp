@@ -96,7 +96,6 @@ import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap5.form.BootstrapFormHelper;
 import com.helger.photon.bootstrap5.form.BootstrapViewForm;
-import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
 import com.helger.photon.bootstrap5.grid.BootstrapRow;
 import com.helger.photon.bootstrap5.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandler;
@@ -350,7 +349,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                 @Nullable final ISMPServiceGroup aSelectedObject)
       {
         final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-
         aForm.setLeft (0);
 
         final BootstrapQuestionBox aQB = question (div ("Are you sure you want to delete the complete SMP Service Group '" +
@@ -515,8 +513,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                             "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
-    aForm.setLeft (BootstrapGridSpec.builder ().sm (12).md (4).lg (3).xl (2).build ());
-
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
                                                  .setCtrl (aSelectedObject.getParticipantIdentifier ()
                                                                           .getURIEncoded ()));
@@ -645,7 +641,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
-    aForm.setLeft (2);
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit service group '" + aSelectedObject.getID () + "'"
                                                               : "Create new service group"));
 
