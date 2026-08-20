@@ -11,12 +11,15 @@
 package com.helger.phoss.smp.domain.user;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.string.StringHelper;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
@@ -36,10 +39,50 @@ import com.helger.photon.security.user.IUserManager;
  */
 public final class SMPUserManagerPhoton
 {
+  /**
+   * The generic error message that is returned for all authentication failures, if
+   * {@link SMPServerConfiguration#isRestAuthErrorDetails()} is disabled. It is deliberately the
+   * same for all failure reasons, so that it cannot be determined from the outside, whether a
+   * specific user exists or not.
+   *
+   * @since 8.1.9
+   */
+  public static final String MSG_AUTH_FAILED = "Username and/or password are invalid!";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPUserManagerPhoton.class);
 
   private SMPUserManagerPhoton ()
   {}
+
+  /**
+   * @param sDetails
+   *        The detailed error message. May not be <code>null</code>.
+   * @return The detailed error message, if the REST authentication error details are enabled, and
+   *         {@link #MSG_AUTH_FAILED} otherwise.
+   */
+  @NonNull
+  private static String _getAuthErrorMsg (@NonNull final String sDetails)
+  {
+    return SMPServerConfiguration.isRestAuthErrorDetails () ? sDetails : MSG_AUTH_FAILED;
+  }
+
+  /**
+   * @param sToken
+   *        The Bearer token to mask. May be <code>null</code>.
+   * @return A shortened representation of the provided Bearer token, so that the token itself is
+   *         never logged and never returned to the caller.
+   */
+  @NonNull
+  private static String _getMaskedToken (@Nullable final String sToken)
+  {
+    final int nLength = StringHelper.getLength (sToken);
+    if (nLength < 12)
+    {
+      // Too short to show anything of it
+      return "*** (length " + nLength + ")";
+    }
+    return sToken.substring (0, 4) + "*** (length " + nLength + ")";
+  }
 
   /**
    * Check if the provided credentials are valid. This checks if the user exists, if it is not
@@ -53,6 +96,8 @@ public final class SMPUserManagerPhoton
    *         if the user does not exist or if the user is marked as deleted.
    * @throws SMPUnauthorizedException
    *         If the password is invalid or if the user is marked as disabled
+   * @see SMPServerConfiguration#isRestAuthErrorDetails() for controlling the amount of details in
+   *      the error messages of the thrown exceptions
    */
   @NonNull
   public static IUser validateUserCredentials (@NonNull final SMPAPICredentials aCredentials) throws SMPUnknownUserException,
@@ -70,17 +115,18 @@ public final class SMPUserManagerPhoton
       {
         // Deleted users are handled like non-existing users
         LOGGER.warn ("Invalid login name provided: '" + aBasicAuth.getUserName () + "'");
-        throw new SMPUnknownUserException (aBasicAuth.getUserName ());
+        throw new SMPUnknownUserException (aBasicAuth.getUserName (),
+                                           _getAuthErrorMsg ("Unknown user '" + aBasicAuth.getUserName () + "'"));
       }
       if (!aUserMgr.areUserIDAndPasswordValid (aUser.getID (), aBasicAuth.getPassword ()))
       {
         LOGGER.warn ("Invalid password provided for '" + aBasicAuth.getUserName () + "'");
-        throw new SMPUnauthorizedException ("Username and/or password are invalid!");
+        throw new SMPUnauthorizedException (MSG_AUTH_FAILED);
       }
       if (aUser.isDisabled ())
       {
         LOGGER.warn ("User '" + aBasicAuth.getUserName () + "' is disabled");
-        throw new SMPUnauthorizedException ("User is disabled!");
+        throw new SMPUnauthorizedException (_getAuthErrorMsg ("User is disabled!"));
       }
 
       if (LOGGER.isDebugEnabled ())
@@ -94,30 +140,35 @@ public final class SMPUserManagerPhoton
       final IUserTokenManager aUserTokenMgr = PhotonSecurityManager.getUserTokenMgr ();
 
       final String sTokenString = aCredentials.getBearerToken ();
+      // Never log or return the Bearer token itself
+      final String sMaskedToken = _getMaskedToken (sTokenString);
       final IUserToken aUserToken = aUserTokenMgr.getUserTokenOfTokenString (sTokenString);
       if (aUserToken == null)
       {
         // Deleted users are handled like non-existing users
-        LOGGER.warn ("Invalid Bearer token provided: '" + sTokenString + "'");
-        throw new SMPUnknownUserException ("{BearerToken}" + sTokenString);
+        LOGGER.warn ("Invalid Bearer token provided: '" + sMaskedToken + "'");
+        throw new SMPUnknownUserException ("{BearerToken}" + sMaskedToken,
+                                           _getAuthErrorMsg ("Unknown Bearer token"));
       }
       if (aUserToken.isDeleted ())
       {
         // Deleted tokens are handled like non-existing token
-        LOGGER.warn ("Deleted Bearer token provided: '" + sTokenString + "'");
-        throw new SMPUnknownUserException ("{BearerToken}" + sTokenString);
+        LOGGER.warn ("Deleted Bearer token provided: '" + sMaskedToken + "'");
+        throw new SMPUnknownUserException ("{BearerToken}" + sMaskedToken,
+                                           _getAuthErrorMsg ("Unknown Bearer token"));
       }
       final IUser aUser = aUserToken.getUser ();
       if (aUser.isDeleted ())
       {
         // Deleted users are handled like non-existing users
-        LOGGER.warn ("The user to which the Bearer token '" + sTokenString + "' belongs is deleted");
-        throw new SMPUnknownUserException (aUser.getLoginName ());
+        LOGGER.warn ("The user to which the Bearer token '" + sMaskedToken + "' belongs is deleted");
+        throw new SMPUnknownUserException (aUser.getLoginName (),
+                                           _getAuthErrorMsg ("Unknown user '" + aUser.getLoginName () + "'"));
       }
       if (aUser.isDisabled ())
       {
-        LOGGER.warn ("User '" + aUser.getLoginName () + "' of Bearer token '" + sTokenString + "' is disabled");
-        throw new SMPUnauthorizedException ("User is disabled!");
+        LOGGER.warn ("User '" + aUser.getLoginName () + "' of Bearer token '" + sMaskedToken + "' is disabled");
+        throw new SMPUnauthorizedException (_getAuthErrorMsg ("User is disabled!"));
       }
 
       if (LOGGER.isDebugEnabled ())

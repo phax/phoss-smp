@@ -39,13 +39,13 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
-import com.helger.photon.bootstrap4.table.BootstrapTable;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap5.table.BootstrapTable;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
+import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.column.DTCol;
-import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
@@ -145,7 +145,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
           aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
                                                                                                                                 sDisplayName)
                                                                                                                      .setTargetBlank ()
-                                                                                                                     .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                                                                                                     .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
         }
         if (aFinalTable.hasBodyRows ())
         {

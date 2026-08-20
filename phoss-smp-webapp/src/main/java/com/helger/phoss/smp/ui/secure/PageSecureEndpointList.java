@@ -43,14 +43,14 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
-import com.helger.photon.uictrls.famfam.EFamFamIcon;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
@@ -147,7 +147,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
                         new HCTextNode (" "),
                         new HCA (aPreviewURL).setTitle ("Perform SMP query on endpoint")
                                              .setTargetBlank ()
-                                             .addChild (EFamFamIcon.SCRIPT_GO.getAsNode ()));
+                                             .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
         }
       }
     }

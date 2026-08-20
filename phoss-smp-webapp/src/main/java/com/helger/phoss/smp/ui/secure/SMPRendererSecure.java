@@ -40,17 +40,17 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.bootstrap4.CBootstrapCSS;
-import com.helger.photon.bootstrap4.alert.BootstrapSuccessBox;
-import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
-import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumb;
-import com.helger.photon.bootstrap4.breadcrumb.BootstrapBreadcrumbProvider;
-import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.layout.BootstrapContainer;
-import com.helger.photon.bootstrap4.navbar.BootstrapNavbar;
-import com.helger.photon.bootstrap4.navbar.BootstrapNavbarToggleable;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapMenuItemRenderer;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapPageRenderer;
+import com.helger.photon.bootstrap5.CBootstrapCSS;
+import com.helger.photon.bootstrap5.alert.BootstrapSuccessBox;
+import com.helger.photon.bootstrap5.alert.EBootstrapAlertType;
+import com.helger.photon.bootstrap5.breadcrumb.BootstrapBreadcrumb;
+import com.helger.photon.bootstrap5.breadcrumb.BootstrapBreadcrumbProvider;
+import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.layout.BootstrapContainer;
+import com.helger.photon.bootstrap5.navbar.BootstrapNavbar;
+import com.helger.photon.bootstrap5.navbar.BootstrapNavbarToggleable;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapMenuItemRenderer;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapPageRenderer;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.html.CLayout;
@@ -89,8 +89,8 @@ public final class SMPRendererSecure
     final BootstrapNavbarToggleable aToggleable = aNavbar.addAndReturnToggleable ();
 
     {
-      aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.ML_AUTO)
-                                                  .addClass (CBootstrapCSS.MR_2)
+      aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.MS_AUTO)
+                                                  .addClass (CBootstrapCSS.ME_2)
                                                   .setOnClick (LinkHelper.getURLWithContext (AbstractPublicApplicationServlet.SERVLET_DEFAULT_PATH +
                                                                                              "/"))
                                                   .addChild ("Goto public view"));
@@ -250,7 +250,7 @@ public final class SMPRendererSecure
       final HCDiv aRow = aOuterContainer.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
                                                                         .addClass (CBootstrapCSS.MT_2));
       final HCDiv aCol1 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.D_MD_FLEX)
-                                                              .addClass (CBootstrapCSS.MR_2));
+                                                              .addClass (CBootstrapCSS.ME_2));
       final HCDiv aCol2 = aRow.addAndReturnChild (new HCDiv ().addClass (CBootstrapCSS.FLEX_FILL));
 
       // left

@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.exception;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,25 @@ public class SMPUnknownUserException extends SMPServerException
 
   private final String m_sUserName;
 
+  @Deprecated (forRemoval = true, since = "8.1.9")
   public SMPUnknownUserException (@Nullable final String sUserName)
   {
-    super ("Unknown user '" + sUserName + "'");
+    this (sUserName, "Unknown user '" + sUserName + "'");
+  }
+
+  /**
+   * Constructor with an explicit error message, so that the message returned to the caller can be
+   * made independent of the user name.
+   *
+   * @param sUserName
+   *        The user name which was not found. May be <code>null</code>.
+   * @param sMessage
+   *        The error message to be used. May not be <code>null</code>.
+   * @since 8.1.9
+   */
+  public SMPUnknownUserException (@Nullable final String sUserName, @NonNull final String sMessage)
+  {
+    super (sMessage);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug (getMessage ());
     m_sUserName = sUserName;

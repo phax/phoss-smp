@@ -89,7 +89,11 @@
     </dependency>
     <dependency>
       <groupId>com.helger.photon</groupId>
-      <artifactId>ph-oton-bootstrap4-stub</artifactId>
+      <artifactId>ph-oton-bootstrap5-stub</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.photon.icon</groupId>
+      <artifactId>ph-oton-icon-fontawesome6</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger.peppol.ui</groupId>

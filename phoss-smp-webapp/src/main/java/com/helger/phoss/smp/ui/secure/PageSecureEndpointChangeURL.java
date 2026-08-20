@@ -47,13 +47,13 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.bootstrap4.button.BootstrapButton;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.traits.IHCBootstrap4Trait;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap4.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.io.PhotonWorkerPool;
@@ -80,7 +80,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
    *
    * @author Philip Helger
    */
-  private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap4Trait
+  private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap5Trait
   {
     private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
 
@@ -268,7 +268,6 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
-      aForm.setLeft (-1, 12, -1, -1, 2);
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_EDIT));
       aForm.addChild (new HCHiddenField (CPageParam.PARAM_SUBACTION, CPageParam.ACTION_SAVE));
 
@@ -334,7 +333,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
                                                                                             aDisplayLocale),
                                           new DTCol ("Endpoint Count").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-      aURLUsage.forEach ( (sURL, aUsageInfo) -> {
+      aURLUsage.forEach ((sURL, aUsageInfo) -> {
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (sURL);
 

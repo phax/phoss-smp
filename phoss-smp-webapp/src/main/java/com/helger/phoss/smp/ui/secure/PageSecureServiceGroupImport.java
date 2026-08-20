@@ -45,15 +45,15 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
-import com.helger.photon.bootstrap4.CBootstrapCSS;
-import com.helger.photon.bootstrap4.badge.BootstrapBadge;
-import com.helger.photon.bootstrap4.badge.EBootstrapBadgeType;
-import com.helger.photon.bootstrap4.button.BootstrapSubmitButton;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.card.BootstrapCard;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.uictrls.ext.BootstrapFileUpload;
+import com.helger.photon.bootstrap5.CBootstrapCSS;
+import com.helger.photon.bootstrap5.badge.BootstrapBadge;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
+import com.helger.photon.bootstrap5.button.BootstrapSubmitButton;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.card.BootstrapCard;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.uictrls.ext.BootstrapFileUpload;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
@@ -166,7 +166,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                                                                                                               : "") +
                                                                                  aAction.getMessage ())
                                                                       .addChild (SMPCommonUI.getTechnicalDetailsUI (aAction.getLinkedException ()))
-                                                                      .addClass (CBootstrapCSS.TEXT_LEFT));
+                                                                      .addClass (CBootstrapCSS.TEXT_START));
             }
           }
           else

@@ -26,11 +26,11 @@ import com.helger.base.string.StringHelper;
 import com.helger.diagnostics.error.IError;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.ui.secure.hc.HCButtonToolbarSticky;
-import com.helger.photon.bootstrap4.alert.BootstrapBox;
-import com.helger.photon.bootstrap4.alert.EBootstrapAlertType;
-import com.helger.photon.bootstrap4.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap4.grid.BootstrapGridSpec;
-import com.helger.photon.bootstrap4.pages.AbstractBootstrapWebPageForm;
+import com.helger.photon.bootstrap5.alert.BootstrapBox;
+import com.helger.photon.bootstrap5.alert.EBootstrapAlertType;
+import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.grid.BootstrapGridSpec;
+import com.helger.photon.bootstrap5.pages.AbstractBootstrapWebPageForm;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
@@ -45,9 +45,13 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
                                              AbstractBootstrapWebPageForm <DATATYPE, WebPageExecutionContext>
 {
   /** Grid spec for identifier schemes */
-  protected static final BootstrapGridSpec GS_IDENTIFIER_SCHEME = BootstrapGridSpec.create (6, 6, 6, 4, 3);
+  protected static final BootstrapGridSpec GS_IDENTIFIER_SCHEME = BootstrapGridSpec.builder ()
+                                                                                   .xs (6)
+                                                                                   .lg (4)
+                                                                                   .xl (3)
+                                                                                   .build ();
   /** Grid spec for identifier values */
-  protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = BootstrapGridSpec.create (6, 6, 6, 8, 9);
+  protected static final BootstrapGridSpec GS_IDENTIFIER_VALUE = GS_IDENTIFIER_SCHEME.getInverse ();
 
   protected static final String HR_EXT_WARNING = AbstractSMPWebPage.HR_EXT_WARNING;
 

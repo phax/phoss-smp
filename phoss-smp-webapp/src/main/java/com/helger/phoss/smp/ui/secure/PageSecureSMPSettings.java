@@ -38,11 +38,11 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.settings.SMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageSimpleForm;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
-import com.helger.photon.bootstrap4.card.BootstrapCard;
-import com.helger.photon.bootstrap4.card.BootstrapCardBody;
-import com.helger.photon.bootstrap4.form.BootstrapForm;
-import com.helger.photon.bootstrap4.form.BootstrapFormGroup;
-import com.helger.photon.bootstrap4.form.BootstrapViewForm;
+import com.helger.photon.bootstrap5.card.BootstrapCard;
+import com.helger.photon.bootstrap5.card.BootstrapCardBody;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
+import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
+import com.helger.photon.bootstrap5.form.BootstrapViewForm;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
@@ -99,7 +99,6 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
 
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
-      aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isRESTWritableAPIDisabled (),
                                                                                           aDisplayLocale)));
@@ -111,7 +110,6 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
 
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
-      aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML connection required?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isSMLRequired (),
                                                                                           aDisplayLocale)));
@@ -138,7 +136,6 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       final BootstrapCardBody aCardBody = aCard.createAndAddBody ();
 
       final BootstrapViewForm aTable = aCardBody.addAndReturnChild (new BootstrapViewForm ());
-      aTable.setLeft (4);
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel (sDirectoryName + " integration required?")
                                                     .setCtrl (EPhotonCoreText.getYesOrNo (aObject.isDirectoryIntegrationRequired (),
                                                                                           aDisplayLocale)));
@@ -244,7 +241,6 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
       bIsNewSml = false;
     }
 
-    aForm.setLeft (3);
     aForm.addChild (getUIHandler ().createDataGroupHeader ("REST API"));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("REST writable API disabled?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_SMP_REST_WRITABLE_API_DISABLED,
