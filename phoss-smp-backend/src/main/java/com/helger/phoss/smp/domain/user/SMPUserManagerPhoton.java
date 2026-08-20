@@ -45,7 +45,7 @@ public final class SMPUserManagerPhoton
    * same for all failure reasons, so that it cannot be determined from the outside, whether a
    * specific user exists or not.
    *
-   * @since 8.1.9
+   * @since 8.2.0
    */
   public static final String MSG_AUTH_FAILED = "Username and/or password are invalid!";
 

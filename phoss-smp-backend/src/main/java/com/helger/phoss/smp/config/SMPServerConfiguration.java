@@ -348,7 +348,7 @@ public final class SMPServerConfiguration
    *         compatibility), but for security reasons it should be disabled, because otherwise it
    *         can be determined, whether a specific user exists or not. The detailed reason is always
    *         logged on the server, independent of this setting.
-   * @since 8.1.9
+   * @since 8.2.0
    */
   public static boolean isRestAuthErrorDetails ()
   {

@@ -26,7 +26,7 @@ public class SMPUnknownUserException extends SMPServerException
 
   private final String m_sUserName;
 
-  @Deprecated (forRemoval = true, since = "8.1.9")
+  @Deprecated (forRemoval = true, since = "8.2.0")
   public SMPUnknownUserException (@Nullable final String sUserName)
   {
     this (sUserName, "Unknown user '" + sUserName + "'");
@@ -40,7 +40,7 @@ public class SMPUnknownUserException extends SMPServerException
    *        The user name which was not found. May be <code>null</code>.
    * @param sMessage
    *        The error message to be used. May not be <code>null</code>.
-   * @since 8.1.9
+   * @since 8.2.0
    */
   public SMPUnknownUserException (@Nullable final String sUserName, @NonNull final String sMessage)
   {
