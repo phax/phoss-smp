@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.ThreadSafe;
+import com.helger.annotation.misc.ChangeNextMajorRelease;
 import com.helger.config.IConfig;
 import com.helger.mime.EMimeContentType;
 import com.helger.peppolid.factory.ESMPIdentifierType;
@@ -81,8 +82,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_CONNECTION_TIMEOUT = "sml.connection.timeout";
   public static final String KEY_SML_REQUEST_TIMEOUT = "sml.request.timeout";
   /**
-   * @deprecated Since 8.1.8; use {@link #KEY_SML_CONNECTION_TIMEOUT} with the duration grammar (e.g.
-   *             <code>5s</code>, <code>1m 30s</code>) instead.
+   * @deprecated Since 8.1.8; use {@link #KEY_SML_CONNECTION_TIMEOUT} with the duration grammar
+   *             (e.g. <code>5s</code>, <code>1m 30s</code>) instead.
    */
   @Deprecated (forRemoval = true, since = "8.1.8")
   public static final String KEY_SML_CONNECTION_TIMEOUT_MS = "sml.connection.timeout.ms";
@@ -103,6 +104,7 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_PAYLOAD_ON_ERROR = true;
   public static final boolean DEFAULT_SMP_REST_REMOTE_QUERY_API_DISABLED = true;
   public static final boolean DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK = false;
+  @ChangeNextMajorRelease ("Change default to false")
   public static final boolean DEFAULT_SMP_REST_AUTH_ERRORDETAILS = true;
 
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
@@ -330,14 +332,13 @@ public final class SMPServerConfiguration
 
   /**
    * @return <code>true</code> if HTTP DELETE requests on non-existing entities should return HTTP
-   *         204 (No Content) instead of HTTP 404 (Not Found), <code>false</code> if not. By
-   *         default this is disabled.
+   *         204 (No Content) instead of HTTP 404 (Not Found), <code>false</code> if not. By default
+   *         this is disabled.
    * @since 8.1.0
    */
   public static boolean isRestDeleteNotFoundAsOk ()
   {
-    return _getConfig ().getAsBoolean (KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK,
-                                       DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK);
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK, DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK);
   }
 
   /**
@@ -431,10 +432,10 @@ public final class SMPServerConfiguration
   /**
    * Resolve an SML timeout, preferring the duration-grammar key over the legacy millisecond-typed
    * key. The duration-grammar key accepts compound expressions like <code>5s</code> or
-   * <code>1m 30s</code> via {@link IConfig#getAsConfigDuration(String, java.util.function.Consumer)}.
-   * If it is missing, blank, or fails to parse, the legacy <code>.ms</code> key is read as a
-   * <code>long</code> (with a deprecation warning); if it too is absent the supplied default is
-   * returned.
+   * <code>1m 30s</code> via
+   * {@link IConfig#getAsConfigDuration(String, java.util.function.Consumer)}. If it is missing,
+   * blank, or fails to parse, the legacy <code>.ms</code> key is read as a <code>long</code> (with
+   * a deprecation warning); if it too is absent the supplied default is returned.
    *
    * @param sDurationKey
    *        The duration-grammar configuration key. May not be <code>null</code>.
