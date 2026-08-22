@@ -38,7 +38,7 @@ public final class RunInJettySMPSERVER_MONGODB
       throw new IllegalStateException ("Please make sure your working directory is the directory containing 'pom.xml'");
 
     new JettyStarter (RunInJettySMPSERVER_MONGODB.class).setPort (90)
-                                                        .setStopPort (x -> x + 1000)
+                                                        .setStopPort (8090)
                                                         .setSessionCookieName ("SMPSESSION")
                                                         .run ();
   }
