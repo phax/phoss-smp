@@ -27,6 +27,7 @@ import com.helger.base.lang.EnumHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.base.string.StringParser;
 import com.helger.base.url.URLHelper;
+import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.http.header.specific.HttpForwardedHeaderHop;
 import com.helger.http.header.specific.HttpForwardedHeaderParser;
@@ -165,11 +166,13 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   @NonNull
   private StringBuilder _getForwardedHeaderBasedHostName ()
   {
+    // Parsing returns null, if the header value is syntactically invalid
+    final ICommonsList <HttpForwardedHeaderHop> aParsedHops = HttpForwardedHeaderParser.parseMultipleHops (m_aRequestScope.headers ()
+                                                                                                                          .getFirstHeaderValue (HttpForwardedHeaderParser.HTTP_HEADER_FORWARDED));
     // Get the hops in reverse order, so that the last hop is in front and we can iterate forward
     // based
-    final ICommonsList <HttpForwardedHeaderHop> aMultiHops = HttpForwardedHeaderParser.parseMultipleHops (m_aRequestScope.headers ()
-                                                                                                                         .getFirstHeaderValue (HttpForwardedHeaderParser.HTTP_HEADER_FORWARDED))
-                                                                                      .reverse ();
+    final ICommonsList <HttpForwardedHeaderHop> aMultiHops = aParsedHops == null ? new CommonsArrayList <> ()
+                                                                                 : aParsedHops.reverse ();
 
     final HttpServletRequest aHttpRequest = m_aRequestScope.getRequest ();
 
@@ -194,11 +197,14 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
         // Host may contain port number as well
         final String sFullHost = aHop.getHost ();
 
-        final int nPortSep = sFullHost.indexOf (':');
-        if (nPortSep > 0)
+        // Consider IPv6 addresses like "[::1]" or "[::1]:8080" - the port separator must be
+        // after the closing bracket
+        final int nBracketEnd = sFullHost.lastIndexOf (']');
+        final int nPortSep = sFullHost.lastIndexOf (':');
+        if (nPortSep > 0 && nPortSep > nBracketEnd)
         {
           sHost = sFullHost.substring (0, nPortSep);
-          nPort = StringParser.parseInt (sFullHost.substring (1), -1);
+          nPort = StringParser.parseInt (sFullHost.substring (nPortSep + 1), -1);
         }
         else
           sHost = sFullHost;
