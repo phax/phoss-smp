@@ -15,12 +15,11 @@
 # limitations under the License.
 #
 
-FROM --platform=$BUILDPLATFORM ubuntu:latest AS build
+FROM --platform=$BUILDPLATFORM ubuntu:24.04 AS build
 
-# Install wget and unzip
+# wget and unzip only - this stage is discarded after the WAR is copied
 RUN apt-get update \
-  && apt-get upgrade -y \
-  && apt-get install -y wget unzip \
+  && apt-get install -y --no-install-recommends ca-certificates wget unzip \
   && rm -rf /var/lib/apt/lists/*
 
 ARG SMP_VERSION
@@ -29,7 +28,7 @@ ARG SMP_VERSION
 # Unzip the WAR file to /smp
 # Remove the default "application.properties" file to avoid invalid default configuration
 RUN echo Downloading phoss SMP $SMP_VERSION \
-  && wget -nv https://github.com/phax/phoss-smp/releases/download/phoss-smp-parent-pom-$SMP_VERSION/phoss-smp-webapp-sql-$SMP_VERSION.war -O smp.zip \ 
+  && wget -nv https://github.com/phax/phoss-smp/releases/download/phoss-smp-parent-pom-$SMP_VERSION/phoss-smp-webapp-sql-$SMP_VERSION.war -O smp.zip \
   && unzip smp.zip -d /smp \
   && rm /smp/WEB-INF/classes/application.properties
 
