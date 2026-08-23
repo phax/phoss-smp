@@ -50,12 +50,18 @@ public final class SMPRestDataProviderTest
 
   private IConfigWithFallback m_aOldConfig;
 
+  private static void _setPublicURLMode (@NonNull final String sMode)
+  {
+    final ICommonsMap <String, String> aConfigValues = new CommonsHashMap <> ();
+    aConfigValues.put (SMPServerConfiguration.KEY_SMP_PUBLIC_URL_MODE, sMode);
+    SMPConfigProvider.setConfig (new SMPConfig (new ConfigurationSourceFunction (aConfigValues::get)));
+  }
+
   @Before
   public void before ()
   {
-    final ICommonsMap <String, String> aConfigValues = new CommonsHashMap <> ();
-    aConfigValues.put (SMPServerConfiguration.KEY_SMP_PUBLIC_URL_MODE, "forwarded-header");
-    m_aOldConfig = SMPConfigProvider.setConfig (new SMPConfig (new ConfigurationSourceFunction (aConfigValues::get)));
+    m_aOldConfig = SMPConfigProvider.getConfig ();
+    _setPublicURLMode ("forwarded-header");
 
     ServletContextPathHolder.clearContextPath ();
     ServletContextPathHolder.setCustomContextPath (CONTEXT_PATH);
@@ -142,6 +148,18 @@ public final class SMPRestDataProviderTest
     final SMPRestDataProvider aDP = _createDataProvider (null);
     assertEquals ("http://internal.host:90" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
                   aDP.getCurrentURI ().toString ());
+  }
+
+  @Test
+  public void testNoXForwardedHeadersUsesRequestData ()
+  {
+    _setPublicURLMode ("x-forwarded-header");
+
+    final SMPRestDataProvider aDP = _createDataProvider (null);
+    assertEquals ("http://internal.host:90" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
+                  aDP.getCurrentURI ().toString ());
+    assertEquals ("http://internal.host:90" + CONTEXT_PATH,
+                  aDP.getBaseUriBuilder ());
   }
 
   @Test

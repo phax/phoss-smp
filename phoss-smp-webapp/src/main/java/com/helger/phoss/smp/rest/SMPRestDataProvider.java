@@ -136,7 +136,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     // Try to use as many "X-Forwarded-*" header values as possible. The parts not present will
     // be replaced with
     final HttpServletRequest aHttpRequest = m_aRequestScope.getRequest ();
-    boolean bFallbackToLocalPort = false;
+    boolean bFallbackToLocalPort = true;
 
     // Scheme
     String sScheme = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_PROTO);
