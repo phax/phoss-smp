@@ -142,6 +142,8 @@ docker rm phoss-smp-release-binary-sql
 It exposes port 8888 where Tomcat is running successfully.
 Open `http://localhost:8888` in your browser.
 
+The SQL image includes JDBC drivers for PostgreSQL, MySQL, Oracle, DB2 and Microsoft SQL Server so that one artefact works with every supported database. Unused drivers stay on disk (about 20 MB in `WEB-INF/lib`) but are never loaded. A downstream image that only uses one database can delete the other driver JARs from `WEB-INF/lib`.
+
 
 ### Release Binary, MongoDB backend
 
