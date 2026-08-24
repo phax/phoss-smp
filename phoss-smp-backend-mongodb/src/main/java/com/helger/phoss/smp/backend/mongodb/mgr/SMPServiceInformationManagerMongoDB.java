@@ -352,7 +352,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
 
-      if (bChangedExisting)
+      if (aOldInformation != null)
         m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
       else
         m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
