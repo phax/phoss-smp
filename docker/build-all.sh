@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Copyright (C) 2015-2026 Philip Helger and contributors
 # philip[at]helger[dot]com
@@ -22,7 +22,7 @@ version=8.2.0
 #echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
 
 echo Starting buildx
-docker buildx create --name phoss-smp node-amd64
+#docker buildx create --name phoss-smp node-amd64
 
 # --------------- XML -----------------------
 docker buildx build --platform=linux/amd64 --push --pull --build-arg SMP_VERSION=$version -t phelger/smp:$version -t phelger/smp:latest -t phelger/phoss-smp-xml:$version -t phelger/phoss-smp-xml:latest -f Dockerfile-release-binary-xml .
