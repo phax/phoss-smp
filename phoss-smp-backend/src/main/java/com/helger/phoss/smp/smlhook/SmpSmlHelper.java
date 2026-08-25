@@ -78,7 +78,8 @@ public final class SmpSmlHelper
     // else local, http only access - no socket factory
 
     // Hostname verifier
-    if (sLowerURL.contains ("//localhost") || sLowerURL.contains ("//127.0.0.1"))
+    final String sHost = aSMLEndpointURL.getHost ();
+    if ("localhost".equalsIgnoreCase (sHost) || "127.0.0.1".equals (sHost))
     {
       // Accept all hostnames
       aCaller.setHostnameVerifier (new HostnameVerifierVerifyAll (false));
