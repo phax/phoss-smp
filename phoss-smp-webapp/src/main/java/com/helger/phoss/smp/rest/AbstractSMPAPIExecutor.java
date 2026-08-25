@@ -61,7 +61,7 @@ abstract class AbstractSMPAPIExecutor implements IAPIExecutor
     if (aElements.length != 2)
       return null;
 
-    if (!aElements[0].equals ("Bearer"))
+    if (!aElements[0].equalsIgnoreCase ("Bearer"))
       return null;
 
     return aElements[1];
