@@ -62,12 +62,9 @@ public final class SMPCommonUI
 
   public static void init ()
   {
-    if (false)
-    {
-      // Use FontAwesome 6 for all default icons
-      EFontAwesome6Icon.setAsDefault ();
-      EFontAwesome6Icon.registerResourcesForGlobal ();
-    }
+    // Use FontAwesome 6 for all default icons
+    EFontAwesome6Icon.setAsDefault ();
+    EFontAwesome6Icon.registerResourcesForGlobal ();
 
     BootstrapDataTables.setConfigurator ((aLEC, aTable, aDataTables) -> {
       final IRequestWebScopeWithoutResponse aRequestScope = aLEC.getRequestScope ();
