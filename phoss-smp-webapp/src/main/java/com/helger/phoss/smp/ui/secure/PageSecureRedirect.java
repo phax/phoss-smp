@@ -167,9 +167,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                      @Nullable final ISMPRedirect aSelectedObject)
   {
     if (eFormAction == EWebPageFormAction.VIEW ||
-        eFormAction == EWebPageFormAction.COPY ||
-        eFormAction == EWebPageFormAction.EDIT ||
-        eFormAction == EWebPageFormAction.DELETE)
+      eFormAction == EWebPageFormAction.COPY ||
+      eFormAction == EWebPageFormAction.EDIT ||
+      eFormAction == EWebPageFormAction.DELETE)
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final String sServiceGroupID = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
@@ -262,12 +262,12 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
-    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID () : aWPEC.params ()
-                                                                                       .getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
+    final String sServiceGroupID = bEdit ? aSelectedObject.getServiceGroupID ()
+                                         : aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
     IParticipantIdentifier aParticipantID = null;
     ISMPServiceGroup aServiceGroup = null;
-    final String sDocTypeID = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded () : aWPEC.params ()
-                                                                                                           .getAsStringTrimmed (FIELD_DOCTYPE_ID);
+    final String sDocTypeID = bEdit ? aSelectedObject.getDocumentTypeIdentifier ().getURIEncoded ()
+                                    : aWPEC.params ().getAsStringTrimmed (FIELD_DOCTYPE_ID);
     IDocumentTypeIdentifier aDocTypeID = null;
     final String sRedirectTo = aWPEC.params ().getAsStringTrimmed (FIELD_REDIRECT_TO);
     final String sSubjectUniqueIdentifier = aWPEC.params ().getAsStringTrimmed (FIELD_SUBJECT_UNIQUE_IDENTIFIER);
@@ -297,8 +297,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
       {
         if (aServiceGroup != null)
         {
-          if (aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) !=
-              null)
+          if (aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantID,
+                                                                                     aDocTypeID) != null)
             aFormErrors.addFieldError (FIELD_DOCTYPE_ID,
                                        "At least one Endpoint is registered for this Document Type. Delete the Endpoint before you can create a Redirect.");
           else
@@ -367,9 +367,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
                                                  .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                          aSelectedObject !=
-                                                                                                                                  null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                       : null),
+                                                                                                          aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                  : null),
                                                                                         aDisplayLocale,
                                                                                         null,
                                                                                         bEdit))
@@ -377,8 +376,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document Type ID")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_DOCTYPE_ID,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getDocumentTypeIdentifier ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getDocumentTypeIdentifier ()
                                                                                                                                   .getURIEncoded ()
                                                                                                                  : aIdentifierFactory.getDefaultDocumentTypeIdentifierScheme () +
                                                                                                                    CIdentifier.URL_SCHEME_VALUE_SEPARATOR)).setReadOnly (bEdit))
@@ -386,16 +384,14 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Redirect To")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_REDIRECT_TO,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getTargetHref ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getTargetHref ()
                                                                                                                  : null)))
                                                  .setHelpText ("URL to redirect to. Must include the service group and the document type in the URL!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_REDIRECT_TO)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Subject Unique Identifier")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SUBJECT_UNIQUE_IDENTIFIER,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getSubjectUniqueIdentifier ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getSubjectUniqueIdentifier ()
                                                                                                                  : null)))
                                                  .setHelpText ("Holds the Subject Unique Identifier of the certificate of the " +
                                                                "destination SMP. A client SHOULD validate that the Subject " +
@@ -406,8 +402,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
-                                                                                             aSelectedObject != null
-                                                                                                                     ? SMPExtensionUI.getSerializedExtensionsForEdit (aSelectedObject.getExtensions ())
+                                                                                             aSelectedObject != null ? SMPExtensionUI.getSerializedExtensionsForEdit (aSelectedObject.getExtensions ())
                                                                                                                      : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid " +
                                                                (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
@@ -422,6 +417,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Redirect", createCreateURL (aWPEC), EDefaultIcon.NEW);

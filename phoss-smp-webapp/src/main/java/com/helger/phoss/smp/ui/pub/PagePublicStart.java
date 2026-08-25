@@ -86,6 +86,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
     }
     else
     {
+      EFontAwesome6Icon.registerResourcesForThisRequest ();
       final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       try
       {

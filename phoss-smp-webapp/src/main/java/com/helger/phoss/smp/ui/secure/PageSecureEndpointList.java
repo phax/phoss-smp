@@ -79,6 +79,8 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation ();
 
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+
     // Count unique service groups
     final ICommonsSet <String> aServiceGroupIDs = new CommonsHashSet <> ();
     aAllServiceInfos.findAllMapped (ISMPServiceInformation::getServiceGroupID, aServiceGroupIDs::add);

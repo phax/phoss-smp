@@ -266,7 +266,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                        .add (CPageParam.PARAM_OBJECT,
                                                                                                                              aServiceGroup.getID ()))
                                                                                                      .setDisabled (bOffline ||
-                                                                                                                   !aSettings.isSMLEnabled ()));
+                                                                                                       !aSettings.isSMLEnabled ()));
         }
         else
         {
@@ -285,7 +285,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                             .add (CPageParam.PARAM_OBJECT,
                                                                                                   aServiceGroup.getID ()))
                                                                           .setDisabled (bOffline ||
-                                                                                        !aSettings.isSMLEnabled ()));
+                                                                            !aSettings.isSMLEnabled ()));
           }
         }
       }
@@ -575,8 +575,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                        @NonNull final FormErrorList aFormErrors)
   {
     final Locale aDisplayLocale = aLEC.getDisplayLocale ();
-    final String sIdentifierID = StringHelper.isNotEmpty (sExistingID) ? sExistingID : TMP_ID_PREFIX +
-                                                                                       Integer.toString (GlobalIDFactory.getNewIntID ());
+    final String sIdentifierID = StringHelper.isNotEmpty (sExistingID) ? sExistingID
+                                                                       : TMP_ID_PREFIX +
+                                                                         Integer.toString (GlobalIDFactory.getNewIntID ());
 
     final HCRow aRow = new HCRow ();
 
@@ -584,8 +585,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     {
       final String sFieldName = RequestParamMap.getFieldName (PREFIX_CUSTPROP, sIdentifierID, SUFFIX_TYPE);
       final var aCtrl = new HCSMPCustomPropertyTypeSelect (new RequestField (sFieldName,
-                                                                             aExistingCustProp == null
-                                                                                                       ? ESGCustomPropertyType.DEFAULT.getID ()
+                                                                             aExistingCustProp == null ? ESGCustomPropertyType.DEFAULT.getID ()
                                                                                                        : aExistingCustProp.getType ()
                                                                                                                           .getID ()),
                                                            aDisplayLocale);
@@ -663,9 +663,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Participant ID")
                                                    .setCtrl (aRow)
                                                    .setHelpText ("The participant identifier for which the service group should be created. The left part is the identifier scheme" +
-                                                                 (sDefaultScheme == null ? "" : " (default: " +
-                                                                                                sDefaultScheme +
-                                                                                                ")") +
+                                                                 (sDefaultScheme == null ? ""
+                                                                                         : " (default: " +
+                                                                                           sDefaultScheme +
+                                                                                           ")") +
                                                                  ", the right part is the identifier value (e.g. 9915:test)")
                                                    .setErrorList (aFormErrors.getListOfFields (FIELD_PARTICIPANT_ID_SCHEME,
                                                                                                FIELD_PARTICIPANT_ID_VALUE)));
@@ -673,8 +674,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Owning User")
                                                  .setCtrl (new HCUserSelect (new RequestField (FIELD_OWNING_USER_ID,
-                                                                                               aSelectedObject != null
-                                                                                                                       ? aSelectedObject.getOwnerID ()
+                                                                                               aSelectedObject != null ? aSelectedObject.getOwnerID ()
                                                                                                                        : LoggedInUserManager.getInstance ()
                                                                                                                                             .getCurrentUserID ()),
                                                                              aDisplayLocale))
@@ -692,8 +692,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_EXTENSION,
-                                                                                             aSelectedObject != null
-                                                                                                                     ? SMPExtensionUI.getSerializedExtensionsForEdit (aSelectedObject.getExtensions ())
+                                                                                             aSelectedObject != null ? SMPExtensionUI.getSerializedExtensionsForEdit (aSelectedObject.getExtensions ())
                                                                                                                      : null)).setRows (CSMP.TEXT_AREA_CERT_EXTENSION))
                                                  .setHelpText ("Optional extension to the service group. If present it must be valid " +
                                                                (SMPExtensionUI.ONLY_ONE_EXTENSION_ALLOWED ? "XML"
@@ -705,8 +704,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     {
       final SGCustomPropertyList aExistingProps = aSelectedObject != null ? aSelectedObject.getCustomProperties ()
                                                                           : null;
-      final String sBodyID = aSelectedObject != null ? aSelectedObject.getID () : TMP_ID_PREFIX +
-                                                                                  Integer.toString (GlobalIDFactory.getNewIntID ());
+      final String sBodyID = aSelectedObject != null ? aSelectedObject.getID ()
+                                                     : TMP_ID_PREFIX +
+                                                       Integer.toString (GlobalIDFactory.getNewIntID ());
 
       final HCNodeList aNL = new HCNodeList ();
       final BootstrapTable aTable = aNL.addAndReturnChild (new BootstrapTable (HCCol.star (),
@@ -943,6 +943,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
     final boolean bShowBusinessCardName = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
 
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+
     try
     {
       final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
@@ -959,9 +961,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                      aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                      EDefaultIcon.MAGNIFIER)
                 .setDisabled (aSettings.getSMLDNSZone () == null ||
-                              aAllServiceGroups.isEmpty () ||
-                              bTooMany ||
-                              !aSettings.isSMLEnabled ());
+                  aAllServiceGroups.isEmpty () ||
+                  bTooMany ||
+                  !aSettings.isSMLEnabled ());
       }
       aNodeList.addChild (aToolbar);
 

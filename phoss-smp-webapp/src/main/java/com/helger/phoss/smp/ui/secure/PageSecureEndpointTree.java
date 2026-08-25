@@ -80,6 +80,8 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
 
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
