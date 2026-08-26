@@ -21,6 +21,7 @@ import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
@@ -152,6 +153,38 @@ public interface ISMPServiceInformationManager
   }
 
   /**
+   * Get a single "page" of all service information objects matching the provided search text,
+   * sorted by service group ID and document type ID. This method is meant to be used for server
+   * side pagination in combination with {@link #getSMPServiceInformationCount(String)}.
+   *
+   * @param sSearchText
+   *        The search text to filter the service information objects. May be <code>null</code> or
+   *        empty in which case no filtering takes place.
+   * @param nStartIndex
+   *        The 0-based index of the first matching service information object to be returned. Must
+   *        be &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of service information objects to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of service information objects.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@Nullable final String sSearchText,
+                                                                             @Nonnegative final int nStartIndex,
+                                                                             @Nonnegative final int nMaxCount)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getAllSMPServiceInformation (nStartIndex, nMaxCount);
+
+    return SMPPagingHelper.getPage (getAllSMPServiceInformation ().getAll (x -> isMatchingSearchText (x, sSearchText)),
+                                    Comparator.comparing (ISMPServiceInformation::getServiceGroupID)
+                                              .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ()),
+                                    nStartIndex,
+                                    nMaxCount);
+  }
+
+  /**
    * Iterate each Service Information element and invoke the provided consumer for it.
    *
    * @param aConsumer
@@ -165,6 +198,46 @@ public interface ISMPServiceInformationManager
    */
   @Nonnegative
   long getSMPServiceInformationCount ();
+
+  /**
+   * Get the number of service information objects matching the provided search text.
+   *
+   * @param sSearchText
+   *        The search text to filter the service information objects. May be <code>null</code> or
+   *        empty in which case all service information objects are counted.
+   * @return The count of all matching service information objects. Always &ge; 0.
+   * @since 8.2.1
+   */
+  @Nonnegative
+  default long getSMPServiceInformationCount (@Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getSMPServiceInformationCount ();
+
+    return getAllSMPServiceInformation ().getCount (x -> isMatchingSearchText (x, sSearchText));
+  }
+
+  /**
+   * Check if the provided service information object matches the provided search text. The
+   * participant ID and the document type ID are checked.
+   *
+   * @param aServiceInfo
+   *        The service information object to check. May not be <code>null</code>.
+   * @param sSearchText
+   *        The search text to be searched. May be <code>null</code> or empty in which case
+   *        <code>true</code> is returned.
+   * @return <code>true</code> if the service information object matches, <code>false</code> if not.
+   * @since 8.2.1
+   */
+  static boolean isMatchingSearchText (@NonNull final ISMPServiceInformation aServiceInfo,
+                                       @Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return true;
+
+    return SMPPagingHelper.matchesSearchText (aServiceInfo.getServiceGroupID (), sSearchText) ||
+           SMPPagingHelper.matchesSearchText (aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded (), sSearchText);
+  }
 
   /**
    * Get all service information objects that belong to the provided service group.

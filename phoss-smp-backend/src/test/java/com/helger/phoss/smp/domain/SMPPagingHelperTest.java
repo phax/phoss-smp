@@ -11,6 +11,8 @@
 package com.helger.phoss.smp.domain;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Comparator;
@@ -54,6 +56,26 @@ public final class SMPPagingHelperTest
     // Empty list
     assertEquals (new CommonsArrayList <> (),
                   SMPPagingHelper.getPage (new CommonsArrayList <String> (), aComp, 0, 10));
+  }
+
+  @Test
+  public void testMatchesSearchText ()
+  {
+    // Empty search text matches everything
+    assertTrue (SMPPagingHelper.matchesSearchText ("anything", null));
+    assertTrue (SMPPagingHelper.matchesSearchText ("anything", ""));
+    assertTrue (SMPPagingHelper.matchesSearchText (null, null));
+
+    // Case insensitive "contains"
+    assertTrue (SMPPagingHelper.matchesSearchText ("iso6523-actorid-upis::9915:test", "9915"));
+    assertTrue (SMPPagingHelper.matchesSearchText ("iso6523-actorid-upis::9915:test", "TEST"));
+    assertTrue (SMPPagingHelper.matchesSearchText ("ISO6523-actorid-upis::9915:test", "iso6523"));
+    assertTrue (SMPPagingHelper.matchesSearchText ("abc", "abc"));
+
+    // No match
+    assertFalse (SMPPagingHelper.matchesSearchText ("iso6523-actorid-upis::9915:test", "9916"));
+    assertFalse (SMPPagingHelper.matchesSearchText (null, "abc"));
+    assertFalse (SMPPagingHelper.matchesSearchText ("", "abc"));
   }
 
   @Test

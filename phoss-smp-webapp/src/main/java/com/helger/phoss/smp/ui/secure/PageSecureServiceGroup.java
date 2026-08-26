@@ -948,10 +948,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     try
     {
-      // Server side pagination - only query the entries of the current page
+      // Server side pagination and filtering - only query the entries of the
+      // current page
       final long nTotalServiceGroupCount = aServiceGroupMgr.getSMPServiceGroupCount ();
-      final SMPPagination aPagination = new SMPPagination (aWPEC, nTotalServiceGroupCount);
-      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups (aPagination.getFirstItemIndex (),
+      final String sSearchText = SMPPagination.getSearchText (aWPEC);
+      final SMPPagination aPagination = new SMPPagination (aWPEC,
+                                                           aServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
+      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups (sSearchText,
+                                                                                                         aPagination.getFirstItemIndex (),
                                                                                                          aPagination.getPageSize ());
 
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
@@ -1064,7 +1068,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
       final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
       aPagination.applyTo (aDataTables);
-      aNodeList.addChild (aTable).addChild (aDataTables).addChild (aPagination.getUI ());
+      aNodeList.addChild (aPagination.getUI ()).addChild (aTable).addChild (aDataTables);
     }
     catch (final RuntimeException ex)
     {

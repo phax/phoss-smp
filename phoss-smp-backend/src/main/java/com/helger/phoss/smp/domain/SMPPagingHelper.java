@@ -12,12 +12,15 @@ package com.helger.phoss.smp.domain;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 
@@ -68,6 +71,25 @@ public final class SMPPagingHelper
     final int nEndIndex = (int) Math.min ((long) nStartIndex + nMaxCount, aList.size ());
     final List <T> aSubList = aList.subList (nStartIndex, nEndIndex);
     return new CommonsArrayList <> (aSubList);
+  }
+
+  /**
+   * Check if the provided value contains the provided search text, ignoring case.
+   *
+   * @param sValue
+   *        The value to be checked. May be <code>null</code>.
+   * @param sSearchText
+   *        The search text to be searched. May be <code>null</code> in which case
+   *        <code>true</code> is returned.
+   * @return <code>true</code> if the search text is empty or if the value contains the search text.
+   */
+  public static boolean matchesSearchText (@Nullable final String sValue, @Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return true;
+    if (StringHelper.isEmpty (sValue))
+      return false;
+    return sValue.toLowerCase (Locale.ROOT).contains (sSearchText.toLowerCase (Locale.ROOT));
   }
 
   /**
