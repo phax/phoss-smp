@@ -79,6 +79,9 @@ public class SMPPagination
   private static final ICSSClassProvider CSS_CLASS_W_AUTO = DefaultCSSClassProvider.create ("w-auto");
   private static final ICSSClassProvider CSS_CLASS_BTN = DefaultCSSClassProvider.create ("btn");
   private static final ICSSClassProvider CSS_CLASS_BTN_SECONDARY = DefaultCSSClassProvider.create ("btn-secondary");
+  private static final ICSSClassProvider CSS_CLASS_BTN_OUTLINE_SECONDARY = DefaultCSSClassProvider.create ("btn-outline-secondary");
+  private static final ICSSClassProvider CSS_CLASS_BTN_SM = DefaultCSSClassProvider.create ("btn-sm");
+  private static final ICSSClassProvider CSS_CLASS_BTN_GROUP = DefaultCSSClassProvider.create ("btn-group");
   private static final ICSSClassProvider CSS_CLASS_ME_3 = DefaultCSSClassProvider.create ("me-3");
 
   private final SimpleURL m_aBaseURL;
@@ -288,7 +291,9 @@ public class SMPPagination
                                                   .addClasses (CSS_CLASS_FORM_CONTROL, CSS_CLASS_W_AUTO));
     aForm.addChild (new HCButton_Submit ("Search").addClasses (CSS_CLASS_BTN, CSS_CLASS_BTN_SECONDARY));
     if (StringHelper.isNotEmpty (m_sSearchText))
-      aForm.addChild (new HCA (_getPageURLNoSearch (0, m_nPageSize)).addChild ("Clear search"));
+      aForm.addChild (new HCA (_getPageURLNoSearch (0, m_nPageSize)).addClasses (CSS_CLASS_BTN,
+                                                                                 CSS_CLASS_BTN_OUTLINE_SECONDARY)
+                                                                    .addChild ("Clear search"));
     return aForm;
   }
 
@@ -324,23 +329,27 @@ public class SMPPagination
     {
       final HCNodeList aPageSizes = new HCNodeList ();
       aPageSizes.addChild (new HCTextNode ("Entries per page: "));
-      boolean bFirst = true;
+
+      final HCSpan aButtonGroup = new HCSpan ().addClass (CSS_CLASS_BTN_GROUP);
       for (final int nPageSize : PAGE_SIZES)
       {
-        if (bFirst)
-          bFirst = false;
-        else
-          aPageSizes.addChild (new HCTextNode (" | "));
-
         final String sText = Integer.toString (nPageSize);
         if (nPageSize == m_nPageSize)
-          aPageSizes.addChild (new HCSpan ().addChild (sText));
+          aButtonGroup.addChild (new HCSpan ().addClasses (CSS_CLASS_BTN,
+                                                           CSS_CLASS_BTN_SECONDARY,
+                                                           CSS_CLASS_BTN_SM,
+                                                           CSS_CLASS_ACTIVE,
+                                                           CSS_CLASS_DISABLED).addChild (sText));
         else
         {
           // Start with the first page again, because the offsets change
-          aPageSizes.addChild (new HCA (_getPageURL (0, nPageSize)).addChild (sText));
+          aButtonGroup.addChild (new HCA (_getPageURL (0, nPageSize)).addClasses (CSS_CLASS_BTN,
+                                                                                  CSS_CLASS_BTN_OUTLINE_SECONDARY,
+                                                                                  CSS_CLASS_BTN_SM)
+                                                                     .addChild (sText));
         }
       }
+      aPageSizes.addChild (aButtonGroup);
       ret.addChild (aPageSizes);
     }
 
