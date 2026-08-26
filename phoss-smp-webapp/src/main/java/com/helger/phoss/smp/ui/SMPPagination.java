@@ -21,9 +21,15 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonnegative;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.string.StringHelper;
 import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
+import com.helger.html.hc.html.forms.EHCFormMethod;
+import com.helger.html.hc.html.forms.HCButton_Submit;
+import com.helger.html.hc.html.forms.HCEdit;
+import com.helger.html.hc.html.forms.HCForm;
+import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.grouping.HCLI;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.sections.HCNav;
@@ -34,7 +40,7 @@ import com.helger.html.hc.impl.HCTextNode;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.uicore.page.IWebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
-import com.helger.url.ISimpleURL;
+import com.helger.url.param.URLParameter;
 import com.helger.url.SimpleURL;
 
 /**
@@ -51,6 +57,8 @@ public class SMPPagination
   public static final String PARAM_PAGE_INDEX = "pageindex";
   /** Name of the request parameter with the number of items per page */
   public static final String PARAM_PAGE_SIZE = "pagesize";
+  /** Name of the request parameter with the search text to filter the items */
+  public static final String PARAM_SEARCH_TEXT = "searchtext";
 
   /** The minimum allowed page size */
   public static final int MIN_PAGE_SIZE = 1;
@@ -63,8 +71,18 @@ public class SMPPagination
   private static final ICSSClassProvider CSS_CLASS_PAGE_LINK = DefaultCSSClassProvider.create ("page-link");
   private static final ICSSClassProvider CSS_CLASS_ACTIVE = DefaultCSSClassProvider.create ("active");
   private static final ICSSClassProvider CSS_CLASS_DISABLED = DefaultCSSClassProvider.create ("disabled");
+  private static final ICSSClassProvider CSS_CLASS_D_FLEX = DefaultCSSClassProvider.create ("d-flex");
+  private static final ICSSClassProvider CSS_CLASS_ALIGN_ITEMS_CENTER = DefaultCSSClassProvider.create ("align-items-center");
+  private static final ICSSClassProvider CSS_CLASS_GAP_2 = DefaultCSSClassProvider.create ("gap-2");
+  private static final ICSSClassProvider CSS_CLASS_MB_2 = DefaultCSSClassProvider.create ("mb-2");
+  private static final ICSSClassProvider CSS_CLASS_FORM_CONTROL = DefaultCSSClassProvider.create ("form-control");
+  private static final ICSSClassProvider CSS_CLASS_W_AUTO = DefaultCSSClassProvider.create ("w-auto");
+  private static final ICSSClassProvider CSS_CLASS_BTN = DefaultCSSClassProvider.create ("btn");
+  private static final ICSSClassProvider CSS_CLASS_BTN_SECONDARY = DefaultCSSClassProvider.create ("btn-secondary");
+  private static final ICSSClassProvider CSS_CLASS_ME_3 = DefaultCSSClassProvider.create ("me-3");
 
-  private final ISimpleURL m_aBaseURL;
+  private final SimpleURL m_aBaseURL;
+  private final String m_sSearchText;
   private final long m_nTotalCount;
   private final int m_nPageSize;
   private final int m_nPageIndex;
@@ -76,14 +94,21 @@ public class SMPPagination
    *        The web page execution context to retrieve the request parameters from. May not be
    *        <code>null</code>.
    * @param nTotalCount
-   *        The total number of items to be paginated. If the value is &lt; 0 (e.g. because the
-   *        backend could not determine it) it is treated as 0.
+   *        The total number of items to be paginated, taking the current search text into account.
+   *        If the value is &lt; 0 (e.g. because the backend could not determine it) it is treated
+   *        as 0.
+   * @see #getSearchText(IWebPageExecutionContext)
    */
   public SMPPagination (@NonNull final IWebPageExecutionContext aWPEC, final long nTotalCount)
   {
     ValueEnforcer.notNull (aWPEC, "WPEC");
 
-    m_aBaseURL = aWPEC.getSelfHref ();
+    // Remove the pagination parameters from the base URL, because they are
+    // added explicitly to each created link
+    m_aBaseURL = new SimpleURL (aWPEC.getSelfHref ()).withParams (x -> x.removeIf (p -> p.hasName (PARAM_PAGE_INDEX) ||
+                                                                                        p.hasName (PARAM_PAGE_SIZE) ||
+                                                                                        p.hasName (PARAM_SEARCH_TEXT)));
+    m_sSearchText = getSearchText (aWPEC);
     m_nTotalCount = Math.max (nTotalCount, 0);
 
     // Determine the page size
@@ -133,6 +158,16 @@ public class SMPPagination
   }
 
   /**
+   * @return The search text to filter the shown items. May be <code>null</code> or empty, if no
+   *         filtering should take place.
+   */
+  @Nullable
+  public final String getSearchText ()
+  {
+    return m_sSearchText;
+  }
+
+  /**
    * @return The total number of pages. Always &ge; 1.
    */
   @Nonnegative
@@ -153,15 +188,25 @@ public class SMPPagination
   }
 
   @NonNull
-  private ISimpleURL _getPageURL (@Nonnegative final int nPageIndex, @Nonnegative final int nPageSize)
+  private SimpleURL _getPageURL (@Nonnegative final int nPageIndex, @Nonnegative final int nPageSize)
   {
-    return new SimpleURL (m_aBaseURL).add (PARAM_PAGE_INDEX, nPageIndex).add (PARAM_PAGE_SIZE, nPageSize);
+    final SimpleURL ret = _getPageURLNoSearch (nPageIndex, nPageSize);
+    if (StringHelper.isNotEmpty (m_sSearchText))
+      ret.add (PARAM_SEARCH_TEXT, m_sSearchText);
+    return ret;
+  }
+
+  @NonNull
+  private SimpleURL _getPageURLNoSearch (@Nonnegative final int nPageIndex, @Nonnegative final int nPageSize)
+  {
+    return new SimpleURL (m_aBaseURL).add (PARAM_PAGE_INDEX, nPageIndex)
+                                     .add (PARAM_PAGE_SIZE, nPageSize);
   }
 
   @NonNull
   private HCLI _createItem (@NonNull final HCUL aUL,
                             @NonNull final String sText,
-                            @Nullable final ISimpleURL aTargetURL,
+                            @Nullable final SimpleURL aTargetURL,
                             final boolean bActive)
   {
     final HCLI aLI = aUL.addAndReturnItem ((IHCNode) null).addClass (CSS_CLASS_PAGE_ITEM);
@@ -178,9 +223,10 @@ public class SMPPagination
   }
 
   /**
-   * Align the provided DataTables with the server side pagination: the client side page length is
-   * set to the server side page size, so that the client side pagination never kicks in, and the
-   * client side page length selection is hidden, because the server side one is used instead.
+   * Align the provided DataTables with the server side pagination: all client side controls that
+   * are provided by the server side pagination as well (paging, page length selection, the
+   * information on the shown entries and the search field) are disabled, so that they are not shown
+   * twice and so that they don't only work on the entries of the current page.
    *
    * @param aDataTables
    *        The DataTables to be modified. May not be <code>null</code>.
@@ -190,12 +236,65 @@ public class SMPPagination
   public DataTables applyTo (@NonNull final DataTables aDataTables)
   {
     ValueEnforcer.notNull (aDataTables, "DataTables");
-    return aDataTables.setPageLength (m_nPageSize).setLengthChange (false);
+    return aDataTables.setPageLength (m_nPageSize)
+                      .setPaging (false)
+                      .setLengthChange (false)
+                      .setInfo (false)
+                      .setSearching (false);
   }
 
   /**
-   * Create the UI of the pagination. If all items fit onto a single page, only the item count is
-   * shown.
+   * Get the search text of the current request. This is needed to determine the total number of
+   * matching items, before this object can be created.
+   *
+   * @param aWPEC
+   *        The web page execution context to retrieve the request parameter from. May not be
+   *        <code>null</code>.
+   * @return The search text to be used for filtering. May be <code>null</code> or empty.
+   */
+  @Nullable
+  public static String getSearchText (@NonNull final IWebPageExecutionContext aWPEC)
+  {
+    ValueEnforcer.notNull (aWPEC, "WPEC");
+    return StringHelper.trim (aWPEC.params ().getAsString (PARAM_SEARCH_TEXT));
+  }
+
+  /**
+   * Create the search field. Because the filtering happens on the server side, a simple GET form is
+   * used, that resets the page index, because the number of matching entries changes.
+   *
+   * @return The created UI node. Never <code>null</code>.
+   */
+  @NonNull
+  private IHCNode _createSearchUI ()
+  {
+    final HCForm aForm = new HCForm (m_aBaseURL).setMethod (EHCFormMethod.GET)
+                                                .addClasses (CSS_CLASS_D_FLEX,
+                                                             CSS_CLASS_ALIGN_ITEMS_CENTER,
+                                                             CSS_CLASS_GAP_2,
+                                                             CSS_CLASS_MB_2);
+
+    // A GET form drops the query parameters of the action URL, so all existing
+    // parameters must be added as hidden fields
+    for (final URLParameter aParam : m_aBaseURL.params ())
+      aForm.addChild (new HCHiddenField (aParam.getName (), aParam.getValue ()));
+
+    // Always start with the first page again, because the number of matching
+    // entries changes
+    aForm.addChild (new HCHiddenField (PARAM_PAGE_INDEX, 0));
+    aForm.addChild (new HCHiddenField (PARAM_PAGE_SIZE, m_nPageSize));
+    aForm.addChild (new HCEdit (PARAM_SEARCH_TEXT).setValue (m_sSearchText)
+                                                  .setPlaceholder ("Search")
+                                                  .addClasses (CSS_CLASS_FORM_CONTROL, CSS_CLASS_W_AUTO));
+    aForm.addChild (new HCButton_Submit ("Search").addClasses (CSS_CLASS_BTN, CSS_CLASS_BTN_SECONDARY));
+    if (StringHelper.isNotEmpty (m_sSearchText))
+      aForm.addChild (new HCA (_getPageURLNoSearch (0, m_nPageSize)).addChild ("Clear search"));
+    return aForm;
+  }
+
+  /**
+   * Create the UI of the pagination. If all items fit onto a single page, only the item count and
+   * the search field are shown.
    *
    * @return The created UI node. Never <code>null</code>.
    */
@@ -205,18 +304,20 @@ public class SMPPagination
     final HCNodeList ret = new HCNodeList ();
     final int nPageCount = getPageCount ();
 
+    ret.addChild (_createSearchUI ());
+
     // Textual information on the currently shown items
     {
       final String sInfo;
       if (m_nTotalCount == 0)
-        sInfo = "No entry found";
+        sInfo = StringHelper.isNotEmpty (m_sSearchText) ? "No matching entry found" : "No entry found";
       else
       {
         final long nFirst = getFirstItemIndex () + 1L;
         final long nLast = Math.min (nFirst + m_nPageSize - 1L, m_nTotalCount);
         sInfo = "Showing entries " + nFirst + " to " + nLast + " of " + m_nTotalCount;
       }
-      ret.addChild (new HCSpan ().addClass (DefaultCSSClassProvider.create ("me-3")).addChild (sInfo));
+      ret.addChild (new HCSpan ().addClass (CSS_CLASS_ME_3).addChild (sInfo));
     }
 
     // The page size selector

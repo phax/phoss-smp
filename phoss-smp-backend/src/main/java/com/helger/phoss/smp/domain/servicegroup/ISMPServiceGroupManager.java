@@ -22,6 +22,7 @@ import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -202,6 +203,57 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   }
 
   /**
+   * Get a single "page" of all service groups matching the provided search text, sorted by the
+   * participant identifier. This method is meant to be used for server side pagination in
+   * combination with {@link #getSMPServiceGroupCount(String)}.
+   *
+   * @param sSearchText
+   *        The search text to filter the service groups. May be <code>null</code> or empty in which
+   *        case no filtering takes place.
+   * @param nStartIndex
+   *        The 0-based index of the first matching service group to be returned. Must be &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of service groups to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of service groups.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@Nullable final String sSearchText,
+                                                                  @Nonnegative final int nStartIndex,
+                                                                  @Nonnegative final int nMaxCount)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getAllSMPServiceGroups (nStartIndex, nMaxCount);
+
+    return SMPPagingHelper.getPage (getAllSMPServiceGroups ().getAll (x -> isMatchingSearchText (x, sSearchText)),
+                                    Comparator.comparing (ISMPServiceGroup::getID),
+                                    nStartIndex,
+                                    nMaxCount);
+  }
+
+  /**
+   * Check if the provided service group matches the provided search text. The participant ID is
+   * checked.
+   *
+   * @param aServiceGroup
+   *        The service group to check. May not be <code>null</code>.
+   * @param sSearchText
+   *        The search text to be searched. May be <code>null</code> or empty in which case
+   *        <code>true</code> is returned.
+   * @return <code>true</code> if the service group matches, <code>false</code> if not.
+   * @since 8.2.1
+   */
+  static boolean isMatchingSearchText (@NonNull final ISMPServiceGroup aServiceGroup,
+                                       @Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return true;
+
+    return SMPPagingHelper.matchesSearchText (aServiceGroup.getID (), sSearchText);
+  }
+
+  /**
    * @return A non-<code>null</code> but maybe empty set of all contained
    *         service group IDs.
    * @since 5.6.0
@@ -249,4 +301,23 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    */
   @CheckForSigned
   long getSMPServiceGroupCount ();
+
+  /**
+   * Get the number of service groups matching the provided search text.
+   *
+   * @param sSearchText
+   *        The search text to filter the service groups. May be <code>null</code> or empty in which
+   *        case all service groups are counted.
+   * @return The number of matching service groups. May be &lt; 0 in case there was an error
+   *         querying (e.g. because of missing SQL backend).
+   * @since 8.2.1
+   */
+  @CheckForSigned
+  default long getSMPServiceGroupCount (@Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getSMPServiceGroupCount ();
+
+    return getAllSMPServiceGroups ().getCount (x -> isMatchingSearchText (x, sSearchText));
+  }
 }

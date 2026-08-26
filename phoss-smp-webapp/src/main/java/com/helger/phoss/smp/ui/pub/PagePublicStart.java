@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -91,9 +92,13 @@ public final class PagePublicStart extends AbstractSMPWebPage
       final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       try
       {
-        // Server side pagination - only query the entries of the current page
-        final SMPPagination aPagination = new SMPPagination (aWPEC, aSMPServiceGroupMgr.getSMPServiceGroupCount ());
-        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (aPagination.getFirstItemIndex (),
+        // Server side pagination and filtering - only query the entries of the
+        // current page
+        final String sSearchText = SMPPagination.getSearchText (aWPEC);
+        final SMPPagination aPagination = new SMPPagination (aWPEC,
+                                                             aSMPServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
+        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (sSearchText,
+                                                                                                           aPagination.getFirstItemIndex (),
                                                                                                            aPagination.getPageSize ());
 
         // Use dynamic or static table?
@@ -152,6 +157,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
                                                                                                                      .setTargetBlank ()
                                                                                                                      .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
         }
+        aNodeList.addChild (aPagination.getUI ());
         if (aFinalTable.hasBodyRows ())
         {
           aNodeList.addChild (aFinalTable);
@@ -162,10 +168,10 @@ public final class PagePublicStart extends AbstractSMPWebPage
             aPagination.applyTo (aDataTables);
             aNodeList.addChild (aDataTables);
           }
-          aNodeList.addChild (aPagination.getUI ());
         }
         else
-          aNodeList.addChild (info ("This SMP does not manage any participant yet."));
+          aNodeList.addChild (info (StringHelper.isNotEmpty (sSearchText) ? "No participant matches the search criteria."
+                                                                          : "This SMP does not manage any participant yet."));
       }
       catch (final RuntimeException ex)
       {

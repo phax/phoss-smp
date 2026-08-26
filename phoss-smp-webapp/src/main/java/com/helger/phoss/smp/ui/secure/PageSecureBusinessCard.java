@@ -1250,10 +1250,13 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    // Server side pagination - only query the entries of the current page
+    // Server side pagination and filtering - only query the entries of the
+    // current page
     final long nTotalBusinessCardCount = aBusinessCardMgr.getSMPBusinessCardCount ();
-    final SMPPagination aPagination = new SMPPagination (aWPEC, nTotalBusinessCardCount);
-    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards (aPagination.getFirstItemIndex (),
+    final String sSearchText = SMPPagination.getSearchText (aWPEC);
+    final SMPPagination aPagination = new SMPPagination (aWPEC, aBusinessCardMgr.getSMPBusinessCardCount (sSearchText));
+    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards (sSearchText,
+                                                                                                       aPagination.getFirstItemIndex (),
                                                                                                        aPagination.getPageSize ());
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
@@ -1338,6 +1341,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
     aPagination.applyTo (aDataTables);
-    aNodeList.addChild (aTable).addChild (aDataTables).addChild (aPagination.getUI ());
+    aNodeList.addChild (aPagination.getUI ()).addChild (aTable).addChild (aDataTables);
   }
 }
