@@ -27,6 +27,7 @@ import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
@@ -51,6 +52,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.SMPPagination;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -418,6 +420,14 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
+    // Server side pagination and filtering - only query the entries of the
+    // current page
+    final String sSearchText = SMPPagination.getSearchText (aWPEC);
+    final SMPPagination aPagination = new SMPPagination (aWPEC, aRedirectMgr.getSMPRedirectCount (sSearchText));
+    final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirects (sSearchText,
+                                                                                       aPagination.getFirstItemIndex (),
+                                                                                       aPagination.getPageSize ());
+
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
@@ -429,7 +439,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                         new DTCol ("Document type ID").setDataSort (1, 0),
                                         new DTCol ("Target URL"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects ())
+    for (final ISMPRedirect aCurObject : aAllRedirects)
     {
       final StringMap aParams = new StringMap ();
       aParams.putIn (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ());
@@ -465,7 +475,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+    aPagination.applyTo (aDataTables);
 
-    aNodeList.addChild (aTable).addChild (aDataTables);
+    aNodeList.addChild (aPagination.getUI ()).addChild (aTable).addChild (aDataTables);
   }
 }

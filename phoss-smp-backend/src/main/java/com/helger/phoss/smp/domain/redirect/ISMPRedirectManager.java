@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
+import java.util.Comparator;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -21,9 +22,11 @@ import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 
 /**
  * Manager for {@link ISMPRedirect} objects. Redirect objects require a service
@@ -33,6 +36,17 @@ import com.helger.peppolid.IParticipantIdentifier;
  */
 public interface ISMPRedirectManager
 {
+  /**
+   * @return The comparator to be used for the server side pagination, to ensure a stable order
+   *         across single page requests.
+   */
+  @NonNull
+  private static Comparator <ISMPRedirect> _getDefaultComparator ()
+  {
+    return Comparator.comparing (ISMPRedirect::getServiceGroupID)
+                     .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ());
+  }
+
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
@@ -100,6 +114,56 @@ public interface ISMPRedirectManager
   ICommonsList <ISMPRedirect> getAllSMPRedirects ();
 
   /**
+   * Get a single "page" of all redirects, sorted by service group ID and document type ID. This
+   * method is meant to be used for server side pagination. Backends that support native paging
+   * should override this method.
+   *
+   * @param nStartIndex
+   *        The 0-based index of the first redirect to be returned. Must be &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of redirects to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of redirects.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nonnegative final int nStartIndex,
+                                                          @Nonnegative final int nMaxCount)
+  {
+    return SMPPagingHelper.getPage (getAllSMPRedirects (), _getDefaultComparator (), nStartIndex, nMaxCount);
+  }
+
+  /**
+   * Get a single "page" of all redirects matching the provided search text, sorted by service group
+   * ID and document type ID. This method is meant to be used for server side pagination in
+   * combination with {@link #getSMPRedirectCount(String)}.
+   *
+   * @param sSearchText
+   *        The search text to filter the redirects. May be <code>null</code> or empty in which case
+   *        no filtering takes place.
+   * @param nStartIndex
+   *        The 0-based index of the first matching redirect to be returned. Must be &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of redirects to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of redirects.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nullable final String sSearchText,
+                                                          @Nonnegative final int nStartIndex,
+                                                          @Nonnegative final int nMaxCount)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getAllSMPRedirects (nStartIndex, nMaxCount);
+
+    return SMPPagingHelper.getPage (getAllSMPRedirects ().getAll (x -> isMatchingSearchText (x, sSearchText)),
+                                    _getDefaultComparator (),
+                                    nStartIndex,
+                                    nMaxCount);
+  }
+
+  /**
    * Get all redirects of the passed service group.
    *
    * @param aParticipantID
@@ -116,6 +180,46 @@ public interface ISMPRedirectManager
    */
   @Nonnegative
   long getSMPRedirectCount ();
+
+  /**
+   * Get the number of redirects matching the provided search text.
+   *
+   * @param sSearchText
+   *        The search text to filter the redirects. May be <code>null</code> or empty in which case
+   *        all redirects are counted.
+   * @return The count of all matching redirects. Always &ge; 0.
+   * @since 8.2.1
+   */
+  @Nonnegative
+  default long getSMPRedirectCount (@Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getSMPRedirectCount ();
+
+    return getAllSMPRedirects ().getCount (x -> isMatchingSearchText (x, sSearchText));
+  }
+
+  /**
+   * Check if the provided redirect matches the provided search text. The participant ID, the
+   * document type ID and the target URL are checked.
+   *
+   * @param aRedirect
+   *        The redirect to check. May not be <code>null</code>.
+   * @param sSearchText
+   *        The search text to be searched. May be <code>null</code> or empty in which case
+   *        <code>true</code> is returned.
+   * @return <code>true</code> if the redirect matches, <code>false</code> if not.
+   * @since 8.2.1
+   */
+  static boolean isMatchingSearchText (@NonNull final ISMPRedirect aRedirect, @Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return true;
+
+    return SMPPagingHelper.matchesSearchText (aRedirect.getServiceGroupID (), sSearchText) ||
+           SMPPagingHelper.matchesSearchText (aRedirect.getDocumentTypeIdentifier ().getURIEncoded (), sSearchText) ||
+           SMPPagingHelper.matchesSearchText (aRedirect.getTargetHref (), sSearchText);
+  }
 
   /**
    * Find the redirect that matches the passed tuple of service group and

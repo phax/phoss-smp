@@ -44,6 +44,8 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
+import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -268,9 +270,31 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   @ReturnsMutableCopy
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
+    return _getAllSMPRedirects (null);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nonnegative final int nStartIndex,
+                                                         @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+    if (nMaxCount == 0)
+      return new CommonsArrayList <> ();
+
+    return _getAllSMPRedirects (" ORDER BY businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier" +
+                                SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount));
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  private ICommonsList <ISMPRedirect> _getAllSMPRedirects (@Nullable final String sSuffix)
+  {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
                                                                           " FROM " +
-                                                                          m_sTableName);
+                                                                          m_sTableName +
+                                                                          (sSuffix == null ? "" : sSuffix));
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
