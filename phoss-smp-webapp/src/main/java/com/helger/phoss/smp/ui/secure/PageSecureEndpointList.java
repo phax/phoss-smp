@@ -76,9 +76,13 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-    // Server side pagination - only query the entries of the current page
-    final SMPPagination aPagination = new SMPPagination (aWPEC, aServiceInfoMgr.getSMPServiceInformationCount ());
-    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation (aPagination.getFirstItemIndex (),
+    // Server side pagination and filtering - only query the entries of the
+    // current page
+    final String sSearchText = SMPPagination.getSearchText (aWPEC);
+    final SMPPagination aPagination = new SMPPagination (aWPEC,
+                                                         aServiceInfoMgr.getSMPServiceInformationCount (sSearchText));
+    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation (sSearchText,
+                                                                                                                aPagination.getFirstItemIndex (),
                                                                                                                 aPagination.getPageSize ());
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
@@ -155,6 +159,6 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
     aPagination.applyTo (aDataTables);
-    aNodeList.addChild (aTable).addChild (aDataTables).addChild (aPagination.getUI ());
+    aNodeList.addChild (aPagination.getUI ()).addChild (aTable).addChild (aDataTables);
   }
 }

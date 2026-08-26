@@ -44,7 +44,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
 
   /** The default number of entries shown per page on paginated list pages */
-  public static final int DEFAULT_PAGINATION_PAGE_SIZE = 100;
+  public static final int DEFAULT_PAGINATION_PAGE_SIZE = 25;
 
   /**
    * @deprecated Only called via reflection
