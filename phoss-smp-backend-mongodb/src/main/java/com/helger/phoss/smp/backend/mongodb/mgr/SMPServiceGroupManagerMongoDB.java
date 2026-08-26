@@ -37,6 +37,7 @@ import com.helger.collection.commons.ICommonsSet;
 import com.helger.json.IJsonArray;
 import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -53,6 +54,7 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 
@@ -315,6 +317,24 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@Nonnegative final int nStartIndex,
+                                                                 @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    if (nMaxCount > 0)
+      getCollection ().find ()
+                      .sort (Sorts.ascending (BSON_ID))
+                      .skip (nStartIndex)
+                      .limit (nMaxCount)
+                      .forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 

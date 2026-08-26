@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -52,6 +53,8 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -408,15 +411,49 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ret;
   }
 
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@Nonnegative final int nStartIndex,
+                                                                            @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    if (nMaxCount > 0)
+      _forEachSMPServiceInformation (" ORDER BY sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier" +
+                                     SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount),
+                                     ret::add);
+    // The DB result is grouped in a Map, so the order needs to be restored
+    ret.sort (Comparator.comparing (ISMPServiceInformation::getServiceGroupID)
+                        .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ()));
+    return ret;
+  }
+
   public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
+    _forEachSMPServiceInformation (null, aConsumer);
+  }
+
+  private void _forEachSMPServiceInformation (@Nullable final String sServiceMetadataSuffix,
+                                              @NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
+  {
+    // If only a single page shall be returned, the paging must happen on the
+    // Service Metadata level, because the joins create multiple rows per
+    // Service Information object
+    final String sServiceMetadataTable = sServiceMetadataSuffix == null ? m_sTableNameSM
+                                                                       : "(SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension FROM " +
+                                                                         m_sTableNameSM +
+                                                                         " sm" +
+                                                                         sServiceMetadataSuffix +
+                                                                         ")";
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                           "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
                                                                           " FROM " +
-                                                                          m_sTableNameSM +
+                                                                          sServiceMetadataTable +
                                                                           " sm" +
                                                                           " INNER JOIN " +
                                                                           m_sTableNameP +

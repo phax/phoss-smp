@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import java.util.Comparator;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -23,6 +25,7 @@ import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
@@ -172,6 +175,31 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ();
+
+  /**
+   * Get a single "page" of all contained service groups, sorted by the
+   * participant identifier. This method is meant to be used for server side
+   * pagination. Backends that support native paging should override this
+   * method.
+   *
+   * @param nStartIndex
+   *        The 0-based index of the first service group to be returned. Must be
+   *        &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of service groups to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of service groups.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@Nonnegative final int nStartIndex,
+                                                                  @Nonnegative final int nMaxCount)
+  {
+    return SMPPagingHelper.getPage (getAllSMPServiceGroups (),
+                                    Comparator.comparing (ISMPServiceGroup::getID),
+                                    nStartIndex,
+                                    nMaxCount);
+  }
 
   /**
    * @return A non-<code>null</code> but maybe empty set of all contained

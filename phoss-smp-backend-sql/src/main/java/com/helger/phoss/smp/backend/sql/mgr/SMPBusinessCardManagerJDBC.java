@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.util.Comparator;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,8 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -357,10 +360,42 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   @ReturnsMutableCopy
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
+    return _convertToBusinessCards (newExecutor ().queryAll ("SELECT id, pid, name, names, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
+                                                             " FROM " +
+                                                             m_sTableName));
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@Nonnegative final int nStartIndex,
+                                                                 @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+    if (nMaxCount == 0)
+      return new CommonsArrayList <> ();
+
+    // A Business Card consists of 1-n rows in the DB (one per Business Entity),
+    // so the paging must happen on the distinct participant IDs
+    final String sSQL = "SELECT bce.id, bce.pid, bce.name, bce.names, bce.country, bce.geoinfo, bce.identifiers, bce.websites, bce.contacts, bce.addon, bce.regdate" +
+                        " FROM " +
+                        m_sTableName +
+                        " bce INNER JOIN (SELECT DISTINCT pid FROM " +
+                        m_sTableName +
+                        " ORDER BY pid" +
+                        SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount) +
+                        ") paged ON bce.pid=paged.pid";
+    final ICommonsList <ISMPBusinessCard> ret = _convertToBusinessCards (newExecutor ().queryAll (sSQL));
+    // The DB result is grouped in a Map, so the order needs to be restored
+    ret.sort (Comparator.comparing (ISMPBusinessCard::getID));
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  private static ICommonsList <ISMPBusinessCard> _convertToBusinessCards (@Nullable final ICommonsList <DBResultRow> aDBResult)
+  {
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, pid, name, names, country, geoinfo, identifiers, websites, contacts, addon, regdate" +
-                                                                          " FROM " +
-                                                                          m_sTableName);
     if (aDBResult != null)
     {
       final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
