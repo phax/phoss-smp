@@ -30,7 +30,6 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.smp.SMPTransportProfile;
-import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.model.Indexes;
@@ -133,10 +132,10 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
     final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, sSMPTransportProfileID));
     if (!aDR.wasAcknowledged () || aDR.getDeletedCount () == 0)
     {
-      AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, sSMPTransportProfileID, "no-such-id");
+      AuditHelper.onAuditDeleteFailure (SMPTransportProfile.OT, sSMPTransportProfileID, "no-such-id");
       return EChange.UNCHANGED;
     }
-    AuditHelper.onAuditDeleteSuccess (SMPRedirect.OT, sSMPTransportProfileID);
+    AuditHelper.onAuditDeleteSuccess (SMPTransportProfile.OT, sSMPTransportProfileID);
     return EChange.CHANGED;
   }
 

@@ -20,17 +20,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
 
+import com.helger.base.type.ObjectType;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ESMPTransportProfileState;
 import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
+import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.audit.IAuditor;
 
 /**
  * Test class for class {@link SMPTransportProfileManagerMongoDB}.
@@ -75,5 +81,33 @@ public final class SMPTransportProfileManagerMongoDBTest
     for (final ISMPTransportProfile aCreate : aCreated)
       assertTrue (aMgr.deleteSMPTransportProfile (aCreate.getID ()).isChanged ());
     assertEquals (0, aMgr.getAllSMPTransportProfiles ().size ());
+  }
+
+  @Test
+  public void testDeleteAuditObjectType ()
+  {
+    final ISMPTransportProfileManager aMgr = SMPMetaManager.getTransportProfileMgr ();
+    final String sID = "test-audit-profile";
+    assertNotNull (aMgr.createSMPTransportProfile (sID, "Test audit profile", false));
+
+    final IAuditor aOldAuditor = AuditHelper.getAuditor ();
+    final AtomicReference <ObjectType> aAuditObjectType = new AtomicReference <> ();
+    try
+    {
+      AuditHelper.setAuditor ( (eActionType, eSuccess, aActionObjectType, sAction, aArgs) -> {
+        aAuditObjectType.set (aActionObjectType);
+      });
+
+      assertTrue (aMgr.deleteSMPTransportProfile (sID).isChanged ());
+      assertEquals (SMPTransportProfile.OT, aAuditObjectType.get ());
+
+      aAuditObjectType.set (null);
+      assertTrue (aMgr.deleteSMPTransportProfile (sID).isUnchanged ());
+      assertEquals (SMPTransportProfile.OT, aAuditObjectType.get ());
+    }
+    finally
+    {
+      AuditHelper.setAuditor (aOldAuditor);
+    }
   }
 }
