@@ -323,7 +323,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   public ICommonsSet <String> getAllSMPServiceGroupIDs ()
   {
     final ICommonsSet <String> ret = new CommonsHashSet <> ();
-    getCollection ().find ().forEach (x -> ret.add (x.getString (BSON_OWNER_ID)));
+    getCollection ().find ().forEach (x -> ret.add (x.getString (BSON_ID)));
     return ret;
   }
 

@@ -84,6 +84,26 @@ public final class SMPTransportProfileManagerMongoDBTest
   }
 
   @Test
+  public void testUpdateState ()
+  {
+    final ISMPTransportProfileManager aMgr = SMPMetaManager.getTransportProfileMgr ();
+    final String sID = "test-update-state";
+    assertNotNull (aMgr.createSMPTransportProfile (sID, "Test update state", false));
+    try
+    {
+      assertTrue (aMgr.updateSMPTransportProfile (sID, "Test update state", true).isChanged ());
+      assertEquals (ESMPTransportProfileState.DEPRECATED, aMgr.getSMPTransportProfileOfID (sID).getState ());
+
+      assertTrue (aMgr.updateSMPTransportProfile (sID, "Test update state", false).isChanged ());
+      assertEquals (ESMPTransportProfileState.ACTIVE, aMgr.getSMPTransportProfileOfID (sID).getState ());
+    }
+    finally
+    {
+      aMgr.deleteSMPTransportProfile (sID);
+    }
+  }
+
+  @Test
   public void testDeleteAuditObjectType ()
   {
     final ISMPTransportProfileManager aMgr = SMPMetaManager.getTransportProfileMgr ();
