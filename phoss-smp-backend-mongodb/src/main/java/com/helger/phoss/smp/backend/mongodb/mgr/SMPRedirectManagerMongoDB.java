@@ -39,6 +39,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -48,6 +49,7 @@ import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.DeleteResult;
 
 /**
@@ -269,6 +271,24 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   {
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nonnegative final int nStartIndex,
+                                                         @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
+    if (nMaxCount > 0)
+      getCollection ().find ()
+                      .sort (Sorts.ascending (BSON_SERVICE_GROUP_ID, BSON_DOCTYPE_ID))
+                      .skip (nStartIndex)
+                      .limit (nMaxCount)
+                      .forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 
