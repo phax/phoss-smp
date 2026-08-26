@@ -11,6 +11,7 @@
 package com.helger.phoss.smp.domain.businesscard;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -23,6 +24,7 @@ import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 
 /**
  * Manager for {@link ISMPBusinessCard} objects. Business card objects require a service group to be
@@ -79,6 +81,29 @@ public interface ISMPBusinessCardManager
   @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ();
+
+  /**
+   * Get a single "page" of all contained SMP business cards, sorted by the business card ID. This
+   * method is meant to be used for server side pagination. Backends that support native paging
+   * should override this method.
+   *
+   * @param nStartIndex
+   *        The 0-based index of the first business card to be returned. Must be &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of business cards to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of business cards.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@Nonnegative final int nStartIndex,
+                                                                  @Nonnegative final int nMaxCount)
+  {
+    return SMPPagingHelper.getPage (getAllSMPBusinessCards (),
+                                    Comparator.comparing (ISMPBusinessCard::getID),
+                                    nStartIndex,
+                                    nMaxCount);
+  }
 
   /**
    * @return All contained SMP business card IDs. Never <code>null</code> but maybe empty.
