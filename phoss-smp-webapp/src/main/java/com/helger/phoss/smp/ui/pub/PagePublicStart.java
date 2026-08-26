@@ -39,6 +39,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.SMPPagination;
 import com.helger.photon.bootstrap5.table.BootstrapTable;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
@@ -90,7 +91,10 @@ public final class PagePublicStart extends AbstractSMPWebPage
       final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       try
       {
-        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
+        // Server side pagination - only query the entries of the current page
+        final SMPPagination aPagination = new SMPPagination (aWPEC, aSMPServiceGroupMgr.getSMPServiceGroupCount ());
+        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (aPagination.getFirstItemIndex (),
+                                                                                                           aPagination.getPageSize ());
 
         // Use dynamic or static table?
         final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
@@ -155,8 +159,10 @@ public final class PagePublicStart extends AbstractSMPWebPage
           if (bUseDataTables)
           {
             final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
+            aPagination.applyTo (aDataTables);
             aNodeList.addChild (aDataTables);
           }
+          aNodeList.addChild (aPagination.getUI ());
         }
         else
           aNodeList.addChild (info ("This SMP does not manage any participant yet."));
