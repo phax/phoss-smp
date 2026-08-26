@@ -22,9 +22,7 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
-import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.commons.ICommonsSet;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -42,6 +40,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
+import com.helger.phoss.smp.ui.SMPPagination;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
@@ -77,14 +76,14 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation ();
+    // Server side pagination - only query the entries of the current page
+    final SMPPagination aPagination = new SMPPagination (aWPEC, aServiceInfoMgr.getSMPServiceInformationCount ());
+    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation (aPagination.getFirstItemIndex (),
+                                                                                                                aPagination.getPageSize ());
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
-    // Count unique service groups
-    final ICommonsSet <String> aServiceGroupIDs = new CommonsHashSet <> ();
-    aAllServiceInfos.findAllMapped (ISMPServiceInformation::getServiceGroupID, aServiceGroupIDs::add);
-    final boolean bHideDetails = aServiceGroupIDs.size () > 1000;
+    final boolean bHideDetails = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCount () > 1000;
 
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -155,6 +154,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-    aNodeList.addChild (aTable).addChild (aDataTables);
+    aPagination.applyTo (aDataTables);
+    aNodeList.addChild (aTable).addChild (aDataTables).addChild (aPagination.getUI ());
   }
 }

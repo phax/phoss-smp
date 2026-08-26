@@ -51,6 +51,8 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
+import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -458,13 +460,38 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroups()");
 
+    return _getAllSMPServiceGroups (null);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@Nonnegative final int nStartIndex,
+                                                                 @Nonnegative final int nMaxCount)
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getAllSMPServiceGroups(" + nStartIndex + ", " + nMaxCount + ")");
+
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+    if (nMaxCount == 0)
+      return new CommonsArrayList <> ();
+
+    return _getAllSMPServiceGroups (" ORDER BY sg.businessIdentifierScheme, sg.businessIdentifier" +
+                                    SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount));
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  private ICommonsList <ISMPServiceGroup> _getAllSMPServiceGroups (@Nullable final String sSuffix)
+  {
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username, sg.customproperties" +
                                                                           " FROM " +
                                                                           m_sTableNameSG +
                                                                           " sg, " +
                                                                           m_sTableNameO +
                                                                           " so" +
-                                                                          " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier");
+                                                                          " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier" +
+                                                                          (sSuffix == null ? "" : sSuffix));
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     if (aDBResult != null)

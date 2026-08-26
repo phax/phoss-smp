@@ -41,6 +41,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -52,6 +53,7 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.DeleteResult;
 
 /**
@@ -360,6 +362,24 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   {
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@Nonnegative final int nStartIndex,
+                                                                 @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+
+    final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
+    if (nMaxCount > 0)
+      getCollection ().find ()
+                      .sort (Sorts.ascending (BSON_SERVICE_GROUP_ID))
+                      .skip (nStartIndex)
+                      .limit (nMaxCount)
+                      .forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
 

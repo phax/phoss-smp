@@ -47,6 +47,7 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -62,6 +63,7 @@ import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.DeleteResult;
 
 /**
@@ -457,6 +459,24 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   {
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     forEachSMPServiceInformation (ret::add);
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@Nonnegative final int nStartIndex,
+                                                                            @Nonnegative final int nMaxCount)
+  {
+    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
+
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    if (nMaxCount > 0)
+      getCollection ().find ()
+                      .sort (Sorts.ascending (BSON_SERVICE_GROUP_ID, BSON_DOCTYPE_ID))
+                      .skip (nStartIndex)
+                      .limit (nMaxCount)
+                      .forEach (x -> ret.add (toServiceInformation (x, true)));
     return ret;
   }
 

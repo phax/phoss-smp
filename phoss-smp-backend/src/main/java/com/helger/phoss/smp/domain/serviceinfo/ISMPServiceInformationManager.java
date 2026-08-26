@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
+import java.util.Comparator;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
@@ -26,6 +27,7 @@ import com.helger.collection.commons.ICommonsMap;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.SMPPagingHelper;
 
 /**
  * Manager for {@link ISMPServiceInformation} objects. Service information objects require a service
@@ -124,6 +126,30 @@ public interface ISMPServiceInformationManager
   @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ();
+
+  /**
+   * Get a single "page" of all service information objects, sorted by service group ID and document
+   * type ID. This method is meant to be used for server side pagination. Backends that support
+   * native paging should override this method.
+   *
+   * @param nStartIndex
+   *        The 0-based index of the first service information object to be returned. Must be &ge; 0.
+   * @param nMaxCount
+   *        The maximum number of service information objects to be returned. Must be &ge; 0.
+   * @return A non-<code>null</code> but maybe empty list of service information objects.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@Nonnegative final int nStartIndex,
+                                                                             @Nonnegative final int nMaxCount)
+  {
+    return SMPPagingHelper.getPage (getAllSMPServiceInformation (),
+                                    Comparator.comparing (ISMPServiceInformation::getServiceGroupID)
+                                              .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ()),
+                                    nStartIndex,
+                                    nMaxCount);
+  }
 
   /**
    * Iterate each Service Information element and invoke the provided consumer for it.
