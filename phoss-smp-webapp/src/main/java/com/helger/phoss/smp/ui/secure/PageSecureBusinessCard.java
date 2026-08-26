@@ -77,6 +77,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
+import com.helger.phoss.smp.ui.SMPPagination;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -1266,7 +1267,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
+    // Server side pagination - only query the entries of the current page
+    final long nTotalBusinessCardCount = aBusinessCardMgr.getSMPBusinessCardCount ();
+    final SMPPagination aPagination = new SMPPagination (aWPEC, nTotalBusinessCardCount);
+    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards (aPagination.getFirstItemIndex (),
+                                                                                                       aPagination.getPageSize ());
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
@@ -1351,6 +1356,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-    aNodeList.addChild (aTable).addChild (aDataTables);
+    aPagination.applyTo (aDataTables);
+    aNodeList.addChild (aTable).addChild (aDataTables).addChild (aPagination.getUI ());
   }
 }

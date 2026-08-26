@@ -20,6 +20,7 @@ import java.net.URL;
 
 import org.jspecify.annotations.NonNull;
 
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.string.StringHelper;
@@ -41,6 +42,9 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 {
   public static final String WEBAPP_KEY_GLOBAL_DEBUG = "global.debug";
   public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
+
+  /** The default number of entries shown per page on paginated list pages */
+  public static final int DEFAULT_PAGINATION_PAGE_SIZE = 100;
 
   /**
    * @deprecated Only called via reflection
@@ -150,6 +154,18 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static boolean isStartPageExtensionsShow ()
   {
     return _getConfig ().getAsBoolean ("webapp.startpage.extensions.show", false);
+  }
+
+  /**
+   * @return The default number of entries shown per page on the paginated list pages. Always &gt;
+   *         0. The default value is {@value #DEFAULT_PAGINATION_PAGE_SIZE}.
+   * @since 8.2.1
+   */
+  @Nonnegative
+  public static int getPaginationPageSize ()
+  {
+    final int ret = _getConfig ().getAsInt ("webapp.pagination.pagesize", DEFAULT_PAGINATION_PAGE_SIZE);
+    return ret > 0 ? ret : DEFAULT_PAGINATION_PAGE_SIZE;
   }
 
   /**
