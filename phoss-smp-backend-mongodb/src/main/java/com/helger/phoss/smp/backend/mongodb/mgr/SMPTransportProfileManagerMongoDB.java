@@ -75,6 +75,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
       eState = ESMPTransportProfileState.getFromIDOrNull (sStateID);
     if (eState == null)
     {
+      // Previous way of data storage
       final boolean bDeprecated = aDoc.getBoolean (BSON_DEPRECATED, false);
       eState = bDeprecated ? ESMPTransportProfileState.DEPRECATED : ESMPTransportProfileState.ACTIVE;
     }

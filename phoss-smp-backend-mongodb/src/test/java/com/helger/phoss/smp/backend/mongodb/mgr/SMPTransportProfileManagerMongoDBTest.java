@@ -59,8 +59,7 @@ public final class SMPTransportProfileManagerMongoDBTest
     {
       final ISMPTransportProfile aCreate = aMgr.createSMPTransportProfile (e.getID (),
                                                                            e.getName (),
-                                                                           e.getState () ==
-                                                                                         ESMPTransportProfileState.DEPRECATED);
+                                                                           e.getState () == ESMPTransportProfileState.DEPRECATED);
       aCreated.add (aCreate);
     }
     final ICommonsList <ISMPTransportProfile> aAll = aMgr.getAllSMPTransportProfiles ();
@@ -89,6 +88,8 @@ public final class SMPTransportProfileManagerMongoDBTest
     final ISMPTransportProfileManager aMgr = SMPMetaManager.getTransportProfileMgr ();
     final String sID = "test-update-state";
     assertNotNull (aMgr.createSMPTransportProfile (sID, "Test update state", false));
+    assertEquals (ESMPTransportProfileState.ACTIVE, aMgr.getSMPTransportProfileOfID (sID).getState ());
+
     try
     {
       assertTrue (aMgr.updateSMPTransportProfile (sID, "Test update state", true).isChanged ());
@@ -114,7 +115,7 @@ public final class SMPTransportProfileManagerMongoDBTest
     final AtomicReference <ObjectType> aAuditObjectType = new AtomicReference <> ();
     try
     {
-      AuditHelper.setAuditor ( (eActionType, eSuccess, aActionObjectType, sAction, aArgs) -> {
+      AuditHelper.setAuditor ((eActionType, eSuccess, aActionObjectType, sAction, aArgs) -> {
         aAuditObjectType.set (aActionObjectType);
       });
 
