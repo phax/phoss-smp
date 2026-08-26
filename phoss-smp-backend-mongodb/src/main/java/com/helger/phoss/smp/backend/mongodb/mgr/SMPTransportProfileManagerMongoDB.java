@@ -110,8 +110,9 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   {
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sSMPTransportProfileID),
                                                                 Updates.combine (Updates.set (BSON_NAME, sName),
-                                                                                 Updates.set (BSON_DEPRECATED,
-                                                                                              Boolean.valueOf (bIsDeprecated))));
+                                                                                 Updates.set (BSON_STATE,
+                                                                                              (bIsDeprecated ? ESMPTransportProfileState.DEPRECATED
+                                                                                                             : ESMPTransportProfileState.ACTIVE).getID ())));
     if (aOldDoc == null)
       return EChange.UNCHANGED;
 
