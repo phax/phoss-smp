@@ -67,10 +67,10 @@
   </developers>
 
   <properties>
-    <flyway.version>13.2.0</flyway.version>
+    <flyway.version>13.4.0</flyway.version>
     <log4j.version>2.26.1</log4j.version>
-    <mongodb.version>5.9.2</mongodb.version>
-    <protobuf.version>4.35.1</protobuf.version>
+    <mongodb.version>5.10.0</mongodb.version>
+    <protobuf.version>4.36.0</protobuf.version>
     
     <ph-db.version>8.4.1</ph-db.version>
   </properties>
