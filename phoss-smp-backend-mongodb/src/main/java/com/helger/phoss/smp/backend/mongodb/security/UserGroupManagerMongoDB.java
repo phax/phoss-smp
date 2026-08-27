@@ -310,6 +310,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              Filters.ne (BSON_USER_GROUP_USERS, sUserID),
                                               addLastModToUpdate (Updates.addToSet (BSON_USER_GROUP_USERS, sUserID)));
     if (eChange.isChanged ())
     {
@@ -332,6 +333,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              Filters.eq (BSON_USER_GROUP_USERS, sUserID),
                                               addLastModToUpdate (Updates.pull (BSON_USER_GROUP_USERS, sUserID)));
     if (eChange.isChanged ())
     {
@@ -390,6 +392,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              Filters.ne (BSON_USER_GROUP_ROLES, sRoleID),
                                               addLastModToUpdate (Updates.addToSet (BSON_USER_GROUP_ROLES, sRoleID)));
     if (eChange.isChanged ())
     {
@@ -412,6 +415,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
       return EChange.UNCHANGED;
 
     final EChange eChange = genericUpdateOne (sUserGroupID,
+                                              Filters.eq (BSON_USER_GROUP_ROLES, sRoleID),
                                               addLastModToUpdate (Updates.pull (BSON_USER_GROUP_ROLES, sRoleID)));
     if (eChange.isChanged ())
     {

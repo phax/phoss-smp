@@ -103,7 +103,24 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     if (StringHelper.isEmpty (sID))
       return EChange.UNCHANGED;
 
-    final UpdateResult aUpdateResult = getCollection ().updateOne (whereID (sID), aUpdate);
+    return genericUpdateOne (whereID (sID), aUpdate);
+  }
+
+  @NonNull
+  protected EChange genericUpdateOne (@Nullable final String sID,
+                                      @NonNull final Bson aAdditionalFilter,
+                                      @NonNull final Bson aUpdate)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    return genericUpdateOne (Filters.and (whereID (sID), aAdditionalFilter), aUpdate);
+  }
+
+  @NonNull
+  private EChange genericUpdateOne (@NonNull final Bson aFilter, @NonNull final Bson aUpdate)
+  {
+    final UpdateResult aUpdateResult = getCollection ().updateOne (aFilter, aUpdate);
 
     // Was an element changed?
     if (aUpdateResult.getModifiedCount () == 0)
@@ -116,6 +133,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   public EChange deleteEntity (@Nullable final String sID)
   {
     return genericUpdateOne (sID,
+                             Filters.eq (BSON_DELETED_TIME, null),
                              Updates.combine (Updates.set (BSON_DELETED_TIME,
                                                            asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
                                               Updates.set (BSON_DELETED_USER_ID,
@@ -126,6 +144,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   public EChange undeleteEntity (@Nullable final String sID)
   {
     return genericUpdateOne (sID,
+                             Filters.ne (BSON_DELETED_TIME, null),
                              Updates.combine (Updates.set (BSON_DELETED_TIME, null),
                                               Updates.set (BSON_DELETED_USER_ID, null)));
   }

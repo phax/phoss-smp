@@ -69,8 +69,7 @@ public final class UserGroupManagerMongoDBTest
       final String sUserID = GlobalIDFactory.getNewStringID ();
 
       assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
-      // Should be false but couldn't figure it out
-      assertTrue (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
+      assertFalse (aUserGroupMgr.assignUserToUserGroup (sUserGroup1ID, sUserID).isChanged ());
       assertTrue (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, sUserID));
       assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, "another uuid"));
 
@@ -86,6 +85,7 @@ public final class UserGroupManagerMongoDBTest
         assertTrue (allUserGroupIDsWithAssignedUser.contains (sUserGroup2ID));
 
         assertTrue (aUserGroupMgr.unassignUserFromUserGroup (sUserGroup1ID, sUserID).isChanged ());
+        assertFalse (aUserGroupMgr.unassignUserFromUserGroup (sUserGroup1ID, sUserID).isChanged ());
         assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup1ID, sUserID));
         assertTrue (aUserGroupMgr.unassignUserFromAllUserGroups (sUserID).isChanged ());
         assertFalse (aUserGroupMgr.isUserAssignedToUserGroup (sUserGroup2ID, sUserID));
@@ -93,6 +93,7 @@ public final class UserGroupManagerMongoDBTest
         final String sRole1ID = GlobalIDFactory.getNewStringID ();
         final String sRole2ID = GlobalIDFactory.getNewStringID ();
         assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole1ID).isChanged ());
+        assertFalse (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole1ID).isChanged ());
         assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup1ID, sRole2ID).isChanged ());
         assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
 
@@ -116,8 +117,7 @@ public final class UserGroupManagerMongoDBTest
         assertFalse (aUserGroupMgr.getAllDeletedUserGroups ().contains (aUserGroup2));
 
         assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
-        // Should be false, but it's only an update operation
-        assertTrue (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
+        assertFalse (aUserGroupMgr.deleteUserGroup (sUserGroup2ID).isChanged ());
 
         assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup1));
         assertTrue (aUserGroupMgr.getAll ().contains (aUserGroup2));
@@ -139,6 +139,7 @@ public final class UserGroupManagerMongoDBTest
         assertTrue (aUserGroupMgr.assignRoleToUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
         assertTrue (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
         assertTrue (aUserGroupMgr.unassignRoleFromUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
+        assertFalse (aUserGroupMgr.unassignRoleFromUserGroup (sUserGroup2ID, sRole1ID).isChanged ());
         assertFalse (aUserGroupMgr.containsUserGroupWithAssignedRole (sRole1ID));
       }
       finally
