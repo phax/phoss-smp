@@ -18,12 +18,11 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.time.LocalDate;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.Nonnegative;
 import com.helger.annotation.misc.WorkInProgress;
 import com.helger.base.compare.CompareHelper;
 import com.helger.base.compare.ESortOrder;
@@ -212,7 +211,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static final class PushAllBusinessCardsToDirectory extends AbstractLongRunningJobRunnable implements
                                                              IHCBootstrap5Trait
   {
-    private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
+    private static final AtomicBoolean RUNNING = new AtomicBoolean (false);
 
     private final PDClient m_aPDClient;
 
@@ -227,7 +226,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
-      RUNNING_JOBS.incrementAndGet ();
       try (final WebScoped w = new WebScoped ())
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
@@ -281,16 +279,45 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
         return LongRunningJobResult.createXML (HCRenderer.getAsNode (aResultNodes));
       }
+    }
+
+    @Override
+    public void run ()
+    {
+      try
+      {
+        super.run ();
+      }
       finally
       {
-        RUNNING_JOBS.decrementAndGet ();
+        // Always release, even if the job failed
+        RUNNING.set (false);
       }
     }
 
-    @Nonnegative
-    public static int getRunningJobCount ()
+    /**
+     * Try to mark this job as running. If this method returns <code>true</code>, the job must be
+     * started, because only the job itself resets the flag again.
+     *
+     * @return <code>true</code> if the job may be started, <code>false</code> if another one is
+     *         already running.
+     */
+    public static boolean tryStartRunning ()
     {
-      return RUNNING_JOBS.get ();
+      return RUNNING.compareAndSet (false, true);
+    }
+
+    /**
+     * Reset the "running" flag, in case the job could not be started at all.
+     */
+    public static void stopRunning ()
+    {
+      RUNNING.set (false);
+    }
+
+    public static boolean isRunning ()
+    {
+      return RUNNING.get ();
     }
   }
 
@@ -409,16 +436,32 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                   " client component. Please check your configuration.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
                           }
                           else
-                          {
-                            PhotonWorkerPool.getInstance ()
-                                            .run ("PushAllBusinessCardsToDirectory",
-                                                  new PushAllBusinessCardsToDirectory (aPDClient,
-                                                                                       aWPEC.getLoggedInUserID ()));
+                            if (!PushAllBusinessCardsToDirectory.tryStartRunning ())
+                            {
+                              aWPEC.postRedirectGetInternal (warn ("An update of the Business Cards in the " +
+                                                                   sDirectoryName +
+                                                                   " is already running in the background. Please wait until it is finished."));
+                            }
+                            else
+                            {
+                              try
+                              {
+                                PhotonWorkerPool.getInstance ()
+                                                .run ("PushAllBusinessCardsToDirectory",
+                                                      new PushAllBusinessCardsToDirectory (aPDClient,
+                                                                                           aWPEC.getLoggedInUserID ()));
+                              }
+                              catch (final RuntimeException ex)
+                              {
+                                // The job was never started, so it can never reset the flag
+                                PushAllBusinessCardsToDirectory.stopRunning ();
+                                throw ex;
+                              }
 
-                            aWPEC.postRedirectGetInternal (success ("The update of the Business Cards in the " +
-                                                                    sDirectoryName +
-                                                                    " is now running in the background. Please manually refresh the page to see the update."));
-                          }
+                              aWPEC.postRedirectGetInternal (success ("The update of the Business Cards in the " +
+                                                                      sDirectoryName +
+                                                                      " is now running in the background. Please manually refresh the page to see the update."));
+                            }
                           return EShowList.SHOW_LIST;
                         }
                       });
@@ -1254,6 +1297,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
     {
+      // Only a single push may run at a time
+      final boolean bPushRunning = PushAllBusinessCardsToDirectory.isRunning ();
+
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aToolbar.addButton ("Create new Business Card", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -1262,12 +1308,11 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                        ACTION_PUBLISH_ALL_TO_INDEXER))
                                                .setIcon (EFontAwesome6Icon.ARROW_ROTATE_RIGHT)
                                                .addChild ("Update all Business Cards in " + sDirectoryName)
-                                               .setDisabled (aAllBusinessCards.isEmpty ()));
+                                               .setDisabled (aAllBusinessCards.isEmpty () || bPushRunning));
 
       aNodeList.addChild (aToolbar);
 
-      final int nCount = PushAllBusinessCardsToDirectory.getRunningJobCount ();
-      if (nCount > 0)
+      if (bPushRunning)
       {
         aNodeList.addChild (warn ("Currently Business Cards are pushed to the " +
                                   sDirectoryName +

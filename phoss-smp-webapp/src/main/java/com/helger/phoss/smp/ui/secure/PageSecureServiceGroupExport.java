@@ -16,16 +16,24 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.datetime.format.PDTToString;
 import com.helger.datetime.util.PDTIOHelper;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.http.CHttp;
+import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
+import com.helger.phoss.smp.exchange.ServiceGroupExportLock;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.ajax.AbstractSMPAjaxExecutor;
@@ -38,7 +46,6 @@ import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.microdom.IMicroDocument;
 
 /**
  * Class to export service groups with all contents
@@ -58,17 +65,42 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       protected void mainHandleRequest (@NonNull final LayoutExecutionContext aLEC,
                                         @NonNull final PhotonUnifiedResponse aAjaxResponse) throws Exception
       {
-        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-        final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-        final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-        final boolean bExportBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
+        // Only a single export may run at a time, because exporting everything is expensive
+        if (!ServiceGroupExportLock.tryAcquire (aLEC.getLoggedInUserID ()))
+        {
+          aAjaxResponse.setStatus (CHttp.HTTP_SERVICE_UNAVAILABLE);
+          aAjaxResponse.setAllowContentOnStatusCode (true)
+                       .setContentAndCharset ("Another Service Group export is already running. Please try again later.",
+                                              StandardCharsets.UTF_8)
+                       .setMimeType (CMimeType.TEXT_PLAIN);
+          return;
+        }
 
-        final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups,
-                                                                                 bExportBusinessCards);
+        try
+        {
+          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+          final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+          final boolean bExportBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
 
-        // Build the XML response
-        aAjaxResponse.xml (aDoc);
-        aAjaxResponse.attachment ("phoss-smp-export-" + PDTIOHelper.getCurrentLocalDateTimeForFilename () + ".xml");
+          // Stream the export, so that never more than a single Service Group is kept in memory
+          try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
+          {
+            ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bExportBusinessCards, aBAOS);
+
+            // Build the XML response
+            aAjaxResponse.setContent (aBAOS);
+            aAjaxResponse.setCharset (ServiceGroupExport.XML_WRITER_SETTINGS.getCharset ());
+            aAjaxResponse.setMimeType (ServiceGroupExport.getExportMimeType ());
+            aAjaxResponse.attachment ("phoss-smp-export-" +
+                                      PDTIOHelper.getCurrentLocalDateTimeForFilename () +
+                                      ".xml");
+          }
+        }
+        finally
+        {
+          ServiceGroupExportLock.release ();
+        }
       }
     });
   }
@@ -105,11 +137,25 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
                                   " to an XML file."));
       }
 
+    // Only a single export may run at a time
+    final boolean bExportRunning = ServiceGroupExportLock.isExportRunning ();
+    if (bExportRunning)
+    {
+      final LocalDateTime aStartDT = ServiceGroupExportLock.getExportStartDateTime ();
+      aNodeList.addChild (warn ("An export is currently running in the background" +
+                                (aStartDT == null ? "" : " (started at " +
+                                                         PDTToString.getAsString (aStartDT,
+                                                                                  aWPEC.getDisplayLocale ()) +
+                                                         ")") +
+                                ". Please wait until it is finished before starting a new one."));
+    }
+
     // The main export logic happens in the AJAX handler
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
     aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
                                              .setIcon (EDefaultIcon.SAVE_ALL)
                                              .setOnClick (AJAX_EXPORT_SG.getInvocationURL (aRequestScope))
-                                             .setDisabled (nServiceGroupCount <= 0));
+                                             .setDisabled (nServiceGroupCount <= 0 || bExportRunning));
+    aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
   }
 }

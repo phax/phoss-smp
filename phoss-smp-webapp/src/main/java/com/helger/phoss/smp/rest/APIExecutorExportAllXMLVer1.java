@@ -23,18 +23,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
+import com.helger.phoss.smp.exception.SMPServiceUnavailableException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
+import com.helger.phoss.smp.exchange.ServiceGroupExportLock;
+import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
+import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.microdom.IMicroDocument;
 
 /**
  * REST API to export all Service Groups into XML v1
@@ -60,23 +64,46 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
 
     // Only authenticated user may do so
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
-    SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+    final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
-    // Start action after authentication
-    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    // Only a single export may run at a time, because exporting everything is expensive
+    if (!ServiceGroupExportLock.tryAcquire (aUser.getID ()))
+    {
+      final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+      throw new SMPServiceUnavailableException ("Another Service Group export is already running. Please try again later",
+                                                aDataProvider.getCurrentURI ());
+    }
 
-    // Now get all relevant service groups
-    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
+    try
+    {
+      // Start action after authentication
+      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
 
-    final boolean bIncludeBusinessCards = aRequestScope.params ()
-                                                       .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
-                                                                      aSettings.isDirectoryIntegrationEnabled ());
-    final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
+      // Now get all relevant service groups
+      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
 
-    LOGGER.info (sLogPrefix + "Finished creating Export data");
+      final boolean bIncludeBusinessCards = aRequestScope.params ()
+                                                         .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
+                                                                        aSettings.isDirectoryIntegrationEnabled ());
 
-    // Build the XML response
-    aUnifiedResponse.xml (aDoc).disableCaching ();
+      // Stream the export, so that never more than a single Service Group is kept in memory
+      try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
+      {
+        ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards, aBAOS);
+
+        LOGGER.info (sLogPrefix + "Finished creating Export data");
+
+        // Build the XML response
+        aUnifiedResponse.setContent (aBAOS);
+        aUnifiedResponse.setCharset (ServiceGroupExport.XML_WRITER_SETTINGS.getCharset ());
+        aUnifiedResponse.setMimeType (ServiceGroupExport.getExportMimeType ());
+        aUnifiedResponse.disableCaching ();
+      }
+    }
+    finally
+    {
+      ServiceGroupExportLock.release ();
+    }
   }
 }
