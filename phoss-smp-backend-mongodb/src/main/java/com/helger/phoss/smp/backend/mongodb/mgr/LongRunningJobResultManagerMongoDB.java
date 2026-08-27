@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.state.EChange;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.mgrs.longrun.ILongRunningJobResultManager;
@@ -36,6 +37,7 @@ import com.helger.xml.microdom.serialize.MicroWriter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * MongoDB based implementation of {@link ILongRunningJobResultManager}. Serializes
@@ -112,5 +114,15 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
     if (aDoc == null)
       return null;
     return _deserialize (aDoc.getString (BSON_JOB_DATA));
+  }
+
+  @NonNull
+  public EChange deleteResult (@Nullable final String sJobResultID)
+  {
+    if (sJobResultID == null)
+      return EChange.UNCHANGED;
+
+    final DeleteResult aResult = getCollection ().deleteOne (Filters.eq (BSON_ID, sJobResultID));
+    return EChange.valueOf (aResult.wasAcknowledged () && aResult.getDeletedCount () > 0);
   }
 }
