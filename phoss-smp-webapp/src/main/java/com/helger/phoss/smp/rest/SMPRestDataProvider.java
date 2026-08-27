@@ -147,13 +147,33 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
 
     // Host
     String sHost = m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_HOST);
+    int nHostPort = -1;
     if (StringHelper.isNotEmpty (sHost))
+    {
       bFallbackToLocalPort = false;
+      // Host may contain a port number as well. Separate it to avoid appending the
+      // X-Forwarded-Port value to a host that already contains the same port.
+      // Consider IPv6 addresses like "[::1]" or "[::1]:8080" - the port separator must be
+      // after the closing bracket.
+      final int nBracketEnd = sHost.lastIndexOf (']');
+      final int nPortSep = sHost.lastIndexOf (':');
+      if (nPortSep > 0 && nPortSep > nBracketEnd)
+      {
+        final int nParsedPort = StringParser.parseInt (sHost.substring (nPortSep + 1), -1);
+        if (nParsedPort >= 0)
+        {
+          sHost = sHost.substring (0, nPortSep);
+          nHostPort = nParsedPort;
+        }
+      }
+    }
     else
       sHost = aHttpRequest.getServerName ();
 
     // Port
     int nPort = StringParser.parseInt (m_aRequestScope.headers ().getFirstHeaderValue (HTTP_X_FORWARDED_PORT), -1);
+    if (nPort < 0)
+      nPort = nHostPort;
     // If no fallback to local port should be performed, the default port of the selected scheme
     // is used
     if (nPort < 0 && bFallbackToLocalPort)

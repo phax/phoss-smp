@@ -78,12 +78,27 @@ public final class SMPRestDataProviderTest
   @NonNull
   private static SMPRestDataProvider _createDataProvider (@Nullable final String sForwardedHeaderValue)
   {
+    return _createDataProvider (sForwardedHeaderValue, null, null, null);
+  }
+
+  @NonNull
+  private static SMPRestDataProvider _createDataProvider (@Nullable final String sForwardedHeaderValue,
+                                                          @Nullable final String sXForwardedProto,
+                                                          @Nullable final String sXForwardedHost,
+                                                          @Nullable final String sXForwardedPort)
+  {
     final MockHttpServletRequest aHttpRequest = new MockHttpServletRequest ();
     aHttpRequest.setAllPaths (REQUEST_URL);
     // No servlet context is present, so the context path must be set explicitly
     aHttpRequest.setContextPath (CONTEXT_PATH);
     if (sForwardedHeaderValue != null)
       aHttpRequest.addHeader ("Forwarded", sForwardedHeaderValue);
+    if (sXForwardedProto != null)
+      aHttpRequest.addHeader ("X-Forwarded-Proto", sXForwardedProto);
+    if (sXForwardedHost != null)
+      aHttpRequest.addHeader ("X-Forwarded-Host", sXForwardedHost);
+    if (sXForwardedPort != null)
+      aHttpRequest.addHeader ("X-Forwarded-Port", sXForwardedPort);
 
     final IRequestWebScopeWithoutResponse aRequestScope = new RequestWebScope (aHttpRequest,
                                                                               new MockHttpServletResponse ());
@@ -160,6 +175,38 @@ public final class SMPRestDataProviderTest
                   aDP.getCurrentURI ().toString ());
     assertEquals ("http://internal.host:90" + CONTEXT_PATH,
                   aDP.getBaseUriBuilder ());
+  }
+
+  @Test
+  public void testXForwardedHostContainingPort ()
+  {
+    _setPublicURLMode ("x-forwarded-header");
+
+    final SMPRestDataProvider aDP = _createDataProvider (null, "https", "example.com:8443", "8443");
+    assertEquals ("https://example.com:8443" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
+                  aDP.getCurrentURI ().toString ());
+    assertEquals ("https://example.com:8443" + CONTEXT_PATH,
+                  aDP.getBaseUriBuilder ());
+  }
+
+  @Test
+  public void testXForwardedHostContainingPortWithoutSeparatePort ()
+  {
+    _setPublicURLMode ("x-forwarded-header");
+
+    final SMPRestDataProvider aDP = _createDataProvider (null, "https", "example.com:8443", null);
+    assertEquals ("https://example.com:8443" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
+                  aDP.getCurrentURI ().toString ());
+  }
+
+  @Test
+  public void testXForwardedHostIPv6ContainingPort ()
+  {
+    _setPublicURLMode ("x-forwarded-header");
+
+    final SMPRestDataProvider aDP = _createDataProvider (null, "https", "[2001:db8::1]:8443", "8443");
+    assertEquals ("https://[2001:db8::1]:8443" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
+                  aDP.getCurrentURI ().toString ());
   }
 
   @Test
