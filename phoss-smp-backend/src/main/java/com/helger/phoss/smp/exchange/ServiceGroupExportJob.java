@@ -12,23 +12,34 @@ package com.helger.phoss.smp.exchange;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.time.LocalDateTime;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsSet;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.util.PDTIOHelper;
 import com.helger.io.file.FileHelper;
 import com.helger.io.file.FileIOError;
+import com.helger.io.file.FileOperationManager;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.photon.io.WebFileIO;
+import com.helger.photon.mgrs.PhotonBasicManager;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
+import com.helger.photon.mgrs.longrun.ELongRunningJobResultType;
+import com.helger.photon.mgrs.longrun.ILongRunningJobResultManager;
+import com.helger.photon.mgrs.longrun.LongRunningJobData;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
 import com.helger.photon.security.lock.SingleRunLock;
 import com.helger.text.ReadOnlyMultilingualText;
@@ -97,9 +108,84 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
     return EXPORT_FILENAME_PREFIX + PDTIOHelper.getCurrentLocalDateTimeForFilename () + EXPORT_FILENAME_EXTENSION;
   }
 
+  /**
+   * Delete all export files that are older than the configured retention period, as well as the
+   * long running job results that refer to them. If the configured retention period is &le; 0, the
+   * export files are kept forever and nothing is deleted.
+   *
+   * @return The number of deleted export files. Always &ge; 0.
+   * @see SMPServerConfiguration#getExportRetentionDays()
+   * @since 8.2.1
+   */
+  @Nonnegative
+  public static int purgeOldExportFiles ()
+  {
+    final int nRetentionDays = SMPServerConfiguration.getExportRetentionDays ();
+    if (nRetentionDays <= 0)
+    {
+      // Keep forever
+      return 0;
+    }
+
+    final File aExportDir = getExportDirectory ();
+    if (!aExportDir.isDirectory ())
+    {
+      // Nothing was ever exported
+      return 0;
+    }
+
+    final LocalDateTime aMaxDT = PDTFactory.getCurrentLocalDateTime ().minusDays (nRetentionDays);
+    final ICommonsSet <String> aDeletedFilenames = new CommonsHashSet <> ();
+
+    for (final File aFile : FileHelper.getDirectoryContent (aExportDir))
+    {
+      if (!aFile.isFile ())
+        continue;
+      if (!aFile.getName ().startsWith (EXPORT_FILENAME_PREFIX) ||
+          !aFile.getName ().endsWith (EXPORT_FILENAME_EXTENSION))
+      {
+        // Don't touch foreign files
+        continue;
+      }
+      if (PDTFactory.createLocalDateTime (aFile.lastModified ()).isAfter (aMaxDT))
+        continue;
+
+      if (FileOperationManager.INSTANCE.deleteFile (aFile).isSuccess ())
+      {
+        LOGGER.info ("Deleted the outdated Service Group export file '" + aFile.getAbsolutePath () + "'");
+        aDeletedFilenames.add (aFile.getAbsolutePath ());
+      }
+      else
+        LOGGER.warn ("Failed to delete the outdated Service Group export file '" +
+                     aFile.getAbsolutePath () +
+                     "'");
+    }
+
+    if (aDeletedFilenames.isNotEmpty ())
+    {
+      // Remove the long running job results that now point to deleted files
+      final ILongRunningJobResultManager aResultMgr = PhotonBasicManager.getLongRunningJobResultMgr ();
+      for (final LongRunningJobData aJobData : aResultMgr.getAllJobResults ())
+      {
+        final LongRunningJobResult aResult = aJobData.getResult ();
+        if (aResult != null &&
+            aResult.getType () == ELongRunningJobResultType.FILE &&
+            aDeletedFilenames.contains (aResult.getResultFile ().getAbsolutePath ()))
+        {
+          aResultMgr.deleteResult (aJobData.getID ());
+        }
+      }
+    }
+
+    return aDeletedFilenames.size ();
+  }
+
   @NonNull
   public LongRunningJobResult createLongRunningJobResult ()
   {
+    // First get rid of the outdated exports, so that the disk usage stays bounded
+    purgeOldExportFiles ();
+
     final FileIOError aError = WebFileIO.getDataIO ().createDirectory (EXPORT_DIRECTORY, true);
     if (aError.isFailure ())
       throw new IllegalStateException ("Failed to create the export directory: " + aError.toString ());

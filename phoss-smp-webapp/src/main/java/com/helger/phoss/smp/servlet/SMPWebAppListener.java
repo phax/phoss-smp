@@ -60,6 +60,7 @@ import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
+import com.helger.phoss.smp.exchange.ServiceGroupExportPurgeJob;
 import com.helger.phoss.smp.nicename.NiceNameHandler;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.SMPCommonUI;
@@ -79,6 +80,8 @@ import com.helger.photon.core.locale.ILocaleManager;
 import com.helger.photon.core.menu.MenuTree;
 import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.core.requestparam.RequestParameterManager;
+import com.helger.quartz.TriggerKey;
+import com.helger.schedule.quartz.GlobalQuartzScheduler;
 import com.helger.servlet.ServletContextPathHolder;
 import com.helger.servlet.ServletSettings;
 import com.helger.servlet.StaticServerInfo;
@@ -179,6 +182,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   private static OffsetDateTime s_aStartupDateTime;
 
   private final ICommonsList <IProxySettingsProvider> m_aProxySettingsProvider = new CommonsArrayList <> ();
+  private TriggerKey m_aExportPurgeJobTrigger;
 
   @Nullable
   public static OffsetDateTime getStartupDateTime ()
@@ -537,9 +541,22 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  protected void initJobs ()
+  {
+    // Delete the outdated Service Group export files once a day
+    m_aExportPurgeJobTrigger = ServiceGroupExportPurgeJob.schedule ();
+  }
+
+  @Override
   @OverridingMethodsMustInvokeSuper
   protected void beforeContextDestroyed (@NonNull final ServletContext aSC)
   {
+    if (m_aExportPurgeJobTrigger != null)
+    {
+      GlobalQuartzScheduler.getInstance ().unscheduleJob (m_aExportPurgeJobTrigger);
+      m_aExportPurgeJobTrigger = null;
+    }
+
     // Explicitly unregister all proxy setting providers
     for (final IProxySettingsProvider aPSP : m_aProxySettingsProvider)
       ProxySettingsManager.unregisterProvider (aPSP);
