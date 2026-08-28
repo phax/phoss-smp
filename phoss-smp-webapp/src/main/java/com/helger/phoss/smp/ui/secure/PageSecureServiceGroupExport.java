@@ -30,11 +30,9 @@ import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.bootstrap5.pages.BootstrapPagesMenuConfigurator;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
-import com.helger.photon.uicore.page.EWebPageText;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
 /**
@@ -74,9 +72,7 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       }
 
       aWPEC.postRedirectGetInternal (success ("The export of all Service Groups is now running in the background. " +
-                                              "The created file is shown on the \"" +
-                                              EWebPageText.PAGE_NAME_APPINFO_LONG_RUNNING_JOBS.getDisplayText (aWPEC.getDisplayLocale ()) +
-                                              "\" page as soon as it is finished."));
+                                              "The created file can be downloaded from the \"Export data\" page as soon as it is finished."));
     }
   }
 
@@ -130,11 +126,10 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
                                                                .add (CPageParam.PARAM_ACTION, ACTION_START_EXPORT))
                                              .setDisabled (nServiceGroupCount <= 0 || bExportRunning));
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (aWPEC.getMenuTree ()
-             .containsItemWithID (BootstrapPagesMenuConfigurator.MENU_ADMIN_APPINFO_LONG_RUNNING_JOBS))
+    if (aWPEC.getMenuTree ().containsItemWithID (CMenuSecure.MENU_SERVICE_GROUPS_EXPORT_DATA))
     {
-      aToolbar.addButton (EWebPageText.PAGE_NAME_APPINFO_LONG_RUNNING_JOBS.getDisplayText (aWPEC.getDisplayLocale ()),
-                          aWPEC.getLinkToMenuItem (BootstrapPagesMenuConfigurator.MENU_ADMIN_APPINFO_LONG_RUNNING_JOBS),
+      aToolbar.addButton ("Export data",
+                          aWPEC.getLinkToMenuItem (CMenuSecure.MENU_SERVICE_GROUPS_EXPORT_DATA),
                           EDefaultIcon.NEXT);
     }
   }

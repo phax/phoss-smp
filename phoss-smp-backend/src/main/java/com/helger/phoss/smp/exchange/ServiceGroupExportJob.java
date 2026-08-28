@@ -11,10 +11,12 @@
 package com.helger.phoss.smp.exchange;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +108,53 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
   public static String createExportFilename ()
   {
     return EXPORT_FILENAME_PREFIX + PDTIOHelper.getCurrentLocalDateTimeForFilename () + EXPORT_FILENAME_EXTENSION;
+  }
+
+  /**
+   * Check whether the provided file is a Service Group export file that may be handed out to a
+   * client, and return it in canonical form.<br>
+   * This is the single place that decides which files are downloadable. A file is only accepted if
+   * it is an existing regular file located <em>directly</em> in the export directory and if its
+   * name follows the export file naming. The comparison is done on the canonical paths, so that
+   * neither <code>..</code> path elements nor symbolic links can be used to escape the export
+   * directory.
+   *
+   * @param aFile
+   *        The file to be checked. May be <code>null</code>.
+   * @return <code>null</code> if the provided file is not a downloadable export file, the canonical
+   *         file otherwise.
+   * @since 8.2.1
+   */
+  @Nullable
+  public static File getValidExportFile (@Nullable final File aFile)
+  {
+    if (aFile == null)
+      return null;
+
+    try
+    {
+      final File aCanonicalFile = aFile.getCanonicalFile ();
+
+      // Must be located directly in the export directory
+      if (!getExportDirectory ().getCanonicalFile ().equals (aCanonicalFile.getParentFile ()))
+        return null;
+
+      // Must follow the export file naming
+      final String sFilename = aCanonicalFile.getName ();
+      if (!sFilename.startsWith (EXPORT_FILENAME_PREFIX) || !sFilename.endsWith (EXPORT_FILENAME_EXTENSION))
+        return null;
+
+      // Must be an existing regular file
+      if (!aCanonicalFile.isFile ())
+        return null;
+
+      return aCanonicalFile;
+    }
+    catch (final IOException ex)
+    {
+      LOGGER.warn ("Failed to determine the canonical file of '" + aFile.getAbsolutePath () + "'", ex);
+      return null;
+    }
   }
 
   /**
