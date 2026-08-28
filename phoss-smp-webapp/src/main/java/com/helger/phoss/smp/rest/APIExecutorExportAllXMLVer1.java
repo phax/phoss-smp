@@ -31,7 +31,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPServiceUnavailableException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
-import com.helger.phoss.smp.exchange.ServiceGroupExportLock;
+import com.helger.phoss.smp.exchange.ServiceGroupExportJob;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -67,7 +67,7 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
     final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
     // Only a single export may run at a time, because exporting everything is expensive
-    if (!ServiceGroupExportLock.tryAcquire (aUser.getID ()))
+    if (!ServiceGroupExportJob.LOCK.tryAcquire (aUser.getID ()))
     {
       final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
       throw new SMPServiceUnavailableException ("Another Service Group export is already running. Please try again later",
@@ -103,7 +103,7 @@ public final class APIExecutorExportAllXMLVer1 extends AbstractSMPAPIExecutor
     }
     finally
     {
-      ServiceGroupExportLock.release ();
+      ServiceGroupExportJob.LOCK.release ();
     }
   }
 }

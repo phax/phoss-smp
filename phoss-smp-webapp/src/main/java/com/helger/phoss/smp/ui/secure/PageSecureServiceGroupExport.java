@@ -16,36 +16,26 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
-import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.format.PDTToString;
-import com.helger.datetime.util.PDTIOHelper;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.http.CHttp;
-import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.exchange.ServiceGroupExport;
-import com.helger.phoss.smp.exchange.ServiceGroupExportLock;
+import com.helger.phoss.smp.exchange.ServiceGroupExportJob;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.phoss.smp.ui.ajax.AbstractSMPAjaxExecutor;
-import com.helger.phoss.smp.ui.ajax.CAjax;
-import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
-import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
-import com.helger.photon.core.execcontext.LayoutExecutionContext;
+import com.helger.photon.bootstrap5.pages.BootstrapPagesMenuConfigurator;
+import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.EWebPageText;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 /**
  * Class to export service groups with all contents
@@ -54,72 +44,54 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
 {
-  private static final IAjaxFunctionDeclaration AJAX_EXPORT_SG;
-
-  static
-  {
-    // Ensure it can only be accessed by logged in users
-    AJAX_EXPORT_SG = CAjax.addAjaxWithLogin (new AbstractSMPAjaxExecutor ()
-    {
-      @Override
-      protected void mainHandleRequest (@NonNull final LayoutExecutionContext aLEC,
-                                        @NonNull final PhotonUnifiedResponse aAjaxResponse) throws Exception
-      {
-        // Only a single export may run at a time, because exporting everything is expensive
-        if (!ServiceGroupExportLock.tryAcquire (aLEC.getLoggedInUserID ()))
-        {
-          aAjaxResponse.setStatus (CHttp.HTTP_SERVICE_UNAVAILABLE);
-          aAjaxResponse.setAllowContentOnStatusCode (true)
-                       .setContentAndCharset ("Another Service Group export is already running. Please try again later.",
-                                              StandardCharsets.UTF_8)
-                       .setMimeType (CMimeType.TEXT_PLAIN);
-          return;
-        }
-
-        try
-        {
-          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-          final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-          final boolean bExportBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
-
-          // Stream the export, so that never more than a single Service Group is kept in memory
-          try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
-          {
-            ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bExportBusinessCards, aBAOS);
-
-            // Build the XML response
-            aAjaxResponse.setContent (aBAOS);
-            aAjaxResponse.setCharset (ServiceGroupExport.XML_WRITER_SETTINGS.getCharset ());
-            aAjaxResponse.setMimeType (ServiceGroupExport.getExportMimeType ());
-            aAjaxResponse.attachment ("phoss-smp-export-" +
-                                      PDTIOHelper.getCurrentLocalDateTimeForFilename () +
-                                      ".xml");
-          }
-        }
-        finally
-        {
-          ServiceGroupExportLock.release ();
-        }
-      }
-    });
-  }
+  private static final String ACTION_START_EXPORT = "start-export";
 
   public PageSecureServiceGroupExport (@NonNull @Nonempty final String sID)
   {
     super (sID, "Export");
   }
 
+  private void _startExport (@NonNull final WebPageExecutionContext aWPEC, final boolean bExportBusinessCards)
+  {
+    // Only a single export may run at a time, because exporting everything is expensive
+    if (!ServiceGroupExportJob.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+    {
+      aWPEC.postRedirectGetInternal (warn ("Another Service Group export is already running in the background. Please wait until it is finished."));
+    }
+    else
+    {
+      try
+      {
+        PhotonWorkerPool.getInstance ()
+                        .run (ServiceGroupExportJob.JOB_ID,
+                              new ServiceGroupExportJob (bExportBusinessCards, aWPEC.getLoggedInUserID ()));
+      }
+      catch (final RuntimeException ex)
+      {
+        // The job was never started, so it can never release the lock
+        ServiceGroupExportJob.LOCK.release ();
+        throw ex;
+      }
+
+      aWPEC.postRedirectGetInternal (success ("The export of all Service Groups is now running in the background. " +
+                                              "The created file is shown on the \"" +
+                                              EWebPageText.PAGE_NAME_APPINFO_LONG_RUNNING_JOBS.getDisplayText (aWPEC.getDisplayLocale ()) +
+                                              "\" page as soon as it is finished."));
+    }
+  }
+
   @Override
   protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final long nServiceGroupCount = aServiceGroupMgr.getSMPServiceGroupCount ();
 
     final boolean bExportBusinessCards = aSettings.isDirectoryIntegrationEnabled ();
+
+    if (aWPEC.hasAction (ACTION_START_EXPORT) && nServiceGroupCount > 0)
+      _startExport (aWPEC, bExportBusinessCards);
 
     if (nServiceGroupCount < 0)
       aNodeList.addChild (error ("The number of service groups is unknown, hence nothing can be exported!"));
@@ -134,14 +106,14 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
                                                                                " service groups") +
                                   (bExportBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
                                                         : "") +
-                                  " to an XML file."));
+                                  " to an XML file. The export runs in the background and the created file is stored on the server."));
       }
 
     // Only a single export may run at a time
-    final boolean bExportRunning = ServiceGroupExportLock.isExportRunning ();
+    final boolean bExportRunning = ServiceGroupExportJob.LOCK.isRunning ();
     if (bExportRunning)
     {
-      final LocalDateTime aStartDT = ServiceGroupExportLock.getExportStartDateTime ();
+      final LocalDateTime aStartDT = ServiceGroupExportJob.LOCK.getStartDateTime ();
       aNodeList.addChild (warn ("An export is currently running in the background" +
                                 (aStartDT == null ? "" : " (started at " +
                                                          PDTToString.getAsString (aStartDT,
@@ -150,12 +122,20 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
                                 ". Please wait until it is finished before starting a new one."));
     }
 
-    // The main export logic happens in the AJAX handler
+    // The main export logic happens in the background job
     final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
     aToolbar.addChild (new BootstrapButton ().addChild ("Export all Service Groups")
                                              .setIcon (EDefaultIcon.SAVE_ALL)
-                                             .setOnClick (AJAX_EXPORT_SG.getInvocationURL (aRequestScope))
+                                             .setOnClick (aWPEC.getSelfHref ()
+                                                               .add (CPageParam.PARAM_ACTION, ACTION_START_EXPORT))
                                              .setDisabled (nServiceGroupCount <= 0 || bExportRunning));
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+    if (aWPEC.getMenuTree ()
+             .containsItemWithID (BootstrapPagesMenuConfigurator.MENU_ADMIN_APPINFO_LONG_RUNNING_JOBS))
+    {
+      aToolbar.addButton (EWebPageText.PAGE_NAME_APPINFO_LONG_RUNNING_JOBS.getDisplayText (aWPEC.getDisplayLocale ()),
+                          aWPEC.getLinkToMenuItem (BootstrapPagesMenuConfigurator.MENU_ADMIN_APPINFO_LONG_RUNNING_JOBS),
+                          EDefaultIcon.NEXT);
+    }
   }
 }

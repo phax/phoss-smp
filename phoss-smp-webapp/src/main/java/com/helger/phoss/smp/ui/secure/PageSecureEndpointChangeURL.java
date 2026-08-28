@@ -18,12 +18,10 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.Nonnegative;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
@@ -59,6 +57,7 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
+import com.helger.photon.security.lock.SingleRunLock;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -82,7 +81,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
    */
   private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap5Trait
   {
-    private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
+    /** The process wide lock ensuring, that only a single bulk change runs at a time */
+    public static final SingleRunLock LOCK = new SingleRunLock ("Bulk change of the endpoint URL");
 
     private final IParticipantIdentifier m_aServiceGroupPID;
     private final String m_sOldURL;
@@ -104,39 +104,39 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
     @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
-      RUNNING_JOBS.incrementAndGet ();
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+      final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointURLs (m_aServiceGroupPID, m_sOldURL, m_sNewURL);
+
+      final IHCNode aRes;
+      if (nEndpointsChanged > 0)
+        aRes = success (div ("The old URL '" +
+                             m_sOldURL +
+                             "' was changed to '" +
+                             m_sNewURL +
+                             "' in " +
+                             nEndpointsChanged +
+                             " " +
+                             (nEndpointsChanged == 1 ? "endpoint" : "endpoints") +
+                             "."));
+      else
+        aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
+
+      return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
+    }
+
+    @Override
+    public void run ()
+    {
       try (final WebScoped w = new WebScoped ())
       {
-        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-
-        final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointURLs (m_aServiceGroupPID, m_sOldURL, m_sNewURL);
-
-        final IHCNode aRes;
-        if (nEndpointsChanged > 0)
-          aRes = success (div ("The old URL '" +
-                               m_sOldURL +
-                               "' was changed to '" +
-                               m_sNewURL +
-                               "' in " +
-                               nEndpointsChanged +
-                               " " +
-                               (nEndpointsChanged == 1 ? "endpoint" : "endpoints") +
-                               "."));
-        else
-          aRes = warn ("No endpoint was found that contains the old URL '" + m_sOldURL + "'");
-
-        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
+        super.run ();
       }
       finally
       {
-        RUNNING_JOBS.decrementAndGet ();
+        // Always release, even if the job failed
+        LOCK.release ();
       }
-    }
-
-    @Nonnegative
-    public static int getRunningJobCount ()
-    {
-      return RUNNING_JOBS.get ();
     }
   }
 
@@ -186,12 +186,8 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aNodeList.addChild (aToolbar);
 
-      final int nCount = BulkChangeEndpointURL.getRunningJobCount ();
-      if (nCount > 0)
-      {
-        aNodeList.addChild (warn ((nCount == 1 ? "1 bulk change is" : nCount + " bulk changes are") +
-                                  " currently running in the background"));
-      }
+      if (BulkChangeEndpointURL.LOCK.isRunning ())
+        aNodeList.addChild (warn ("A bulk change is currently running in the background"));
     }
 
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
@@ -233,19 +229,36 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         // Validate parameters
         if (aFormErrors.isEmpty ())
         {
-          PhotonWorkerPool.getInstance ()
-                          .run ("BulkChangeEndpointURL",
-                                new BulkChangeEndpointURL (aSelectedServiceGroup == null ? null : aSelectedServiceGroup
-                                                                                                                       .getParticipantIdentifier (),
-                                                           sOldURL,
-                                                           sNewURL,
-                                                           aWPEC.getLoggedInUserID ()));
+          // Only a single bulk change may run at a time
+          if (!BulkChangeEndpointURL.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+          {
+            aWPEC.postRedirectGetInternal (warn ("Another bulk change is already running in the background. Please wait until it is finished."));
+          }
+          else
+          {
+            try
+            {
+              PhotonWorkerPool.getInstance ()
+                              .run ("BulkChangeEndpointURL",
+                                    new BulkChangeEndpointURL (aSelectedServiceGroup == null ? null
+                                                                                             : aSelectedServiceGroup.getParticipantIdentifier (),
+                                                               sOldURL,
+                                                               sNewURL,
+                                                               aWPEC.getLoggedInUserID ()));
+            }
+            catch (final RuntimeException ex)
+            {
+              // The job was never started, so it can never release the lock
+              BulkChangeEndpointURL.LOCK.release ();
+              throw ex;
+            }
 
-          aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
-                                                  sOldURL +
-                                                  "' to '" +
-                                                  sNewURL +
-                                                  "' is now running in the background. Please manually refresh the page to see the update."));
+            aWPEC.postRedirectGetInternal (success ("The bulk change of the endpoint URL from '" +
+                                                    sOldURL +
+                                                    "' to '" +
+                                                    sNewURL +
+                                                    "' is now running in the background. Please manually refresh the page to see the update."));
+          }
         }
       }
 
@@ -319,8 +332,9 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
 
       aNodeList.addChild (info ().addChildren (div ("This page lets you change the URLs of multiple endpoints at once. This is e.g. helpful when the underlying server got a new URL."),
                                                div ("Currently " +
-                                                    (nTotalEndpointCount == 1 ? "1 endpoint is" : nTotalEndpointCount +
-                                                                                                  " endpoints are") +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                              : nTotalEndpointCount +
+                                                                                " endpoints are") +
                                                     " registered" +
                                                     (nTotalEndpointCountWithURL < nTotalEndpointCount ? " of which " +
                                                                                                         nTotalEndpointCountWithURL +
