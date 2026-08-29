@@ -556,7 +556,7 @@ public final class ServiceGroupImport
                       }
                       else
                       {
-                        aImportLogger.success (sServiceGroupID, "Error creating the new Redirect");
+                        aImportLogger.error (sServiceGroupID, "Error creating the new Redirect");
                         aImportLogger.onError (EImportSummaryAction.CREATE_REDIRECT);
                       }
                     }

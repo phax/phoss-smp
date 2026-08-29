@@ -115,7 +115,7 @@ public final class ServiceGroupExport
     // Add Business cards only if PD integration is enabled
     if (bIncludeBusinessCards)
     {
-      LOGGER.info ("  Now exporting business groups");
+      LOGGER.info ("  Now exporting Business Cards");
 
       // Add all business cards
       final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
