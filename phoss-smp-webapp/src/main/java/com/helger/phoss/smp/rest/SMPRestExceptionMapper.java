@@ -25,6 +25,7 @@ import com.helger.base.state.EHandled;
 import com.helger.http.EHttpMethod;
 import com.helger.base.string.StringHelper;
 import com.helger.http.CHttp;
+import com.helger.http.CHttpHeader;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
@@ -32,6 +33,7 @@ import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.exception.SMPServiceUnavailableException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.photon.api.AbstractAPIExceptionMapper;
@@ -49,6 +51,9 @@ import jakarta.annotation.Nullable;
 public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestExceptionMapper.class);
+
+  /** The number of seconds to be used in the "Retry-After" HTTP header */
+  private static final int RETRY_AFTER_SECONDS = 60;
 
   private static void _logRestException (@NonNull final String sMsg, @NonNull final Throwable t)
   {
@@ -160,6 +165,17 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
       _logRestException ("Precondition failed", aThrowable, true);
       _setSimpleTextResponse (aUnifiedResponse,
                               CHttp.HTTP_PRECONDITION_FAILED,
+                              getResponseEntityWithoutStackTrace (aThrowable));
+      return EHandled.HANDLED;
+    }
+    if (aThrowable instanceof SMPServiceUnavailableException)
+    {
+      // Forcing no stack trace, because the context should be self-explanatory
+      _logRestException ("Service unavailable", aThrowable, true);
+      aUnifiedResponse.setCustomResponseHeader (CHttpHeader.RETRY_AFTER,
+                                                Integer.toString (RETRY_AFTER_SECONDS));
+      _setSimpleTextResponse (aUnifiedResponse,
+                              CHttp.HTTP_SERVICE_UNAVAILABLE,
                               getResponseEntityWithoutStackTrace (aThrowable));
       return EHandled.HANDLED;
     }

@@ -32,6 +32,7 @@ public final class CMenuSecure
   // Menu item IDs
   public static final String MENU_SERVICE_GROUPS = "service_groups";
   public static final String MENU_SERVICE_GROUPS_EXPORT = "service_groups_export";
+  public static final String MENU_SERVICE_GROUPS_EXPORT_DATA = "service_groups_export_data";
   public static final String MENU_SERVICE_GROUPS_IMPORT = "service_groups_import";
   public static final String MENU_SERVICE_GROUPS_MIGRATE_OUTBOUND = "service_groups_migrate_outbound";
   public static final String MENU_SERVICE_GROUPS_MIGRATE_INBOUND = "service_groups_migrate_inbound";

@@ -76,6 +76,8 @@ public final class SMPServerConfiguration
 
   public static final String KEY_SMP_TIMEZONE = "smp.timezone";
 
+  public static final String KEY_SMP_EXPORT_RETENTION_DAYS = "smp.export.retention.days";
+
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
@@ -106,6 +108,9 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK = false;
   @ChangeNextMajorRelease ("Change default to false")
   public static final boolean DEFAULT_SMP_REST_AUTH_ERRORDETAILS = true;
+
+  /** The default number of days an exported file is kept - roughly one month */
+  public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
 
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
@@ -339,6 +344,17 @@ public final class SMPServerConfiguration
   public static boolean isRestDeleteNotFoundAsOk ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK, DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK);
+  }
+
+  /**
+   * @return The number of days a created Service Group export file is kept on disk, before it is
+   *         deleted. If the value is &le; 0, the export files are kept forever. The default value
+   *         is {@value #DEFAULT_SMP_EXPORT_RETENTION_DAYS} days.
+   * @since 8.2.1
+   */
+  public static int getExportRetentionDays ()
+  {
+    return _getConfig ().getAsInt (KEY_SMP_EXPORT_RETENTION_DAYS, DEFAULT_SMP_EXPORT_RETENTION_DAYS);
   }
 
   /**

@@ -458,7 +458,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
     final long nCount = newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableName + " WHERE pid=?",
                                                    new ConstantPreparedStatementDataProvider (aID.getURIEncoded ()));
-    return nCount == 1;
+    return nCount > 0;
   }
 
   @Nullable

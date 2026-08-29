@@ -18,12 +18,10 @@ package com.helger.phoss.smp.ui.secure;
 
 import java.time.LocalDate;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.Nonnegative;
 import com.helger.annotation.misc.WorkInProgress;
 import com.helger.base.compare.CompareHelper;
 import com.helger.base.compare.ESortOrder;
@@ -112,6 +110,7 @@ import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
+import com.helger.photon.security.lock.SingleRunLock;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.html.select.HCCountrySelect;
 import com.helger.photon.uicore.html.select.HCCountrySelect.EWithDeprecated;
@@ -213,7 +212,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private static final class PushAllBusinessCardsToDirectory extends AbstractLongRunningJobRunnable implements
                                                              IHCBootstrap5Trait
   {
-    private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
+    /** The process wide lock ensuring, that only a single push runs at a time */
+    public static final SingleRunLock LOCK = new SingleRunLock ("Business Card push to the Directory");
 
     private final PDClient m_aPDClient;
 
@@ -228,70 +228,71 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
-      RUNNING_JOBS.incrementAndGet ();
+      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+      final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+
+      final ICommonsList <String> aSuccess = new CommonsArrayList <> ();
+      final ICommonsList <String> aFailure = new CommonsArrayList <> ();
+
+      for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
+      {
+        final IParticipantIdentifier aParticipantID = aCurObject.getParticipantIdentifier ();
+        final ESuccess eSuccess = m_aPDClient.addServiceGroupToIndex (aParticipantID);
+        (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
+      }
+
+      final HCNodeList aResultNodes = new HCNodeList ();
+      if (aSuccess.isNotEmpty ())
+      {
+        final BootstrapSuccessBox aBox = success ();
+        if (aSuccess.size () <= 20)
+        {
+          // Otherwise the list would get too long
+          for (final String sPI : aSuccess)
+            aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
+        }
+        else
+        {
+          aBox.addChild ("Successfully notified the " +
+                         sDirectoryName +
+                         " to index " +
+                         aSuccess.size () +
+                         " participants");
+        }
+        aResultNodes.addChild (aBox);
+      }
+      if (aFailure.isNotEmpty ())
+      {
+        final BootstrapErrorBox aBox = error ();
+        for (final String sPI : aFailure)
+        {
+          aBox.addChild (div ("Error notifying the " +
+                              sDirectoryName +
+                              " to index '" +
+                              sPI +
+                              "'. See the logs for details."));
+        }
+        aResultNodes.addChild (aBox);
+      }
+      if (aResultNodes.hasNoChildren ())
+        aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
+
+      return LongRunningJobResult.createXML (HCRenderer.getAsNode (aResultNodes));
+    }
+
+    @Override
+    public void run ()
+    {
+      // A Web Scope is needed for the DB access as well as for storing the job result
       try (final WebScoped w = new WebScoped ())
       {
-        final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-        final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
-
-        final ICommonsList <String> aSuccess = new CommonsArrayList <> ();
-        final ICommonsList <String> aFailure = new CommonsArrayList <> ();
-
-        for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards ())
-        {
-          final IParticipantIdentifier aParticipantID = aCurObject.getParticipantIdentifier ();
-          final ESuccess eSuccess = m_aPDClient.addServiceGroupToIndex (aParticipantID);
-          (eSuccess.isSuccess () ? aSuccess : aFailure).add (aParticipantID.getURIEncoded ());
-        }
-
-        final HCNodeList aResultNodes = new HCNodeList ();
-        if (aSuccess.isNotEmpty ())
-        {
-          final BootstrapSuccessBox aBox = success ();
-          if (aSuccess.size () <= 20)
-          {
-            // Otherwise the list would get too long
-            for (final String sPI : aSuccess)
-              aBox.addChild (div ("Successfully notified the " + sDirectoryName + " to index '" + sPI + "'"));
-          }
-          else
-          {
-            aBox.addChild ("Successfully notified the " +
-                           sDirectoryName +
-                           " to index " +
-                           aSuccess.size () +
-                           " participants");
-          }
-          aResultNodes.addChild (aBox);
-        }
-        if (aFailure.isNotEmpty ())
-        {
-          final BootstrapErrorBox aBox = error ();
-          for (final String sPI : aFailure)
-          {
-            aBox.addChild (div ("Error notifying the " +
-                                sDirectoryName +
-                                " to index '" +
-                                sPI +
-                                "'. See the logs for details."));
-          }
-          aResultNodes.addChild (aBox);
-        }
-        if (aResultNodes.hasNoChildren ())
-          aResultNodes.addChild (info ("No participants to be indexed to " + sDirectoryName + "."));
-
-        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aResultNodes));
+        super.run ();
       }
       finally
       {
-        RUNNING_JOBS.decrementAndGet ();
+        // Always release, even if the job failed
+        LOCK.release ();
       }
-    }
-
-    @Nonnegative
-    public static int getRunningJobCount ()
-    {
-      return RUNNING_JOBS.get ();
     }
   }
 
@@ -410,16 +411,32 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                   " client component. Please check your configuration.").addChild (SMPCommonUI.getTechnicalDetailsUI (aCaughtEx)));
                           }
                           else
-                          {
-                            PhotonWorkerPool.getInstance ()
-                                            .run ("PushAllBusinessCardsToDirectory",
-                                                  new PushAllBusinessCardsToDirectory (aPDClient,
-                                                                                       aWPEC.getLoggedInUserID ()));
+                            if (!PushAllBusinessCardsToDirectory.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+                            {
+                              aWPEC.postRedirectGetInternal (warn ("An update of the Business Cards in the " +
+                                                                   sDirectoryName +
+                                                                   " is already running in the background. Please wait until it is finished."));
+                            }
+                            else
+                            {
+                              try
+                              {
+                                PhotonWorkerPool.getInstance ()
+                                                .run ("PushAllBusinessCardsToDirectory",
+                                                      new PushAllBusinessCardsToDirectory (aPDClient,
+                                                                                           aWPEC.getLoggedInUserID ()));
+                              }
+                              catch (final RuntimeException ex)
+                              {
+                                // The job was never started, so it can never release the lock
+                                PushAllBusinessCardsToDirectory.LOCK.release ();
+                                throw ex;
+                              }
 
-                            aWPEC.postRedirectGetInternal (success ("The update of the Business Cards in the " +
-                                                                    sDirectoryName +
-                                                                    " is now running in the background. Please manually refresh the page to see the update."));
-                          }
+                              aWPEC.postRedirectGetInternal (success ("The update of the Business Cards in the " +
+                                                                      sDirectoryName +
+                                                                      " is now running in the background. Please manually refresh the page to see the update."));
+                            }
                           return EShowList.SHOW_LIST;
                         }
                       });
@@ -1262,6 +1279,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
     {
+      // Only a single push may run at a time
+      final boolean bPushRunning = PushAllBusinessCardsToDirectory.LOCK.isRunning ();
+
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aToolbar.addButton ("Create new Business Card", createCreateURL (aWPEC), EDefaultIcon.NEW);
@@ -1269,13 +1289,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                  .add (CPageParam.PARAM_ACTION,
                                                                        ACTION_PUBLISH_ALL_TO_INDEXER))
                                                .setIcon (EFontAwesome6Icon.ARROW_ROTATE_RIGHT)
-                                               .addChild ("Update all Business Cards in " + sDirectoryName)
-                                               .setDisabled (nTotalBusinessCardCount <= 0));
+                                               .addChild ("Update all Business Cards in " + sDirectoryName)                                               
+                                               .setDisabled (nTotalBusinessCardCount <= 0 || bPushRunning));
 
       aNodeList.addChild (aToolbar);
 
-      final int nCount = PushAllBusinessCardsToDirectory.getRunningJobCount ();
-      if (nCount > 0)
+      if (bPushRunning)
       {
         aNodeList.addChild (warn ("Currently Business Cards are pushed to the " +
                                   sDirectoryName +

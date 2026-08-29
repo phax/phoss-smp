@@ -19,12 +19,10 @@ package com.helger.phoss.smp.ui.secure;
 import java.security.cert.X509Certificate;
 import java.time.OffsetDateTime;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.Nonnegative;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
@@ -63,6 +61,7 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
+import com.helger.photon.security.lock.SingleRunLock;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -86,7 +85,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
    */
   private static final class BulkChangeCertificate extends AbstractLongRunningJobRunnable implements IHCBootstrap5Trait
   {
-    private static final AtomicInteger RUNNING_JOBS = new AtomicInteger (0);
+    /** The process wide lock ensuring, that only a single bulk change runs at a time */
+    public static final SingleRunLock LOCK = new SingleRunLock ("Bulk change of the endpoint certificate");
 
     private final Locale m_aDisplayLocale;
     private final String m_sOldUnifiedCert;
@@ -108,36 +108,36 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
     @NonNull
     public LongRunningJobResult createLongRunningJobResult ()
     {
-      RUNNING_JOBS.incrementAndGet ();
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+
+      final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointCertificates (m_sOldUnifiedCert, m_sNewCert);
+
+      final IHCNode aRes;
+      if (nEndpointsChanged > 0)
+        aRes = success (new HCNodeList ().addChildren (div ("The old certificate was changed in " +
+                                                            nEndpointsChanged +
+                                                            " " +
+                                                            (nEndpointsChanged == 1 ? "endpoint" : "endpoints") +
+                                                            " to the new certificate:"),
+                                                       _getCertificateDisplay (m_sNewCert, m_aDisplayLocale)));
+      else
+        aRes = warn ("No endpoint was found that contains the old certificate");
+
+      return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
+    }
+
+    @Override
+    public void run ()
+    {
       try (final WebScoped w = new WebScoped ())
       {
-        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-
-        final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointCertificates (m_sOldUnifiedCert, m_sNewCert);
-
-        final IHCNode aRes;
-        if (nEndpointsChanged > 0)
-          aRes = success (new HCNodeList ().addChildren (div ("The old certificate was changed in " +
-                                                              nEndpointsChanged +
-                                                              " " +
-                                                              (nEndpointsChanged == 1 ? "endpoint" : "endpoints") +
-                                                              " to the new certificate:"),
-                                                         _getCertificateDisplay (m_sNewCert, m_aDisplayLocale)));
-        else
-          aRes = warn ("No endpoint was found that contains the old certificate");
-
-        return LongRunningJobResult.createXML (HCRenderer.getAsNode (aRes));
+        super.run ();
       }
       finally
       {
-        RUNNING_JOBS.decrementAndGet ();
+        // Always release, even if the job failed
+        LOCK.release ();
       }
-    }
-
-    @Nonnegative
-    public static int getRunningJobCount ()
-    {
-      return RUNNING_JOBS.get ();
     }
   }
 
@@ -221,12 +221,8 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aNodeList.addChild (aToolbar);
 
-      final int nCount = BulkChangeCertificate.getRunningJobCount ();
-      if (nCount > 0)
-      {
-        aNodeList.addChild (warn ((nCount == 1 ? "1 bulk change is" : nCount + " bulk changes are") +
-                                  " currently running in the background"));
-      }
+      if (BulkChangeCertificate.LOCK.isRunning ())
+        aNodeList.addChild (warn ("A bulk change is currently running in the background"));
     }
 
     if (aWPEC.hasAction (CPageParam.ACTION_EDIT))
@@ -267,17 +263,34 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
         if (aFormErrors.containsNoError ())
         {
-          PhotonWorkerPool.getInstance ()
-                          .run ("BulkChangeCertificate",
-                                new BulkChangeCertificate (aDisplayLocale,
-                                                           sOldUnifiedCert,
-                                                           sNewCert,
-                                                           aWPEC.getLoggedInUserID ()));
+          // Only a single bulk change may run at a time
+          if (!BulkChangeCertificate.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+          {
+            aWPEC.postRedirectGetInternal (warn ("Another bulk change is already running in the background. Please wait until it is finished."));
+          }
+          else
+          {
+            try
+            {
+              PhotonWorkerPool.getInstance ()
+                              .run ("BulkChangeCertificate",
+                                    new BulkChangeCertificate (aDisplayLocale,
+                                                               sOldUnifiedCert,
+                                                               sNewCert,
+                                                               aWPEC.getLoggedInUserID ()));
+            }
+            catch (final RuntimeException ex)
+            {
+              // The job was never started, so it can never release the lock
+              BulkChangeCertificate.LOCK.release ();
+              throw ex;
+            }
 
-          aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
-                                                                 _getCertificateDisplay (sNewUnifiedCert,
-                                                                                         aDisplayLocale),
-                                                                 div ("is now running in the background. Please manually refresh the page to see the update.")));
+            aWPEC.postRedirectGetInternal (success ().addChildren (div ("The bulk change of the endpoint certificate to"),
+                                                                   _getCertificateDisplay (sNewUnifiedCert,
+                                                                                           aDisplayLocale),
+                                                                   div ("is now running in the background. Please manually refresh the page to see the update.")));
+          }
         }
       }
 
@@ -329,8 +342,9 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
 
       aNodeList.addChild (info ().addChildren (div ("This page lets you change the certificates of multiple endpoints at once. This is e.g. helpful when the old certificate expired."),
                                                div ("Currently " +
-                                                    (nTotalEndpointCount == 1 ? "1 endpoint is" : nTotalEndpointCount +
-                                                                                                  " endpoints are") +
+                                                    (nTotalEndpointCount == 1 ? "1 endpoint is"
+                                                                              : nTotalEndpointCount +
+                                                                                " endpoints are") +
                                                     " registered.")));
 
       final HCTable aTable = new HCTable (new DTCol ("Certificate").setInitialSorting (ESortOrder.ASCENDING),
