@@ -38,13 +38,21 @@ public class SMPCSPReportingServlet extends AbstractXServlet
   {
     public ERBCSPReportingXServletHandler ()
     {
-      super (aJson -> {
-        // As done in super class
-        CSPReportingXServletHandler.logCSPReport (aJson);
-        // Notify ourselves
-        new InternalErrorBuilder ().addErrorMessage ("CSP error")
-                                   .addCustomData ("CSP-Report", aJson.getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED))
-                                   .handle ();
+      super (aReport -> {
+        // As done in super class - noise is logged on a lower level
+        CSPReportingXServletHandler.logCSPReport (aReport);
+
+        // Only notify ourselves about actionable reports. A large share of what reaches a public
+        // reporting endpoint is caused by browser internal code and by browser extensions, which
+        // cannot be fixed by changing this application
+        if (!aReport.getClassification ().isLikelyNoise ())
+        {
+          new InternalErrorBuilder ().addErrorMessage ("CSP error")
+                                     .addCustomData ("CSP-Report",
+                                                     aReport.getAsJson ()
+                                                            .getAsJsonString (JsonWriterSettings.DEFAULT_SETTINGS_FORMATTED))
+                                     .handle ();
+        }
       });
       // Avoid spamming us
       setFilterDuplicates (true);
