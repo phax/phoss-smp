@@ -23,14 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
+import com.helger.phoss.smp.exception.SMPServiceUnavailableException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exchange.ServiceGroupExport;
+import com.helger.phoss.smp.exchange.ServiceGroupExportJob;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -38,7 +41,6 @@ import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.security.user.IUser;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.microdom.IMicroDocument;
 
 /**
  * REST API to export all Service Groups of one owner into XML v1
@@ -80,17 +82,38 @@ public final class APIExecutorExportByOwnerXMLVer1 extends AbstractSMPAPIExecuto
                                           "'",
                                           aDataProvider.getCurrentURI ());
     }
-    // Now get all relevant service groups
-    final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroupsOfOwner (aUser.getID ());
+    // Only a single export may run at a time, because a single owner may own all Service Groups
+    if (!ServiceGroupExportJob.LOCK.tryAcquire (aUser.getID ()))
+    {
+      throw new SMPServiceUnavailableException ("Another Service Group export is already running. Please try again later",
+                                                aDataProvider.getCurrentURI ());
+    }
 
-    final boolean bIncludeBusinessCards = aRequestScope.params ()
-                                                       .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
-                                                                      aSettings.isDirectoryIntegrationEnabled ());
-    final IMicroDocument aDoc = ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards);
+    try
+    {
+      // Now get all relevant service groups
+      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroupsOfOwner (aUser.getID ());
 
-    LOGGER.info (sLogPrefix + "Finished creating Export data");
+      final boolean bIncludeBusinessCards = aRequestScope.params ()
+                                                         .getAsBoolean (PARAM_INCLUDE_BUSINESS_CARDS,
+                                                                        aSettings.isDirectoryIntegrationEnabled ());
 
-    // Build the XML response
-    aUnifiedResponse.xml (aDoc);
+      // Stream the export, so that never more than a single Service Group is kept in memory
+      try (final NonBlockingByteArrayOutputStream aBAOS = new NonBlockingByteArrayOutputStream ())
+      {
+        ServiceGroupExport.createExportDataXMLVer10 (aAllServiceGroups, bIncludeBusinessCards, aBAOS);
+
+        LOGGER.info (sLogPrefix + "Finished creating Export data");
+
+        // Build the XML response
+        aUnifiedResponse.setContent (aBAOS);
+        aUnifiedResponse.setCharset (ServiceGroupExport.XML_WRITER_SETTINGS.getCharset ());
+        aUnifiedResponse.setMimeType (ServiceGroupExport.getExportMimeType ());
+      }
+    }
+    finally
+    {
+      ServiceGroupExportJob.LOCK.release ();
+    }
   }
 }

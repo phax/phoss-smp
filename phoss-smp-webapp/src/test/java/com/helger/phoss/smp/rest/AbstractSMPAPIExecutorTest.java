@@ -27,7 +27,7 @@ import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 
 /**
- * Test class for class {@link AbstractSMPAPIExecutor}.
+ * Test class for class AbstractSMPAPIExecutor.
  *
  * @author vinit-thummar
  */

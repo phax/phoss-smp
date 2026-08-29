@@ -17,15 +17,17 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.util.Date;
+import java.util.function.Consumer;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
-import com.helger.collection.commons.CommonsArrayList;
-import com.helger.collection.commons.ICommonsList;
+import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
+import com.helger.photon.mgrs.longrun.ILongRunningJob;
 import com.helger.photon.mgrs.longrun.ILongRunningJobResultManager;
 import com.helger.photon.mgrs.longrun.LongRunningJobData;
 import com.helger.photon.mgrs.longrun.LongRunningJobDataMicroTypeConverter;
@@ -36,6 +38,7 @@ import com.helger.xml.microdom.serialize.MicroWriter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.result.DeleteResult;
 
 /**
  * MongoDB based implementation of {@link ILongRunningJobResultManager}. Serializes
@@ -46,6 +49,7 @@ import com.mongodb.client.model.Sorts;
 public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB implements ILongRunningJobResultManager
 {
   private static final String BSON_ID = "id";
+  private static final String BSON_JOB_TYPE = "job_type";
   private static final String BSON_START_DT = "start_dt";
   private static final String BSON_JOB_DATA = "job_data";
 
@@ -56,6 +60,7 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
   {
     super ("smp-long-running-job");
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    getCollection ().createIndex (Indexes.ascending (BSON_JOB_TYPE));
   }
 
   @NonNull
@@ -81,6 +86,9 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
       throw new IllegalArgumentException ("Passed jobData is not yet finished");
 
     final Document aDoc = new Document ().append (BSON_ID, aJobData.getID ())
+                                         .append (BSON_JOB_TYPE,
+                                                  StringHelper.getCutAfterLength (aJobData.getJobType (),
+                                                                                  ILongRunningJob.JOB_TYPE_MAX_LENGTH))
                                          .append (BSON_START_DT,
                                                   TypeConverter.convert (aJobData.getStartDateTime (), Date.class))
                                          .append (BSON_JOB_DATA, _serialize (aJobData));
@@ -89,18 +97,25 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
       throw new IllegalStateException ("Failed to insert long running job '" + aJobData.getID () + "'");
   }
 
-  @NonNull
-  @ReturnsMutableCopy
-  public ICommonsList <LongRunningJobData> getAllJobResults ()
+  public void forEachJobResult (@Nullable final String sJobType,
+                               @NonNull final Consumer <? super LongRunningJobData> aConsumer)
   {
-    final ICommonsList <LongRunningJobData> ret = new CommonsArrayList <> ();
-    for (final Document aDoc : getCollection ().find ().sort (Sorts.ascending (BSON_START_DT)))
+    ValueEnforcer.notNull (aConsumer, "Consumer");
+
+    // Job results without a job type never match a non-null filter
+    final Bson aFilter = sJobType == null ? new Document ()
+                                          : Filters.eq (BSON_JOB_TYPE,
+                                                        StringHelper.getCutAfterLength (sJobType,
+                                                                                        ILongRunningJob.JOB_TYPE_MAX_LENGTH));
+
+    // Deserialize and consume document by document, so that never more than a single job result
+    // needs to be kept in memory
+    for (final Document aDoc : getCollection ().find (aFilter).sort (Sorts.ascending (BSON_START_DT)))
     {
       final LongRunningJobData aJobData = _deserialize (aDoc.getString (BSON_JOB_DATA));
       if (aJobData != null)
-        ret.add (aJobData);
+        aConsumer.accept (aJobData);
     }
-    return ret;
   }
 
   @Nullable
@@ -112,5 +127,15 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
     if (aDoc == null)
       return null;
     return _deserialize (aDoc.getString (BSON_JOB_DATA));
+  }
+
+  @NonNull
+  public EChange deleteResult (@Nullable final String sJobResultID)
+  {
+    if (sJobResultID == null)
+      return EChange.UNCHANGED;
+
+    final DeleteResult aResult = getCollection ().deleteOne (Filters.eq (BSON_ID, sJobResultID));
+    return EChange.valueOf (aResult.wasAcknowledged () && aResult.getDeletedCount () > 0);
   }
 }
