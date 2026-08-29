@@ -59,8 +59,8 @@ import com.helger.web.scope.mgr.WebScoped;
  */
 public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
 {
-  /** The ID of this long running job type */
-  public static final String JOB_ID = "service-group-export";
+  /** The type of this long running job */
+  public static final String JOB_TYPE = "service-group-export";
 
   /**
    * The process wide lock ensuring, that only a single Service Group export runs at a time. It is
@@ -83,7 +83,7 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
 
   public ServiceGroupExportJob (final boolean bIncludeBusinessCards, @NonNull @Nonempty final String sUserID)
   {
-    super (JOB_ID,
+    super (JOB_TYPE,
            new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Export all Service Groups"),
            () -> sUserID);
     ValueEnforcer.notEmpty (sUserID, "UserID");

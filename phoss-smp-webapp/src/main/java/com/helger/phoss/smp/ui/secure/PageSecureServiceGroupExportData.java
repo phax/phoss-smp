@@ -100,6 +100,10 @@ public final class PageSecureServiceGroupExportData extends AbstractSMPWebPage
     if (aJobData == null)
       return null;
 
+    // Only a Service Group export may be downloaded here
+    if (!ServiceGroupExportJob.JOB_TYPE.equals (aJobData.getJobType ()))
+      return null;
+
     final LongRunningJobResult aResult = aJobData.getResult ();
     if (aResult == null || aResult.getType () != ELongRunningJobResultType.FILE)
       return null;
@@ -147,8 +151,9 @@ public final class PageSecureServiceGroupExportData extends AbstractSMPWebPage
   private static ICommonsList <LongRunningJobData> _getAllDownloadableExports ()
   {
     final ICommonsList <LongRunningJobData> ret = new CommonsArrayList <> ();
-    for (final LongRunningJobData aJobData : PhotonBasicManager.getLongRunningJobResultMgr ().getAllJobResults ())
-    {
+    // Only the results of the Service Group export job - other long running jobs are none of this
+    // page's business
+    PhotonBasicManager.getLongRunningJobResultMgr ().forEachJobResult (ServiceGroupExportJob.JOB_TYPE, aJobData -> {
       final LongRunningJobResult aResult = aJobData.getResult ();
       if (aResult != null &&
           aResult.getType () == ELongRunningJobResultType.FILE &&
@@ -156,7 +161,7 @@ public final class PageSecureServiceGroupExportData extends AbstractSMPWebPage
       {
         ret.add (aJobData);
       }
-    }
+    });
     return ret;
   }
 

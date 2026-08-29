@@ -61,7 +61,7 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       try
       {
         PhotonWorkerPool.getInstance ()
-                        .run (ServiceGroupExportJob.JOB_ID,
+                        .run (ServiceGroupExportJob.JOB_TYPE,
                               new ServiceGroupExportJob (bExportBusinessCards, aWPEC.getLoggedInUserID ()));
       }
       catch (final RuntimeException ex)
