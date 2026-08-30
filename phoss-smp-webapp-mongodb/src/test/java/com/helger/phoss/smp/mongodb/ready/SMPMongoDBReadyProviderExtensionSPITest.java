@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.mongodb.ready;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -41,7 +40,7 @@ public final class SMPMongoDBReadyProviderExtensionSPITest
   public void testReadinessFollowsTheWritableState ()
   {
     // The check must use the live cluster state maintained by the MongoDB driver
-    assertEquals (MongoClientSingleton.isDBWritable (), new SMPMongoDBReadyProviderExtensionSPI ().isReady ());
+    assertTrue (MongoClientSingleton.isDBWritable () == new SMPMongoDBReadyProviderExtensionSPI ().isReady ());
   }
 
   @Test

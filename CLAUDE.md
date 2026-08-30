@@ -118,6 +118,7 @@ Three API variants are implemented in `phoss-smp-backend/src/main/java/com/helge
 | PUT | `/businesscard/{ServiceGroupId}` | Yes | Create/update business card |
 | DELETE | `/businesscard/{ServiceGroupId}` | Yes | Delete business card |
 | GET | `/smp-status/` | No | Health/status JSON (disabled by default) |
+| GET | `/smp-ready` | No | Backend-aware readiness: HTTP 200 `{"ready":true}` / HTTP 503 `{"ready":false}` |
 
 ### Authentication
 
@@ -136,6 +137,7 @@ The management UI uses the **ph-oton / Photon** framework (Bootstrap 5, server-s
 | `/secure/*` | `SecureApplicationServlet` | Authenticated management UI |
 | `/public/*` | `PublicApplicationServlet` | Public info pages |
 | `/smp-status/*` | `SMPStatusServlet` | Health/status endpoint |
+| `/smp-ready/*` | `SMPReadyServlet` | Readiness probe (backend-aware) |
 | `/ping/*` | `PingPongServlet` | Liveness probe |
 | `/logout/*` | `SMPLogoutServlet` | Logout |
 
@@ -199,6 +201,7 @@ webapp.security.login.errordetails = false
 csp.enabled = true
 smp.rest.remote.queryapi.disabled = true
 smp.status.enabled = false     # /smp-status/ endpoint; off by default
+smp.ready.timeout = 2s         # time limit for the /smp-ready backend checks
 
 # Reverse proxy support
 smp.forceroot = false          # Set true when behind a reverse proxy stripping context path

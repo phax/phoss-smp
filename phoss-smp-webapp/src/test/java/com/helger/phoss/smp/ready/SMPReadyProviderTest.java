@@ -20,13 +20,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
 import com.helger.base.timing.StopWatch;
+import com.helger.collection.commons.CommonsArrayList;
 
 /**
  * Test class for class {@link SMPReadyProvider}.
@@ -39,23 +39,23 @@ public final class SMPReadyProviderTest
   public void testReadinessAggregation ()
   {
     // A backend that provides no readiness check at all is NOT ready
-    assertFalse (SMPReadyProvider.areAllReady (List.of ()));
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> ()));
 
-    assertTrue (SMPReadyProvider.areAllReady (List.of ( () -> true)));
-    assertTrue (SMPReadyProvider.areAllReady (List.of ( () -> true, () -> true)));
-    assertFalse (SMPReadyProvider.areAllReady (List.of ( () -> false)));
-    assertFalse (SMPReadyProvider.areAllReady (List.of ( () -> true, () -> false)));
-    assertFalse (SMPReadyProvider.areAllReady (List.of ( () -> false, () -> true)));
+    assertTrue (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true)));
+    assertTrue (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true, () -> true)));
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> false)));
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true, () -> false)));
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> false, () -> true)));
   }
 
   @Test
   public void testExceptionMeansNotReady ()
   {
-    assertFalse (SMPReadyProvider.areAllReady (List.of ( () -> {
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> {
       throw new IllegalStateException ("Expected test exception");
     })));
     // The exception of the second check must not be swallowed either
-    assertFalse (SMPReadyProvider.areAllReady (List.of ( () -> true, () -> {
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true, () -> {
       throw new IllegalStateException ("Expected test exception");
     })));
   }
@@ -64,21 +64,21 @@ public final class SMPReadyProviderTest
   public void testNoTimeout ()
   {
     // A non-positive or missing timeout means "no time limit"
-    assertTrue (SMPReadyProvider.areAllReady (List.of ( () -> true), (Duration) null));
-    assertTrue (SMPReadyProvider.areAllReady (List.of ( () -> true), Duration.ZERO));
-    assertTrue (SMPReadyProvider.areAllReady (List.of ( () -> true), Duration.ofSeconds (-1)));
-    assertFalse (SMPReadyProvider.areAllReady (List.of ( () -> false), Duration.ofSeconds (10)));
+    assertTrue (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true), (Duration) null));
+    assertTrue (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true), Duration.ZERO));
+    assertTrue (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true), Duration.ofSeconds (-1)));
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> false), Duration.ofSeconds (10)));
   }
 
   @Test
-  public void testTimeoutIsRespected () throws InterruptedException
+  public void testTimeoutIsRespected ()
   {
     // Ensure the blocking check is released, even if the assertions fail
     final CountDownLatch aLatch = new CountDownLatch (1);
     try
     {
       final StopWatch aSW = StopWatch.createdStarted ();
-      final boolean bReady = SMPReadyProvider.areAllReady (List.of ( () -> {
+      final boolean bReady = SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> {
         try
         {
           // Way longer than the timeout below
