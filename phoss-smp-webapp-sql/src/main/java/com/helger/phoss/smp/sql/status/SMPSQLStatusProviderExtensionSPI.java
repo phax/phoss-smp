@@ -31,6 +31,7 @@ import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.IHasConnection;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJdbcConfiguration;
+import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
 
 /**
@@ -40,7 +41,7 @@ import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
  * @since 5.4.0
  */
 @IsSPIImplementation
-public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExtensionSPI
+public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExtensionSPI, ISMPReadyProviderExtensionSPI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPSQLStatusProviderExtensionSPI.class);
 
@@ -70,6 +71,11 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
       // Close connection again (if necessary)
       JDBCHelper.close (aConnection);
     }
+  }
+
+  public boolean isReady ()
+  {
+    return _isDBConnectionPossible ();
   }
 
   @NonNull

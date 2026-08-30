@@ -52,6 +52,15 @@
     <servlet-name>SMPStatusServlet</servlet-name>
     <url-pattern>/smp-status/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>SMPReadyServlet</servlet-name>
+    <servlet-class>com.helger.phoss.smp.servlet.SMPReadyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SMPReadyServlet</servlet-name>
+    <url-pattern>/smp-ready/*</url-pattern>
+  </servlet-mapping>
   
   <!-- UI stuff -->
 
