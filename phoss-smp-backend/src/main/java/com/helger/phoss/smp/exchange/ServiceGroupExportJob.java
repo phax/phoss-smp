@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -101,13 +102,17 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
   }
 
   /**
-   * @return The name of the export file to be created now. Never <code>null</code> nor empty.
+   * @return The unique name of the export file to be created now. Never <code>null</code> nor empty.
    */
   @NonNull
   @Nonempty
   public static String createExportFilename ()
   {
-    return EXPORT_FILENAME_PREFIX + PDTIOHelper.getCurrentLocalDateTimeForFilename () + EXPORT_FILENAME_EXTENSION;
+    return EXPORT_FILENAME_PREFIX +
+           PDTIOHelper.getCurrentLocalDateTimeForFilename () +
+           "-" +
+           UUID.randomUUID ().toString () +
+           EXPORT_FILENAME_EXTENSION;
   }
 
   /**

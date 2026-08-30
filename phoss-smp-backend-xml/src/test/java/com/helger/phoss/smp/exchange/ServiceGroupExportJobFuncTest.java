@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +47,19 @@ public final class ServiceGroupExportJobFuncTest
 {
   @Rule
   public final TestRule m_aTestRule = new SMPServerTestRule ();
+
+  @Test
+  public void testExportFilenamesAreUnique ()
+  {
+    final Set <String> aFilenames = new HashSet <> ();
+    for (int i = 0; i < 100; ++i)
+    {
+      final String sFilename = ServiceGroupExportJob.createExportFilename ();
+      assertTrue (sFilename.startsWith (ServiceGroupExportJob.EXPORT_FILENAME_PREFIX));
+      assertTrue (sFilename.endsWith (ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION));
+      assertTrue ("Duplicate export filename: " + sFilename, aFilenames.add (sFilename));
+    }
+  }
 
   @Test
   public void testExportToFile () throws SMPServerException
