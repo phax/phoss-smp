@@ -11,11 +11,11 @@
 package com.helger.phoss.smp.domain.businesscard;
 
 import java.util.Collection;
-import java.util.Comparator;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
@@ -24,8 +24,9 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPPagingHelper;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 
 /**
  * Manager for {@link ISMPBusinessCard} objects. Business card objects require a service group to be
@@ -84,85 +85,32 @@ public interface ISMPBusinessCardManager
   ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ();
 
   /**
-   * Get a single "page" of all contained SMP business cards, sorted by the business card ID. This
-   * method is meant to be used for server side pagination. Backends that support native paging
-   * should override this method.
+   * Get a single "page" of all entries matching the provided search text. This method is meant to
+   * be used for server side pagination in combination with
+   * {@link #getSMPBusinessCardCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via {@link ESMPBusinessCardColumn} -
+   * unknown or non-sortable field names are ignored, because they are provided by a client. If no
+   * sort field remains, the first column of {@link ESMPBusinessCardColumn} is used, so that
+   * consecutive page requests return disjunct results.
    *
-   * @param nStartIndex
-   *        The 0-based index of the first business card to be returned. Must be &ge; 0.
-   * @param nMaxCount
-   *        The maximum number of business cards to be returned. Must be &ge; 0.
-   * @return A non-<code>null</code> but maybe empty list of business cards.
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering takes place. It is matched against all searchable columns of
+   *        {@link ESMPBusinessCardColumn}, ignoring case.
+   * @return A non-<code>null</code> but maybe empty list.
    * @since 8.2.1
    */
   @NonNull
   @ReturnsMutableCopy
-  default ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@Nonnegative final int nStartIndex,
-                                                                  @Nonnegative final int nMaxCount)
+  default ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@NonNull final IPagingSpec aPagingSpec,
+                                                                  @Nullable final String sSearchText)
   {
-    return SMPPagingHelper.getPage (getAllSMPBusinessCards (),
-                                    Comparator.comparing (ISMPBusinessCard::getID),
-                                    nStartIndex,
-                                    nMaxCount);
-  }
-
-  /**
-   * Get a single "page" of all SMP business cards matching the provided search text, sorted by the
-   * business card ID. This method is meant to be used for server side pagination in combination
-   * with {@link #getSMPBusinessCardCount(String)}.
-   *
-   * @param sSearchText
-   *        The search text to filter the business cards. May be <code>null</code> or empty in which
-   *        case no filtering takes place.
-   * @param nStartIndex
-   *        The 0-based index of the first matching business card to be returned. Must be &ge; 0.
-   * @param nMaxCount
-   *        The maximum number of business cards to be returned. Must be &ge; 0.
-   * @return A non-<code>null</code> but maybe empty list of business cards.
-   * @since 8.2.1
-   */
-  @NonNull
-  @ReturnsMutableCopy
-  default ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@Nullable final String sSearchText,
-                                                                  @Nonnegative final int nStartIndex,
-                                                                  @Nonnegative final int nMaxCount)
-  {
-    if (StringHelper.isEmpty (sSearchText))
-      return getAllSMPBusinessCards (nStartIndex, nMaxCount);
-
-    return SMPPagingHelper.getPage (getAllSMPBusinessCards ().getAll (x -> isMatchingSearchText (x, sSearchText)),
-                                    Comparator.comparing (ISMPBusinessCard::getID),
-                                    nStartIndex,
-                                    nMaxCount);
-  }
-
-  /**
-   * Check if the provided business card matches the provided search text. The participant ID as
-   * well as the names and the country codes of all contained entities are checked.
-   *
-   * @param aBusinessCard
-   *        The business card to check. May not be <code>null</code>.
-   * @param sSearchText
-   *        The search text to be searched. May be <code>null</code> or empty in which case
-   *        <code>true</code> is returned.
-   * @return <code>true</code> if the business card matches, <code>false</code> if not.
-   * @since 8.2.1
-   */
-  static boolean isMatchingSearchText (@NonNull final ISMPBusinessCard aBusinessCard,
-                                       @Nullable final String sSearchText)
-  {
-    if (StringHelper.isEmpty (sSearchText))
-      return true;
-
-    if (SMPPagingHelper.matchesSearchText (aBusinessCard.getID (), sSearchText))
-      return true;
-
-    return aBusinessCard.getAllEntities ()
-                        .containsAny (aEntity -> SMPPagingHelper.matchesSearchText (aEntity.getCountryCode (),
-                                                                                    sSearchText) ||
-                                                 aEntity.names ()
-                                                        .containsAny (aName -> SMPPagingHelper.matchesSearchText (aName.getName (),
-                                                                                                                  sSearchText)));
+    return SMPTableColumnHelper.getPage (ESMPBusinessCardColumn.values (),
+                                         getAllSMPBusinessCards (),
+                                         aPagingSpec,
+                                         sSearchText);
   }
 
   /**
@@ -200,20 +148,21 @@ public interface ISMPBusinessCardManager
   long getSMPBusinessCardCount ();
 
   /**
-   * Get the number of business cards matching the provided search text.
+   * Get the number of entries matching the provided search text.
    *
    * @param sSearchText
-   *        The search text to filter the business cards. May be <code>null</code> or empty in which
-   *        case all business cards are counted.
-   * @return The count of all matching business cards. Always &ge; 0.
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        entries are counted.
+   * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
+   *         because of a missing SQL backend).
    * @since 8.2.1
    */
-  @Nonnegative
+  @CheckForSigned
   default long getSMPBusinessCardCount (@Nullable final String sSearchText)
   {
     if (StringHelper.isEmpty (sSearchText))
       return getSMPBusinessCardCount ();
 
-    return getAllSMPBusinessCards ().getCount (x -> isMatchingSearchText (x, sSearchText));
+    return SMPTableColumnHelper.getCount (ESMPBusinessCardColumn.values (), getAllSMPBusinessCards (), sSearchText);
   }
 }

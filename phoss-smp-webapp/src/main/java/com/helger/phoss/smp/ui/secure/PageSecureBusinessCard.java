@@ -1271,9 +1271,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     // current page
     final String sSearchText = SMPPagination.getSearchText (aWPEC);
     final SMPPagination aPagination = new SMPPagination (aWPEC, aBusinessCardMgr.getSMPBusinessCardCount (sSearchText));
-    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards (sSearchText,
-                                                                                                       aPagination.getFirstItemIndex (),
-                                                                                                       aPagination.getPageSize ());
+    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards (aPagination.getPagingSpec (), sSearchText);
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 

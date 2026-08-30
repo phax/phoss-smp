@@ -14,9 +14,13 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.peppolid.IParticipantIdentifier;
 
 /**
@@ -149,6 +153,88 @@ public interface ISMPParticipantMigrationManager
   @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable EParticipantMigrationState eState);
+
+  /**
+   * Get all participant migrations of the provided direction and state.
+   *
+   * @param eDirection
+   *        The migration direction to query. May not be <code>null</code>.
+   * @param eState
+   *        The migration state to filter by. May be <code>null</code> in which case all states are
+   *        returned.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPParticipantMigration> getAllParticipantMigrations (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                               @Nullable final EParticipantMigrationState eState)
+  {
+    ValueEnforcer.notNull (eDirection, "Direction");
+
+    return eDirection.isOutbound () ? getAllOutboundParticipantMigrations (eState)
+                                    : getAllInboundParticipantMigrations (eState);
+  }
+
+  /**
+   * Get a single "page" of all participant migrations of the provided direction and state, matching
+   * the provided search text. This method is meant to be used for server side pagination in
+   * combination with
+   * {@link #getParticipantMigrationCount(EParticipantMigrationDirection, EParticipantMigrationState, String)}.<br>
+   * The sort fields of the paging specification are resolved via
+   * {@link ESMPParticipantMigrationColumn} - unknown or non-sortable field names are ignored,
+   * because they are provided by a client.
+   *
+   * @param eDirection
+   *        The migration direction to query. May not be <code>null</code>.
+   * @param eState
+   *        The migration state to filter by. May be <code>null</code> in which case all states are
+   *        returned.
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering takes place.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPParticipantMigration> getAllParticipantMigrations (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                               @Nullable final EParticipantMigrationState eState,
+                                                                               @NonNull final IPagingSpec aPagingSpec,
+                                                                               @Nullable final String sSearchText)
+  {
+    return SMPTableColumnHelper.getPage (ESMPParticipantMigrationColumn.values (),
+                                         getAllParticipantMigrations (eDirection, eState),
+                                         aPagingSpec,
+                                         sSearchText);
+  }
+
+  /**
+   * Get the number of participant migrations of the provided direction and state, matching the
+   * provided search text.
+   *
+   * @param eDirection
+   *        The migration direction to query. May not be <code>null</code>.
+   * @param eState
+   *        The migration state to filter by. May be <code>null</code> in which case all states are
+   *        counted.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        entries are counted.
+   * @return The number of matching entries. Always &ge; 0.
+   * @since 8.2.1
+   */
+  @Nonnegative
+  default long getParticipantMigrationCount (@NonNull final EParticipantMigrationDirection eDirection,
+                                             @Nullable final EParticipantMigrationState eState,
+                                             @Nullable final String sSearchText)
+  {
+    return SMPTableColumnHelper.getCount (ESMPParticipantMigrationColumn.values (),
+                                          getAllParticipantMigrations (eDirection, eState),
+                                          sSearchText);
+  }
 
   /**
    * Check if an outbound migration for the provided participant identifier is

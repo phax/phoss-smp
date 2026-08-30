@@ -954,9 +954,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final String sSearchText = SMPPagination.getSearchText (aWPEC);
       final SMPPagination aPagination = new SMPPagination (aWPEC,
                                                            aServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
-      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups (sSearchText,
-                                                                                                         aPagination.getFirstItemIndex (),
-                                                                                                         aPagination.getPageSize ());
+      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups (aPagination.getPagingSpec (), sSearchText);
 
       final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
       aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);

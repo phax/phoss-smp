@@ -81,9 +81,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     final String sSearchText = SMPPagination.getSearchText (aWPEC);
     final SMPPagination aPagination = new SMPPagination (aWPEC,
                                                          aServiceInfoMgr.getSMPServiceInformationCount (sSearchText));
-    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation (sSearchText,
-                                                                                                                aPagination.getFirstItemIndex (),
-                                                                                                                aPagination.getPageSize ());
+    final ICommonsList <ISMPServiceInformation> aAllServiceInfos = aServiceInfoMgr.getAllSMPServiceInformation (aPagination.getPagingSpec (), sSearchText);
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 

@@ -57,9 +57,12 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.domain.SMPPagingHelper;
-import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -79,6 +82,7 @@ import com.helger.photon.audit.AuditHelper;
 public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager implements ISMPBusinessCardManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerJDBC.class);
+  private static final ESMPBusinessCardColumn [] COLUMNS = ESMPBusinessCardColumn.values ();
 
   // Create with as minimal output as possible
   private static final IJsonWriterSettings JWS = JsonWriterSettings.DEFAULT_SETTINGS;
@@ -368,27 +372,49 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   @NonNull
   @ReturnsMutableCopy
   @Override
-  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@Nonnegative final int nStartIndex,
-                                                                 @Nonnegative final int nMaxCount)
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
   {
-    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
-    if (nMaxCount == 0)
+    if (aPagingSpec.isEmptyPage ())
       return new CommonsArrayList <> ();
 
-    // A Business Card consists of 1-n rows in the DB (one per Business Entity),
-    // so the paging must happen on the distinct participant IDs
+    // A Business Card consists of 1-n rows in the DB (one per Business Entity), so both the search
+    // and the paging must happen on the distinct participant IDs. A Business Card matches, if any
+    // of its rows matches.
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
     final String sSQL = "SELECT bce.id, bce.pid, bce.name, bce.names, bce.country, bce.geoinfo, bce.identifiers, bce.websites, bce.contacts, bce.addon, bce.regdate" +
                         " FROM " +
                         m_sTableName +
                         " bce INNER JOIN (SELECT DISTINCT pid FROM " +
                         m_sTableName +
-                        " ORDER BY pid" +
-                        SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount) +
+                        (aSearch.isEmpty () ? "" : " WHERE " + aSearch.getSQL ()) +
+                        SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec) +
                         ") paged ON bce.pid=paged.pid";
-    final ICommonsList <ISMPBusinessCard> ret = _convertToBusinessCards (newExecutor ().queryAll (sSQL));
+    final ICommonsList <DBResultRow> aDBResult = aSearch.isEmpty () ? newExecutor ().queryAll (sSQL)
+                                                                    : newExecutor ().queryAll (sSQL,
+                                                                                               new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
+    final ICommonsList <ISMPBusinessCard> ret = _convertToBusinessCards (aDBResult);
     // The DB result is grouped in a Map, so the order needs to be restored
-    ret.sort (Comparator.comparing (ISMPBusinessCard::getID));
+    final Comparator <ISMPBusinessCard> aComparator = SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec);
+    if (aComparator != null)
+      ret.sort (aComparator);
     return ret;
+  }
+
+  @Override
+  public long getSMPBusinessCardCount (@Nullable final String sSearchText)
+  {
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    if (aSearch.isEmpty ())
+      return getSMPBusinessCardCount ();
+
+    // Count the distinct participant IDs, because one Business Card is 1-n rows
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM (SELECT DISTINCT pid FROM " +
+                                      m_sTableName +
+                                      " WHERE " +
+                                      aSearch.getSQL () +
+                                      ") matching",
+                                      new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
   }
 
   @NonNull

@@ -51,8 +51,10 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.CIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
-import com.helger.phoss.smp.domain.SMPPagingHelper;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -76,6 +78,7 @@ import com.helger.photon.audit.AuditHelper;
 public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager implements ISMPServiceGroupManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerJDBC.class);
+  private static final ESMPServiceGroupColumn [] COLUMNS = ESMPServiceGroupColumn.values ();
 
   private static final String CACHE_NAME = "phoss.smp.servicegroup";
   private static final Duration CACHE_TTL = Duration.ofSeconds (60);
@@ -466,32 +469,67 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   @NonNull
   @ReturnsMutableCopy
   @Override
-  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@Nonnegative final int nStartIndex,
-                                                                 @Nonnegative final int nMaxCount)
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
   {
     if (LOGGER.isDebugEnabled ())
-      LOGGER.debug ("getAllSMPServiceGroups(" + nStartIndex + ", " + nMaxCount + ")");
+      LOGGER.debug ("getAllSMPServiceGroups(" + aPagingSpec + ", " + sSearchText + ")");
 
-    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
-    if (nMaxCount == 0)
+    if (aPagingSpec.isEmptyPage ())
       return new CommonsArrayList <> ();
 
-    return _getAllSMPServiceGroups (" ORDER BY sg.businessIdentifierScheme, sg.businessIdentifier" +
-                                    SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount));
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    return _getAllSMPServiceGroups ((aSearch.isEmpty () ? "" : " AND " + aSearch.getSQL ()) +
+                                    SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec),
+                                    aSearch.getAllParams ());
+  }
+
+  @Override
+  public long getSMPServiceGroupCount (@Nullable final String sSearchText)
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getSMPServiceGroupCount(" + sSearchText + ")");
+
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    if (aSearch.isEmpty ())
+      return getSMPServiceGroupCount ();
+
+    // Use the same FROM and JOIN as the list query, so that all searchable columns are available
+    return newExecutor ().queryCount ("SELECT COUNT(*)" +
+                                      " FROM " +
+                                      m_sTableNameSG +
+                                      " sg, " +
+                                      m_sTableNameO +
+                                      " so" +
+                                      " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier" +
+                                      " AND " +
+                                      aSearch.getSQL (),
+                                      new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
   }
 
   @NonNull
   @ReturnsMutableCopy
   private ICommonsList <ISMPServiceGroup> _getAllSMPServiceGroups (@Nullable final String sSuffix)
   {
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username, sg.customproperties" +
-                                                                          " FROM " +
-                                                                          m_sTableNameSG +
-                                                                          " sg, " +
-                                                                          m_sTableNameO +
-                                                                          " so" +
-                                                                          " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier" +
-                                                                          (sSuffix == null ? "" : sSuffix));
+    return _getAllSMPServiceGroups (sSuffix, null);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  private ICommonsList <ISMPServiceGroup> _getAllSMPServiceGroups (@Nullable final String sSuffix,
+                                                                   @Nullable final ICommonsList <Object> aParams)
+  {
+    final String sSQL = "SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username, sg.customproperties" +
+                        " FROM " +
+                        m_sTableNameSG +
+                        " sg, " +
+                        m_sTableNameO +
+                        " so" +
+                        " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier" +
+                        (sSuffix == null ? "" : sSuffix);
+    final ICommonsList <DBResultRow> aDBResult = aParams == null || aParams.isEmpty () ? newExecutor ().queryAll (sSQL)
+                                                                                      : newExecutor ().queryAll (sSQL,
+                                                                                                                 new ConstantPreparedStatementDataProvider (aParams));
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     if (aDBResult != null)

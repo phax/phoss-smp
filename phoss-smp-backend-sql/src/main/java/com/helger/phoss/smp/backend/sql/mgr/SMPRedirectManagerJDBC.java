@@ -44,8 +44,10 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.phoss.smp.backend.sql.SMPJDBCPagingHelper;
-import com.helger.phoss.smp.domain.SMPPagingHelper;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -63,6 +65,7 @@ import com.helger.security.certificate.CertificateHelper;
 public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager implements ISMPRedirectManager
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerJDBC.class);
+  private static final ESMPRedirectColumn [] COLUMNS = ESMPRedirectColumn.values ();
 
   private final String m_sTableName;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
@@ -276,25 +279,48 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   @NonNull
   @ReturnsMutableCopy
   @Override
-  public ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nonnegative final int nStartIndex,
-                                                         @Nonnegative final int nMaxCount)
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
+                                                         @Nullable final String sSearchText)
   {
-    SMPPagingHelper.checkPagingParams (nStartIndex, nMaxCount);
-    if (nMaxCount == 0)
+    if (aPagingSpec.isEmptyPage ())
       return new CommonsArrayList <> ();
 
-    return _getAllSMPRedirects (" ORDER BY businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier" +
-                                SMPJDBCPagingHelper.getPagingClause (nStartIndex, nMaxCount));
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    return _getAllSMPRedirects ((aSearch.isEmpty () ? "" : " WHERE " + aSearch.getSQL ()) +
+                                SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec),
+                                aSearch.getAllParams ());
+  }
+
+  @Override
+  public long getSMPRedirectCount (@Nullable final String sSearchText)
+  {
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    if (aSearch.isEmpty ())
+      return getSMPRedirectCount ();
+
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableName + " WHERE " + aSearch.getSQL (),
+                                      new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
   }
 
   @NonNull
   @ReturnsMutableCopy
   private ICommonsList <ISMPRedirect> _getAllSMPRedirects (@Nullable final String sSuffix)
   {
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
-                                                                          " FROM " +
-                                                                          m_sTableName +
-                                                                          (sSuffix == null ? "" : sSuffix));
+    return _getAllSMPRedirects (sSuffix, null);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  private ICommonsList <ISMPRedirect> _getAllSMPRedirects (@Nullable final String sSuffix,
+                                                           @Nullable final ICommonsList <Object> aParams)
+  {
+    final String sSQL = "SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, redirectionUrl, certificateUID, certificate, extension" +
+                        " FROM " +
+                        m_sTableName +
+                        (sSuffix == null ? "" : sSuffix);
+    final ICommonsList <DBResultRow> aDBResult = aParams == null || aParams.isEmpty () ? newExecutor ().queryAll (sSQL)
+                                                                                       : newExecutor ().queryAll (sSQL,
+                                                                                                                  new ConstantPreparedStatementDataProvider (aParams));
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)

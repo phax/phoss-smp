@@ -424,9 +424,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     // current page
     final String sSearchText = SMPPagination.getSearchText (aWPEC);
     final SMPPagination aPagination = new SMPPagination (aWPEC, aRedirectMgr.getSMPRedirectCount (sSearchText));
-    final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirects (sSearchText,
-                                                                                       aPagination.getFirstItemIndex (),
-                                                                                       aPagination.getPageSize ());
+    final ICommonsList <ISMPRedirect> aAllRedirects = aRedirectMgr.getAllSMPRedirects (aPagination.getPagingSpec (), sSearchText);
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 

@@ -22,6 +22,8 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.collection.paging.PagingSpec;
 import com.helger.html.css.DefaultCSSClassProvider;
 import com.helger.html.css.ICSSClassProvider;
 import com.helger.html.hc.IHCNode;
@@ -179,6 +181,17 @@ public class SMPPagination
     if (m_nTotalCount <= 0)
       return 1;
     return (int) Math.min ((m_nTotalCount + m_nPageSize - 1) / m_nPageSize, Integer.MAX_VALUE);
+  }
+
+  /**
+   * @return The paging specification matching the current page index and page size, without any
+   *         sort field. Never <code>null</code>.
+   * @since 8.2.1
+   */
+  @NonNull
+  public final IPagingSpec getPagingSpec ()
+  {
+    return PagingSpec.createForPage (m_nPageIndex, m_nPageSize);
   }
 
   /**

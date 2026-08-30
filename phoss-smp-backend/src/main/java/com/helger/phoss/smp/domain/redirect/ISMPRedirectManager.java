@@ -16,6 +16,7 @@ import java.util.Comparator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
@@ -24,9 +25,10 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPPagingHelper;
 
 /**
  * Manager for {@link ISMPRedirect} objects. Redirect objects require a service
@@ -114,54 +116,31 @@ public interface ISMPRedirectManager
   ICommonsList <ISMPRedirect> getAllSMPRedirects ();
 
   /**
-   * Get a single "page" of all redirects, sorted by service group ID and document type ID. This
-   * method is meant to be used for server side pagination. Backends that support native paging
-   * should override this method.
+   * Get a single "page" of all entries matching the provided search text. This method is meant to
+   * be used for server side pagination in combination with {@link #getSMPRedirectCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via {@link ESMPRedirectColumn} - unknown or
+   * non-sortable field names are ignored, because they are provided by a client. If no sort field
+   * remains, the first column of {@link ESMPRedirectColumn} is used, so that consecutive page requests return
+   * disjunct results.
    *
-   * @param nStartIndex
-   *        The 0-based index of the first redirect to be returned. Must be &ge; 0.
-   * @param nMaxCount
-   *        The maximum number of redirects to be returned. Must be &ge; 0.
-   * @return A non-<code>null</code> but maybe empty list of redirects.
-   * @since 8.2.1
-   */
-  @NonNull
-  @ReturnsMutableCopy
-  default ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nonnegative final int nStartIndex,
-                                                          @Nonnegative final int nMaxCount)
-  {
-    return SMPPagingHelper.getPage (getAllSMPRedirects (), _getDefaultComparator (), nStartIndex, nMaxCount);
-  }
-
-  /**
-   * Get a single "page" of all redirects matching the provided search text, sorted by service group
-   * ID and document type ID. This method is meant to be used for server side pagination in
-   * combination with {@link #getSMPRedirectCount(String)}.
-   *
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
    * @param sSearchText
-   *        The search text to filter the redirects. May be <code>null</code> or empty in which case
-   *        no filtering takes place.
-   * @param nStartIndex
-   *        The 0-based index of the first matching redirect to be returned. Must be &ge; 0.
-   * @param nMaxCount
-   *        The maximum number of redirects to be returned. Must be &ge; 0.
-   * @return A non-<code>null</code> but maybe empty list of redirects.
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering takes place. It is matched against all searchable columns of
+   *        {@link ESMPRedirectColumn}, ignoring case.
+   * @return A non-<code>null</code> but maybe empty list.
    * @since 8.2.1
    */
   @NonNull
   @ReturnsMutableCopy
-  default ICommonsList <ISMPRedirect> getAllSMPRedirects (@Nullable final String sSearchText,
-                                                          @Nonnegative final int nStartIndex,
-                                                          @Nonnegative final int nMaxCount)
+  default ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
+                                                          @Nullable final String sSearchText)
   {
-    if (StringHelper.isEmpty (sSearchText))
-      return getAllSMPRedirects (nStartIndex, nMaxCount);
-
-    return SMPPagingHelper.getPage (getAllSMPRedirects ().getAll (x -> isMatchingSearchText (x, sSearchText)),
-                                    _getDefaultComparator (),
-                                    nStartIndex,
-                                    nMaxCount);
+    return SMPTableColumnHelper.getPage (ESMPRedirectColumn.values (), getAllSMPRedirects (), aPagingSpec, sSearchText);
   }
+
+
 
   /**
    * Get all redirects of the passed service group.
@@ -182,44 +161,24 @@ public interface ISMPRedirectManager
   long getSMPRedirectCount ();
 
   /**
-   * Get the number of redirects matching the provided search text.
+   * Get the number of entries matching the provided search text.
    *
    * @param sSearchText
-   *        The search text to filter the redirects. May be <code>null</code> or empty in which case
-   *        all redirects are counted.
-   * @return The count of all matching redirects. Always &ge; 0.
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        entries are counted.
+   * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
+   *         because of a missing SQL backend).
    * @since 8.2.1
    */
-  @Nonnegative
+  @CheckForSigned
   default long getSMPRedirectCount (@Nullable final String sSearchText)
   {
     if (StringHelper.isEmpty (sSearchText))
       return getSMPRedirectCount ();
 
-    return getAllSMPRedirects ().getCount (x -> isMatchingSearchText (x, sSearchText));
+    return SMPTableColumnHelper.getCount (ESMPRedirectColumn.values (), getAllSMPRedirects (), sSearchText);
   }
 
-  /**
-   * Check if the provided redirect matches the provided search text. The participant ID, the
-   * document type ID and the target URL are checked.
-   *
-   * @param aRedirect
-   *        The redirect to check. May not be <code>null</code>.
-   * @param sSearchText
-   *        The search text to be searched. May be <code>null</code> or empty in which case
-   *        <code>true</code> is returned.
-   * @return <code>true</code> if the redirect matches, <code>false</code> if not.
-   * @since 8.2.1
-   */
-  static boolean isMatchingSearchText (@NonNull final ISMPRedirect aRedirect, @Nullable final String sSearchText)
-  {
-    if (StringHelper.isEmpty (sSearchText))
-      return true;
-
-    return SMPPagingHelper.matchesSearchText (aRedirect.getServiceGroupID (), sSearchText) ||
-           SMPPagingHelper.matchesSearchText (aRedirect.getDocumentTypeIdentifier ().getURIEncoded (), sSearchText) ||
-           SMPPagingHelper.matchesSearchText (aRedirect.getTargetHref (), sSearchText);
-  }
 
   /**
    * Find the redirect that matches the passed tuple of service group and

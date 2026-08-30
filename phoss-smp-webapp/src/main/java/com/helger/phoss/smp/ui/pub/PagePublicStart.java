@@ -97,9 +97,8 @@ public final class PagePublicStart extends AbstractSMPWebPage
         final String sSearchText = SMPPagination.getSearchText (aWPEC);
         final SMPPagination aPagination = new SMPPagination (aWPEC,
                                                              aSMPServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
-        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (sSearchText,
-                                                                                                           aPagination.getFirstItemIndex (),
-                                                                                                           aPagination.getPageSize ());
+        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (aPagination.getPagingSpec (),
+                                                                                                           sSearchText);
 
         // Use dynamic or static table?
         final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();

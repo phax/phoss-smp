@@ -10,25 +10,26 @@
  */
 package com.helger.phoss.smp.domain.serviceinfo;
 
-import java.util.Comparator;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
-import com.helger.base.string.StringHelper;
 import com.helger.base.state.ESuccess;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
-import com.helger.phoss.smp.domain.SMPPagingHelper;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 
 /**
  * Manager for {@link ISMPServiceInformation} objects. Service information objects require a service
@@ -129,60 +130,31 @@ public interface ISMPServiceInformationManager
   ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ();
 
   /**
-   * Get a single "page" of all service information objects, sorted by service group ID and document
-   * type ID. This method is meant to be used for server side pagination. Backends that support
-   * native paging should override this method.
+   * Get a single "page" of all entries matching the provided search text. This method is meant to
+   * be used for server side pagination in combination with {@link #getSMPServiceInformationCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via {@link ESMPServiceInformationColumn} - unknown or
+   * non-sortable field names are ignored, because they are provided by a client. If no sort field
+   * remains, the first column of {@link ESMPServiceInformationColumn} is used, so that consecutive page requests return
+   * disjunct results.
    *
-   * @param nStartIndex
-   *        The 0-based index of the first service information object to be returned. Must be &ge; 0.
-   * @param nMaxCount
-   *        The maximum number of service information objects to be returned. Must be &ge; 0.
-   * @return A non-<code>null</code> but maybe empty list of service information objects.
-   * @since 8.2.1
-   */
-  @NonNull
-  @ReturnsMutableCopy
-  default ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@Nonnegative final int nStartIndex,
-                                                                             @Nonnegative final int nMaxCount)
-  {
-    return SMPPagingHelper.getPage (getAllSMPServiceInformation (),
-                                    Comparator.comparing (ISMPServiceInformation::getServiceGroupID)
-                                              .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ()),
-                                    nStartIndex,
-                                    nMaxCount);
-  }
-
-  /**
-   * Get a single "page" of all service information objects matching the provided search text,
-   * sorted by service group ID and document type ID. This method is meant to be used for server
-   * side pagination in combination with {@link #getSMPServiceInformationCount(String)}.
-   *
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
    * @param sSearchText
-   *        The search text to filter the service information objects. May be <code>null</code> or
-   *        empty in which case no filtering takes place.
-   * @param nStartIndex
-   *        The 0-based index of the first matching service information object to be returned. Must
-   *        be &ge; 0.
-   * @param nMaxCount
-   *        The maximum number of service information objects to be returned. Must be &ge; 0.
-   * @return A non-<code>null</code> but maybe empty list of service information objects.
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering takes place. It is matched against all searchable columns of
+   *        {@link ESMPServiceInformationColumn}, ignoring case.
+   * @return A non-<code>null</code> but maybe empty list.
    * @since 8.2.1
    */
   @NonNull
   @ReturnsMutableCopy
-  default ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@Nullable final String sSearchText,
-                                                                             @Nonnegative final int nStartIndex,
-                                                                             @Nonnegative final int nMaxCount)
+  default ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@NonNull final IPagingSpec aPagingSpec,
+                                                                             @Nullable final String sSearchText)
   {
-    if (StringHelper.isEmpty (sSearchText))
-      return getAllSMPServiceInformation (nStartIndex, nMaxCount);
-
-    return SMPPagingHelper.getPage (getAllSMPServiceInformation ().getAll (x -> isMatchingSearchText (x, sSearchText)),
-                                    Comparator.comparing (ISMPServiceInformation::getServiceGroupID)
-                                              .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ()),
-                                    nStartIndex,
-                                    nMaxCount);
+    return SMPTableColumnHelper.getPage (ESMPServiceInformationColumn.values (), getAllSMPServiceInformation (), aPagingSpec, sSearchText);
   }
+
+
 
   /**
    * Iterate each Service Information element and invoke the provided consumer for it.
@@ -200,44 +172,24 @@ public interface ISMPServiceInformationManager
   long getSMPServiceInformationCount ();
 
   /**
-   * Get the number of service information objects matching the provided search text.
+   * Get the number of entries matching the provided search text.
    *
    * @param sSearchText
-   *        The search text to filter the service information objects. May be <code>null</code> or
-   *        empty in which case all service information objects are counted.
-   * @return The count of all matching service information objects. Always &ge; 0.
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        entries are counted.
+   * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
+   *         because of a missing SQL backend).
    * @since 8.2.1
    */
-  @Nonnegative
+  @CheckForSigned
   default long getSMPServiceInformationCount (@Nullable final String sSearchText)
   {
     if (StringHelper.isEmpty (sSearchText))
       return getSMPServiceInformationCount ();
 
-    return getAllSMPServiceInformation ().getCount (x -> isMatchingSearchText (x, sSearchText));
+    return SMPTableColumnHelper.getCount (ESMPServiceInformationColumn.values (), getAllSMPServiceInformation (), sSearchText);
   }
 
-  /**
-   * Check if the provided service information object matches the provided search text. The
-   * participant ID and the document type ID are checked.
-   *
-   * @param aServiceInfo
-   *        The service information object to check. May not be <code>null</code>.
-   * @param sSearchText
-   *        The search text to be searched. May be <code>null</code> or empty in which case
-   *        <code>true</code> is returned.
-   * @return <code>true</code> if the service information object matches, <code>false</code> if not.
-   * @since 8.2.1
-   */
-  static boolean isMatchingSearchText (@NonNull final ISMPServiceInformation aServiceInfo,
-                                       @Nullable final String sSearchText)
-  {
-    if (StringHelper.isEmpty (sSearchText))
-      return true;
-
-    return SMPPagingHelper.matchesSearchText (aServiceInfo.getServiceGroupID (), sSearchText) ||
-           SMPPagingHelper.matchesSearchText (aServiceInfo.getDocumentTypeIdentifier ().getURIEncoded (), sSearchText);
-  }
 
   /**
    * Get all service information objects that belong to the provided service group.
