@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.jspecify.annotations.NonNull;
 
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.http.CHttp;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
@@ -41,10 +42,18 @@ public class SMPReadyXServletHandler implements IXServletSimpleHandler
 {
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
-  public void handleRequest (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                             @NonNull final UnifiedResponse aUnifiedResponse) throws Exception
+  /**
+   * Fill the provided response with the readiness state: HTTP 200 if the SMP is ready and HTTP 503
+   * if it is not. In both cases a small JSON object is returned as the payload.
+   *
+   * @param bReady
+   *        The readiness state to be returned.
+   * @param aUnifiedResponse
+   *        The response to be filled. May not be <code>null</code>.
+   */
+  @VisibleForTesting
+  static void fillResponse (final boolean bReady, @NonNull final UnifiedResponse aUnifiedResponse)
   {
-    final boolean bReady = SMPReadyProvider.isReady ();
     final IJsonObject aData = new JsonObject ();
     aData.add ("ready", bReady);
 
@@ -57,5 +66,11 @@ public class SMPReadyXServletHandler implements IXServletSimpleHandler
       aUnifiedResponse.setStatus (CHttp.HTTP_SERVICE_UNAVAILABLE);
     }
     aUnifiedResponse.setContentAndCharset (aData.getAsJsonString (), CHARSET);
+  }
+
+  public void handleRequest (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                             @NonNull final UnifiedResponse aUnifiedResponse) throws Exception
+  {
+    fillResponse (SMPReadyProvider.isReady (), aUnifiedResponse);
   }
 }

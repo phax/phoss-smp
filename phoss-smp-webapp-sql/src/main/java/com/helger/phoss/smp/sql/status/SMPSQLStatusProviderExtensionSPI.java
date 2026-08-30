@@ -16,9 +16,6 @@
  */
 package com.helger.phoss.smp.sql.status;
 
-import java.sql.Connection;
-
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +23,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.collection.commons.CommonsLinkedHashMap;
 import com.helger.collection.commons.ICommonsOrderedMap;
-import com.helger.db.api.jdbc.JDBCHelper;
-import com.helger.db.jdbc.ConnectionFromDataSource;
-import com.helger.db.jdbc.IHasConnection;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPJdbcConfiguration;
-import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
 import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
 
 /**
@@ -41,42 +34,9 @@ import com.helger.phoss.smp.status.ISMPStatusProviderExtensionSPI;
  * @since 5.4.0
  */
 @IsSPIImplementation
-public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExtensionSPI, ISMPReadyProviderExtensionSPI
+public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExtensionSPI
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPSQLStatusProviderExtensionSPI.class);
-
-  private static boolean _isDBConnectionPossible ()
-  {
-    final BasicDataSource aDS = SMPDataSourceSingleton.getInstance ().getDataSourceProvider ().getDataSource ();
-
-    // Note: maxReconnects setting for MySQL makes no difference
-    final IHasConnection aCP = new ConnectionFromDataSource (aDS);
-    Connection aConnection = null;
-    try
-    {
-      // Get connection
-      aConnection = aCP.getConnection ();
-      if (aConnection == null)
-        return false;
-
-      // Okay, connection was established
-      return true;
-    }
-    catch (final Exception ex)
-    {
-      return false;
-    }
-    finally
-    {
-      // Close connection again (if necessary)
-      JDBCHelper.close (aConnection);
-    }
-  }
-
-  public boolean isReady ()
-  {
-    return _isDBConnectionPossible ();
-  }
 
   @NonNull
   public ICommonsOrderedMap <String, ?> getAdditionalStatusData (final boolean bDisableLongRunningOperations)
@@ -104,7 +64,8 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
         // Since 5.4.0
         // It takes approximately 4 seconds on a local MySQL to say "no
         // connection" by default
-        ret.put ("smp.sql.db.connection-possible", Boolean.valueOf (_isDBConnectionPossible ()));
+        ret.put ("smp.sql.db.connection-possible",
+                 Boolean.valueOf (SMPDataSourceSingleton.isDBConnectionPossible ()));
       }
     }
     else

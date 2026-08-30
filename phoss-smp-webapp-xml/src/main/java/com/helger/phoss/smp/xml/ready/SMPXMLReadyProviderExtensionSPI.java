@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2026 Philip Helger and contributors
+ * Copyright (C) 2014-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.mongodb.status;
+package com.helger.phoss.smp.xml.ready;
 
 import com.helger.annotation.style.IsSPIImplementation;
-import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
 import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
 
 /**
- * MongoDB-specific readiness check using the live cluster writable state.
+ * XML specific readiness check. The XML backend has no external dependency that could be
+ * unavailable, so it is always ready. This implementation exists nevertheless, so that a backend
+ * that ships no readiness check at all can be detected as a configuration error.
  *
  * @author vinit-thummar
  * @since 8.3.1
  */
 @IsSPIImplementation
-public class SMPMongoDBReadyProviderExtensionSPI implements ISMPReadyProviderExtensionSPI
+public class SMPXMLReadyProviderExtensionSPI implements ISMPReadyProviderExtensionSPI
 {
   public boolean isReady ()
   {
-    return MongoClientSingleton.isDBWritable ();
+    return true;
   }
 }

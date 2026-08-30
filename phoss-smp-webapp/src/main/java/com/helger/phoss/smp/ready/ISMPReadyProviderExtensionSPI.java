@@ -19,12 +19,16 @@ package com.helger.phoss.smp.ready;
 import com.helger.annotation.style.IsSPIInterface;
 
 /**
- * SPI interface for backend-specific readiness checks.
+ * An SPI interface to be implemented by the real backends to determine, whether the SMP is
+ * currently able to serve requests. Every backend must provide exactly one implementation - a
+ * backend without an external dependency simply returns <code>true</code>. If no implementation is
+ * found at all, the SMP is considered to be not ready.<br>
+ * Implementations are invoked on every readiness request, so they must be cheap and they must not
+ * block indefinitely.
  *
  * @author vinit-thummar
  * @since 8.3.1
  */
-@FunctionalInterface
 @IsSPIInterface
 public interface ISMPReadyProviderExtensionSPI
 {

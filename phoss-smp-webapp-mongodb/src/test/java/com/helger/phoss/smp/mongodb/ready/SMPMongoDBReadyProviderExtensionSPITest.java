@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2019-2026 Philip Helger and contributors
+ * philip[at]helger[dot]com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.helger.phoss.smp.mongodb.ready;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import com.helger.base.timing.StopWatch;
+import com.helger.io.resource.FileSystemResource;
+import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
+
+/**
+ * Test class for class {@link SMPMongoDBReadyProviderExtensionSPI}.
+ *
+ * @author vinit-thummar
+ */
+public final class SMPMongoDBReadyProviderExtensionSPITest
+{
+  @Rule
+  public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-mongodb.properties"));
+
+  @Test
+  public void testReadinessFollowsTheWritableState ()
+  {
+    // The check must use the live cluster state maintained by the MongoDB driver
+    assertEquals (MongoClientSingleton.isDBWritable (), new SMPMongoDBReadyProviderExtensionSPI ().isReady ());
+  }
+
+  @Test
+  public void testReadinessDoesNotBlock ()
+  {
+    // The state is cached by the cluster listener, so no I/O may happen here
+    final StopWatch aSW = StopWatch.createdStarted ();
+    new SMPMongoDBReadyProviderExtensionSPI ().isReady ();
+    final long nMillis = aSW.stopAndGetMillis ();
+    assertTrue ("The readiness check took " + nMillis + " milliseconds", nMillis < 1_000);
+  }
+}

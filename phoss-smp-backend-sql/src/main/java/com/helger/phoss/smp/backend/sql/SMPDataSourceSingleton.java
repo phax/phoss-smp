@@ -16,17 +16,25 @@
  */
 package com.helger.phoss.smp.backend.sql;
 
+import java.sql.Connection;
 import java.util.EnumSet;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.string.StringImplode;
 import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.api.config.IJdbcConfiguration;
+import com.helger.db.api.jdbc.JDBCHelper;
+import com.helger.db.jdbc.ConnectionFromDataSource;
 import com.helger.db.jdbc.DataSourceProviderFromJdbcConfiguration;
+import com.helger.db.jdbc.IHasConnection;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
@@ -39,6 +47,15 @@ import com.helger.scope.singleton.AbstractGlobalSingleton;
 @ThreadSafe
 public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
 {
+  /**
+   * The default number of seconds a single database connection validation may take.
+   *
+   * @since 8.3.1
+   */
+  public static final int DEFAULT_CONNECTION_VALIDATION_TIMEOUT_SECONDS = 1;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPDataSourceSingleton.class);
+
   private static final EnumSet <EDatabaseSystemType> ALLOWED_DB_TYPES = EnumSet.of (EDatabaseSystemType.DB2,
                                                                                     EDatabaseSystemType.MYSQL,
                                                                                     EDatabaseSystemType.ORACLE,
@@ -115,5 +132,62 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   public DataSourceProviderFromJdbcConfiguration getDataSourceProvider ()
   {
     return m_aDSP;
+  }
+
+  /**
+   * Check whether a usable connection to the configured database can currently be established.
+   * Contrary to just taking a connection from the pool, the retrieved connection is explicitly
+   * validated, because the connection pool hands out pooled connections without validating them,
+   * unless <code>jdbc.pooling.test-on-borrow</code> is enabled - and that is disabled by default.
+   * Without the validation a connection to an already dead database would be considered to be
+   * usable, until the pool evicts it.
+   *
+   * @param nValidationTimeoutSeconds
+   *        The maximum number of seconds the validation of the connection may take. Must be &ge; 0,
+   *        where 0 means "no timeout".
+   * @return <code>true</code> if a usable connection was established, <code>false</code> otherwise.
+   * @since 8.3.1
+   */
+  public static boolean isDBConnectionPossible (@Nonnegative final int nValidationTimeoutSeconds)
+  {
+    final BasicDataSource aDS = getInstance ().getDataSourceProvider ().getDataSource ();
+
+    // Note: maxReconnects setting for MySQL makes no difference
+    final IHasConnection aCP = new ConnectionFromDataSource (aDS);
+    Connection aConnection = null;
+    try
+    {
+      // Get connection
+      aConnection = aCP.getConnection ();
+      if (aConnection == null)
+        return false;
+
+      // The connection may be a pooled one that was established before the database went down
+      return aConnection.isValid (nValidationTimeoutSeconds);
+    }
+    catch (final Exception ex)
+    {
+      if (LOGGER.isDebugEnabled ())
+        LOGGER.debug ("Failed to establish a usable database connection", ex);
+      return false;
+    }
+    finally
+    {
+      // Close connection again (if necessary)
+      JDBCHelper.close (aConnection);
+    }
+  }
+
+  /**
+   * Check whether a usable connection to the configured database can currently be established,
+   * using {@link #DEFAULT_CONNECTION_VALIDATION_TIMEOUT_SECONDS} as the validation timeout.
+   *
+   * @return <code>true</code> if a usable connection was established, <code>false</code> otherwise.
+   * @see #isDBConnectionPossible(int)
+   * @since 8.3.1
+   */
+  public static boolean isDBConnectionPossible ()
+  {
+    return isDBConnectionPossible (DEFAULT_CONNECTION_VALIDATION_TIMEOUT_SECONDS);
   }
 }

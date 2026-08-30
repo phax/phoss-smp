@@ -78,6 +78,8 @@ public final class SMPServerConfiguration
 
   public static final String KEY_SMP_EXPORT_RETENTION_DAYS = "smp.export.retention.days";
 
+  public static final String KEY_SMP_READY_TIMEOUT = "smp.ready.timeout";
+
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
@@ -111,6 +113,9 @@ public final class SMPServerConfiguration
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
+
+  /** The default maximum duration a single readiness check may take */
+  public static final Duration DEFAULT_SMP_READY_TIMEOUT = Duration.ofSeconds (2);
 
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
@@ -355,6 +360,25 @@ public final class SMPServerConfiguration
   public static int getExportRetentionDays ()
   {
     return _getConfig ().getAsInt (KEY_SMP_EXPORT_RETENTION_DAYS, DEFAULT_SMP_EXPORT_RETENTION_DAYS);
+  }
+
+  /**
+   * @return The maximum duration a readiness check may take, before the SMP is considered to be
+   *         not ready. This ensures that a readiness request never blocks an HTTP thread for an
+   *         unbounded amount of time, e.g. because the database connection pool is exhausted. If
+   *         the value is &le; 0, the readiness checks are executed without a time limit. The
+   *         default value is 2 seconds.
+   * @since 8.3.1
+   */
+  @NonNull
+  public static Duration getReadyTimeout ()
+  {
+    final Duration ret = _getConfig ().getAsConfigDuration (KEY_SMP_READY_TIMEOUT,
+                                                            sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                                 KEY_SMP_READY_TIMEOUT +
+                                                                                 "' as duration: " +
+                                                                                 sMsg));
+    return ret != null ? ret : DEFAULT_SMP_READY_TIMEOUT;
   }
 
   /**
