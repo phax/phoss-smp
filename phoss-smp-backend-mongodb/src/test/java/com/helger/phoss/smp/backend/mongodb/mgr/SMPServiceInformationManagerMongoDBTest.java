@@ -17,9 +17,11 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Rule;
@@ -36,6 +38,7 @@ import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -43,6 +46,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -52,28 +56,161 @@ import com.helger.photon.security.CSecurity;
  */
 public final class SMPServiceInformationManagerMongoDBTest
 {
+  private static final String TRANSPORT_PROFILE = "mongodb-test-transport-profile";
+
   @Rule
   public final TestRule m_aRule = new SMPServerMongoDBTestRule ();
+
+  private static SMPEndpoint _createEndpoint (final String sID,
+                                               final String sEndpointReference,
+                                               final String sCertificate)
+  {
+    return new SMPEndpoint (sID,
+                            TRANSPORT_PROFILE,
+                            sEndpointReference,
+                            false,
+                            null,
+                            null,
+                            null,
+                            sCertificate,
+                            null,
+                            null,
+                            null,
+                            null);
+  }
+
+  private static SMPServiceInformation _createServiceInformation (final IParticipantIdentifier aPI,
+                                                                  final IDocumentTypeIdentifier aDocTypeID,
+                                                                  final IProcessIdentifier aProcessID,
+                                                                  final String sExtension,
+                                                                  final SMPEndpoint... aEndpoints)
+  {
+    final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEndpoints), null);
+    return new SMPServiceInformation (aPI, aDocTypeID, new CommonsArrayList <> (aProcess), sExtension);
+  }
 
   private static SMPServiceInformation _createServiceInformation (final IParticipantIdentifier aPI,
                                                                   final IDocumentTypeIdentifier aDocTypeID,
                                                                   final IProcessIdentifier aProcessID,
                                                                   final String sExtension)
   {
-    final SMPEndpoint aEndpoint = new SMPEndpoint ("mongodb-callback-endpoint",
-                                                   "mongodb-callback-transport-profile",
-                                                   "https://example.org/as4",
-                                                   false,
-                                                   null,
-                                                   null,
-                                                   null,
-                                                   null,
-                                                   null,
-                                                   null,
-                                                   null,
-                                                   null);
-    final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEndpoint), null);
-    return new SMPServiceInformation (aPI, aDocTypeID, new CommonsArrayList <> (aProcess), sExtension);
+    return _createServiceInformation (aPI,
+                                      aDocTypeID,
+                                      aProcessID,
+                                      sExtension,
+                                      _createEndpoint ("mongodb-callback-endpoint", "https://example.org/as4", null));
+  }
+
+  @Test
+  public void testEndpointUsageAggregation () throws SMPServerException
+  {
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
+
+    final IParticipantIdentifier aPI1 = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                         "0088:mongodb-usage-1");
+    final IParticipantIdentifier aPI2 = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                         "0088:mongodb-usage-2");
+    final IDocumentTypeIdentifier aDocTypeID1 = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                  "xml::xml##mongodb-usage-1::1");
+    final IDocumentTypeIdentifier aDocTypeID2 = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                  "xml::xml##mongodb-usage-2::1");
+    final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
+                                                                                       "mongodb-usage");
+    assertNotNull (aPI1);
+    assertNotNull (aPI2);
+    assertNotNull (aDocTypeID1);
+    assertNotNull (aDocTypeID2);
+    assertNotNull (aProcessID);
+
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI2, true);
+
+    final long nEndpointCountBefore = aServiceInformationMgr.getEndpointCount ();
+    final IEndpointUsageInfo aEmptyCertUsageBefore = aServiceInformationMgr.getEndpointCertificateUsageMap ().get ("");
+    final int nEmptyCertEndpointCountBefore = aEmptyCertUsageBefore == null ? 0 : aEmptyCertUsageBefore.getEndpointCount ();
+    final int nEmptyCertServiceGroupCountBefore = aEmptyCertUsageBefore == null ? 0 : aEmptyCertUsageBefore.getServiceGroupCount ();
+
+    final String sSharedURL = "https://mongodb-usage.example/shared";
+    final String sUniqueURL = "https://mongodb-usage.example/unique";
+    final String sCertPEM = "-----BEGIN CERTIFICATE-----\nQUJD\n-----END CERTIFICATE-----";
+    final String sCertPlain = "QUJD";
+    final String sOtherCert = "REVG";
+    final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (sCertPEM);
+    assertEquals (sNormalizedCert, SMPCertificateHelper.getNormalizedCert (sCertPlain));
+
+    try
+    {
+      assertNotNull (aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
+                                                             aPI1,
+                                                             null,
+                                                             null,
+                                                             false));
+      assertNotNull (aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
+                                                             aPI2,
+                                                             null,
+                                                             null,
+                                                             false));
+
+      assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (_createServiceInformation (aPI1,
+                                                                                                 aDocTypeID1,
+                                                                                                 aProcessID,
+                                                                                                 null,
+                                                                                                 _createEndpoint ("mongodb-usage-1",
+                                                                                                                  sSharedURL,
+                                                                                                                  sCertPEM),
+                                                                                                 _createEndpoint ("mongodb-usage-2",
+                                                                                                                  sSharedURL,
+                                                                                                                  sCertPlain),
+                                                                                                 _createEndpoint ("mongodb-usage-3",
+                                                                                                                  sUniqueURL,
+                                                                                                                  null)))
+                                        .isSuccess ());
+      assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (_createServiceInformation (aPI2,
+                                                                                                 aDocTypeID2,
+                                                                                                 aProcessID,
+                                                                                                 null,
+                                                                                                 _createEndpoint ("mongodb-usage-4",
+                                                                                                                  sSharedURL,
+                                                                                                                  sCertPlain),
+                                                                                                 _createEndpoint ("mongodb-usage-5",
+                                                                                                                  null,
+                                                                                                                  sOtherCert),
+                                                                                                 _createEndpoint ("mongodb-usage-6",
+                                                                                                                  "",
+                                                                                                                  null)))
+                                        .isSuccess ());
+
+      assertEquals (nEndpointCountBefore + 6, aServiceInformationMgr.getEndpointCount ());
+
+      final var aURLUsage = aServiceInformationMgr.getEndpointURLUsageMap ();
+      final IEndpointUsageInfo aSharedURLUsage = aURLUsage.get (sSharedURL);
+      assertNotNull (aSharedURLUsage);
+      assertEquals (3, aSharedURLUsage.getEndpointCount ());
+      assertEquals (2, aSharedURLUsage.getServiceGroupCount ());
+      assertEquals (new CommonsArrayList <> (aPI1.getURIEncoded (), aPI2.getURIEncoded ()),
+                    aSharedURLUsage.getServiceGroupIDsSorted (Comparator.naturalOrder ()));
+      assertEquals (1, aURLUsage.get (sUniqueURL).getEndpointCount ());
+      assertFalse (aURLUsage.containsKey (""));
+
+      final var aCertUsage = aServiceInformationMgr.getEndpointCertificateUsageMap ();
+      final IEndpointUsageInfo aNormalizedCertUsage = aCertUsage.get (sNormalizedCert);
+      assertNotNull (aNormalizedCertUsage);
+      assertEquals (3, aNormalizedCertUsage.getEndpointCount ());
+      assertEquals (2, aNormalizedCertUsage.getServiceGroupCount ());
+      assertEquals (1, aCertUsage.get (SMPCertificateHelper.getNormalizedCert (sOtherCert)).getEndpointCount ());
+
+      final IEndpointUsageInfo aEmptyCertUsageAfter = aCertUsage.get ("");
+      assertNotNull (aEmptyCertUsageAfter);
+      assertEquals (nEmptyCertEndpointCountBefore + 2, aEmptyCertUsageAfter.getEndpointCount ());
+      assertEquals (nEmptyCertServiceGroupCountBefore + 2, aEmptyCertUsageAfter.getServiceGroupCount ());
+    }
+    finally
+    {
+      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
+      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI2, true);
+    }
   }
 
   @Test
