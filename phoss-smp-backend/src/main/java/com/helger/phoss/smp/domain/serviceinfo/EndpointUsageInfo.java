@@ -43,8 +43,29 @@ public final class EndpointUsageInfo implements IEndpointUsageInfo
    */
   public void incrementForServiceGroupID (@NonNull final String sServiceGroupID)
   {
-    m_nEndpointCount++;
-    m_aServiceGroupIDs.add (sServiceGroupID);
+    addForServiceGroupID (sServiceGroupID, 1);
+  }
+
+  /**
+   * Add the provided number of endpoint usages for the provided service group ID at once. This is
+   * the bulk version of {@link #incrementForServiceGroupID(String)} and is meant for backends that
+   * let the database do the counting.
+   *
+   * @param sServiceGroupID
+   *        The service group ID to add. May not be <code>null</code>.
+   * @param nEndpointCount
+   *        The number of endpoints to add. Must be &ge; 0. If 0 is passed, the service group ID is
+   *        not added, so that this method is equivalent to calling
+   *        {@link #incrementForServiceGroupID(String)} that often.
+   * @since 8.3.0
+   */
+  public void addForServiceGroupID (@NonNull final String sServiceGroupID, @Nonnegative final int nEndpointCount)
+  {
+    if (nEndpointCount > 0)
+    {
+      m_nEndpointCount += nEndpointCount;
+      m_aServiceGroupIDs.add (sServiceGroupID);
+    }
   }
 
   /**

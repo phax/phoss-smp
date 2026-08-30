@@ -41,6 +41,14 @@ import com.mongodb.client.MongoCollection;
  */
 public abstract class AbstractManagerMongoDB
 {
+  /**
+   * The name of the MongoDB internal primary key field. The MongoDB Java driver has no public
+   * constant for it - the only one it has is package private.
+   *
+   * @since 8.3.0
+   */
+  protected static final String BSON_MONGO_ID = "_id";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractManagerMongoDB.class);
 
   private static final String BSON_SCHEME = "scheme";

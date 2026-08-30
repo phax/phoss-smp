@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -523,7 +522,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     getCollection ().find (Filters.and (new Document (BSON_SERVICE_GROUP_ID, aParticipantIdentifier.getURIEncoded ()),
                                         new Document (BSON_DOCTYPE_ID, toBson (aDocumentTypeIdentifier))))
-                    .forEach ((Consumer <Document>) x -> ret.add (toServiceInformation (x, true)));
+                    .forEach (x -> ret.add (toServiceInformation (x, true)));
 
     if (ret.isEmpty ())
       return null;
@@ -536,13 +535,44 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return ret.getFirstOrNull ();
   }
 
+  /**
+   * Create an aggregation pipeline that unwinds all endpoints of all documents, so that the
+   * provided final stage sees one document per endpoint.
+   *
+   * @param aFinalStage
+   *        The last stage of the pipeline. May not be <code>null</code>.
+   * @return The pipeline stages. Never <code>null</code>.
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  private static ICommonsList <Bson> _createUnwindEndpointsPipeline (@NonNull final Bson aFinalStage)
+  {
+    return new CommonsArrayList <> (Aggregates.unwind ("$" + BSON_PROCESSES),
+                                    Aggregates.unwind ("$" + BSON_ENDPOINTS_PATH),
+                                    aFinalStage);
+  }
+
+  /**
+   * Create the aggregation pipeline that counts all endpoints grouped by the provided group ID
+   * expression.
+   *
+   * @param aGroupID
+   *        The <code>_id</code> expression of the <code>$group</code> stage. May not be
+   *        <code>null</code>.
+   * @return The pipeline stages. Never <code>null</code>.
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  private static ICommonsList <Bson> _createEndpointGroupPipeline (@NonNull final Document aGroupID)
+  {
+    return _createUnwindEndpointsPipeline (Aggregates.group (aGroupID,
+                                                             Accumulators.sum (BSON_COUNT, Integer.valueOf (1))));
+  }
+
   @Nonnegative
   public long getEndpointCount ()
   {
-    final Document aResult = getCollection ().aggregate (Arrays.asList (Aggregates.unwind ("$" + BSON_PROCESSES),
-                                                                        Aggregates.unwind ("$" + BSON_ENDPOINTS_PATH),
-                                                                        Aggregates.count ()))
-                                             .first ();
+    final Document aResult = getCollection ().aggregate (_createUnwindEndpointsPipeline (Aggregates.count ())).first ();
     return aResult == null ? 0 : ((Number) aResult.get (BSON_COUNT)).longValue ();
   }
 
@@ -551,25 +581,20 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
   {
     final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
-    final Document aGroupID = new Document (BSON_ENDPOINT_REFERENCE, "$" + BSON_ENDPOINT_REFERENCE_PATH).append (BSON_SERVICE_GROUP_ID,
-                                                                                                                   "$" + BSON_SERVICE_GROUP_ID);
-    for (final Document aDoc : getCollection ().aggregate (Arrays.asList (Aggregates.unwind ("$" + BSON_PROCESSES),
-                                                                          Aggregates.unwind ("$" + BSON_ENDPOINTS_PATH),
-                                                                          Aggregates.group (aGroupID,
-                                                                                            Accumulators.sum (BSON_COUNT,
-                                                                                                              1))))
-                                                .allowDiskUse (true))
+    final Document aGroupID = new Document (BSON_ENDPOINT_REFERENCE, "$" + BSON_ENDPOINT_REFERENCE_PATH).append (
+                                                                                                                 BSON_SERVICE_GROUP_ID,
+                                                                                                                 "$" +
+                                                                                                                                        BSON_SERVICE_GROUP_ID);
+    for (final Document aDoc : getCollection ().aggregate (_createEndpointGroupPipeline (aGroupID))
+                                               .allowDiskUse (Boolean.TRUE))
     {
-      final Document aID = aDoc.get ("_id", Document.class);
+      final Document aID = aDoc.get (BSON_MONGO_ID, Document.class);
       final String sURL = aID.getString (BSON_ENDPOINT_REFERENCE);
       if (StringHelper.isNotEmpty (sURL))
       {
         final String sServiceGroupID = aID.getString (BSON_SERVICE_GROUP_ID);
-        final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sURL,
-                                                                                 k -> new EndpointUsageInfo ());
-        final int nCount = ((Number) aDoc.get (BSON_COUNT)).intValue ();
-        for (int i = 0; i < nCount; ++i)
-          aInfo.incrementForServiceGroupID (sServiceGroupID);
+        final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
+        aInfo.addForServiceGroupID (sServiceGroupID, ((Number) aDoc.get (BSON_COUNT)).intValue ());
       }
     }
     return ret;
@@ -582,22 +607,17 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
     final String sCertificatePath = BSON_ENDPOINTS_PATH + "." + BSON_CERTIFICATE;
     final Document aGroupID = new Document (BSON_CERTIFICATE, "$" + sCertificatePath).append (BSON_SERVICE_GROUP_ID,
-                                                                                               "$" + BSON_SERVICE_GROUP_ID);
-    for (final Document aDoc : getCollection ().aggregate (Arrays.asList (Aggregates.unwind ("$" + BSON_PROCESSES),
-                                                                          Aggregates.unwind ("$" + BSON_ENDPOINTS_PATH),
-                                                                          Aggregates.group (aGroupID,
-                                                                                            Accumulators.sum (BSON_COUNT,
-                                                                                                              1))))
-                                                .allowDiskUse (true))
+                                                                                              "$" +
+                                                                                                                     BSON_SERVICE_GROUP_ID);
+    for (final Document aDoc : getCollection ().aggregate (_createEndpointGroupPipeline (aGroupID))
+                                               .allowDiskUse (Boolean.TRUE))
     {
-      final Document aID = aDoc.get ("_id", Document.class);
+      final Document aID = aDoc.get (BSON_MONGO_ID, Document.class);
       final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aID.getString (BSON_CERTIFICATE));
       final String sServiceGroupID = aID.getString (BSON_SERVICE_GROUP_ID);
       final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sNormalizedCert,
                                                                                k -> new EndpointUsageInfo ());
-      final int nCount = ((Number) aDoc.get (BSON_COUNT)).intValue ();
-      for (int i = 0; i < nCount; ++i)
-        aInfo.incrementForServiceGroupID (sServiceGroupID);
+      aInfo.addForServiceGroupID (sServiceGroupID, ((Number) aDoc.get (BSON_COUNT)).intValue ());
     }
     return ret;
   }
@@ -687,8 +707,6 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       return false;
 
     // As simple as it can be
-    return getCollection ().find (Filters.eq (BSON_TRANSPORT_PROFILE_PATH, sTransportProfileID))
-                           .iterator ()
-                           .hasNext ();
+    return getCollection ().find (Filters.eq (BSON_TRANSPORT_PROFILE_PATH, sTransportProfileID)).iterator ().hasNext ();
   }
 }
