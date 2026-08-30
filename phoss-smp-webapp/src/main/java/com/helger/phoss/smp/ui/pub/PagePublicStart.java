@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.ui.pub;
 
-import java.util.Comparator;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
@@ -26,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.html.hc.html.tabular.AbstractHCTable;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
@@ -35,18 +34,23 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.SMPInternalErrorHandler;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.SMPPagination;
 import com.helger.photon.bootstrap5.table.BootstrapTable;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
+import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.url.SimpleURL;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -62,6 +66,8 @@ public final class PagePublicStart extends AbstractSMPWebPage
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (PagePublicStart.class);
 
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerPublic (this::_getOnDemandData);
+
   public PagePublicStart (@NonNull @Nonempty final String sID)
   {
     super (sID, "Start page");
@@ -72,6 +78,83 @@ public final class PagePublicStart extends AbstractSMPWebPage
   public String getHeaderText (@NonNull final WebPageExecutionContext aWPEC)
   {
     return "Managed participants on this SMP";
+  }
+
+  private void _addRow (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                        @NonNull final Locale aDisplayLocale,
+                        @NonNull final HCRow aRow,
+                        @NonNull final ISMPServiceGroup aServiceGroup,
+                        final boolean bShowExtensionDetails)
+  {
+    final String sDisplayName = aServiceGroup.getParticipantIdentifier ().getURIEncoded ();
+
+    aRow.addCell (sDisplayName);
+    if (bShowExtensionDetails)
+    {
+      if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
+        aRow.addCell (SMPExtensionUI.getSerializedExtensions (aServiceGroup.getExtensions ()));
+      else
+        aRow.addCell ();
+    }
+    else
+    {
+      aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
+                                                aDisplayLocale));
+    }
+    final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
+    aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
+                                                                                                                          sDisplayName)
+                                                                                                               .setTargetBlank ()
+                                                                                                               .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
+  }
+
+  /**
+   * Provide the rows of a single page of the dynamic participant table. Only the entries of the
+   * requested page are queried - nothing is kept in the session.
+   *
+   * @param aRequest
+   *        The DataTables request. May not be <code>null</code>.
+   * @param aRequestScope
+   *        The current request scope. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
+                                                     @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
+  {
+    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
+                                                                       this);
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
+    final String sSearchText = aRequest.getSearchText ();
+
+    try
+    {
+      final ICommonsList <HCRow> aRows = new CommonsArrayList <> ();
+      for (final ISMPServiceGroup aServiceGroup : aSMPServiceGroupMgr.getAllSMPServiceGroups (aRequest.getPagingSpec (),
+                                                                                              sSearchText))
+      {
+        final HCRow aRow = new HCRow ();
+        _addRow (aRequestScope, aDisplayLocale, aRow, aServiceGroup, bShowExtensionDetails);
+        aRows.add (aRow);
+      }
+      return new DataTablesOnDemandResult (aSMPServiceGroupMgr.getSMPServiceGroupCount (),
+                                           aSMPServiceGroupMgr.getSMPServiceGroupCount (sSearchText),
+                                           aRows);
+    }
+    catch (final RuntimeException ex)
+    {
+      // E.g. MongoDB having invalid Participant IDs in the DB
+      final String sError = "Internal Error listing all Service Groups";
+      LOGGER.error (sError, ex);
+      SMPInternalErrorHandler.createInternalErrorBuilder ()
+                             .addErrorMessage (sError)
+                             .setFromWebExecutionContext (aWPEC)
+                             .setThrowable (ex)
+                             .handle ();
+      return DataTablesOnDemandResult.createEmpty ();
+    }
   }
 
   @Override
@@ -85,105 +168,65 @@ public final class PagePublicStart extends AbstractSMPWebPage
     {
       // New in v5.0.4
       aNodeList.addChild (info ("This SMP has disabled the list of participants."));
+      return;
     }
-    else
+
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+    final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
+
+    if (SMPWebAppConfiguration.isStartPageDynamicTable ())
     {
-      EFontAwesome6Icon.registerResourcesForThisRequest ();
-      final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      try
-      {
-        // Server side pagination and filtering - only query the entries of the
-        // current page
-        final String sSearchText = SMPPagination.getSearchText (aWPEC);
-        final SMPPagination aPagination = new SMPPagination (aWPEC,
-                                                             aSMPServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
-        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (aPagination.getPagingSpec (),
-                                                                                                           sSearchText);
+      // Dynamic - paging, sorting and searching are done by DataTables via the AJAX function, so
+      // only the rows of the currently displayed page are ever queried
+      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setName (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ())
+                                                                      .setInitialSorting (ESortOrder.ASCENDING),
+                                          new DTCol (bShowExtensionDetails ? "Extension" : "Extension?").setOrderable (false),
+                                          new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
+      aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
+      return;
+    }
 
-        // Use dynamic or static table?
-        final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
-        final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
+    // Static table - there is no DataTables that could do the paging, so the server side pagination
+    // UI is used instead
+    final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    try
+    {
+      final String sSearchText = SMPPagination.getSearchText (aWPEC);
+      final SMPPagination aPagination = new SMPPagination (aWPEC,
+                                                           aSMPServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
+      final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups (aPagination.getPagingSpec (),
+                                                                                                         sSearchText);
 
-        AbstractHCTable <?> aFinalTable;
-        if (bUseDataTables)
-        {
-          // Dynamic
-          final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                              new DTCol (bShowExtensionDetails ? "Extension" : "Extension?")
-                                                                                                            .setDataSort (1,
-                                                                                                                          0),
-                                              new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-          aFinalTable = aTable;
-        }
-        else
-        {
-          // Static
-          final BootstrapTable aTable = new BootstrapTable ();
-          aTable.setBordered (true);
-          aTable.setCondensed (true);
-          aTable.setStriped (true);
-          aTable.addHeaderRow ()
-                .addCell ("Participant ID")
-                .addCell (bShowExtensionDetails ? "Extension" : "Extension?")
-                .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
-          aFinalTable = aTable;
+      final BootstrapTable aTable = new BootstrapTable ();
+      aTable.setBordered (true);
+      aTable.setCondensed (true);
+      aTable.setStriped (true);
+      aTable.addHeaderRow ()
+            .addCell ("Participant ID")
+            .addCell (bShowExtensionDetails ? "Extension" : "Extension?")
+            .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
 
-          // Sort manually
-          aServiceGroups.sort (Comparator.comparing (x -> x.getParticipantIdentifier ().getURIEncoded ()));
-        }
+      for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
+        _addRow (aRequestScope, aDisplayLocale, aTable.addBodyRow (), aServiceGroup, bShowExtensionDetails);
 
-        for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
-        {
-          final String sDisplayName = aServiceGroup.getParticipantIdentifier ().getURIEncoded ();
-
-          final HCRow aRow = aFinalTable.addBodyRow ();
-          aRow.addCell (sDisplayName);
-          if (bShowExtensionDetails)
-          {
-            if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
-              aRow.addCell (SMPExtensionUI.getSerializedExtensions (aServiceGroup.getExtensions ()));
-            else
-              aRow.addCell ();
-          }
-          else
-          {
-            aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
-                                                      aDisplayLocale));
-          }
-          final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
-          aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
-                                                                                                                                sDisplayName)
-                                                                                                                     .setTargetBlank ()
-                                                                                                                     .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
-        }
-        aNodeList.addChild (aPagination.getUI ());
-        if (aFinalTable.hasBodyRows ())
-        {
-          aNodeList.addChild (aFinalTable);
-
-          if (bUseDataTables)
-          {
-            final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
-            aPagination.applyTo (aDataTables);
-            aNodeList.addChild (aDataTables);
-          }
-        }
-        else
-          aNodeList.addChild (info (StringHelper.isNotEmpty (sSearchText) ? "No participant matches the search criteria."
-                                                                          : "This SMP does not manage any participant yet."));
-      }
-      catch (final RuntimeException ex)
-      {
-        // E.g. MongoDB having invalid Participant IDs in the DB
-        final String sError = "Internal Error listing all Service Groups";
-        LOGGER.error (sError, ex);
-        aNodeList.addChild (error (sError));
-        SMPInternalErrorHandler.createInternalErrorBuilder ()
-                               .addErrorMessage (sError)
-                               .setFromWebExecutionContext (aWPEC)
-                               .setThrowable (ex)
-                               .handle ();
-      }
+      aNodeList.addChild (aPagination.getUI ());
+      if (aTable.hasBodyRows ())
+        aNodeList.addChild (aTable);
+      else
+        aNodeList.addChild (info (StringHelper.isNotEmpty (sSearchText) ? "No participant matches the search criteria."
+                                                                        : "This SMP does not manage any participant yet."));
+    }
+    catch (final RuntimeException ex)
+    {
+      // E.g. MongoDB having invalid Participant IDs in the DB
+      final String sError = "Internal Error listing all Service Groups";
+      LOGGER.error (sError, ex);
+      aNodeList.addChild (error (sError));
+      SMPInternalErrorHandler.createInternalErrorBuilder ()
+                             .addErrorMessage (sError)
+                             .setFromWebExecutionContext (aWPEC)
+                             .setThrowable (ex)
+                             .handle ();
     }
   }
 }

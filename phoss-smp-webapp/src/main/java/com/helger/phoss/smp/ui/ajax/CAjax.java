@@ -73,6 +73,24 @@ public final class CAjax
     LOGGER.info ("Successfully registered the Ajax functions");
   }
 
+  /**
+   * Register a new AJAX function with a random name, that can be invoked by everybody. Use this for
+   * the public pages only.
+   *
+   * @param aExecutor
+   *        The executor to be invoked. May not be <code>null</code>.
+   * @return The created function declaration. Never <code>null</code>.
+   * @since 8.3.1
+   */
+  @NonNull
+  public static AjaxFunctionDeclaration addAjax (@NonNull final IAjaxExecutor aExecutor)
+  {
+    // random name
+    final AjaxFunctionDeclaration aFunction = AjaxFunctionDeclaration.builder ().executor (aExecutor).build ();
+    GlobalAjaxInvoker.getInstance ().getRegistry ().registerFunction (aFunction);
+    return aFunction;
+  }
+
   @NonNull
   public static AjaxFunctionDeclaration addAjaxWithLogin (@NonNull final IAjaxExecutor aExecutor)
   {

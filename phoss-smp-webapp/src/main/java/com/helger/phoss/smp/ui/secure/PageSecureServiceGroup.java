@@ -32,6 +32,7 @@ import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
+import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.html.hc.IHCNode;
@@ -61,6 +62,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -78,7 +80,7 @@ import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
-import com.helger.phoss.smp.ui.SMPPagination;
+import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPCustomPropertyTypeSelect;
@@ -120,8 +122,11 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.servlet.request.IRequestParamMap;
@@ -338,6 +343,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aAjaxResponse.html (aNode);
     });
   }
+
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
 
   public PageSecureServiceGroup (@NonNull @Nonempty final String sID)
   {
@@ -931,79 +938,89 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
   }
 
-  @Override
-  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
+  private static boolean _isShowBusinessCardName ()
   {
-    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
+    return CSMP.ENABLE_ISSUE_56 && SMPMetaManager.getSettings ().isDirectoryIntegrationEnabled ();
+  }
+
+  private static boolean _isShowDetails ()
+  {
+    // Counting the assigned document types, processes and endpoints is one query per row, so it is
+    // only done for small installations
+    return SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCount () <= 1_000;
+  }
+
+  @NonNull
+  private HCTable _createTable (@NonNull final WebPageExecutionContext aWPEC)
+  {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
+    final boolean bShowBusinessCardName = _isShowBusinessCardName ();
+    final boolean bShowDetails = _isShowDetails ();
+
+    // Only the participant ID and the owner exist as columns in the data store - everything else is
+    // derived and can therefore not be sorted by
+    return new HCTable (new DTCol ("Participant ID").setName (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ())
+                                                    .setInitialSorting (ESortOrder.ASCENDING),
+                        new DTCol ("Owner").setName (ESMPServiceGroupColumn.OWNER.getID ()),
+                        bShowBusinessCardName ? new DTCol ("Business Card Name").setOrderable (false) : null,
+                        new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle ("Is an Extension present?")).setOrderable (false),
+                        new DTCol ("Properties").setDisplayType (EDTColType.INT, aDisplayLocale).setOrderable (false),
+                        bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
+                                                                                                                                aDisplayLocale)
+                                                                                                               .setOrderable (false)
+                                     : null,
+                        bShowDetails ? new DTCol (span ("Procs").setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
+                                                                                                                            aDisplayLocale)
+                                                                                                           .setOrderable (false)
+                                     : null,
+                        bShowDetails ? new DTCol (span ("EPs").setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
+                                                                                                                          aDisplayLocale)
+                                                                                                         .setOrderable (false)
+                                     : null,
+                        new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
+  }
+
+  /**
+   * Provide the rows of a single page. Only the entries of the requested page are queried from the
+   * manager - nothing is kept in the session.
+   *
+   * @param aRequest
+   *        The DataTables request. May not be <code>null</code>.
+   * @param aRequestScope
+   *        The current request scope. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
+                                                     @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
+  {
+    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
+                                                                       this);
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
-    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final boolean bShowExtensionDetails = SMPWebAppConfiguration.isServiceGroupsExtensionsShow ();
-    final boolean bShowBusinessCardName = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
-
-    EFontAwesome6Icon.registerResourcesForThisRequest ();
+    final boolean bShowBusinessCardName = _isShowBusinessCardName ();
+    final boolean bShowDetails = _isShowDetails ();
+    final String sSearchText = aRequest.getSearchText ();
 
     try
     {
-      // Server side pagination and filtering - only query the entries of the
-      // current page
-      final long nTotalServiceGroupCount = aServiceGroupMgr.getSMPServiceGroupCount ();
-      final String sSearchText = SMPPagination.getSearchText (aWPEC);
-      final SMPPagination aPagination = new SMPPagination (aWPEC,
-                                                           aServiceGroupMgr.getSMPServiceGroupCount (sSearchText));
-      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups (aPagination.getPagingSpec (), sSearchText);
-
-      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-      aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
-      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-      if (aSettings.isSMLRequired () || aSettings.isSMLEnabled ())
-      {
-        // Disable button if no SML URL is configured
-        // Disable button if no service group is present
-        final boolean bTooMany = nTotalServiceGroupCount > 10_000;
-        aToolbar.addAndReturnButton ("Check DNS state" + (bTooMany ? " (too many entries)" : ""),
-                                     aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
-                                     EDefaultIcon.MAGNIFIER)
-                .setDisabled (aSettings.getSMLDNSZone () == null ||
-                  nTotalServiceGroupCount <= 0 ||
-                  bTooMany ||
-                  !aSettings.isSMLEnabled ());
-      }
-      aNodeList.addChild (aToolbar);
-
-      final boolean bShowDetails = nTotalServiceGroupCount <= 1_000;
-
-      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                          new DTCol ("Owner"),
-                                          bShowBusinessCardName ? new DTCol ("Business Card Name") : null,
-                                          new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle (
-                                                                                                             "Is an Extension present?")),
-                                          new DTCol ("Properties").setDisplayType (EDTColType.INT, aDisplayLocale),
-                                          bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
-                                                                                                                                                  aDisplayLocale)
-                                                       : null,
-                                          bShowDetails ? new DTCol (span ("Procs").setTitle ("Number of assigned processes")).setDisplayType (EDTColType.INT,
-                                                                                                                                              aDisplayLocale)
-                                                       : null,
-                                          bShowDetails ? new DTCol (span ("EPs").setTitle ("Number of assigned endpoints")).setDisplayType (EDTColType.INT,
-                                                                                                                                            aDisplayLocale)
-                                                       : null,
-                                          new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-
       // Use a username cache to avoid too many DB queries
       final SMPOwnerNameCache aOwnerNameCache = new SMPOwnerNameCache ();
       final SMPRestDataProvider aRDP = new SMPRestDataProvider (aRequestScope);
+      final ICommonsList <HCRow> aRows = new CommonsArrayList <> ();
 
-      for (final ISMPServiceGroup aCurObject : aAllServiceGroups)
+      for (final ISMPServiceGroup aCurObject : aServiceGroupMgr.getAllSMPServiceGroups (aRequest.getPagingSpec (),
+                                                                                        sSearchText))
       {
         final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject.getID ());
         final IParticipantIdentifier aCurPI = aCurObject.getParticipantIdentifier ();
         final String sDisplayName = aCurPI.getURIEncoded ();
 
-        final HCRow aRow = aTable.addBodyRow ();
+        final HCRow aRow = new HCRow ();
         aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
         aRow.addCell (aOwnerNameCache.getFromCache (aCurObject.getOwnerID ()));
         if (bShowBusinessCardName)
@@ -1062,23 +1079,58 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                          .setTargetBlank ()
                                                                                          .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
         aRow.addCell (aActions);
+        aRows.add (aRow);
       }
 
-      final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-      aPagination.applyTo (aDataTables);
-      aNodeList.addChild (aPagination.getUI ()).addChild (aTable).addChild (aDataTables);
+      return new DataTablesOnDemandResult (aServiceGroupMgr.getSMPServiceGroupCount (),
+                                           aServiceGroupMgr.getSMPServiceGroupCount (sSearchText),
+                                           aRows);
     }
     catch (final RuntimeException ex)
     {
       // E.g. MongoDB having invalid Participant IDs in the DB
       final String sError = "Internal Error listing all Service Groups";
       LOGGER.error (sError, ex);
-      aNodeList.addChild (error (sError));
       SMPInternalErrorHandler.createInternalErrorBuilder ()
                              .addErrorMessage (sError)
                              .setFromWebExecutionContext (aWPEC)
                              .setThrowable (ex)
                              .handle ();
+      return DataTablesOnDemandResult.createEmpty ();
     }
+  }
+
+  @Override
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+
+    final long nTotalServiceGroupCount = aServiceGroupMgr.getSMPServiceGroupCount ();
+
+    final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+    aToolbar.addButton ("Create new Service group", createCreateURL (aWPEC), EDefaultIcon.NEW);
+    aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+    if (aSettings.isSMLRequired () || aSettings.isSMLEnabled ())
+    {
+      // Disable button if no SML URL is configured
+      // Disable button if no service group is present
+      final boolean bTooMany = nTotalServiceGroupCount > 10_000;
+      aToolbar.addAndReturnButton ("Check DNS state" + (bTooMany ? " (too many entries)" : ""),
+                                   aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
+                                   EDefaultIcon.MAGNIFIER)
+              .setDisabled (aSettings.getSMLDNSZone () == null ||
+                nTotalServiceGroupCount <= 0 ||
+                bTooMany ||
+                !aSettings.isSMLEnabled ());
+    }
+    aNodeList.addChild (aToolbar);
+
+    // The rows are filled by the AJAX function only
+    final HCTable aTable = _createTable (aWPEC);
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
   }
 }
