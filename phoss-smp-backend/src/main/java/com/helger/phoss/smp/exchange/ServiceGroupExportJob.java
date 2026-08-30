@@ -55,7 +55,7 @@ import com.helger.web.scope.mgr.WebScoped;
  * when it is done.
  *
  * @author Philip Helger
- * @since 8.2.1
+ * @since 8.3.0
  */
 public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
 {
@@ -123,7 +123,7 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
    *        The file to be checked. May be <code>null</code>.
    * @return <code>null</code> if the provided file is not a downloadable export file, the canonical
    *         file otherwise.
-   * @since 8.2.1
+   * @since 8.3.0
    */
   @Nullable
   public static File getValidExportFile (@Nullable final File aFile)
@@ -164,7 +164,7 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
    *
    * @return The number of deleted export files. Always &ge; 0.
    * @see SMPServerConfiguration#getExportRetentionDays()
-   * @since 8.2.1
+   * @since 8.3.0
    */
   @Nonnegative
   public static int purgeOldExportFiles ()

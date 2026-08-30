@@ -29,7 +29,7 @@ import com.helger.web.scope.util.AbstractScopeAwareJob;
  * A scheduled job that deletes the outdated Service Group export files once a day.
  *
  * @author Philip Helger
- * @since 8.2.1
+ * @since 8.3.0
  * @see ServiceGroupExportJob#purgeOldExportFiles()
  */
 @DisallowConcurrentExecution

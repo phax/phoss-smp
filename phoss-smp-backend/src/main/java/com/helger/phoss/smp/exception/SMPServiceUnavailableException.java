@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
  * possible, but that may be retried later.
  *
  * @author Philip Helger
- * @since 8.2.1
+ * @since 8.3.0
  */
 public class SMPServiceUnavailableException extends SMPServerException
 {

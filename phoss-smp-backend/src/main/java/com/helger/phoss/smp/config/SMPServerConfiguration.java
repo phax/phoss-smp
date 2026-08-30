@@ -350,7 +350,7 @@ public final class SMPServerConfiguration
    * @return The number of days a created Service Group export file is kept on disk, before it is
    *         deleted. If the value is &le; 0, the export files are kept forever. The default value
    *         is {@value #DEFAULT_SMP_EXPORT_RETENTION_DAYS} days.
-   * @since 8.2.1
+   * @since 8.3.0
    */
   public static int getExportRetentionDays ()
   {

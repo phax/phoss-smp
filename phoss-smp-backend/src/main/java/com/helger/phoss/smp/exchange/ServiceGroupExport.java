@@ -87,7 +87,7 @@ public final class ServiceGroupExport
   /**
    * @return The MIME type of the created export data, including the charset parameter. Never
    *         <code>null</code>.
-   * @since 8.2.1
+   * @since 8.3.0
    */
   @NonNull
   public static IMimeType getExportMimeType ()
@@ -223,7 +223,7 @@ public final class ServiceGroupExport
    * @param aOS
    *        The output stream to write to. May not be <code>null</code>. The stream is neither
    *        flushed nor closed by this method.
-   * @since 8.2.1
+   * @since 8.3.0
    */
   public static void createExportDataXMLVer10 (@NonNull final ICommonsList <ISMPServiceGroup> aServiceGroups,
                                                final boolean bIncludeBusinessCards,

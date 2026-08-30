@@ -65,14 +65,15 @@ public final class SMPApplicationXServletHandlerTest
   @Test
   public void testPolicyWithReporting ()
   {
-    final CSPReportingEndpoint aEP = new CSPReportingEndpoint ("/smp-cspreporting?page=menuitem-service_groups_export_data&build=8.2.1");
+    final CSPReportingEndpoint aEP = new CSPReportingEndpoint ("/smp-cspreporting?page=menuitem-service_groups_export_data&build=8.3.0");
     final String sPolicy = SMPApplicationXServletHandler.createCSPPolicy (NONCE, aEP).getAsString ();
 
     // Both mechanisms are emitted, and "report-to" uses the name the header declares
     assertTrue (sPolicy,
-                sPolicy.contains ("report-uri /smp-cspreporting?page=menuitem-service_groups_export_data&build=8.2.1"));
+                sPolicy.contains ("report-uri /smp-cspreporting?page=menuitem-service_groups_export_data&build=8.3.0"));
     assertTrue (sPolicy, sPolicy.contains ("report-to " + CSPReportingEndpoint.DEFAULT_ENDPOINT_NAME));
-    assertEquals (CSPReportingEndpoint.DEFAULT_ENDPOINT_NAME + "=\"/smp-cspreporting?page=menuitem-service_groups_export_data&build=8.2.1\"",
+    assertEquals (CSPReportingEndpoint.DEFAULT_ENDPOINT_NAME +
+                  "=\"/smp-cspreporting?page=menuitem-service_groups_export_data&build=8.3.0\"",
                   aEP.getReportingEndpointsHeaderValue ());
   }
 }
