@@ -32,6 +32,7 @@ import com.helger.datetime.util.PDTIOHelper;
 import com.helger.io.file.FileHelper;
 import com.helger.io.file.FileIOError;
 import com.helger.io.file.FileOperationManager;
+import com.helger.io.file.FilenameHelper;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -108,11 +109,17 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
   @Nonempty
   public static String createExportFilename ()
   {
-    return EXPORT_FILENAME_PREFIX +
-           PDTIOHelper.getCurrentLocalDateTimeForFilename () +
-           "-" +
-           UUID.randomUUID ().toString () +
-           EXPORT_FILENAME_EXTENSION;
+    final String sFilename = EXPORT_FILENAME_PREFIX +
+                             PDTIOHelper.getCurrentLocalDateTimeForFilename () +
+                             "-" +
+                             UUID.randomUUID ().toString () +
+                             EXPORT_FILENAME_EXTENSION;
+
+    // Ensure the resulting name is a valid filename on all platforms
+    final String ret = FilenameHelper.getAsSecureValidASCIIFilename (sFilename);
+    if (ret == null)
+      throw new IllegalStateException ("Failed to create a valid export filename from '" + sFilename + "'");
+    return ret;
   }
 
   /**
