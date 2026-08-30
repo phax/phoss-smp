@@ -456,7 +456,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     final APIPath aAPIPath = APIPath.createForFilter (aRequestScope);
 
     // Hard coded path with white listed requests
-    if (RegExHelper.stringMatchesPattern ("^/(ajax|error|favicon.ico|logout|ping|public|resbundle|robots.txt|secure|smp-cspreporting|smp-status|stream)(/.*)?$",
+    if (RegExHelper.stringMatchesPattern ("^/(ajax|error|favicon.ico|logout|ping|public|resbundle|robots.txt|secure|smp-cspreporting|smp-ready|smp-status|stream)(/.*)?$",
                                           aAPIPath.getPath ()))
     {
       // Explicitly other servlet
