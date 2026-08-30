@@ -1269,7 +1269,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     // Server side pagination and filtering - only query the entries of the
     // current page
-    final long nTotalBusinessCardCount = aBusinessCardMgr.getSMPBusinessCardCount ();
     final String sSearchText = SMPPagination.getSearchText (aWPEC);
     final SMPPagination aPagination = new SMPPagination (aWPEC, aBusinessCardMgr.getSMPBusinessCardCount (sSearchText));
     final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards (sSearchText,
