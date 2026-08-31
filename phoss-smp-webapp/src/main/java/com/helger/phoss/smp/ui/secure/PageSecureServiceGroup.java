@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.WorkInProgress;
-import com.helger.base.compare.ESortOrder;
 import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
@@ -199,7 +198,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final String sSMLZoneName = aSettings.getSMLDNSZone ();
       final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
 
-      final HCTable aTable = new HCTable (new DTCol ("Service group").setInitialSorting (ESortOrder.ASCENDING),
+      final HCTable aTable = new HCTable (new DTCol ("Service group"),
                                           new DTCol ("DNS name (not clickable)").setWidth ("50%"),
                                           new DTCol ("SMP URI").setDataSort (2, 0),
                                           new DTCol ("Action")).setID (getID () + "_checkdns");
@@ -536,7 +535,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addChild (getUIHandler ().createDataGroupHeader ("Custom Properties"));
 
       final HCTable aCPTable = new HCTable (new DTCol ("Type"),
-                                            new DTCol ("Name").setInitialSorting (ESortOrder.ASCENDING),
+                                            new DTCol ("Name"),
                                             new DTCol ("Value")).setID (getID () + "_customprops");
       aCustomProperties.forEach (x -> {
         final HCRow aRow = aCPTable.addBodyRow ();
@@ -959,8 +958,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     // Only the participant ID and the owner exist as columns in the data store - everything else is
     // derived and can therefore not be sorted by
-    return new HCTable (new DTCol ("Participant ID").setName (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ())
-                                                    .setInitialSorting (ESortOrder.ASCENDING),
+    return new HCTable (new DTCol ("Participant ID").setName (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ()),
                         new DTCol ("Owner").setName (ESMPServiceGroupColumn.OWNER.getID ()),
                         bShowBusinessCardName ? new DTCol ("Business Card Name").setOrderable (false) : null,
                         new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle ("Is an Extension present?"))
@@ -1131,6 +1129,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPServiceGroupColumn.values ()));
   }
 }

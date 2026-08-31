@@ -21,7 +21,6 @@ import java.util.Locale;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.base.compare.ESortOrder;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.html.tabular.HCRow;
@@ -82,8 +81,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
     // requested by the client can be resolved onto the respective SQL column or MongoDB field.
     // Process ID, Transport Profile and Validity live in child entities and can therefore not be
     // sorted by in the data store.
-    return new HCTable (new DTCol ("Service Group").setName (ESMPServiceInformationColumn.SERVICE_GROUP.getID ())
-                                                   .setInitialSorting (ESortOrder.ASCENDING),
+    return new HCTable (new DTCol ("Service Group").setName (ESMPServiceInformationColumn.SERVICE_GROUP.getID ()),
                         new DTCol ("Document Type ID").setName (ESMPServiceInformationColumn.DOCUMENT_TYPE_ID.getID ()),
                         new DTCol ("Process ID").setOrderable (false),
                         new DTCol ("Transport Profile").setOrderable (false),
@@ -193,6 +191,6 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPServiceInformationColumn.values ()));
   }
 }

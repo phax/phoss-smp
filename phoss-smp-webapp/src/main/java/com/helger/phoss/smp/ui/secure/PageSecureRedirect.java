@@ -22,7 +22,6 @@ import java.util.Locale;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.base.compare.ESortOrder;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
@@ -435,8 +434,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     // The column names are the IDs of ESMPRedirectColumn, so that the sort order requested by the
     // client can be resolved onto the respective SQL column or MongoDB field
-    return new HCTable (new DTCol ("Service Group").setName (ESMPRedirectColumn.SERVICE_GROUP.getID ())
-                                                   .setInitialSorting (ESortOrder.ASCENDING),
+    return new HCTable (new DTCol ("Service Group").setName (ESMPRedirectColumn.SERVICE_GROUP.getID ()),
                         new DTCol ("Document type ID").setName (ESMPRedirectColumn.DOCUMENT_TYPE_ID.getID ()),
                         new DTCol ("Target URL").setName (ESMPRedirectColumn.TARGET_URL.getID ()),
                         new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
@@ -522,6 +520,6 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPRedirectColumn.values ()));
   }
 }

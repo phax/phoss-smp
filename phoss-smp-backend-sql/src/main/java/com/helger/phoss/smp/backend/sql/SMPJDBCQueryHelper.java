@@ -18,18 +18,14 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
-import com.helger.base.reflection.GenericReflection;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
-import com.helger.collection.paging.PagingSpec;
-import com.helger.collection.paging.SortField;
 import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.api.paging.DBPagingHelper;
 import com.helger.db.api.paging.IDBColumnNameResolver;
 import com.helger.phoss.smp.domain.ISMPTableColumn;
-import com.helger.phoss.smp.domain.SMPSortColumn;
 import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 
 /**
@@ -73,35 +69,6 @@ public final class SMPJDBCQueryHelper
     };
   }
 
-  /**
-   * Resolve the sort fields of the provided paging specification onto the provided columns and
-   * return a paging specification that contains the resolved sort fields only. This drops unknown
-   * and non-sortable sort fields, and - if none remains - it adds the default sort order, so that
-   * the created SQL always contains an <code>ORDER BY</code> clause. Without it a query would
-   * return the rows of a page in an undefined order, and consecutive pages could overlap or lose
-   * rows.<br>
-   * All backends use {@link SMPTableColumnHelper} for this, so that they all sort identically.
-   *
-   * @param aColumns
-   *        All available columns. May not be <code>null</code>.
-   * @param aPagingSpec
-   *        The paging specification to be resolved. May not be <code>null</code>.
-   * @return Never <code>null</code>.
-   */
-  @NonNull
-  public static IPagingSpec getEffectivePagingSpec (@NonNull final ISMPTableColumn <?> [] aColumns,
-                                                    @NonNull final IPagingSpec aPagingSpec)
-  {
-    ValueEnforcer.notNull (aColumns, "Columns");
-    ValueEnforcer.notNull (aPagingSpec, "PagingSpec");
-
-    final ICommonsList <SortField> aSortFields = new CommonsArrayList <> ();
-    for (final SMPSortColumn <?> aSortColumn : SMPTableColumnHelper.getAllSortColumns (GenericReflection.uncheckedCast (aColumns),
-                                                                                       aPagingSpec))
-      aSortFields.add (new SortField (aSortColumn.getColumn ().getID (), aSortColumn.getSortOrder ()));
-
-    return new PagingSpec (aPagingSpec.getStartIndex (), aPagingSpec.getMaxCount (), aSortFields);
-  }
 
   /**
    * Create the combined <code>ORDER BY</code> and paging clause for the provided paging
@@ -122,7 +89,11 @@ public final class SMPJDBCQueryHelper
 
   /**
    * Create the combined <code>ORDER BY</code> and paging clause for the provided paging
-   * specification.
+   * specification. If the specification contains no usable sort field - because none was requested
+   * or because none could be resolved - the default order declared by the provided columns is used,
+   * so that the created SQL always contains an <code>ORDER BY</code> clause. Without it a query
+   * would return the rows of a page in an undefined order, and consecutive pages could overlap or
+   * lose rows.
    *
    * @param eDBType
    *        The database system to create the clause for. May not be <code>null</code>.
@@ -131,15 +102,19 @@ public final class SMPJDBCQueryHelper
    * @param aPagingSpec
    *        The paging specification to be applied. May not be <code>null</code>.
    * @return The SQL clause, starting with a blank. Never <code>null</code> but maybe empty.
+   * @see ISMPTableColumn#getDefaultSortOrder()
    */
   @NonNull
   public static String getOrderByAndPagingClause (@NonNull final EDatabaseSystemType eDBType,
                                                   @NonNull final ISMPTableColumn <?> [] aColumns,
                                                   @NonNull final IPagingSpec aPagingSpec)
   {
+    ValueEnforcer.notNull (aColumns, "Columns");
+
     return DBPagingHelper.getOrderByAndPagingClause (eDBType,
-                                                     getEffectivePagingSpec (aColumns, aPagingSpec),
-                                                     createColumnNameResolver (aColumns));
+                                                     aPagingSpec,
+                                                     createColumnNameResolver (aColumns),
+                                                     SMPTableColumnHelper.getAllDefaultSortFields (aColumns));
   }
 
   /**

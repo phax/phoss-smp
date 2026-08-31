@@ -24,7 +24,6 @@ import org.jspecify.annotations.NonNull;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.WorkInProgress;
 import com.helger.base.compare.CompareHelper;
-import com.helger.base.compare.ESortOrder;
 import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.state.ESuccess;
 import com.helger.base.state.EValidity;
@@ -1274,8 +1273,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     // Only the participant ID exists as a column in the data store. A Business Card has 0-n
     // entities, so everything below can be searched but not sorted by
-    return new HCTable (new DTCol ("Service Group").setName (ESMPBusinessCardColumn.SERVICE_GROUP.getID ())
-                                                   .setInitialSorting (ESortOrder.ASCENDING),
+    return new HCTable (new DTCol ("Service Group").setName (ESMPBusinessCardColumn.SERVICE_GROUP.getID ()),
                         new DTCol ("Name").setOrderable (false),
                         new DTCol ("Country").setOrderable (false),
                         new DTCol ("GeoInfo").setOrderable (false),
@@ -1397,6 +1395,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPBusinessCardColumn.values ()));
   }
 }

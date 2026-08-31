@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.compare.ESortOrder;
 import com.helger.base.lang.EnumHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -37,6 +38,7 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
                  new String [] { "sgid" },
                  true,
                  true,
+                 ESortOrder.ASCENDING,
                  ISMPBusinessCard::getID),
   /**
    * The names of all contained business entities. A Business Card has 0-n entities with 0-n names
@@ -47,6 +49,7 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
         new String [] { "entities.names.name" },
         false,
         true,
+        null,
         ESMPBusinessCardColumn::_getAllEntityNames);
 
   private final String m_sID;
@@ -54,6 +57,7 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
   private final String [] m_aMongoFieldNames;
   private final boolean m_bSortable;
   private final boolean m_bSearchable;
+  private final ESortOrder m_eDefaultSortOrder;
   private final Function <ISMPBusinessCard, String> m_aValueProvider;
 
   ESMPBusinessCardColumn (@NonNull @Nonempty final String sID,
@@ -61,6 +65,7 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
                          final String @Nullable [] aMongoFieldNames,
                          final boolean bSortable,
                          final boolean bSearchable,
+                         @Nullable final ESortOrder eDefaultSortOrder,
                          @NonNull final Function <ISMPBusinessCard, String> aValueProvider)
   {
     m_sID = sID;
@@ -68,6 +73,7 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
     m_aMongoFieldNames = aMongoFieldNames;
     m_bSortable = bSortable;
     m_bSearchable = bSearchable;
+    m_eDefaultSortOrder = eDefaultSortOrder;
     m_aValueProvider = aValueProvider;
   }
 
@@ -100,6 +106,12 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
   public boolean isSearchable ()
   {
     return m_bSearchable;
+  }
+
+  @Nullable
+  public ESortOrder getDefaultSortOrder ()
+  {
+    return m_eDefaultSortOrder;
   }
 
   @NonNull

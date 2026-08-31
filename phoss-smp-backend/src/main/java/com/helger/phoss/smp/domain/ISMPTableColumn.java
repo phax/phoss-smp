@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.compare.CompareHelper;
+import com.helger.base.compare.ESortOrder;
 import com.helger.base.id.IHasID;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
@@ -70,6 +71,30 @@ public interface ISMPTableColumn <DATATYPE> extends IHasID <String>
    *         otherwise.
    */
   boolean isSearchable ();
+
+  /**
+   * The sort order this column contributes to the <b>default order</b> - the order that is used if
+   * a client requests no order at all, or only unknown respectively non-sortable ones. All columns
+   * with a non-<code>null</code> value form the default order together, in their declaration
+   * order, which is how a composite key like "service group, then document type" is expressed.<br>
+   * A default order is mandatory for paging: without a deterministic order a query returns the rows
+   * of a page arbitrarily, so that consecutive pages may overlap or lose rows. Therefore at least
+   * one column of a domain object must declare one, and every such column must be sortable.
+   *
+   * @return The sort order to be used in the default order, or <code>null</code> if this column is
+   *         not part of it.
+   */
+  @Nullable
+  ESortOrder getDefaultSortOrder ();
+
+  /**
+   * @return <code>true</code> if this column is part of the default order.
+   * @see #getDefaultSortOrder()
+   */
+  default boolean isDefaultSortColumn ()
+  {
+    return getDefaultSortOrder () != null;
+  }
 
   /**
    * @return The provider of the value of this column for a single domain object. It is used for the

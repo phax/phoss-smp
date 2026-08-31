@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.compare.ESortOrder;
 import com.helger.base.lang.EnumHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -36,15 +37,18 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
                   new String [] { "id" },
                   true,
                   true,
+                  ESortOrder.ASCENDING,
                   ISMPServiceGroup::getID),
   /** The ID of the owning user */
-  OWNER ("owner", new String [] { "so.username" }, new String [] { "ownerid" }, true, false, ISMPServiceGroup::getOwnerID);
+  OWNER ("owner", new String [] { "so.username" }, new String [] { "ownerid" }, true, false,
+                  null, ISMPServiceGroup::getOwnerID);
 
   private final String m_sID;
   private final String [] m_aSQLColumnNames;
   private final String [] m_aMongoFieldNames;
   private final boolean m_bSortable;
   private final boolean m_bSearchable;
+  private final ESortOrder m_eDefaultSortOrder;
   private final Function <ISMPServiceGroup, String> m_aValueProvider;
 
   ESMPServiceGroupColumn (@NonNull @Nonempty final String sID,
@@ -52,6 +56,7 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
                           final String @Nullable [] aMongoFieldNames,
                           final boolean bSortable,
                           final boolean bSearchable,
+                          @Nullable final ESortOrder eDefaultSortOrder,
                           @NonNull final Function <ISMPServiceGroup, String> aValueProvider)
   {
     m_sID = sID;
@@ -59,6 +64,7 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
     m_aMongoFieldNames = aMongoFieldNames;
     m_bSortable = bSortable;
     m_bSearchable = bSearchable;
+    m_eDefaultSortOrder = eDefaultSortOrder;
     m_aValueProvider = aValueProvider;
   }
 
@@ -91,6 +97,12 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
   public boolean isSearchable ()
   {
     return m_bSearchable;
+  }
+
+  @Nullable
+  public ESortOrder getDefaultSortOrder ()
+  {
+    return m_eDefaultSortOrder;
   }
 
   @NonNull

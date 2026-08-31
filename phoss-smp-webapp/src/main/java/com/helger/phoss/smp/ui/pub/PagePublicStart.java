@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
-import com.helger.base.compare.ESortOrder;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -178,11 +177,10 @@ public final class PagePublicStart extends AbstractSMPWebPage
     {
       // Dynamic - paging, sorting and searching are done by DataTables via the AJAX function, so
       // only the rows of the currently displayed page are ever queried
-      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setName (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ())
-                                                                      .setInitialSorting (ESortOrder.ASCENDING),
+      final HCTable aTable = new HCTable (new DTCol ("Participant ID").setName (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ()),
                                           new DTCol (bShowExtensionDetails ? "Extension" : "Extension?").setOrderable (false),
                                           new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
-      aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand));
+      aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPServiceGroupColumn.values ()));
       return;
     }
 

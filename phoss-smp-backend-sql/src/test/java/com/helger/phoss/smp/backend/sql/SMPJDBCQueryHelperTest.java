@@ -95,13 +95,22 @@ public final class SMPJDBCQueryHelperTest
   }
 
   @Test
-  public void testEffectivePagingSpecKeepsPaging ()
+  public void testDefaultOrderIsTheDeclaredOne ()
   {
-    final IPagingSpec aSpec = SMPJDBCQueryHelper.getEffectivePagingSpec (ESMPServiceGroupColumn.values (),
-                                                                         new PagingSpec (50, 25));
-    assertEquals (50, aSpec.getStartIndex ());
-    assertEquals (25, aSpec.getMaxCount ());
-    assertEquals (new CommonsArrayList <> (SortField.ascending ("participantid")), aSpec.getAllSortFields ());
+    // Not just "the first column": Redirects sort by service group AND document type, which is what
+    // the enum declares
+    assertEquals (" ORDER BY businessIdentifierScheme ASC, businessIdentifier ASC," +
+                  " documentIdentifierScheme ASC, documentIdentifier ASC" +
+                  " LIMIT 25 OFFSET 0",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
+                                                                ESMPRedirectColumn.values (),
+                                                                new PagingSpec (0, 25)));
+
+    // The Business Card name is searchable but not sortable, so it is not part of the default order
+    assertEquals (" ORDER BY pid ASC LIMIT 25 OFFSET 0",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
+                                                                com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn.values (),
+                                                                new PagingSpec (0, 25)));
   }
 
   @Test

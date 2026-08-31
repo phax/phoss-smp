@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.compare.ESortOrder;
 import com.helger.base.lang.EnumHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -40,32 +41,38 @@ public enum ESMPParticipantMigrationColumn implements ISMPTableColumn <ISMPParti
                   new String [] { "pid" },
                   true,
                   true,
+                  ESortOrder.ASCENDING,
                   x -> x.getParticipantIdentifier ().getURIEncoded ()),
   /** The date and time the migration was initiated */
   INITIATION_DATE_TIME ("initiationdt",
                         new String [] { "initdt" },
                         true,
                         false,
+                        null,
                         x -> x.getInitiationDateTime () == null ? null : x.getInitiationDateTime ().toString ()),
   /** The migration key exchanged with the SML */
-  MIGRATION_KEY ("migrationkey", new String [] { "migkey" }, true, true, ISMPParticipantMigration::getMigrationKey);
+  MIGRATION_KEY ("migrationkey", new String [] { "migkey" }, true, true,
+                  null, ISMPParticipantMigration::getMigrationKey);
 
   private final String m_sID;
   private final String [] m_aSQLColumnNames;
   private final boolean m_bSortable;
   private final boolean m_bSearchable;
+  private final ESortOrder m_eDefaultSortOrder;
   private final Function <ISMPParticipantMigration, String> m_aValueProvider;
 
   ESMPParticipantMigrationColumn (@NonNull @Nonempty final String sID,
                                   final String @Nullable [] aSQLColumnNames,
                                   final boolean bSortable,
                                   final boolean bSearchable,
+                                  @Nullable final ESortOrder eDefaultSortOrder,
                                   @NonNull final Function <ISMPParticipantMigration, String> aValueProvider)
   {
     m_sID = sID;
     m_aSQLColumnNames = aSQLColumnNames;
     m_bSortable = bSortable;
     m_bSearchable = bSearchable;
+    m_eDefaultSortOrder = eDefaultSortOrder;
     m_aValueProvider = aValueProvider;
   }
 
@@ -99,6 +106,12 @@ public enum ESMPParticipantMigrationColumn implements ISMPTableColumn <ISMPParti
   public boolean isSearchable ()
   {
     return m_bSearchable;
+  }
+
+  @Nullable
+  public ESortOrder getDefaultSortOrder ()
+  {
+    return m_eDefaultSortOrder;
   }
 
   @NonNull

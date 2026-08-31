@@ -17,26 +17,36 @@
 package com.helger.phoss.smp.ui;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.collection.paging.SortField;
+import com.helger.html.hc.html.tabular.HCColGroup;
+import com.helger.html.hc.html.tabular.IHCCol;
 import com.helger.html.hc.html.tabular.IHCTable;
 import com.helger.html.jquery.JQueryAjaxBuilder;
 import com.helger.html.jscode.JSAssocArray;
+import com.helger.phoss.smp.domain.ISMPTableColumn;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.uicore.page.IWebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.DataTablesOrder;
 import com.helger.photon.uictrls.datatables.EDataTablesServerSideMode;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTables;
 import com.helger.photon.uictrls.datatables.ajax.AjaxExecutorDataTablesOnDemand;
 import com.helger.photon.uictrls.datatables.ajax.IDataTablesOnDemandDataProvider;
+import com.helger.photon.uictrls.datatables.column.DTCol;
 
 /**
- * Helper to run a DataTables in the server side mode
- * {@link EDataTablesServerSideMode#ON_DEMAND}: the table is never rendered as a whole, instead
- * every AJAX request queries only the rows of the requested page from the respective manager.<br>
+ * Helper to run a DataTables in the server side mode {@link EDataTablesServerSideMode#ON_DEMAND}:
+ * the table is never rendered as a whole, instead every AJAX request queries only the rows of the
+ * requested page from the respective manager.<br>
  * The default configuration of {@link SMPCommonUI} points all DataTables to the shared
  * {@link AjaxExecutorDataTables}, which keeps a rendered copy of the whole table in the session.
  * This class overrides that per table.
@@ -47,6 +57,8 @@ import com.helger.photon.uictrls.datatables.ajax.IDataTablesOnDemandDataProvider
 @Immutable
 public final class SMPDataTablesOnDemand
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPDataTablesOnDemand.class);
+
   private SMPDataTablesOnDemand ()
   {}
 
@@ -99,18 +111,85 @@ public final class SMPDataTablesOnDemand
   @NonNull
   public static DataTables createDataTables (@NonNull final IWebPageExecutionContext aWPEC,
                                              @NonNull final IHCTable <?> aTable,
-                                             @NonNull final IAjaxFunctionDeclaration aAjaxFunction)
+                                             @NonNull final IAjaxFunctionDeclaration aAjaxFunction,
+                                             @NonNull final ISMPTableColumn <?> [] aColumns)
   {
     ValueEnforcer.notNull (aWPEC, "WPEC");
     ValueEnforcer.notNull (aTable, "Table");
     ValueEnforcer.notNull (aAjaxFunction, "AjaxFunction");
+    ValueEnforcer.notNull (aColumns, "Columns");
 
     final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+
     // Overwrite the default AJAX URL of SMPCommonUI, that points to the shared executor keeping a
     // copy of the whole table in the session
-    return aDataTables.setServerSideMode (EDataTablesServerSideMode.ON_DEMAND)
-                      .setAjaxBuilder (new JQueryAjaxBuilder ().url (aAjaxFunction.getInvocationURL (aWPEC.getRequestScope ()))
-                                                               .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
-                                                                                               aTable.getID ())));
+    aDataTables.setServerSideMode (EDataTablesServerSideMode.ON_DEMAND)
+               .setAjaxBuilder (new JQueryAjaxBuilder ().url (aAjaxFunction.getInvocationURL (aWPEC.getRequestScope ()))
+                                                        .data (new JSAssocArray ().add (AjaxExecutorDataTables.OBJECT_ID,
+                                                                                        aTable.getID ())));
+
+    // The initial order of the table is the default order declared by the columns, so that the
+    // order shown in the UI and the order the backend falls back to cannot drift apart. It may
+    // consist of more than one column, e.g. "service group, then document type"
+    final DataTablesOrder aInitialOrder = createInitialOrder (aTable, aColumns);
+    if (aInitialOrder != null)
+      aDataTables.setInitialOrder (aInitialOrder);
+
+    return aDataTables;
+  }
+
+  private static int _getColumnIndexOfName (@NonNull final IHCTable <?> aTable, @NonNull final String sName)
+  {
+    final HCColGroup aColGroup = aTable.getColGroup ();
+    if (aColGroup != null)
+    {
+      int nIndex = 0;
+      for (final IHCCol <?> aCol : aColGroup.getAllColumns ())
+      {
+        if (aCol instanceof final DTCol aDTCol && sName.equals (aDTCol.getName ()))
+          return nIndex;
+        ++nIndex;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Map the default order declared by the provided columns onto the column indices of the provided
+   * table.
+   *
+   * @param aTable
+   *        The table to map onto. May not be <code>null</code>. Its sortable columns must be named
+   *        after the ID of the respective {@link ISMPTableColumn}.
+   * @param aColumns
+   *        All available columns. May not be <code>null</code>.
+   * @return <code>null</code> if the table contains none of the default order columns.
+   * @see ISMPTableColumn#getDefaultSortOrder()
+   */
+  @Nullable
+  public static DataTablesOrder createInitialOrder (@NonNull final IHCTable <?> aTable,
+                                                    @NonNull final ISMPTableColumn <?> [] aColumns)
+  {
+    ValueEnforcer.notNull (aTable, "Table");
+    ValueEnforcer.notNull (aColumns, "Columns");
+
+    final DataTablesOrder ret = new DataTablesOrder ();
+    boolean bAny = false;
+    for (final SortField aSortField : SMPTableColumnHelper.getAllDefaultSortFields (aColumns))
+    {
+      final int nColumnIndex = _getColumnIndexOfName (aTable, aSortField.getFieldName ());
+      if (nColumnIndex < 0)
+      {
+        LOGGER.warn ("The default sort column '" +
+                     aSortField.getFieldName () +
+                     "' is not part of the table '" +
+                     aTable.getID () +
+                     "' - the initial order of the UI and the default order of the backend may differ");
+        continue;
+      }
+      ret.addColumn (nColumnIndex, aSortField.getSortOrder ());
+      bAny = true;
+    }
+    return bAny ? ret : null;
   }
 }

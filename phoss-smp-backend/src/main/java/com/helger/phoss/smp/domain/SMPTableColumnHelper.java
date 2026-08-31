@@ -23,6 +23,7 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.reflection.GenericReflection;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -104,12 +105,69 @@ public final class SMPTableColumnHelper
       ret.add (new SMPSortColumn <> (aColumn, aSortField.getSortOrder ()));
     }
 
-    if (ret.isEmpty () && aColumns.length > 0)
+    if (ret.isEmpty ())
     {
-      // Paging without a deterministic order returns arbitrary rows, so the first column is used
-      // as the default order. All backends use this same fallback.
-      ret.add (new SMPSortColumn <> (aColumns[0], ESortOrder.ASCENDING));
+      // Paging without a deterministic order returns arbitrary rows, so the explicitly declared
+      // default order is used. All backends use this same fallback.
+      ret.addAll (getAllDefaultSortColumns (aColumns));
     }
+    return ret;
+  }
+
+  /**
+   * Get the columns that form the default order of the provided domain object, in the order of
+   * precedence.
+   *
+   * @param <DATATYPE>
+   *        The domain object type
+   * @param aColumns
+   *        All available columns. May not be <code>null</code>.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @see ISMPTableColumn#getDefaultSortOrder()
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  public static <DATATYPE> ICommonsList <SMPSortColumn <DATATYPE>> getAllDefaultSortColumns (@NonNull final ISMPTableColumn <DATATYPE> [] aColumns)
+  {
+    ValueEnforcer.notNull (aColumns, "Columns");
+
+    final ICommonsList <SMPSortColumn <DATATYPE>> ret = new CommonsArrayList <> ();
+    for (final ISMPTableColumn <DATATYPE> aColumn : aColumns)
+    {
+      final ESortOrder eSortOrder = aColumn.getDefaultSortOrder ();
+      if (eSortOrder != null)
+      {
+        if (!aColumn.isSortable ())
+        {
+          LOGGER.error ("The column '" +
+                        aColumn.getID () +
+                        "' is part of the default order but is not sortable - ignoring it");
+          continue;
+        }
+        ret.add (new SMPSortColumn <> (aColumn, eSortOrder));
+      }
+    }
+
+    if (ret.isEmpty ())
+      LOGGER.error ("None of the provided columns declares a default sort order. Paging will therefore return the rows of a page in an undefined order.");
+    return ret;
+  }
+
+  /**
+   * Get the default order of the provided domain object as data store independent sort fields.
+   *
+   * @param aColumns
+   *        All available columns. May not be <code>null</code>.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @see #getAllDefaultSortColumns(ISMPTableColumn[])
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  public static ICommonsList <SortField> getAllDefaultSortFields (@NonNull final ISMPTableColumn <?> [] aColumns)
+  {
+    final ICommonsList <SortField> ret = new CommonsArrayList <> ();
+    for (final SMPSortColumn <?> aSortColumn : getAllDefaultSortColumns (GenericReflection.uncheckedCast (aColumns)))
+      ret.add (new SortField (aSortColumn.getColumn ().getID (), aSortColumn.getSortOrder ()));
     return ret;
   }
 

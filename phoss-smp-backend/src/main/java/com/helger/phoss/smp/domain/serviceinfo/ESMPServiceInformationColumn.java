@@ -17,6 +17,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.compare.ESortOrder;
 import com.helger.base.lang.EnumHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
@@ -36,6 +37,7 @@ public enum ESMPServiceInformationColumn implements ISMPTableColumn <ISMPService
                  new String [] { "sgid" },
                  true,
                  true,
+                 ESortOrder.ASCENDING,
                  ISMPServiceInformation::getServiceGroupID),
   /** The document type identifier */
   DOCUMENT_TYPE_ID ("doctypeid",
@@ -43,6 +45,7 @@ public enum ESMPServiceInformationColumn implements ISMPTableColumn <ISMPService
                     new String [] { "doctypeid" },
                     true,
                     true,
+                    ESortOrder.ASCENDING,
                     x -> x.getDocumentTypeIdentifier ().getURIEncoded ());
 
   private final String m_sID;
@@ -50,6 +53,7 @@ public enum ESMPServiceInformationColumn implements ISMPTableColumn <ISMPService
   private final String [] m_aMongoFieldNames;
   private final boolean m_bSortable;
   private final boolean m_bSearchable;
+  private final ESortOrder m_eDefaultSortOrder;
   private final Function <ISMPServiceInformation, String> m_aValueProvider;
 
   ESMPServiceInformationColumn (@NonNull @Nonempty final String sID,
@@ -57,6 +61,7 @@ public enum ESMPServiceInformationColumn implements ISMPTableColumn <ISMPService
                                final String @Nullable [] aMongoFieldNames,
                                final boolean bSortable,
                                final boolean bSearchable,
+                               @Nullable final ESortOrder eDefaultSortOrder,
                                @NonNull final Function <ISMPServiceInformation, String> aValueProvider)
   {
     m_sID = sID;
@@ -64,6 +69,7 @@ public enum ESMPServiceInformationColumn implements ISMPTableColumn <ISMPService
     m_aMongoFieldNames = aMongoFieldNames;
     m_bSortable = bSortable;
     m_bSearchable = bSearchable;
+    m_eDefaultSortOrder = eDefaultSortOrder;
     m_aValueProvider = aValueProvider;
   }
 
@@ -96,6 +102,12 @@ public enum ESMPServiceInformationColumn implements ISMPTableColumn <ISMPService
   public boolean isSearchable ()
   {
     return m_bSearchable;
+  }
+
+  @Nullable
+  public ESortOrder getDefaultSortOrder ()
+  {
+    return m_eDefaultSortOrder;
   }
 
   @NonNull

@@ -23,6 +23,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.Test;
 
+import com.helger.base.compare.ESortOrder;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
@@ -53,16 +54,19 @@ public final class SMPTableColumnHelperTest
     private final String m_sID;
     private final boolean m_bSortable;
     private final boolean m_bSearchable;
+    private final ESortOrder m_eDefaultSortOrder;
     private final Function <String, String> m_aValueProvider;
 
     MockColumn (@NonNull final String sID,
                 final boolean bSortable,
                 final boolean bSearchable,
+                @Nullable final ESortOrder eDefaultSortOrder,
                 @NonNull final Function <String, String> aValueProvider)
     {
       m_sID = sID;
       m_bSortable = bSortable;
       m_bSearchable = bSearchable;
+      m_eDefaultSortOrder = eDefaultSortOrder;
       m_aValueProvider = aValueProvider;
     }
 
@@ -93,6 +97,12 @@ public final class SMPTableColumnHelperTest
       return m_bSearchable;
     }
 
+    @Nullable
+    public ESortOrder getDefaultSortOrder ()
+    {
+      return m_eDefaultSortOrder;
+    }
+
     @NonNull
     public Function <String, String> getValueProvider ()
     {
@@ -101,10 +111,10 @@ public final class SMPTableColumnHelperTest
   }
 
   // "first" sorts by the first character, "all" by the whole value
-  private static final MockColumn COL_FIRST = new MockColumn ("first", true, true, x -> x.substring (0, 1));
-  private static final MockColumn COL_ALL = new MockColumn ("all", true, true, x -> x);
-  private static final MockColumn COL_NOSORT = new MockColumn ("nosort", false, true, x -> x);
-  private static final MockColumn COL_NOSEARCH = new MockColumn ("nosearch", true, false, x -> x);
+  private static final MockColumn COL_FIRST = new MockColumn ("first", true, true, ESortOrder.ASCENDING, x -> x.substring (0, 1));
+  private static final MockColumn COL_ALL = new MockColumn ("all", true, true, null, x -> x);
+  private static final MockColumn COL_NOSORT = new MockColumn ("nosort", false, true, null, x -> x);
+  private static final MockColumn COL_NOSEARCH = new MockColumn ("nosearch", true, false, null, x -> x);
   @SuppressWarnings ("unchecked")
   private static final ISMPTableColumn <String> [] COLUMNS = new ISMPTableColumn [] { COL_FIRST, COL_ALL, COL_NOSORT,
                                                                                       COL_NOSEARCH };
@@ -136,14 +146,32 @@ public final class SMPTableColumnHelperTest
   }
 
   @Test
-  public void testSortColumnsFallBackToFirstColumn ()
+  public void testSortColumnsFallBackToDefaultOrder ()
   {
-    // No sort field at all - the first column is used, so that paging is deterministic
+    // No sort field at all - the declared default order is used, so that paging is deterministic
     final ICommonsList <SMPSortColumn <String>> aSortColumns;
     aSortColumns = SMPTableColumnHelper.getAllSortColumns (COLUMNS, new PagingSpec (0, 10));
     assertEquals (1, aSortColumns.size ());
     assertSame (COL_FIRST, aSortColumns.getFirstOrNull ().getColumn ());
     assertTrue (aSortColumns.getFirstOrNull ().isAscending ());
+
+    // Same for a specification whose sort fields are all unknown
+    assertEquals (aSortColumns.size (),
+                  SMPTableColumnHelper.getAllSortColumns (COLUMNS,
+                                                          new PagingSpec (0, 10, SortField.ascending ("unknown")))
+                                      .size ());
+  }
+
+  @Test
+  public void testDefaultSortColumns ()
+  {
+    // Only the columns that declare a default sort order are part of it
+    final ICommonsList <SMPSortColumn <String>> aDefault = SMPTableColumnHelper.getAllDefaultSortColumns (COLUMNS);
+    assertEquals (1, aDefault.size ());
+    assertSame (COL_FIRST, aDefault.getFirstOrNull ().getColumn ());
+
+    assertEquals (new CommonsArrayList <> (SortField.ascending ("first")),
+                  SMPTableColumnHelper.getAllDefaultSortFields (COLUMNS));
   }
 
   @Test
