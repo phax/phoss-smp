@@ -18,6 +18,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.collection.paging.PagingSpec;
+import com.helger.collection.paging.SortField;
+import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.api.paging.IDBColumnNameResolver;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
 import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
@@ -57,6 +61,50 @@ public final class SMPJDBCQueryHelperTest
   }
 
   @Test
+  public void testOrderByAlwaysPresent ()
+  {
+    // A paging specification without any sort field must still create an ORDER BY, because paging
+    // without a deterministic order returns arbitrary rows. This is the case for the initial
+    // request of a page, where the client did not (yet) request a specific order.
+    assertEquals (" ORDER BY sg.businessIdentifierScheme ASC, sg.businessIdentifier ASC LIMIT 25 OFFSET 0",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
+                                                                ESMPServiceGroupColumn.values (),
+                                                                new PagingSpec (0, 25)));
+
+    // Same for a specification whose sort fields are all unknown or non-sortable
+    assertEquals (" ORDER BY sg.businessIdentifierScheme ASC, sg.businessIdentifier ASC LIMIT 25 OFFSET 50",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
+                                                                ESMPServiceGroupColumn.values (),
+                                                                new PagingSpec (50,
+                                                                                25,
+                                                                                SortField.ascending ("no-such-field"))));
+
+    // An explicitly requested order wins over the default
+    assertEquals (" ORDER BY so.username DESC OFFSET 0 ROWS FETCH NEXT 25 ROWS ONLY",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.POSTGRESQL,
+                                                                ESMPServiceGroupColumn.values (),
+                                                                new PagingSpec (0,
+                                                                                25,
+                                                                                SortField.descending ("owner"))));
+
+    // Even without any paging an order is created
+    assertEquals (" ORDER BY sg.businessIdentifierScheme ASC, sg.businessIdentifier ASC",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
+                                                                ESMPServiceGroupColumn.values (),
+                                                                PagingSpec.UNLIMITED));
+  }
+
+  @Test
+  public void testEffectivePagingSpecKeepsPaging ()
+  {
+    final IPagingSpec aSpec = SMPJDBCQueryHelper.getEffectivePagingSpec (ESMPServiceGroupColumn.values (),
+                                                                         new PagingSpec (50, 25));
+    assertEquals (50, aSpec.getStartIndex ());
+    assertEquals (25, aSpec.getMaxCount ());
+    assertEquals (new CommonsArrayList <> (SortField.ascending ("participantid")), aSpec.getAllSortFields ());
+  }
+
+  @Test
   public void testSearchConditionEmpty ()
   {
     assertTrue (SMPJDBCQueryHelper.createSearchCondition (ESMPServiceGroupColumn.values (), null).isEmpty ());
@@ -72,7 +120,7 @@ public final class SMPJDBCQueryHelperTest
     assertEquals ("(LOWER(sg.businessIdentifierScheme) LIKE ? ESCAPE '!'" +
                   " OR LOWER(sg.businessIdentifier) LIKE ? ESCAPE '!')",
                   aSC.getSQL ());
-    assertEquals (new CommonsArrayList <Object> ("%0088%", "%0088%"), aSC.getAllParams ());
+    assertEquals (new CommonsArrayList <> ("%0088%", "%0088%"), aSC.getAllParams ());
   }
 
   @Test

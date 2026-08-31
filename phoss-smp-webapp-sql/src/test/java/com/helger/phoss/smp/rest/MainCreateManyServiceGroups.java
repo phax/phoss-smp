@@ -75,7 +75,7 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
       for (int i = START_INDEX; i < START_INDEX + PARTICIPANT_COUNT; ++i)
       {
         final int idx = i;
-        es.submit ( () -> {
+        es.submit (() -> {
           final StopWatch aSW = StopWatch.createdStarted ();
           final PeppolParticipantIdentifier aPI = createPID (idx);
           final String sPI = aPI.getURIEncoded ();
@@ -105,9 +105,15 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
                                                        .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
             _testResponseJerseyClient (aResponseMsg, 200);
           }
-
-          aSW.stop ();
-          LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+          catch (final Throwable t)
+          {
+            LOGGER.error ("Oops", t);
+          }
+          finally
+          {
+            aSW.stop ();
+            LOGGER.info (sPI + " took " + aSW.getMillis () + " ms");
+          }
         });
       }
 

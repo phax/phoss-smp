@@ -79,8 +79,8 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
+import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPCustomPropertyTypeSelect;
@@ -122,7 +122,6 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
-import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
@@ -964,7 +963,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                     .setInitialSorting (ESortOrder.ASCENDING),
                         new DTCol ("Owner").setName (ESMPServiceGroupColumn.OWNER.getID ()),
                         bShowBusinessCardName ? new DTCol ("Business Card Name").setOrderable (false) : null,
-                        new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle ("Is an Extension present?")).setOrderable (false),
+                        new DTCol (span (bShowExtensionDetails ? "Ext" : "Ext?").setTitle ("Is an Extension present?"))
+                                                                                                                       .setOrderable (false),
                         new DTCol ("Properties").setDisplayType (EDTColType.INT, aDisplayLocale).setOrderable (false),
                         bShowDetails ? new DTCol (span ("Docs").setTitle ("Number of assigned document types")).setDisplayType (EDTColType.INT,
                                                                                                                                 aDisplayLocale)

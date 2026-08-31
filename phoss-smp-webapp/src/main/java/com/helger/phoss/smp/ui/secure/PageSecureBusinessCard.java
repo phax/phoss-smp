@@ -118,9 +118,7 @@ import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
-import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -1265,7 +1263,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     return ret;
   }
 
-  /** The number of columns of the list table - see {@link #_createTable(WebPageExecutionContext)} */
+  /**
+   * The number of columns of the list table - see {@link #_createTable(WebPageExecutionContext)}
+   */
   private static final int LIST_COLUMN_COUNT = 6;
 
   @NonNull

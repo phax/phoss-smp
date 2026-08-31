@@ -34,9 +34,9 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
-import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
@@ -44,14 +44,13 @@ import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
-import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
-import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -137,10 +136,12 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
           aRow.addCell (NiceNameUI.createProcessID (aDocTypeID, aProcessID, false));
 
           final String sTransportProfile = aEndpoint.getTransportProfile ();
-          aRow.addCell (new HCA (createViewURL (aWPEC, CMenuSecure.MENU_TRANSPORT_PROFILES, sTransportProfile))
-                                                                                                               .addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
-                                                                                                                                                             aTPCache.getFromCache (sTransportProfile),
-                                                                                                                                                             false)));
+          aRow.addCell (new HCA ().setHref (createViewURL (aWPEC,
+                                                           CMenuSecure.MENU_TRANSPORT_PROFILES,
+                                                           sTransportProfile))
+                                  .addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                aTPCache.getFromCache (sTransportProfile),
+                                                                                false)));
 
           aRow.addCell (SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
                                                                aEndpoint.getServiceExpirationDate (),
@@ -178,12 +179,13 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
-    final boolean bHideDetails = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCount () > 1000;
+    final boolean bShowTreeview = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCount () <= 1_000;
 
+    // Toolbar
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (!bHideDetails)
+    if (bShowTreeview)
       aToolbar.addButton ("Tree view",
                           aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE),
                           EDefaultIcon.MAGNIFIER);
