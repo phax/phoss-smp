@@ -132,6 +132,7 @@ public final class SMPUserManagerPhoton
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("The provided BasicAuth credentials resolved to the user '" + aUser.getLoginName () + "'");
 
+      SMPCurrentUserIDProvider.setCurrentAPIUserID (aUser.getID ());
       return aUser;
     }
 
@@ -174,6 +175,7 @@ public final class SMPUserManagerPhoton
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("The provided Bearer token resolved to the user '" + aUser.getLoginName () + "'");
 
+      SMPCurrentUserIDProvider.setCurrentAPIUserID (aUser.getID ());
       return aUser;
     }
 
