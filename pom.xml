@@ -70,7 +70,7 @@
     <flyway.version>13.4.0</flyway.version>
     <log4j.version>2.26.1</log4j.version>
     <mongodb.version>5.11.0</mongodb.version>
-    <protobuf.version>4.36.0</protobuf.version>
+    <protobuf.version>4.36.1</protobuf.version>
     
     <ph-db.version>8.4.3-SNAPSHOT</ph-db.version>
   </properties>
