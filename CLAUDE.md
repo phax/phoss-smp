@@ -196,7 +196,6 @@ global.debug = false           # Set true only in development
 global.production = true
 
 # Security (recommended for production)
-webapp.startpage.participants.none = true
 webapp.security.login.errordetails = false
 csp.enabled = true
 smp.rest.remote.queryapi.disabled = true
