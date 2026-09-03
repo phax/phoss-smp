@@ -78,21 +78,6 @@ public final class SMPDataTablesOnDemand
   }
 
   /**
-   * Register the AJAX function that provides the rows of a single page of a public page. Contrary
-   * to {@link #registerSecure(IDataTablesOnDemandDataProvider)} no login is required.
-   *
-   * @param aDataProvider
-   *        The provider that queries and renders the rows. May not be <code>null</code>.
-   * @return The created function declaration. Never <code>null</code>.
-   */
-  @NonNull
-  public static IAjaxFunctionDeclaration registerPublic (@NonNull final IDataTablesOnDemandDataProvider aDataProvider)
-  {
-    ValueEnforcer.notNull (aDataProvider, "DataProvider");
-    return CAjax.addAjax (new AjaxExecutorDataTablesOnDemand (aDataProvider));
-  }
-
-  /**
    * Create the DataTables for the provided table and switch it to the "on demand" server side mode,
    * so that the AJAX requests are answered by the provided function instead of by the shared
    * {@link AjaxExecutorDataTables}.
@@ -104,8 +89,7 @@ public final class SMPDataTablesOnDemand
    *        ID.
    * @param aAjaxFunction
    *        The AJAX function providing the rows, as created by
-   *        {@link #registerSecure(IDataTablesOnDemandDataProvider)} respectively
-   *        {@link #registerPublic(IDataTablesOnDemandDataProvider)}. May not be <code>null</code>.
+   *        {@link #registerSecure(IDataTablesOnDemandDataProvider)}. May not be <code>null</code>.
    * @return The created DataTables. Never <code>null</code>.
    */
   @NonNull
