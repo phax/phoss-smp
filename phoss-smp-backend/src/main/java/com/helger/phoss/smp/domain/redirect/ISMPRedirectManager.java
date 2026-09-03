@@ -11,17 +11,22 @@
 package com.helger.phoss.smp.domain.redirect;
 
 import java.security.cert.X509Certificate;
+import java.util.Comparator;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 
@@ -33,6 +38,17 @@ import com.helger.peppolid.IParticipantIdentifier;
  */
 public interface ISMPRedirectManager
 {
+  /**
+   * @return The comparator to be used for the server side pagination, to ensure a stable order
+   *         across single page requests.
+   */
+  @NonNull
+  private static Comparator <ISMPRedirect> _getDefaultComparator ()
+  {
+    return Comparator.comparing (ISMPRedirect::getServiceGroupID)
+                     .thenComparing (x -> x.getDocumentTypeIdentifier ().getURIEncoded ());
+  }
+
   /**
    * @return A non-<code>null</code> mutable list of callbacks.
    */
@@ -100,6 +116,33 @@ public interface ISMPRedirectManager
   ICommonsList <ISMPRedirect> getAllSMPRedirects ();
 
   /**
+   * Get a single "page" of all entries matching the provided search text. This method is meant to
+   * be used for server side pagination in combination with {@link #getSMPRedirectCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via {@link ESMPRedirectColumn} - unknown or
+   * non-sortable field names are ignored, because they are provided by a client. If no sort field
+   * remains, the first column of {@link ESMPRedirectColumn} is used, so that consecutive page requests return
+   * disjunct results.
+   *
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering takes place. It is matched against all searchable columns of
+   *        {@link ESMPRedirectColumn}, ignoring case.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
+                                                          @Nullable final String sSearchText)
+  {
+    return SMPTableColumnHelper.getPage (ESMPRedirectColumn.values (), getAllSMPRedirects (), aPagingSpec, sSearchText);
+  }
+
+
+
+  /**
    * Get all redirects of the passed service group.
    *
    * @param aParticipantID
@@ -116,6 +159,26 @@ public interface ISMPRedirectManager
    */
   @Nonnegative
   long getSMPRedirectCount ();
+
+  /**
+   * Get the number of entries matching the provided search text.
+   *
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        entries are counted.
+   * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
+   *         because of a missing SQL backend).
+   * @since 8.2.1
+   */
+  @CheckForSigned
+  default long getSMPRedirectCount (@Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getSMPRedirectCount ();
+
+    return SMPTableColumnHelper.getCount (ESMPRedirectColumn.values (), getAllSMPRedirects (), sSearchText);
+  }
+
 
   /**
    * Find the redirect that matches the passed tuple of service group and

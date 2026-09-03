@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -56,6 +57,11 @@ import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -74,6 +80,8 @@ import com.helger.photon.audit.AuditHelper;
 public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledManager implements
                                                     ISMPServiceInformationManager
 {
+  private static final ESMPServiceInformationColumn [] COLUMNS = ESMPServiceInformationColumn.values ();
+
   @MustImplementEqualsAndHashcode
   private static final class DocTypeAndExtension
   {
@@ -408,15 +416,64 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ret;
   }
 
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@NonNull final IPagingSpec aPagingSpec,
+                                                                            @Nullable final String sSearchText)
+  {
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    _forEachSMPServiceInformation ((aSearch.isEmpty () ? "" : " WHERE " + aSearch.getSQL ()) +
+                                   SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec),
+                                   aSearch.getAllParams (),
+                                   ret::add);
+    // The DB result is grouped in a Map, so the order needs to be restored
+    final Comparator <ISMPServiceInformation> aComparator = SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec);
+    if (aComparator != null)
+      ret.sort (aComparator);
+    return ret;
+  }
+
+  @Override
+  public long getSMPServiceInformationCount (@Nullable final String sSearchText)
+  {
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    if (aSearch.isEmpty ())
+      return getSMPServiceInformationCount ();
+
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableNameSM + " sm WHERE " + aSearch.getSQL (),
+                                      new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
+  }
+
   public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
   {
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
+    _forEachSMPServiceInformation (null, null, aConsumer);
+  }
+
+  private void _forEachSMPServiceInformation (@Nullable final String sServiceMetadataSuffix,
+                                              @Nullable final ICommonsList <Object> aParams,
+                                              @NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
+  {
+    // If only a single page shall be returned, the paging must happen on the
+    // Service Metadata level, because the joins create multiple rows per
+    // Service Information object
+    final String sServiceMetadataTable = sServiceMetadataSuffix == null ? m_sTableNameSM
+                                                                       : "(SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension FROM " +
+                                                                         m_sTableNameSM +
+                                                                         " sm" +
+                                                                         sServiceMetadataSuffix +
+                                                                         ")";
+    final String sSQL = "SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
                                                                           "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
                                                                           "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
                                                                           "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
                                                                           " FROM " +
-                                                                          m_sTableNameSM +
+                                                                          sServiceMetadataTable +
                                                                           " sm" +
                                                                           " INNER JOIN " +
                                                                           m_sTableNameP +
@@ -428,7 +485,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           " se" +
                                                                           "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
                                                                           "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
-                                                                          "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier");
+                                                                          "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier";
+    final ICommonsList <DBResultRow> aDBResult = aParams == null || aParams.isEmpty () ? newExecutor ().queryAll (sSQL)
+                                                                                       : newExecutor ().queryAll (sSQL,
+                                                                                                                  new ConstantPreparedStatementDataProvider (aParams));
 
     final ICommonsMap <IParticipantIdentifier, ICommonsMap <DocTypeAndExtension, ICommonsMap <SMPProcess, ICommonsList <SMPEndpoint>>>> aGrouping = new CommonsHashMap <> ();
     if (aDBResult != null)

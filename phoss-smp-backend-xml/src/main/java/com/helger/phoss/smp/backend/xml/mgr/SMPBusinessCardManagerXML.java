@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.xml.mgr;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -33,6 +34,9 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -53,6 +57,8 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
                                              implements
                                              ISMPBusinessCardManager
 {
+  private static final ESMPBusinessCardColumn [] COLUMNS = ESMPBusinessCardColumn.values ();
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerXML.class);
 
   private final CallbackList <ISMPBusinessCardCallback> m_aCBs = new CallbackList <> ();
@@ -175,6 +181,24 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards ()
   {
     return getAll ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+                        aPagingSpec,
+                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+  }
+
+  @Override
+  public long getSMPBusinessCardCount (@Nullable final String sSearchText)
+  {
+    final Predicate <ISMPBusinessCard> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPBusinessCardCount () : getCount (aFilter);
   }
 
   @NonNull

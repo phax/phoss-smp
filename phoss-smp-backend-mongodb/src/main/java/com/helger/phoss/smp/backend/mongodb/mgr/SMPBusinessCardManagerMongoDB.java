@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -39,8 +40,11 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.backend.mongodb.SMPMongoQueryHelper;
+import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -51,6 +55,7 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
 
@@ -64,6 +69,7 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerMongoDB.class);
 
   private static final String BSON_ID = "id";
+  private static final ESMPBusinessCardColumn [] COLUMNS = ESMPBusinessCardColumn.values ();
   private static final String BSON_SERVICE_GROUP_ID = "sgid";
   private static final String BSON_ENTITIES = "entities";
   private static final String BSON_NAMES = "names";
@@ -361,6 +367,35 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
     final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    final ICommonsList <ISMPBusinessCard> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    final FindIterable <Document> aCursor = aFilter == null ? getCollection ().find ()
+                                                            : getCollection ().find (aFilter);
+    aCursor.sort (SMPMongoQueryHelper.createSort (COLUMNS, aPagingSpec));
+    if (aPagingSpec.getStartIndex () > 0)
+      aCursor.skip ((int) Math.min (aPagingSpec.getStartIndex (), Integer.MAX_VALUE));
+    if (!aPagingSpec.isUnlimited ())
+      aCursor.limit ((int) Math.min (aPagingSpec.getMaxCount (), Integer.MAX_VALUE));
+    aCursor.forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @Override
+  public long getSMPBusinessCardCount (@Nullable final String sSearchText)
+  {
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPBusinessCardCount () : getCollection ().countDocuments (aFilter);
   }
 
   @NonNull

@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.xml.mgr;
 
 import java.security.cert.X509Certificate;
+import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -35,6 +36,9 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -53,6 +57,8 @@ import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <ISMPRedirect, SMPRedirect> implements
                                          ISMPRedirectManager
 {
+  private static final ESMPRedirectColumn [] COLUMNS = ESMPRedirectColumn.values ();
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerXML.class);
 
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
@@ -222,6 +228,24 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   public ICommonsList <ISMPRedirect> getAllSMPRedirects ()
   {
     return getAll ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
+                                                         @Nullable final String sSearchText)
+  {
+    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+                        aPagingSpec,
+                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+  }
+
+  @Override
+  public long getSMPRedirectCount (@Nullable final String sSearchText)
+  {
+    final Predicate <ISMPRedirect> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPRedirectCount () : getCount (aFilter);
   }
 
   @NonNull

@@ -29,8 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.CheckForSigned;
 import com.helger.annotation.Nonempty;
+import com.helger.base.debug.GlobalDebug;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.io.stream.StreamHelper;
+import com.helger.base.log.ConditionalLogger;
 import com.helger.base.numeric.mutable.MutableInt;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsMap;
@@ -57,6 +59,7 @@ public class MongoClientProvider implements AutoCloseable
 {
   private static final class LoggingCommandListener implements CommandListener
   {
+    private static ConditionalLogger COND_LOG = new ConditionalLogger (LOGGER, GlobalDebug.isDebugMode ());
     private final AtomicInteger m_aTotalCount = new AtomicInteger (0);
     private final ICommonsMap <String, MutableInt> m_aCommands = new CommonsHashMap <> ();
 
@@ -66,7 +69,7 @@ public class MongoClientProvider implements AutoCloseable
       final String sCommandName = event.getCommandName ();
       final int nCount = m_aCommands.computeIfAbsent (sCommandName, k -> new MutableInt (0)).inc ();
       final int nTotal = m_aTotalCount.incrementAndGet ();
-      LOGGER.info ("Successfully executed '" + sCommandName + "' [" + nCount + "/" + nTotal + "]");
+      COND_LOG.info (() -> "Successfully executed '" + sCommandName + "' [" + nCount + "/" + nTotal + "]");
     }
 
     @Override

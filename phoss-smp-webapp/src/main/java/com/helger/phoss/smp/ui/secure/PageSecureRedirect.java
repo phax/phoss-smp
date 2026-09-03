@@ -22,11 +22,12 @@ import java.util.Locale;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
-import com.helger.base.compare.ESortOrder;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
@@ -43,6 +44,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
@@ -51,6 +53,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -60,15 +63,18 @@ import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap5.form.BootstrapViewForm;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
+import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
@@ -87,6 +93,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
   private static final String ATTR_SERVICE_GROUP = "$servicegroup";
   private static final String ATTR_DOCTYPE_ID = "$doctypeid";
+
+  /** Provides the rows of a single page - see {@link #_getOnDemandData(DataTablesOnDemandRequest, IRequestWebScopeWithoutResponse)} */
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
 
   public PageSecureRedirect (@NonNull @Nonempty final String sID)
   {
@@ -411,12 +420,97 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_EXTENSION)));
   }
 
+  /**
+   * Create the table with the columns only. The rows are added by the "on demand" AJAX function,
+   * because only the rows of the currently displayed page are ever queried and rendered.
+   *
+   * @param aWPEC
+   *        The current context. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private HCTable _createTable (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    // The column names are the IDs of ESMPRedirectColumn, so that the sort order requested by the
+    // client can be resolved onto the respective SQL column or MongoDB field
+    return new HCTable (new DTCol ("Service Group").setName (ESMPRedirectColumn.SERVICE_GROUP.getID ()),
+                        new DTCol ("Document type ID").setName (ESMPRedirectColumn.DOCUMENT_TYPE_ID.getID ()),
+                        new DTCol ("Target URL").setName (ESMPRedirectColumn.TARGET_URL.getID ()),
+                        new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
+  }
+
+  private void _addRow (@NonNull final WebPageExecutionContext aWPEC,
+                        @NonNull final HCRow aRow,
+                        @NonNull final ISMPRedirect aCurObject)
+  {
+    final StringMap aParams = new StringMap ();
+    aParams.putIn (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ());
+    aParams.putIn (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
+    final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject, aParams);
+    final String sDisplayName = aCurObject.getServiceGroupID ();
+
+    aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
+    aRow.addCell (NiceNameUI.createDocTypeID (aCurObject.getDocumentTypeIdentifier (), false));
+    aRow.addCell (aCurObject.getTargetHref ());
+
+    final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);
+    final ISimpleURL aCopyURL = createCopyURL (aWPEC, aCurObject).addAll (aParams);
+    final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aCurObject).addAll (aParams);
+    final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroupParticipantIdentifier ()
+                                                                                    .getURIPercentEncoded () +
+                                                                          SMPRestFilter.PATH_SERVICES +
+                                                                          "/" +
+                                                                          aCurObject.getDocumentTypeIdentifier ()
+                                                                                    .getURIPercentEncoded ());
+    aRow.addCell (new HCA (aEditURL).setTitle ("Edit " + sDisplayName).addChild (EDefaultIcon.EDIT.getAsNode ()),
+                  new HCTextNode (" "),
+                  new HCA (aCopyURL).setTitle ("Create a copy of " + sDisplayName)
+                                    .addChild (EDefaultIcon.COPY.getAsNode ()),
+                  new HCTextNode (" "),
+                  new HCA (aDeleteURL).setTitle ("Delete " + sDisplayName)
+                                      .addChild (EDefaultIcon.DELETE.getAsNode ()),
+                  new HCTextNode (" "),
+                  new HCA (aPreviewURL).setTitle ("Perform SMP query on " + sDisplayName)
+                                       .setTargetBlank ()
+                                       .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
+  }
+
+  /**
+   * Provide the rows of a single page. Only the entries of the requested page are queried from the
+   * manager - nothing is kept in the session.
+   *
+   * @param aRequest
+   *        The DataTables request. May not be <code>null</code>.
+   * @param aRequestScope
+   *        The current request scope. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
+                                                     @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
+  {
+    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
+                                                                       this);
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+    final String sSearchText = aRequest.getSearchText ();
+
+    final ICommonsList <HCRow> aRows = new CommonsArrayList <> ();
+    for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects (aRequest.getPagingSpec (), sSearchText))
+    {
+      final HCRow aRow = new HCRow ();
+      _addRow (aWPEC, aRow, aCurObject);
+      aRows.add (aRow);
+    }
+    return new DataTablesOnDemandResult (aRedirectMgr.getSMPRedirectCount (),
+                                         aRedirectMgr.getSMPRedirectCount (sSearchText),
+                                         aRows);
+  }
+
   @Override
   protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
   {
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
@@ -424,48 +518,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     aToolbar.addButton ("Create new Redirect", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aNodeList.addChild (aToolbar);
 
-    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1)
-                                                                   .setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Document type ID").setDataSort (1, 0),
-                                        new DTCol ("Target URL"),
-                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPRedirect aCurObject : aRedirectMgr.getAllSMPRedirects ())
-    {
-      final StringMap aParams = new StringMap ();
-      aParams.putIn (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ());
-      aParams.putIn (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
-      final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject, aParams);
-      final String sDisplayName = aCurObject.getServiceGroupID ();
-
-      final HCRow aRow = aTable.addBodyRow ();
-      aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-      aRow.addCell (NiceNameUI.createDocTypeID (aCurObject.getDocumentTypeIdentifier (), false));
-      aRow.addCell (aCurObject.getTargetHref ());
-
-      final ISimpleURL aEditURL = createEditURL (aWPEC, aCurObject).addAll (aParams);
-      final ISimpleURL aCopyURL = createCopyURL (aWPEC, aCurObject).addAll (aParams);
-      final ISimpleURL aDeleteURL = createDeleteURL (aWPEC, aCurObject).addAll (aParams);
-      final ISimpleURL aPreviewURL = LinkHelper.getURLWithServerAndContext (aCurObject.getServiceGroupParticipantIdentifier ()
-                                                                                      .getURIPercentEncoded () +
-                                                                            SMPRestFilter.PATH_SERVICES +
-                                                                            "/" +
-                                                                            aCurObject.getDocumentTypeIdentifier ()
-                                                                                      .getURIPercentEncoded ());
-      aRow.addCell (new HCA (aEditURL).setTitle ("Edit " + sDisplayName).addChild (EDefaultIcon.EDIT.getAsNode ()),
-                    new HCTextNode (" "),
-                    new HCA (aCopyURL).setTitle ("Create a copy of " + sDisplayName)
-                                      .addChild (EDefaultIcon.COPY.getAsNode ()),
-                    new HCTextNode (" "),
-                    new HCA (aDeleteURL).setTitle ("Delete " + sDisplayName)
-                                        .addChild (EDefaultIcon.DELETE.getAsNode ()),
-                    new HCTextNode (" "),
-                    new HCA (aPreviewURL).setTitle ("Perform SMP query on " + sDisplayName)
-                                         .setTargetBlank ()
-                                         .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
-    }
-
-    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-
-    aNodeList.addChild (aTable).addChild (aDataTables);
+    // The rows are filled by the AJAX function only
+    final HCTable aTable = _createTable (aWPEC);
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPRedirectColumn.values ()));
   }
 }

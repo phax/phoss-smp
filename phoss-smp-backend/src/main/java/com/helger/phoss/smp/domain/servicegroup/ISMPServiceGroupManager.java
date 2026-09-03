@@ -20,9 +20,12 @@ import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
@@ -43,23 +46,21 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   CallbackList <ISMPServiceGroupCallback> serviceGroupCallbacks ();
 
   /**
-   * Create a new service group. The implementation of this class is responsible
-   * for creating the service group in the SML!
+   * Create a new service group. The implementation of this class is responsible for creating the
+   * service group in the SML!
    *
    * @param sOwnerID
-   *        The ID of the owning user. May neither be <code>null</code> nor
-   *        empty.
+   *        The ID of the owning user. May neither be <code>null</code> nor empty.
    * @param aParticipantIdentifier
    *        The underlying participant identifier. May not be <code>null</code>.
    * @param sExtension
-   *        The optional extension element that must be either a well-formed XML
-   *        string (for Peppol SMP) or a valid JSON string (for BDXR SMP).
+   *        The optional extension element that must be either a well-formed XML string (for Peppol
+   *        SMP) or a valid JSON string (for BDXR SMP).
    * @param aCustomProperties
-   *        The optional custom properties for this service group. May be
-   *        <code>null</code>.
+   *        The optional custom properties for this service group. May be <code>null</code>.
    * @param bCreateInSML
-   *        <code>true</code> if the service group should also be created in the
-   *        SML, <code>false</code> if not.
+   *        <code>true</code> if the service group should also be created in the SML,
+   *        <code>false</code> if not.
    * @return The created service group object. Never <code>null</code>.
    * @throws SMPServerException
    *         In case of error
@@ -72,24 +73,21 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
                                           boolean bCreateInSML) throws SMPServerException;
 
   /**
-   * Update an existing service group. Note: the participant ID of a service
-   * group cannot be changed.
+   * Update an existing service group. Note: the participant ID of a service group cannot be
+   * changed.
    *
    * @param aParticipantIdentifier
    *        The ID of the service group to modify. May not be <code>null</code>.
    * @param sOwnerID
-   *        The ID of the (new) owning user. May neither be <code>null</code>
-   *        nor empty.
+   *        The ID of the (new) owning user. May neither be <code>null</code> nor empty.
    * @param sExtension
-   *        The optional (new) extension element that must be well-formed XML if
-   *        present.
+   *        The optional (new) extension element that must be well-formed XML if present.
    * @param aCustomProperties
    *        The optional (new) custom properties. May be <code>null</code>.
    * @throws SMPServerException
    *         In case of error
-   * @return {@link EChange#CHANGED} if the passed service group is contained
-   *         and at least one field was changed, {@link EChange#UNCHANGED}
-   *         otherwise.
+   * @return {@link EChange#CHANGED} if the passed service group is contained and at least one field
+   *         was changed, {@link EChange#UNCHANGED} otherwise.
    */
   @NonNull
   EChange updateSMPServiceGroup (@NonNull IParticipantIdentifier aParticipantIdentifier,
@@ -114,20 +112,18 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   }
 
   /**
-   * Delete an existing service group. If the service group exists and can be
-   * deleted, the implementation of this method is responsible to remove all
-   * related service information and redirects of the service group. The
-   * implementation of this class is responsible for deleting the service group
-   * in the SML!
+   * Delete an existing service group. If the service group exists and can be deleted, the
+   * implementation of this method is responsible to remove all related service information and
+   * redirects of the service group. The implementation of this class is responsible for deleting
+   * the service group in the SML!
    *
    * @param aParticipantIdentifier
-   *        The participant identifier to be deleted. May not be
-   *        <code>null</code>.
+   *        The participant identifier to be deleted. May not be <code>null</code>.
    * @param bDeleteInSML
-   *        <code>true</code> if the service group should also be deleted in the
-   *        SML, <code>false</code> if not.
-   * @return {@link EChange#CHANGED} if the passed service group is contained
-   *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
+   *        <code>true</code> if the service group should also be deleted in the SML,
+   *        <code>false</code> if not.
+   * @return {@link EChange#CHANGED} if the passed service group is contained and was successfully
+   *         deleted, {@link EChange#UNCHANGED} otherwise.
    * @throws SMPServerException
    *         In case of error
    * @see ISMPServiceInformationManager#deleteAllSMPServiceInformationOfServiceGroup(IParticipantIdentifier)
@@ -138,17 +134,15 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
                                                                                                                throws SMPServerException;
 
   /**
-   * Delete the service group, and swallow all exceptions. This is only
-   * recommended for unit tests.
+   * Delete the service group, and swallow all exceptions. This is only recommended for unit tests.
    *
    * @param aParticipantIdentifier
-   *        The participant identifier to be deleted. May not be
-   *        <code>null</code>.
+   *        The participant identifier to be deleted. May not be <code>null</code>.
    * @param bDeleteInSML
-   *        <code>true</code> if the service group should also be deleted in the
-   *        SML, <code>false</code> if not.
-   * @return {@link EChange#CHANGED} if the passed service group is contained
-   *         and was successfully deleted, {@link EChange#UNCHANGED} otherwise.
+   *        <code>true</code> if the service group should also be deleted in the SML,
+   *        <code>false</code> if not.
+   * @return {@link EChange#CHANGED} if the passed service group is contained and was successfully
+   *         deleted, {@link EChange#UNCHANGED} otherwise.
    * @see #deleteSMPServiceGroup(IParticipantIdentifier, boolean)
    */
   @NonNull
@@ -166,16 +160,43 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   }
 
   /**
-   * @return A non-<code>null</code> but maybe empty list of all contained
-   *         service groups.
+   * @return A non-<code>null</code> but maybe empty list of all contained service groups.
    */
   @NonNull
   @ReturnsMutableCopy
   ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ();
 
   /**
-   * @return A non-<code>null</code> but maybe empty set of all contained
-   *         service group IDs.
+   * Get a single "page" of all entries matching the provided search text. This method is meant to
+   * be used for server side pagination in combination with
+   * {@link #getSMPServiceGroupCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via {@link ESMPServiceGroupColumn} -
+   * unknown or non-sortable field names are ignored, because they are provided by a client. If no
+   * sort field remains, the first column of {@link ESMPServiceGroupColumn} is used, so that
+   * consecutive page requests return disjunct results.
+   *
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering takes place. It is matched against all searchable columns of
+   *        {@link ESMPServiceGroupColumn}, ignoring case.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @since 8.2.1
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
+                                                                  @Nullable final String sSearchText)
+  {
+    return SMPTableColumnHelper.getPage (ESMPServiceGroupColumn.values (),
+                                         getAllSMPServiceGroups (),
+                                         aPagingSpec,
+                                         sSearchText);
+  }
+
+  /**
+   * @return A non-<code>null</code> but maybe empty set of all contained service group IDs.
    * @since 5.6.0
    */
   @NonNull
@@ -187,8 +208,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *
    * @param sOwnerID
    *        The owner ID to search. May be <code>null</code>.
-   * @return A non-<code>null</code> but maybe empty list of all contained
-   *         service groups of the passed owner.
+   * @return A non-<code>null</code> but maybe empty list of all contained service groups of the
+   *         passed owner.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -205,20 +226,37 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   long getSMPServiceGroupCountOfOwner (@NonNull String sOwnerID);
 
   /**
-   * Check if a service group with the passed participant identifier is
-   * contained.
+   * Check if a service group with the passed participant identifier is contained.
    *
    * @param aParticipantIdentifier
    *        The participant identifier to search. May be <code>null</code>.
-   * @return <code>true</code> if the participant identifier is not
-   *         <code>null</code> and contained.
+   * @return <code>true</code> if the participant identifier is not <code>null</code> and contained.
    */
   boolean containsSMPServiceGroupWithID (@Nullable IParticipantIdentifier aParticipantIdentifier);
 
   /**
-   * @return The total number of contained service groups. May be &lt; 0 in case
-   *         there was an error querying (e.g. because of missing SQL backend).
+   * @return The total number of contained service groups. May be &lt; 0 in case there was an error
+   *         querying (e.g. because of missing SQL backend).
    */
   @CheckForSigned
   long getSMPServiceGroupCount ();
+
+  /**
+   * Get the number of entries matching the provided search text.
+   *
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        entries are counted.
+   * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
+   *         because of a missing SQL backend).
+   * @since 8.2.1
+   */
+  @CheckForSigned
+  default long getSMPServiceGroupCount (@Nullable final String sSearchText)
+  {
+    if (StringHelper.isEmpty (sSearchText))
+      return getSMPServiceGroupCount ();
+
+    return SMPTableColumnHelper.getCount (ESMPServiceGroupColumn.values (), getAllSMPServiceGroups (), sSearchText);
+  }
 }

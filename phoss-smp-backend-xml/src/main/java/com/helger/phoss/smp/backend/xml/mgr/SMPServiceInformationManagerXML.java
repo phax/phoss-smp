@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.xml.mgr;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -37,6 +38,9 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -65,6 +69,8 @@ public final class SMPServiceInformationManagerXML extends
                                                    implements
                                                    ISMPServiceInformationManager
 {
+  private static final ESMPServiceInformationColumn [] COLUMNS = ESMPServiceInformationColumn.values ();
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
 
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
@@ -305,6 +311,24 @@ public final class SMPServiceInformationManagerXML extends
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation ()
   {
     return getAll ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@NonNull final IPagingSpec aPagingSpec,
+                                                                            @Nullable final String sSearchText)
+  {
+    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+                        aPagingSpec,
+                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+  }
+
+  @Override
+  public long getSMPServiceInformationCount (@Nullable final String sSearchText)
+  {
+    final Predicate <ISMPServiceInformation> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPServiceInformationCount () : getCount (aFilter);
   }
 
   public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)
