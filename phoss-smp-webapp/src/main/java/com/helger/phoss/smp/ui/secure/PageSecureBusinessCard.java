@@ -322,7 +322,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                   (aSettings.isDirectoryIntegrationEnabled () &&
                                                     aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
                                                                                                     SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                    " server should have been updated."
+                                                                                                    " server is updated in the background."
                                                                                                   : "")));
         }
         else
@@ -806,7 +806,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                 (aSettings.isDirectoryIntegrationEnabled () &&
                                                   aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
                                                                                                   SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                  " server should have been updated."
+                                                                                                  " server is updated in the background."
                                                                                                 : "")));
       }
       else
