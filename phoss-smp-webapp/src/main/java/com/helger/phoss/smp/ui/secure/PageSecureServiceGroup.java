@@ -227,15 +227,14 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         String sURI = null;
         try
         {
-          if (aURLProvider instanceof IPeppolURLProvider)
-            sDNSName = ((IPeppolURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
-                                                                                    sSMLZoneName);
+          if (aURLProvider instanceof final IPeppolURLProvider aRealProvider)
+            sDNSName = aRealProvider.getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (), sSMLZoneName);
           else
-            if (aURLProvider instanceof IBDXLURLProvider)
+            if (aURLProvider instanceof final IBDXLURLProvider aRealProvider)
             {
               // Fallback by not resolving the NAPTR
-              sDNSName = ((IBDXLURLProvider) aURLProvider).getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
-                                                                                    sSMLZoneName);
+              sDNSName = aRealProvider.getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
+                                                                sSMLZoneName);
             }
             else
             {
@@ -517,108 +516,6 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     return aServiceGroupMgr.getSMPServiceGroupOfID (aIdentifierFactory.parseParticipantIdentifier (sID));
   }
 
-  @Override
-  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
-                                     @NonNull final ISMPServiceGroup aSelectedObject)
-  {
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
-    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    final boolean bShowBusinessCard = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
-
-    EFontAwesome6Icon.registerResourcesForThisRequest ();
-
-    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
-                                                            aSelectedObject.getID () +
-                                                            "'"));
-
-    final BootstrapViewForm aForm = new BootstrapViewForm ();
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID").setCtrl (aParticipantID.getURIEncoded ()));
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
-                                                 .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
-    if (aSelectedObject.getExtensions ().extensions ().isNotEmpty ())
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
-                                                   .setCtrl (SMPExtensionUI.getExtensionDisplay (aSelectedObject)));
-
-    // Show custom properties
-    final SGCustomPropertyList aCustomProperties = aSelectedObject.getCustomProperties ();
-    if (aCustomProperties != null && aCustomProperties.isNotEmpty ())
-    {
-      aForm.addChild (getUIHandler ().createDataGroupHeader ("Custom Properties"));
-
-      final HCTable aCPTable = new HCTable (new DTCol ("Type"),
-                                            new DTCol ("Name"),
-                                            new DTCol ("Value")).setID (getID () + "_customprops");
-      aCustomProperties.forEach (x -> {
-        final HCRow aRow = aCPTable.addBodyRow ();
-        aRow.addCell (x.getType ().getDisplayText (aDisplayLocale));
-
-        // Check if this is a predefined property
-        final ESGPredefinedCustomProperty ePredefined = ESGPredefinedCustomProperty.getFromNameOrNull (x.getName ());
-        if (ePredefined != null)
-          aRow.addCell (new HCNodeList ().addChild (x.getName ())
-                                         .addChild (" ")
-                                         .addChild (badgeSuccess (ePredefined.getDisplayText (aDisplayLocale))));
-        else
-          aRow.addCell (x.getName ());
-        aRow.addCell (x.getValue ());
-      });
-      aForm.addChildren (aCPTable, BootstrapDataTables.createDefaultDataTables (aWPEC, aCPTable));
-    }
-
-    // Show all Document Types, Processes and Endpoints assigned to this Service Group
-    {
-      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-      final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aParticipantID);
-
-      int nEndpoints = 0;
-      for (final ISMPServiceInformation aServiceInfo : aServiceInfos)
-        nEndpoints += aServiceInfo.getTotalEndpointCount ();
-
-      aForm.addChild (getUIHandler ().createDataGroupHeader ("Endpoints (" +
-                                                             aServiceInfos.size () +
-                                                             " Document Types, " +
-                                                             nEndpoints +
-                                                             " Endpoints)"));
-      if (aServiceInfos.isEmpty ())
-        aForm.addChild (badgeInfo ("This Service Group has no assigned Endpoints"));
-      else
-        aForm.addChild (_createEndpointTree (aWPEC, aParticipantID, aServiceInfos));
-    }
-
-    // Show all Redirects assigned to this Service Group
-    {
-      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-      final ICommonsList <ISMPRedirect> aRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aParticipantID);
-
-      aForm.addChild (getUIHandler ().createDataGroupHeader ("Redirects (" + aRedirects.size () + ")"));
-      if (aRedirects.isEmpty ())
-        aForm.addChild (badgeInfo ("This Service Group has no assigned Redirects"));
-      else
-        aForm.addChild (_createRedirectTable (aWPEC, aRedirects));
-    }
-
-    if (bShowBusinessCard)
-    {
-      aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Details"));
-
-      final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
-      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aParticipantID);
-      if (aBC != null)
-      {
-        int nIndex = 0;
-        for (final SMPBusinessCardEntity aEntity : aBC.getAllEntities ())
-        {
-          ++nIndex;
-          aForm.addChild (PageSecureBusinessCard.showBusinessCardEntity (aEntity, nIndex, aDisplayLocale));
-        }
-      }
-    }
-
-    aNodeList.addChild (aForm);
-  }
-
   /**
    * Create the tree of all Document Types, Processes and Endpoints of a single Service Group -
    * similar to what {@link PageSecureEndpointTree} shows for all Service Groups.
@@ -652,10 +549,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                 .getSortedInline (ISMPProcess.comparator ());
       for (final ISMPProcess aProcess : aProcesses)
       {
-        final BootstrapTable aEPTable = new BootstrapTable (HCCol.star (),
-                                                            HCCol.star (),
-                                                            HCCol.star (),
-                                                            HCCol.star ()).setBordered (true);
+        final BootstrapTable aEPTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ())
+                                                                                                                       .setBordered (true);
         aEPTable.addHeaderRow ().addCells ("Transport Profile", "Validity", "Endpoint reference", "");
 
         final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ()
@@ -724,10 +619,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static IHCNode _createRedirectTable (@NonNull final WebPageExecutionContext aWPEC,
                                                @NonNull final ICommonsList <ISMPRedirect> aRedirects)
   {
-    final BootstrapTable aTable = new BootstrapTable (HCCol.star (),
-                                                      HCCol.star (),
-                                                      HCCol.star (),
-                                                      HCCol.star ()).setBordered (true);
+    final BootstrapTable aTable = new BootstrapTable (HCCol.star (), HCCol.star (), HCCol.star (), HCCol.star ())
+                                                                                                                 .setBordered (true);
     aTable.addHeaderRow ().addCells ("Document Type ID", "Target URL", "Subject unique identifier", "");
     for (final ISMPRedirect aRedirect : aRedirects.getSortedInline (ISMPRedirect.comparator ()))
     {
@@ -746,6 +639,114 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
               .addClass (CSS_CLASS_RIGHT);
     }
     return aTable;
+  }
+
+  @Override
+  protected void showSelectedObject (@NonNull final WebPageExecutionContext aWPEC,
+                                     @NonNull final ISMPServiceGroup aSelectedObject)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final boolean bShowBusinessCard = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
+
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+
+    aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
+                                                            aSelectedObject.getID () +
+                                                            "'"));
+
+    final BootstrapViewForm aForm = new BootstrapViewForm ();
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
+                                                 .setCtrl (aParticipantID.getURIEncoded ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
+                                                 .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
+    if (aSelectedObject.getExtensions ().extensions ().isNotEmpty ())
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Extension")
+                                                   .setCtrl (SMPExtensionUI.getExtensionDisplay (aSelectedObject)));
+
+    // Show custom properties
+    final SGCustomPropertyList aCustomProperties = aSelectedObject.getCustomProperties ();
+    if (aCustomProperties != null && aCustomProperties.isNotEmpty ())
+    {
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Custom Properties"));
+
+      final HCTable aCPTable = new HCTable (new DTCol ("Type"), new DTCol ("Name"), new DTCol ("Value")).setID (
+                                                                                                                getID () +
+                                                                                                                "_customprops");
+      aCustomProperties.forEach (x -> {
+        final HCRow aRow = aCPTable.addBodyRow ();
+        aRow.addCell (x.getType ().getDisplayText (aDisplayLocale));
+
+        // Check if this is a predefined property
+        final ESGPredefinedCustomProperty ePredefined = ESGPredefinedCustomProperty.getFromNameOrNull (x.getName ());
+        if (ePredefined != null)
+          aRow.addCell (new HCNodeList ().addChild (x.getName ())
+                                         .addChild (" ")
+                                         .addChild (badgeSuccess (ePredefined.getDisplayText (aDisplayLocale))));
+        else
+          aRow.addCell (x.getName ());
+        aRow.addCell (x.getValue ());
+      });
+      aForm.addChildren (aCPTable, BootstrapDataTables.createDefaultDataTables (aWPEC, aCPTable));
+    }
+
+    // Show all Document Types, Processes and Endpoints assigned to this Service Group
+    {
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aParticipantID);
+
+      int nEndpoints = 0;
+      for (final ISMPServiceInformation aServiceInfo : aServiceInfos)
+        nEndpoints += aServiceInfo.getTotalEndpointCount ();
+
+      final int nDocTypes = aServiceInfos.size ();
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Endpoints (" +
+                                                             nDocTypes +
+                                                             " Document Type" +
+                                                             (nDocTypes == 1 ? "" : "s") +
+                                                             ", " +
+                                                             nEndpoints +
+                                                             " Endpoint" +
+                                                             (nEndpoints == 1 ? "" : "s") +
+                                                             ")"));
+      if (aServiceInfos.isEmpty ())
+        aForm.addChild (badgeInfo ("This Service Group has no assigned Endpoints"));
+      else
+        aForm.addChild (_createEndpointTree (aWPEC, aParticipantID, aServiceInfos));
+    }
+
+    // Show all Redirects assigned to this Service Group
+    {
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+      final ICommonsList <ISMPRedirect> aRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aParticipantID);
+
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Redirects (" + aRedirects.size () + ")"));
+      if (aRedirects.isEmpty ())
+        aForm.addChild (badgeInfo ("This Service Group has no assigned Redirects"));
+      else
+        aForm.addChild (_createRedirectTable (aWPEC, aRedirects));
+    }
+
+    if (bShowBusinessCard)
+    {
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Details"));
+
+      final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
+      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aParticipantID);
+      if (aBC != null)
+      {
+        int nIndex = 0;
+        for (final SMPBusinessCardEntity aEntity : aBC.getAllEntities ())
+        {
+          ++nIndex;
+          aForm.addChild (PageSecureBusinessCard.showBusinessCardEntity (aEntity, nIndex, aDisplayLocale));
+        }
+      }
+    }
+
+    aNodeList.addChild (aForm);
   }
 
   @NonNull
@@ -1303,6 +1304,10 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPServiceGroupColumn.values ()));
+    aNodeList.addChild (aTable)
+             .addChild (SMPDataTablesOnDemand.createDataTables (aWPEC,
+                                                                aTable,
+                                                                m_aAjaxOnDemand,
+                                                                ESMPServiceGroupColumn.values ()));
   }
 }
