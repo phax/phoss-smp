@@ -38,6 +38,10 @@ import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.pmigration.ESMPParticipantMigrationColumn;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
@@ -54,6 +58,8 @@ import com.helger.photon.audit.AuditHelper;
 public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManager implements
                                                 ISMPParticipantMigrationManager
 {
+  private static final ESMPParticipantMigrationColumn [] COLUMNS = ESMPParticipantMigrationColumn.values ();
+
   private final String m_sTableName;
 
   /**
@@ -333,6 +339,83 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   public ICommonsList <ISMPParticipantMigration> getAllInboundParticipantMigrations (@Nullable final EParticipantMigrationState eState)
   {
     return _getAllParticipantMigrations (EParticipantMigrationDirection.INBOUND, eState);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPParticipantMigration> getAllParticipantMigrations (@NonNull final EParticipantMigrationDirection eDirection,
+                                                                              @Nullable final EParticipantMigrationState eState,
+                                                                              @NonNull final IPagingSpec aPagingSpec,
+                                                                              @Nullable final String sSearchText)
+  {
+    ValueEnforcer.notNull (eDirection, "Direction");
+
+    final ICommonsList <ISMPParticipantMigration> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    final ICommonsList <Object> aParams = new CommonsArrayList <> ();
+    final StringBuilder aWhere = new StringBuilder (" WHERE direction=?");
+    aParams.add (eDirection.getID ());
+    if (eState != null)
+    {
+      aWhere.append (" AND state=?");
+      aParams.add (eState.getID ());
+    }
+    if (aSearch.isNotEmpty ())
+    {
+      aWhere.append (" AND ").append (aSearch.getSQL ());
+      aParams.addAll (aSearch.getAllParams ());
+    }
+
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, state, pid, initdt, migkey FROM " +
+                                                                          m_sTableName +
+                                                                          aWhere +
+                                                                          SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS,
+                                                                                                                        aPagingSpec),
+                                                                          new ConstantPreparedStatementDataProvider (aParams));
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+      {
+        final EParticipantMigrationState eRealState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
+        final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                         .parseParticipantIdentifier (aRow.getAsString (2));
+        ret.add (new SMPParticipantMigration (aRow.getAsString (0),
+                                              eDirection,
+                                              eRealState,
+                                              aPI,
+                                              aRow.getAsLocalDateTime (3),
+                                              aRow.getAsString (4)));
+      }
+    return ret;
+  }
+
+  @Override
+  public long getParticipantMigrationCount (@NonNull final EParticipantMigrationDirection eDirection,
+                                            @Nullable final EParticipantMigrationState eState,
+                                            @Nullable final String sSearchText)
+  {
+    ValueEnforcer.notNull (eDirection, "Direction");
+
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    final ICommonsList <Object> aParams = new CommonsArrayList <> ();
+    final StringBuilder aWhere = new StringBuilder (" WHERE direction=?");
+    aParams.add (eDirection.getID ());
+    if (eState != null)
+    {
+      aWhere.append (" AND state=?");
+      aParams.add (eState.getID ());
+    }
+    if (aSearch.isNotEmpty ())
+    {
+      aWhere.append (" AND ").append (aSearch.getSQL ());
+      aParams.addAll (aSearch.getAllParams ());
+    }
+
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableName + aWhere,
+                                      new ConstantPreparedStatementDataProvider (aParams));
   }
 
   private boolean _containsMigration (@NonNull final EParticipantMigrationDirection eDirection,

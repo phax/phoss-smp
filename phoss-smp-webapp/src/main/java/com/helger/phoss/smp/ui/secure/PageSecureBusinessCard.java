@@ -24,7 +24,6 @@ import org.jspecify.annotations.NonNull;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.misc.WorkInProgress;
 import com.helger.base.compare.CompareHelper;
-import com.helger.base.compare.ESortOrder;
 import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.state.ESuccess;
 import com.helger.base.state.EValidity;
@@ -66,6 +65,7 @@ import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardContact;
@@ -77,6 +77,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
+import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -99,7 +100,6 @@ import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageAction
 import com.helger.photon.bootstrap5.table.BootstrapTable;
 import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap5.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
@@ -118,7 +118,8 @@ import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.famfam.EFamFamFlagIcon;
 import com.helger.servlet.request.IRequestParamMap;
@@ -295,6 +296,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
   }
 
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
+
   public PageSecureBusinessCard (@NonNull @Nonempty final String sID)
   {
     super (sID, "Business Cards");
@@ -322,7 +325,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                   (aSettings.isDirectoryIntegrationEnabled () &&
                                                     aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
                                                                                                     SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                    " server should have been updated."
+                                                                                                    " server is updated in the background."
                                                                                                   : "")));
         }
         else
@@ -806,7 +809,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                 (aSettings.isDirectoryIntegrationEnabled () &&
                                                   aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
                                                                                                   SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                  " server should have been updated."
+                                                                                                  " server is updated in the background."
                                                                                                 : "")));
       }
       else
@@ -1259,49 +1262,49 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     return ret;
   }
 
-  @Override
-  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
+  /**
+   * The number of columns of the list table - see {@link #_createTable(WebPageExecutionContext)}
+   */
+  private static final int LIST_COLUMN_COUNT = 6;
+
+  @NonNull
+  private HCTable _createTable (@NonNull final WebPageExecutionContext aWPEC)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+    // Only the participant ID exists as a column in the data store. A Business Card has 0-n
+    // entities, so everything below can be searched but not sorted by
+    return new HCTable (new DTCol ("Service Group").setName (ESMPBusinessCardColumn.SERVICE_GROUP.getID ()),
+                        new DTCol ("Name").setOrderable (false),
+                        new DTCol ("Country").setOrderable (false),
+                        new DTCol ("GeoInfo").setOrderable (false),
+                        new DTCol ("Identifiers").setOrderable (false),
+                        new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
+  }
+
+  /**
+   * Provide the rows of a single page. Note that the paging happens on Business Card level, whereas
+   * a single row represents a single business entity - so one page may contain more rows than the
+   * page size.
+   *
+   * @param aRequest
+   *        The DataTables request. May not be <code>null</code>.
+   * @param aRequestScope
+   *        The current request scope. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
+                                                     @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
+  {
+    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
+                                                                       this);
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-    final ICommonsList <ISMPBusinessCard> aAllBusinessCards = aBusinessCardMgr.getAllSMPBusinessCards ();
+    final String sSearchText = aRequest.getSearchText ();
 
-    EFontAwesome6Icon.registerResourcesForThisRequest ();
-
-    {
-      // Only a single push may run at a time
-      final boolean bPushRunning = PushAllBusinessCardsToDirectory.LOCK.isRunning ();
-
-      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-      aToolbar.addButton ("Create new Business Card", createCreateURL (aWPEC), EDefaultIcon.NEW);
-      aToolbar.addChild (new BootstrapButton ().setOnClick (aWPEC.getSelfHref ()
-                                                                 .add (CPageParam.PARAM_ACTION,
-                                                                       ACTION_PUBLISH_ALL_TO_INDEXER))
-                                               .setIcon (EFontAwesome6Icon.ARROW_ROTATE_RIGHT)
-                                               .addChild ("Update all Business Cards in " + sDirectoryName)
-                                               .setDisabled (aAllBusinessCards.isEmpty () || bPushRunning));
-
-      aNodeList.addChild (aToolbar);
-
-      if (bPushRunning)
-      {
-        aNodeList.addChild (warn ("Currently Business Cards are pushed to the " +
-                                  sDirectoryName +
-                                  " in the background"));
-      }
-    }
-
-    final HCTable aTable = new HCTable (new DTCol ("Service Group").setDataSort (0, 1)
-                                                                   .setInitialSorting (ESortOrder.ASCENDING),
-                                        new DTCol ("Name"),
-                                        new DTCol ("Country"),
-                                        new DTCol ("GeoInfo"),
-                                        new DTCol ("Identifiers"),
-                                        new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-    for (final ISMPBusinessCard aCurObject : aAllBusinessCards)
+    final ICommonsList <HCRow> aRows = new CommonsArrayList <> ();
+    for (final ISMPBusinessCard aCurObject : aBusinessCardMgr.getAllSMPBusinessCards (aRequest.getPagingSpec (),
+                                                                                      sSearchText))
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
       final String sDisplayName = aCurObject.getID ();
@@ -1309,18 +1312,19 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
       if (aCurObject.getEntityCount () == 0)
       {
         // Business Card without an entity
-        final HCRow aRow = aTable.addBodyRow ();
+        final HCRow aRow = new HCRow ();
         aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
-        for (int i = 1; i < aTable.getColumnCount () - 1; ++i)
+        for (int i = 1; i < LIST_COLUMN_COUNT - 1; ++i)
           aRow.addCell ();
         aRow.addCell (_createActionCell (aWPEC, aCurObject));
+        aRows.add (aRow);
       }
       else
       {
         // Show all BusinessCard entities
         for (final SMPBusinessCardEntity aEntity : aCurObject.getAllEntities ())
         {
-          final HCRow aRow = aTable.addBodyRow ();
+          final HCRow aRow = new HCRow ();
           aRow.addCell (new HCA (aViewLink).addChild (sDisplayName));
           aRow.addCell (aEntity.names ().getFirstOrNull ().getName ());
 
@@ -1346,11 +1350,51 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
             aRow.addCell (aIdentifiers);
           }
           aRow.addCell (_createActionCell (aWPEC, aCurObject));
+          aRows.add (aRow);
         }
       }
     }
+    return new DataTablesOnDemandResult (aBusinessCardMgr.getSMPBusinessCardCount (),
+                                         aBusinessCardMgr.getSMPBusinessCardCount (sSearchText),
+                                         aRows);
+  }
 
-    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-    aNodeList.addChild (aTable).addChild (aDataTables);
+  @Override
+  protected void showListOfExistingObjects (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+    final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
+    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
+
+    {
+      final long nTotalBusinessCardCount = aBusinessCardMgr.getSMPBusinessCardCount ();
+      // Only a single push may run at a time
+      final boolean bPushRunning = PushAllBusinessCardsToDirectory.LOCK.isRunning ();
+
+      final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+      aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
+      aToolbar.addButton ("Create new Business Card", createCreateURL (aWPEC), EDefaultIcon.NEW);
+      aToolbar.addChild (new BootstrapButton ().setOnClick (aWPEC.getSelfHref ()
+                                                                 .add (CPageParam.PARAM_ACTION,
+                                                                       ACTION_PUBLISH_ALL_TO_INDEXER))
+                                               .setIcon (EFontAwesome6Icon.ARROW_ROTATE_RIGHT)
+                                               .addChild ("Update all Business Cards in " + sDirectoryName)
+                                               .setDisabled (nTotalBusinessCardCount <= 0 || bPushRunning));
+
+      aNodeList.addChild (aToolbar);
+
+      if (bPushRunning)
+      {
+        aNodeList.addChild (warn ("Currently Business Cards are pushed to the " +
+                                  sDirectoryName +
+                                  " in the background"));
+      }
+    }
+
+    // The rows are filled by the AJAX function only
+    final HCTable aTable = _createTable (aWPEC);
+    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPBusinessCardColumn.values ()));
   }
 }

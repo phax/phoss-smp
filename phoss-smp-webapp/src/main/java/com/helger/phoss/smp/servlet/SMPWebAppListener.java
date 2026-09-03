@@ -80,6 +80,7 @@ import com.helger.photon.core.locale.ILocaleManager;
 import com.helger.photon.core.menu.MenuTree;
 import com.helger.photon.core.requestparam.RequestParameterHandlerURLPathNamed;
 import com.helger.photon.core.requestparam.RequestParameterManager;
+import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.quartz.TriggerKey;
 import com.helger.schedule.quartz.GlobalQuartzScheduler;
 import com.helger.servlet.ServletContextPathHolder;
@@ -107,13 +108,18 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     {
       if (bSyncToDirectory)
       {
-        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-        if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+        final PDClient aPDClient = _getDirectoryAutoUpdateClient ();
+        if (aPDClient != null)
         {
+          final IParticipantIdentifier aPID = aBusinessCard.getParticipantIdentifier ();
+
           // Notify PD server: add
-          PDClientProvider.getInstance ()
-                          .getPDClient ()
-                          .addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
+          PhotonWorkerPool.getInstance ()
+                          .run ("Add '" +
+                                aPID.getURIEncoded () +
+                                "' to the " +
+                                SMPWebAppConfiguration.getDirectoryName (),
+                                () -> aPDClient.addServiceGroupToIndex (aPID));
         }
       }
     }
@@ -122,19 +128,29 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     {
       if (bSyncToDirectory)
       {
-        final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-        if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+        final PDClient aPDClient = _getDirectoryAutoUpdateClient ();
+        if (aPDClient != null)
         {
+          final IParticipantIdentifier aPID = aBusinessCard.getParticipantIdentifier ();
+
           // Notify PD server: delete
-          final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
+          // Both calls must happen in a single task, so that their order is
+          // maintained
+          PhotonWorkerPool.getInstance ()
+                          .run ("Delete '" +
+                                aPID.getURIEncoded () +
+                                "' from the " +
+                                SMPWebAppConfiguration.getDirectoryName (),
+                                () -> {
+                                  // "Add" before "delete" to make sure it works
+                                  // This will update the ownership in the
+                                  // Directory, in case a certificate change
+                                  // happened since the last time
+                                  aPDClient.addServiceGroupToIndex (aPID);
 
-          // "Add" before "delete" to make sure it works
-          // This will update the ownership in the Directory, in case a
-          // certificate change happened since the last time
-          aPDClient.addServiceGroupToIndex (aBusinessCard.getParticipantIdentifier ());
-
-          // This is the actual delete call
-          aPDClient.deleteServiceGroupFromIndex (aBusinessCard.getParticipantIdentifier ());
+                                  // This is the actual delete call
+                                  aPDClient.deleteServiceGroupFromIndex (aPID);
+                                });
         }
       }
     }
@@ -152,15 +168,20 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     @Override
     public void onSMPServiceInformationCreated (@NonNull final ISMPServiceInformation aServiceInformation)
     {
-      final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-      if (aSettings.isDirectoryIntegrationEnabled () && aSettings.isDirectoryIntegrationAutoUpdate ())
+      final PDClient aPDClient = _getDirectoryAutoUpdateClient ();
+      if (aPDClient != null)
       {
         // Only if a business card is present
         final IParticipantIdentifier aPID = aServiceInformation.getServiceGroupParticipantIdentifier ();
         if (m_aBusinessCardMgr.containsSMPBusinessCardOfID (aPID))
         {
           // Notify PD server: update
-          PDClientProvider.getInstance ().getPDClient ().addServiceGroupToIndex (aPID);
+          PhotonWorkerPool.getInstance ()
+                          .run ("Add '" +
+                                aPID.getURIEncoded () +
+                                "' to the " +
+                                SMPWebAppConfiguration.getDirectoryName (),
+                                () -> aPDClient.addServiceGroupToIndex (aPID));
         }
       }
     }
@@ -183,6 +204,30 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
   private final ICommonsList <IProxySettingsProvider> m_aProxySettingsProvider = new CommonsArrayList <> ();
   private TriggerKey m_aExportPurgeJobTrigger;
+
+  /**
+   * Get the Directory client to be used for an automatic update. Everything that requires an open
+   * request scope - the SMP settings and the creation of the client - happens in the calling
+   * thread, so that the returned client can afterwards be used in a {@link PhotonWorkerPool}
+   * thread.
+   *
+   * @return <code>null</code> if the Directory integration or the automatic update is disabled, or
+   *         if no Directory host name is configured.
+   */
+  @Nullable
+  private static PDClient _getDirectoryAutoUpdateClient ()
+  {
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    if (!aSettings.isDirectoryIntegrationEnabled () || !aSettings.isDirectoryIntegrationAutoUpdate ())
+      return null;
+
+    final PDClient ret = PDClientProvider.getInstance ().getPDClient ();
+    if (ret == null)
+      LOGGER.warn ("Failed to create the " +
+                   SMPWebAppConfiguration.getDirectoryName () +
+                   " client component - not performing the automatic update");
+    return ret;
+  }
 
   @Nullable
   public static OffsetDateTime getStartupDateTime ()

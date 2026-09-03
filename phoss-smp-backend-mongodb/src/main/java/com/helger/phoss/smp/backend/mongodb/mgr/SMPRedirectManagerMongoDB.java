@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import java.security.cert.X509Certificate;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -36,9 +37,12 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.backend.mongodb.SMPMongoQueryHelper;
+import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -46,6 +50,7 @@ import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
@@ -60,6 +65,7 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerMongoDB.class);
 
   private static final String BSON_ID = "id";
+  private static final ESMPRedirectColumn [] COLUMNS = ESMPRedirectColumn.values ();
   private static final String BSON_SERVICE_GROUP_ID = "sgid";
   private static final String BSON_DOCTYPE_ID = "doctypeid";
   private static final String BSON_TARGET_HREF = "target";
@@ -270,6 +276,35 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
+                                                         @Nullable final String sSearchText)
+  {
+    final ICommonsList <ISMPRedirect> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    final FindIterable <Document> aCursor = aFilter == null ? getCollection ().find ()
+                                                            : getCollection ().find (aFilter);
+    aCursor.sort (SMPMongoQueryHelper.createSort (COLUMNS, aPagingSpec));
+    if (aPagingSpec.getStartIndex () > 0)
+      aCursor.skip ((int) Math.min (aPagingSpec.getStartIndex (), Integer.MAX_VALUE));
+    if (!aPagingSpec.isUnlimited ())
+      aCursor.limit ((int) Math.min (aPagingSpec.getMaxCount (), Integer.MAX_VALUE));
+    aCursor.forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @Override
+  public long getSMPRedirectCount (@Nullable final String sSearchText)
+  {
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPRedirectCount () : getCollection ().countDocuments (aFilter);
   }
 
   @NonNull

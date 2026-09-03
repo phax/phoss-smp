@@ -122,37 +122,6 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   }
 
   /**
-   * This method has only effect, if participants are shown on the start page.
-   *
-   * @return <code>true</code> if the start page should show a dynamic table
-   * @since 5.0.2
-   */
-  public static boolean isStartPageDynamicTable ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.startpage.dynamictable", false);
-  }
-
-  /**
-   * @return <code>true</code> to show no participants on the start page. Default is
-   *         <code>false</code>.
-   * @since 5.0.4
-   */
-  public static boolean isStartPageParticipantsNone ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.startpage.participants.none", false);
-  }
-
-  /**
-   * @return <code>true</code> to show extension details on the public start page,
-   *         <code>false</code> to just show a yes or no indicator. Default is <code>false</code>.
-   * @since 5.1.0
-   */
-  public static boolean isStartPageExtensionsShow ()
-  {
-    return _getConfig ().getAsBoolean ("webapp.startpage.extensions.show", false);
-  }
-
-  /**
    * @return Name of the Directory. Usually "Peppol Directory" but maybe "TOOP Directory" as well.
    * @since 5.0.7
    */

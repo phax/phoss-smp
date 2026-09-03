@@ -42,11 +42,14 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.backend.mongodb.SMPMongoQueryHelper;
+import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -61,6 +64,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
@@ -78,6 +82,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerMongoDB.class);
 
   private static final String BSON_ID = "id";
+  private static final ESMPServiceInformationColumn [] COLUMNS = ESMPServiceInformationColumn.values ();
   private static final String BSON_SERVICE_GROUP_ID = "sgid";
   private static final String BSON_DOCTYPE_ID = "doctypeid";
   private static final String BSON_PROCESSES = "processes";
@@ -470,6 +475,35 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
     forEachSMPServiceInformation (ret::add);
     return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@NonNull final IPagingSpec aPagingSpec,
+                                                                            @Nullable final String sSearchText)
+  {
+    final ICommonsList <ISMPServiceInformation> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    final FindIterable <Document> aCursor = aFilter == null ? getCollection ().find ()
+                                                            : getCollection ().find (aFilter);
+    aCursor.sort (SMPMongoQueryHelper.createSort (COLUMNS, aPagingSpec));
+    if (aPagingSpec.getStartIndex () > 0)
+      aCursor.skip ((int) Math.min (aPagingSpec.getStartIndex (), Integer.MAX_VALUE));
+    if (!aPagingSpec.isUnlimited ())
+      aCursor.limit ((int) Math.min (aPagingSpec.getMaxCount (), Integer.MAX_VALUE));
+    aCursor.forEach (x -> ret.add (toServiceInformation (x, true)));
+    return ret;
+  }
+
+  @Override
+  public long getSMPServiceInformationCount (@Nullable final String sSearchText)
+  {
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPServiceInformationCount () : getCollection ().countDocuments (aFilter);
   }
 
   public void forEachSMPServiceInformation (@NonNull final Consumer <? super ISMPServiceInformation> aConsumer)

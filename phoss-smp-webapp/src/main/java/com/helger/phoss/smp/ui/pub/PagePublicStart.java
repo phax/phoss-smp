@@ -16,50 +16,29 @@
  */
 package com.helger.phoss.smp.ui.pub;
 
-import java.util.Comparator;
-import java.util.Locale;
-
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
-import com.helger.base.compare.ESortOrder;
-import com.helger.collection.commons.ICommonsList;
-import com.helger.html.hc.html.tabular.AbstractHCTable;
-import com.helger.html.hc.html.tabular.HCRow;
-import com.helger.html.hc.html.tabular.HCTable;
-import com.helger.html.hc.html.textlevel.HCA;
+import com.helger.html.hc.html.grouping.HCP;
 import com.helger.html.hc.impl.HCNodeList;
-import com.helger.phoss.smp.app.SMPInternalErrorHandler;
+import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
-import com.helger.phoss.smp.rest.SMPRestDataProvider;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.phoss.smp.ui.SMPExtensionUI;
-import com.helger.photon.bootstrap5.table.BootstrapTable;
-import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
-import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.core.EPhotonCoreText;
-import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.url.SimpleURL;
-import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 import jakarta.annotation.Nullable;
 
 /**
- * This is the start page of the public application. It lists all available service groups.
+ * This is the start page of the public application. It contains a static description of this SMP
+ * only - the participants contained in it are deliberately not listed, so that the page can be
+ * rendered without touching the backend at all.
  *
  * @author Philip Helger
  */
 public final class PagePublicStart extends AbstractSMPWebPage
 {
-  private static final Logger LOGGER = LoggerFactory.getLogger (PagePublicStart.class);
-
   public PagePublicStart (@NonNull @Nonempty final String sID)
   {
     super (sID, "Start page");
@@ -69,110 +48,41 @@ public final class PagePublicStart extends AbstractSMPWebPage
   @Nullable
   public String getHeaderText (@NonNull final WebPageExecutionContext aWPEC)
   {
-    return "Managed participants on this SMP";
+    return "Welcome to this phoss Service Metadata Publisher";
   }
 
   @Override
   protected void fillContent (final WebPageExecutionContext aWPEC)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
-    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
 
-    if (SMPWebAppConfiguration.isStartPageParticipantsNone ())
-    {
-      // New in v5.0.4
-      aNodeList.addChild (info ("This SMP has disabled the list of participants."));
-    }
-    else
-    {
-      EFontAwesome6Icon.registerResourcesForThisRequest ();
-      final ISMPServiceGroupManager aSMPServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-      try
-      {
-        final ICommonsList <ISMPServiceGroup> aServiceGroups = aSMPServiceGroupMgr.getAllSMPServiceGroups ();
+    aNodeList.addChild (p ().addChild ("This server is a ")
+                            .addChild (strong ("Service Metadata Publisher (SMP)"))
+                            .addChild (". For each of the participants registered on it, it states which " +
+                                       "document types that participant is able to receive, and at which " +
+                                       "Access Point these documents are to be delivered. " +
+                                       "We call those the 'receiving capabilities'."));
 
-        // Use dynamic or static table?
-        final boolean bUseDataTables = SMPWebAppConfiguration.isStartPageDynamicTable ();
-        final boolean bShowExtensionDetails = SMPWebAppConfiguration.isStartPageExtensionsShow ();
+    aNodeList.addChild (p ().addChild ("That information is served via the ")
+                            .addChild (strong (SMPServerConfiguration.getRESTType ().getDisplayName () +
+                                               " SMP REST API"))
+                            .addChild (" - the interface a sending Access Point queries before it delivers a " +
+                                       "document. A query needs nothing but the identifier of the participant " +
+                                       "in question and returns a machine readable XML document."));
 
-        AbstractHCTable <?> aFinalTable;
-        if (bUseDataTables)
-        {
-          // Dynamic
-          final HCTable aTable = new HCTable (new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
-                                              new DTCol (bShowExtensionDetails ? "Extension" : "Extension?")
-                                                                                                            .setDataSort (1,
-                                                                                                                          0),
-                                              new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
-          aFinalTable = aTable;
-        }
-        else
-        {
-          // Static
-          final BootstrapTable aTable = new BootstrapTable ();
-          aTable.setBordered (true);
-          aTable.setCondensed (true);
-          aTable.setStriped (true);
-          aTable.addHeaderRow ()
-                .addCell ("Participant ID")
-                .addCell (bShowExtensionDetails ? "Extension" : "Extension?")
-                .addCell (EPhotonCoreText.ACTIONS.getDisplayText (aDisplayLocale));
-          aFinalTable = aTable;
-
-          // Sort manually
-          aServiceGroups.sort (Comparator.comparing (x -> x.getParticipantIdentifier ().getURIEncoded ()));
-        }
-
-        for (final ISMPServiceGroup aServiceGroup : aServiceGroups)
-        {
-          final String sDisplayName = aServiceGroup.getParticipantIdentifier ().getURIEncoded ();
-
-          final HCRow aRow = aFinalTable.addBodyRow ();
-          aRow.addCell (sDisplayName);
-          if (bShowExtensionDetails)
-          {
-            if (aServiceGroup.getExtensions ().extensions ().isNotEmpty ())
-              aRow.addCell (SMPExtensionUI.getSerializedExtensions (aServiceGroup.getExtensions ()));
-            else
-              aRow.addCell ();
-          }
-          else
-          {
-            aRow.addCell (EPhotonCoreText.getYesOrNo (aServiceGroup.getExtensions ().extensions ().isNotEmpty (),
-                                                      aDisplayLocale));
-          }
-          final SMPRestDataProvider aDP = new SMPRestDataProvider (aRequestScope);
-          aRow.addCell (new HCA (new SimpleURL (aDP.getServiceGroupHref (aServiceGroup.getParticipantIdentifier ()))).setTitle ("Perform SMP query on " +
-                                                                                                                                sDisplayName)
-                                                                                                                     .setTargetBlank ()
-                                                                                                                     .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ()));
-        }
-        if (aFinalTable.hasBodyRows ())
-        {
-          aNodeList.addChild (aFinalTable);
-
-          if (bUseDataTables)
-          {
-            final BootstrapDataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aFinalTable);
-            aNodeList.addChild (aDataTables);
-          }
-        }
-        else
-          aNodeList.addChild (info ("This SMP does not manage any participant yet."));
-      }
-      catch (final RuntimeException ex)
-      {
-        // E.g. MongoDB having invalid Participant IDs in the DB
-        final String sError = "Internal Error listing all Service Groups";
-        LOGGER.error (sError, ex);
-        aNodeList.addChild (error (sError));
-        SMPInternalErrorHandler.createInternalErrorBuilder ()
-                               .addErrorMessage (sError)
-                               .setFromWebExecutionContext (aWPEC)
-                               .setThrowable (ex)
-                               .handle ();
-      }
-    }
+    final HCP aOSS = aNodeList.addAndReturnChild (p ().addChild ("This SMP is powered by ")
+                                                      .addChild (strong (CSMP.APPLICATION_TITLE))
+                                                      .addChild (", an ")
+                                                      .addChild (strong ("Open Source"))
+                                                      .addChild (" solution. " +
+                                                                 "Everybody is free to use it, to review what " +
+                                                                 "it does and to run an own instance of it."));
+    // Respect the configuration that hides the link to the source code
+    if (SMPWebAppConfiguration.isPublicShowSource ())
+      aOSS.addChild (" The complete source code is available on ")
+          .addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp"))
+                         .setTargetBlank ()
+                         .addChild ("GitHub"))
+          .addChild (".");
   }
 }

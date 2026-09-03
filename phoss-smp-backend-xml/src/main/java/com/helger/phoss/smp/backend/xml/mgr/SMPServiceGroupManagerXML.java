@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
+import java.util.function.Predicate;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,6 +32,9 @@ import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
+import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -61,6 +66,8 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                                              implements
                                              ISMPServiceGroupManager
 {
+  private static final ESMPServiceGroupColumn [] COLUMNS = ESMPServiceGroupColumn.values ();
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerXML.class);
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
@@ -339,6 +346,24 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     return getAll ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+                        aPagingSpec,
+                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+  }
+
+  @Override
+  public long getSMPServiceGroupCount (@Nullable final String sSearchText)
+  {
+    final Predicate <ISMPServiceGroup> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPServiceGroupCount () : getCount (aFilter);
   }
 
   @NonNull

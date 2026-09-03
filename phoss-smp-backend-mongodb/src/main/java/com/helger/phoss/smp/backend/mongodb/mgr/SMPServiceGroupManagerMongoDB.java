@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -34,11 +35,14 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.json.IJsonArray;
 import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.backend.mongodb.SMPMongoQueryHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -52,6 +56,7 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
@@ -65,6 +70,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceGroupManagerMongoDB.class);
   private static final String BSON_ID = "id";
+  private static final ESMPServiceGroupColumn [] COLUMNS = ESMPServiceGroupColumn.values ();
   private static final String BSON_OWNER_ID = "ownerid";
   private static final String BSON_PARTICIPANT_ID = "participantid";
   private static final String BSON_EXTENSION = "extension";
@@ -316,6 +322,35 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     getCollection ().find ().forEach (x -> ret.add (toDomain (x)));
     return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    final FindIterable <Document> aCursor = aFilter == null ? getCollection ().find ()
+                                                            : getCollection ().find (aFilter);
+    aCursor.sort (SMPMongoQueryHelper.createSort (COLUMNS, aPagingSpec));
+    if (aPagingSpec.getStartIndex () > 0)
+      aCursor.skip ((int) Math.min (aPagingSpec.getStartIndex (), Integer.MAX_VALUE));
+    if (!aPagingSpec.isUnlimited ())
+      aCursor.limit ((int) Math.min (aPagingSpec.getMaxCount (), Integer.MAX_VALUE));
+    aCursor.forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @Override
+  public long getSMPServiceGroupCount (@Nullable final String sSearchText)
+  {
+    final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    return aFilter == null ? getSMPServiceGroupCount () : getCollection ().countDocuments (aFilter);
   }
 
   @NonNull
