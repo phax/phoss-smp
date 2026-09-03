@@ -20,14 +20,13 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.html.hc.html.grouping.HCP;
-import com.helger.html.hc.html.textlevel.HCA;
-import com.helger.html.hc.html.textlevel.HCStrong;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
-import com.helger.photon.app.url.LinkHelper;
-import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.url.SimpleURL;
 
 import jakarta.annotation.Nullable;
 
@@ -49,7 +48,7 @@ public final class PagePublicStart extends AbstractSMPWebPage
   @Nullable
   public String getHeaderText (@NonNull final WebPageExecutionContext aWPEC)
   {
-    return "Welcome to this Service Metadata Publisher";
+    return "Welcome to this phoss Service Metadata Publisher";
   }
 
   @Override
@@ -57,29 +56,33 @@ public final class PagePublicStart extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    aNodeList.addChild (new HCP ().addChild ("This server is a ")
-                                  .addChild (new HCStrong ().addChild ("Service Metadata Publisher (SMP)"))
-                                  .addChild (". For each of the participants registered on it, it states which " +
-                                             "document types that participant is able to receive, and at which " +
-                                             "Access Point these documents are to be delivered."));
+    aNodeList.addChild (p ().addChild ("This server is a ")
+                            .addChild (strong ("Service Metadata Publisher (SMP)"))
+                            .addChild (". For each of the participants registered on it, it states which " +
+                                       "document types that participant is able to receive, and at which " +
+                                       "Access Point these documents are to be delivered. " +
+                                       "We call those the 'receiving capabilities'."));
 
-    aNodeList.addChild (new HCP ().addChild ("That information is served via the ")
-                                  .addChild (new HCStrong ().addChild (SMPServerConfiguration.getRESTType ()
-                                                                                             .getDisplayName () +
-                                                                       " SMP REST API"))
-                                  .addChild (" - the interface a sending Access Point queries before it delivers a " +
-                                             "document. A query needs nothing but the identifier of the participant " +
-                                             "in question and returns a machine readable XML document."));
+    aNodeList.addChild (p ().addChild ("That information is served via the ")
+                            .addChild (strong (SMPServerConfiguration.getRESTType ().getDisplayName () +
+                                               " SMP REST API"))
+                            .addChild (" - the interface a sending Access Point queries before it delivers a " +
+                                       "document. A query needs nothing but the identifier of the participant " +
+                                       "in question and returns a machine readable XML document."));
 
-    aNodeList.addChild (new HCP ().addChild ("The participants managed by this SMP are not listed here. Each of them " +
-                                             "is looked up individually, so this page is rendered without querying " +
-                                             "the underlying storage at all - no matter how many participants this " +
-                                             "SMP manages."));
-
-    aNodeList.addChild (new HCP ().addChild ("Administrators of this SMP manage the participants in the ")
-                                  .addChild (new HCA (LinkHelper.getURLWithContext (aWPEC.getRequestScope (),
-                                                                                    AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH +
-                                                                                                                     "/")).addChild ("administration area"))
-                                  .addChild ("."));
+    final HCP aOSS = aNodeList.addAndReturnChild (p ().addChild ("This SMP is powered by ")
+                                                      .addChild (strong (CSMP.APPLICATION_TITLE))
+                                                      .addChild (", an ")
+                                                      .addChild (strong ("Open Source"))
+                                                      .addChild (" solution. " +
+                                                                 "Everybody is free to use it, to review what " +
+                                                                 "it does and to run an own instance of it."));
+    // Respect the configuration that hides the link to the source code
+    if (SMPWebAppConfiguration.isPublicShowSource ())
+      aOSS.addChild (" The complete source code is available on ")
+          .addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp"))
+                         .setTargetBlank ()
+                         .addChild ("GitHub"))
+          .addChild (".");
   }
 }
