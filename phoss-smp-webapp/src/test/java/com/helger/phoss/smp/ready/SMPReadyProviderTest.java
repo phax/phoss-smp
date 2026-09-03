@@ -51,13 +51,13 @@ public final class SMPReadyProviderTest
   @Test
   public void testExceptionMeansNotReady ()
   {
-    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> {
+    // Avoid selecting the CommonsArrayList constructor that accepts an Iterable
+    final ISMPReadyProviderExtensionSPI aThrowingProvider = () -> {
       throw new IllegalStateException ("Expected test exception");
-    })));
+    };
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (aThrowingProvider)));
     // The exception of the second check must not be swallowed either
-    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true, () -> {
-      throw new IllegalStateException ("Expected test exception");
-    })));
+    assertFalse (SMPReadyProvider.areAllReady (new CommonsArrayList <> (() -> true, aThrowingProvider)));
   }
 
   @Test
