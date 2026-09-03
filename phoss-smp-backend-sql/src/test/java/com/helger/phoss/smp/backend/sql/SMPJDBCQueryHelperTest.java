@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.helger.collection.commons.CommonsArrayList;
-import com.helger.collection.paging.IPagingSpec;
 import com.helger.collection.paging.PagingSpec;
 import com.helger.collection.paging.SortField;
 import com.helger.db.api.EDatabaseSystemType;

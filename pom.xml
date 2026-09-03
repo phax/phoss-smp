@@ -72,7 +72,7 @@
     <mongodb.version>5.11.0</mongodb.version>
     <protobuf.version>4.36.1</protobuf.version>
     
-    <ph-db.version>8.4.3-SNAPSHOT</ph-db.version>
+    <ph-db.version>8.4.3</ph-db.version>
   </properties>
   
   <dependencyManagement>
