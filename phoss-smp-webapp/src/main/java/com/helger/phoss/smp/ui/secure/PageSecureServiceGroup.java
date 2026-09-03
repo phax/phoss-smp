@@ -35,9 +35,12 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.html.hc.IHCNode;
+import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCTextArea;
+import com.helger.html.hc.html.grouping.HCLI;
+import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCCol;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -52,6 +55,8 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSPackage;
 import com.helger.html.jscode.JSParam;
 import com.helger.network.port.NetworkOnlineStatusDeterminator;
+import com.helger.peppol.ui.nicename.NiceNameUI;
+import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.app.CSMP;
@@ -61,16 +66,22 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
+import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.sgprops.ESGCustomPropertyType;
 import com.helger.phoss.smp.domain.sgprops.ESGPredefinedCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.IRegistrationHook;
@@ -82,6 +93,7 @@ import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
+import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPCustomPropertyTypeSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCUserSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -511,17 +523,18 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
     final boolean bShowBusinessCard = CSMP.ENABLE_ISSUE_56 && aSettings.isDirectoryIntegrationEnabled ();
+
+    EFontAwesome6Icon.registerResourcesForThisRequest ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of service group '" +
                                                             aSelectedObject.getID () +
                                                             "'"));
 
     final BootstrapViewForm aForm = new BootstrapViewForm ();
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID")
-                                                 .setCtrl (aSelectedObject.getParticipantIdentifier ()
-                                                                          .getURIEncoded ()));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Participant ID").setCtrl (aParticipantID.getURIEncoded ()));
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Owning user")
                                                  .setCtrl (SMPCommonUI.getOwnerName (aSelectedObject.getOwnerID ())));
     if (aSelectedObject.getExtensions ().extensions ().isNotEmpty ())
@@ -554,12 +567,44 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       aForm.addChildren (aCPTable, BootstrapDataTables.createDefaultDataTables (aWPEC, aCPTable));
     }
 
+    // Show all Document Types, Processes and Endpoints assigned to this Service Group
+    {
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      final ICommonsList <ISMPServiceInformation> aServiceInfos = aServiceInfoMgr.getAllSMPServiceInformationOfServiceGroup (aParticipantID);
+
+      int nEndpoints = 0;
+      for (final ISMPServiceInformation aServiceInfo : aServiceInfos)
+        nEndpoints += aServiceInfo.getTotalEndpointCount ();
+
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Endpoints (" +
+                                                             aServiceInfos.size () +
+                                                             " Document Types, " +
+                                                             nEndpoints +
+                                                             " Endpoints)"));
+      if (aServiceInfos.isEmpty ())
+        aForm.addChild (badgeInfo ("This Service Group has no assigned Endpoints"));
+      else
+        aForm.addChild (_createEndpointTree (aWPEC, aParticipantID, aServiceInfos));
+    }
+
+    // Show all Redirects assigned to this Service Group
+    {
+      final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+      final ICommonsList <ISMPRedirect> aRedirects = aRedirectMgr.getAllSMPRedirectsOfServiceGroup (aParticipantID);
+
+      aForm.addChild (getUIHandler ().createDataGroupHeader ("Redirects (" + aRedirects.size () + ")"));
+      if (aRedirects.isEmpty ())
+        aForm.addChild (badgeInfo ("This Service Group has no assigned Redirects"));
+      else
+        aForm.addChild (_createRedirectTable (aWPEC, aRedirects));
+    }
+
     if (bShowBusinessCard)
     {
       aForm.addChild (getUIHandler ().createDataGroupHeader ("Business Card Details"));
 
       final ISMPBusinessCardManager aBCMgr = SMPMetaManager.getBusinessCardMgr ();
-      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aSelectedObject.getParticipantIdentifier ());
+      final ISMPBusinessCard aBC = aBCMgr.getSMPBusinessCardOfID (aParticipantID);
       if (aBC != null)
       {
         int nIndex = 0;
@@ -572,6 +617,135 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
 
     aNodeList.addChild (aForm);
+  }
+
+  /**
+   * Create the tree of all Document Types, Processes and Endpoints of a single Service Group -
+   * similar to what {@link PageSecureEndpointTree} shows for all Service Groups.
+   *
+   * @param aWPEC
+   *        The current context. May not be <code>null</code>.
+   * @param aParticipantID
+   *        The Participant ID of the Service Group. May not be <code>null</code>.
+   * @param aServiceInfos
+   *        All Service Information objects of that Service Group. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private IHCNode _createEndpointTree (@NonNull final WebPageExecutionContext aWPEC,
+                                       @NonNull final IParticipantIdentifier aParticipantID,
+                                       @NonNull final ICommonsList <ISMPServiceInformation> aServiceInfos)
+  {
+    final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final SMPRestDataProvider aRDP = new SMPRestDataProvider (aWPEC.getRequestScope ());
+
+    // Use the cache here, to avoid too many DB lookups
+    final SMPTransportProfileCache aTPCache = new SMPTransportProfileCache ();
+
+    final HCUL aULDT = new HCUL ();
+    for (final ISMPServiceInformation aServiceInfo : aServiceInfos.getSortedInline (ISMPServiceInformation.comparator ()))
+    {
+      final IDocumentTypeIdentifier aDocTypeID = aServiceInfo.getDocumentTypeIdentifier ();
+
+      final HCUL aULP = new HCUL ();
+      final ICommonsList <ISMPProcess> aProcesses = aServiceInfo.getAllProcesses ()
+                                                                .getSortedInline (ISMPProcess.comparator ());
+      for (final ISMPProcess aProcess : aProcesses)
+      {
+        final BootstrapTable aEPTable = new BootstrapTable (HCCol.star (),
+                                                            HCCol.star (),
+                                                            HCCol.star (),
+                                                            HCCol.star ()).setBordered (true);
+        aEPTable.addHeaderRow ().addCells ("Transport Profile", "Validity", "Endpoint reference", "");
+
+        final ICommonsList <ISMPEndpoint> aEndpoints = aProcess.getAllEndpoints ()
+                                                               .getSortedInline (ISMPEndpoint.comparator ());
+        for (final ISMPEndpoint aEndpoint : aEndpoints)
+        {
+          final ISimpleURL aViewURL = createViewURL (aWPEC,
+                                                     CMenuSecure.MENU_ENDPOINT_LIST,
+                                                     aServiceInfo.getID (),
+                                                     AbstractPageSecureEndpoint.createParamMap (aServiceInfo,
+                                                                                                aProcess,
+                                                                                                aEndpoint));
+
+          final HCRow aBodyRow = aEPTable.addBodyRow ();
+
+          final String sTransportProfile = aEndpoint.getTransportProfile ();
+          aBodyRow.addCell (new HCA (aViewURL).addChild (SMPNiceNameUI.getTransportProfile (sTransportProfile,
+                                                                                            aTPCache.getFromCache (sTransportProfile),
+                                                                                            false)));
+
+          aBodyRow.addCell (SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                                   aEndpoint.getServiceExpirationDate (),
+                                                                   aDisplayLocale));
+
+          aBodyRow.addCell (aEndpoint.getEndpointReference ());
+
+          aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View Endpoint")
+                                                       .addChild (EDefaultIcon.MAGNIFIER.getAsNode ()))
+                  .addClass (CSS_CLASS_RIGHT);
+        }
+
+        // Show process + endpoints
+        final HCLI aLIP = aULP.addItem ();
+        aLIP.addChild (div (NiceNameUI.createProcessID (aDocTypeID, aProcess.getProcessIdentifier (), false)));
+        if (aEndpoints.isEmpty ())
+          aLIP.addChild (badgeInfo ("This Process has no assigned Endpoints"));
+        else
+          aLIP.addChild (aEPTable);
+      }
+
+      // Show document type + children
+      final HCLI aLIDT = aULDT.addItem ();
+      aLIDT.addChild (div (NiceNameUI.createDocTypeID (aDocTypeID, false)).addChild (" ")
+                                                                          .addChild (new HCA (new SimpleURL (aRDP.getServiceMetadataReferenceHref (aParticipantID,
+                                                                                                                                                   aDocTypeID))).setTitle ("Perform SMP query on Document Type")
+                                                                                                                                                                .setTargetBlank ()
+                                                                                                                                                                .addChild (EFontAwesome6Icon.UP_RIGHT_FROM_SQUARE.getAsNode ())));
+      if (aProcesses.isEmpty ())
+        aLIDT.addChild (badgeInfo ("This Document Type has no assigned Processes"));
+      else
+        aLIDT.addChild (aULP);
+    }
+    return aULDT;
+  }
+
+  /**
+   * Create the table of all Redirects of a single Service Group.
+   *
+   * @param aWPEC
+   *        The current context. May not be <code>null</code>.
+   * @param aRedirects
+   *        All Redirects of that Service Group. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private static IHCNode _createRedirectTable (@NonNull final WebPageExecutionContext aWPEC,
+                                               @NonNull final ICommonsList <ISMPRedirect> aRedirects)
+  {
+    final BootstrapTable aTable = new BootstrapTable (HCCol.star (),
+                                                      HCCol.star (),
+                                                      HCCol.star (),
+                                                      HCCol.star ()).setBordered (true);
+    aTable.addHeaderRow ().addCells ("Document Type ID", "Target URL", "Subject unique identifier", "");
+    for (final ISMPRedirect aRedirect : aRedirects.getSortedInline (ISMPRedirect.comparator ()))
+    {
+      final ISimpleURL aViewURL = createViewURL (aWPEC,
+                                                 CMenuSecure.MENU_REDIRECTS,
+                                                 aRedirect.getID (),
+                                                 PageSecureRedirect.createParamMap (aRedirect));
+
+      final HCRow aBodyRow = aTable.addBodyRow ();
+      aBodyRow.addCell (new HCA (aViewURL).addChild (NiceNameUI.createDocTypeID (aRedirect.getDocumentTypeIdentifier (),
+                                                                                 false)));
+      aBodyRow.addCell (HCA.createLinkedWebsite (aRedirect.getTargetHref (), HC_Target.BLANK));
+      aBodyRow.addCell (aRedirect.getSubjectUniqueIdentifier ());
+      aBodyRow.addAndReturnCell (new HCA (aViewURL).setTitle ("View Redirect")
+                                                   .addChild (EDefaultIcon.MAGNIFIER.getAsNode ()))
+              .addClass (CSS_CLASS_RIGHT);
+    }
+    return aTable;
   }
 
   @NonNull

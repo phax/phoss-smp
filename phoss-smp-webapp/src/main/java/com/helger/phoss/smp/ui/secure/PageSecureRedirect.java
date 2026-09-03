@@ -440,13 +440,27 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                         new BootstrapDTColAction (aDisplayLocale).setOrderable (false)).setID (getID ());
   }
 
+  /**
+   * Create the request parameters needed to identify a single Redirect on this page.
+   *
+   * @param aRedirect
+   *        The Redirect to be referenced. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  static StringMap createParamMap (@NonNull final ISMPRedirect aRedirect)
+  {
+    final StringMap ret = new StringMap ();
+    ret.putIn (FIELD_SERVICE_GROUP_ID, aRedirect.getServiceGroupID ());
+    ret.putIn (FIELD_DOCTYPE_ID, aRedirect.getDocumentTypeIdentifier ().getURIEncoded ());
+    return ret;
+  }
+
   private void _addRow (@NonNull final WebPageExecutionContext aWPEC,
                         @NonNull final HCRow aRow,
                         @NonNull final ISMPRedirect aCurObject)
   {
-    final StringMap aParams = new StringMap ();
-    aParams.putIn (FIELD_SERVICE_GROUP_ID, aCurObject.getServiceGroupID ());
-    aParams.putIn (FIELD_DOCTYPE_ID, aCurObject.getDocumentTypeIdentifier ().getURIEncoded ());
+    final StringMap aParams = createParamMap (aCurObject);
     final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject, aParams);
     final String sDisplayName = aCurObject.getServiceGroupID ();
 
