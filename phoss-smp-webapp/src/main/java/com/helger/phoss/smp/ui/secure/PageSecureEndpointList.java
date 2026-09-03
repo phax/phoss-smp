@@ -177,16 +177,11 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     EFontAwesome6Icon.registerResourcesForThisRequest ();
 
-    final boolean bShowTreeview = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCount () <= 1_000;
-
     // Toolbar
     final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
     aToolbar.addButton ("Create new Endpoint", createCreateURL (aWPEC), EDefaultIcon.NEW);
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
-    if (bShowTreeview)
-      aToolbar.addButton ("Tree view",
-                          aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE),
-                          EDefaultIcon.MAGNIFIER);
+    aToolbar.addButton ("Tree view", aWPEC.getLinkToMenuItem (CMenuSecure.MENU_ENDPOINT_TREE), EDefaultIcon.MAGNIFIER);
     aNodeList.addChild (aToolbar);
 
     // The rows are filled by the AJAX function only
