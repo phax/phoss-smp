@@ -25,9 +25,9 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
-import com.helger.base.string.StringHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.mgrs.sysmsg.ESystemMessageType;
+import com.helger.photon.mgrs.sysmsg.ISystemMessageData;
 import com.helger.photon.mgrs.sysmsg.ISystemMessageManager;
 import com.helger.photon.mgrs.sysmsg.SystemMessageData;
 import com.helger.typeconvert.impl.TypeConverter;
@@ -56,38 +56,31 @@ public class SystemMessageManagerMongoDB extends AbstractManagerMongoDB implemen
     return getCollection ().find ().first ();
   }
 
-  @Nullable
-  public LocalDateTime getLastUpdateDT ()
+  /**
+   * Convert the read document to the system message data.
+   *
+   * @param aDoc
+   *        The document read. May be <code>null</code>.
+   * @return Never <code>null</code>. The default data, if no document is present.
+   */
+  @NonNull
+  private static SystemMessageData _toData (@Nullable final Document aDoc)
   {
-    final Document aDoc = _readDoc ();
     if (aDoc == null)
-      return null;
+      return new SystemMessageData ();
+
+    final SystemMessageData ret = new SystemMessageData (ESystemMessageType.getFromIDOrDefault (aDoc.getString (BSON_MESSAGETYPE)),
+                                                         aDoc.getString (BSON_MESSAGE));
     final Date aDate = aDoc.getDate (BSON_LASTUPDATE);
-    return aDate != null ? TypeConverter.convert (aDate, LocalDateTime.class) : null;
+    if (aDate != null)
+      ret.setLastUpdate (TypeConverter.convert (aDate, LocalDateTime.class));
+    return ret;
   }
 
   @NonNull
-  public ESystemMessageType getMessageType ()
+  public ISystemMessageData getSystemMessageData ()
   {
-    final Document aDoc = _readDoc ();
-    if (aDoc != null)
-      return ESystemMessageType.getFromIDOrDefault (aDoc.getString (BSON_MESSAGETYPE));
-    return ESystemMessageType.DEFAULT;
-  }
-
-  @Nullable
-  public String getSystemMessage ()
-  {
-    final Document aDoc = _readDoc ();
-    return aDoc != null ? aDoc.getString (BSON_MESSAGE) : null;
-  }
-
-  public boolean hasSystemMessage ()
-  {
-    final Document aDoc = _readDoc ();
-    if (aDoc == null)
-      return false;
-    return StringHelper.isNotEmpty (aDoc.getString (BSON_MESSAGE));
+    return _toData (_readDoc ());
   }
 
   @NonNull
@@ -97,20 +90,7 @@ public class SystemMessageManagerMongoDB extends AbstractManagerMongoDB implemen
 
     // Use SystemMessageData to check for actual change and compute new lastupdate
     final Document aExisting = _readDoc ();
-    final SystemMessageData aData;
-    if (aExisting != null)
-    {
-      aData = new SystemMessageData (ESystemMessageType.getFromIDOrDefault (aExisting.getString (BSON_MESSAGETYPE)),
-                                     aExisting.getString (BSON_MESSAGE));
-      final Date aDate = aExisting.getDate (BSON_LASTUPDATE);
-      if (aDate != null)
-        aData.setLastUpdate (TypeConverter.convert (aDate, LocalDateTime.class));
-    }
-    else
-    {
-      aData = new SystemMessageData ();
-    }
-
+    final SystemMessageData aData = _toData (aExisting);
     if (aData.setSystemMessage (eMessageType, sMessage).isUnchanged ())
       return EChange.UNCHANGED;
 

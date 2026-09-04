@@ -51,6 +51,7 @@ import com.helger.photon.mgrs.longrun.LongRunningJobResultManager;
 import com.helger.photon.mgrs.sysmigration.ISystemMigrationManager;
 import com.helger.photon.mgrs.sysmigration.SystemMigrationManager;
 import com.helger.photon.mgrs.sysmigration.SystemMigrationResult;
+import com.helger.photon.mgrs.sysmsg.ISystemMessageData;
 import com.helger.photon.mgrs.sysmsg.SystemMessageManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.Role;
@@ -289,10 +290,11 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
           if (aFile.exists ())
           {
             final SystemMessageManager aMgrXML = new SystemMessageManager (sFilename);
-            if (aMgrXML.hasSystemMessage ())
+            final ISystemMessageData aDataXML = aMgrXML.getSystemMessageData ();
+            if (aDataXML.hasMessage ())
             {
               PhotonBasicManager.getSystemMessageMgr ()
-                                .setSystemMessage (aMgrXML.getMessageType (), aMgrXML.getSystemMessage ());
+                                .setSystemMessage (aDataXML.getMessageType (), aDataXML.getMessage ());
             }
             WebFileIO.getDataIO ().renameFile (sFilename, sFilename + ".migrated");
             LOGGER.info ("Finished migrating system message to MongoDB");
