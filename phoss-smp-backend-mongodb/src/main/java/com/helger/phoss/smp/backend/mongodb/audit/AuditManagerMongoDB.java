@@ -27,7 +27,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.audit.IAuditor;
-import com.helger.photon.security.login.LoggedInUserManager;
+import com.helger.photon.security.login.GlobalUserIDProvider;
 
 /**
  * The MongoDB based implementation of {@link IAuditManager}
@@ -40,7 +40,7 @@ public class AuditManagerMongoDB implements IAuditManager
 
   public AuditManagerMongoDB ()
   {
-    m_aAuditor = new AuditorMongoDB (LoggedInUserManager.getInstance ());
+    m_aAuditor = new AuditorMongoDB (GlobalUserIDProvider::getCurrentUserID);
   }
 
   public boolean isInMemory ()
