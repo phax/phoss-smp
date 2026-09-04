@@ -72,7 +72,7 @@
     <mongodb.version>5.11.0</mongodb.version>
     <protobuf.version>4.36.1</protobuf.version>
     
-    <ph-db.version>8.4.3-SNAPSHOT</ph-db.version>
+    <ph-db.version>8.4.3</ph-db.version>
   </properties>
   
   <dependencyManagement>
@@ -120,14 +120,14 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-parent-pom</artifactId>
-        <version>10.5.0-SNAPSHOT</version>
+        <version>10.5.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-bootstrap5-parent-pom</artifactId>
-        <version>0.9.3</version>
+        <version>0.9.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
