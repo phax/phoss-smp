@@ -28,6 +28,7 @@ import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.photon.io.WebFileIO;
 import com.helger.photon.jdbc.basic.SystemMessageManagerJDBC;
 import com.helger.photon.mgrs.PhotonBasicManager;
+import com.helger.photon.mgrs.sysmsg.ISystemMessageData;
 import com.helger.photon.mgrs.sysmsg.SystemMessageManager;
 import com.helger.web.scope.mgr.WebScoped;
 
@@ -52,12 +53,13 @@ public final class V29__MigrateSystemMessageToDB extends BaseJavaMigration
       if (aFile.exists ())
       {
         final SystemMessageManager aMgrXML = new SystemMessageManager (sFilename);
+        final ISystemMessageData aDataXML = aMgrXML.getSystemMessageData ();
 
-        if (aMgrXML.hasSystemMessage ())
+        if (aDataXML.hasMessage ())
         {
           final SystemMessageManagerJDBC aMgrNew = new SystemMessageManagerJDBC (SMPDBExecutor::new,
                                                                                  SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
-          aMgrNew.setSystemMessage (aMgrXML.getMessageType (), aMgrXML.getSystemMessage ());
+          aMgrNew.setSystemMessage (aDataXML.getMessageType (), aDataXML.getMessage ());
         }
 
         // Rename to avoid later inconsistencies
