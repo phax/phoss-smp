@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.servlet;
 
-import java.io.IOException;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -39,8 +37,6 @@ import com.helger.photon.core.appid.RequestSettings;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-
-import jakarta.servlet.ServletException;
 
 /**
  * CSP enabled application servlet handler
@@ -123,7 +119,7 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
 
   @Override
   public void handleRequest (final IRequestWebScopeWithoutResponse aRequestScope,
-                             final UnifiedResponse aUnifiedResponse) throws IOException, ServletException
+                             final UnifiedResponse aUnifiedResponse) throws Exception
   {
     if (SMPWebAppConfiguration.isCSPEnabled ())
     {

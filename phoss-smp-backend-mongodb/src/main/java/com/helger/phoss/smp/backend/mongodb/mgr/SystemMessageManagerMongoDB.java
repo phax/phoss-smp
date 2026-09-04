@@ -28,6 +28,7 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.mgrs.sysmsg.ESystemMessageType;
+import com.helger.photon.mgrs.sysmsg.ISystemMessageData;
 import com.helger.photon.mgrs.sysmsg.ISystemMessageManager;
 import com.helger.photon.mgrs.sysmsg.SystemMessageData;
 import com.helger.typeconvert.impl.TypeConverter;
@@ -54,6 +55,21 @@ public class SystemMessageManagerMongoDB extends AbstractManagerMongoDB implemen
   private Document _readDoc ()
   {
     return getCollection ().find ().first ();
+  }
+
+  @NonNull
+  public ISystemMessageData getSystemMessageData ()
+  {
+    final Document aDoc = _readDoc ();
+    if (aDoc == null)
+      return new SystemMessageData ();
+
+    final SystemMessageData ret = new SystemMessageData (ESystemMessageType.getFromIDOrDefault (aDoc.getString (BSON_MESSAGETYPE)),
+                                                         aDoc.getString (BSON_MESSAGE));
+    final Date aDate = aDoc.getDate (BSON_LASTUPDATE);
+    if (aDate != null)
+      ret.setLastUpdate (TypeConverter.convert (aDate, LocalDateTime.class));
+    return ret;
   }
 
   @Nullable
