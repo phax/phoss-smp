@@ -46,6 +46,8 @@ import com.helger.phoss.smp.backend.sql.migration.V31__MigrateLongRunningJobsToD
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.photon.audit.AuditHelper;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * This class has the sole purpose of encapsulating the org.flywaydb classes, so that it's usage can
  * be turned off (for whatever reason).
@@ -88,13 +90,26 @@ final class FlywayMigrator
             final ResolvedMigration aRM = aMII.getResolvedMigration ();
             // Version 6 establishes the audit table - so don't audit anything
             // before that version
-            if (aRM != null && aRM.getVersion ().isAtLeast ("7"))
-              AuditHelper.onAuditExecuteSuccess ("sql-migration-success",
-                                                 aRM.getVersion ().toString (),
-                                                 aRM.getDescription (),
-                                                 aRM.getScript (),
-                                                 aRM.getType ().name (),
-                                                 aRM.getPhysicalLocation ());
+            if (aRM != null && aRM.getVersion ().isAtLeast ("7")) {
+              // if migration affects the table smp_audit directly (live V36 migration),
+              // then this insert gets stuck because the migration uses transaction that is in progress
+              // causing a deadlock. So we run the audit insert in a separate thread to avoid this.
+
+              CompletableFuture.supplyAsync(() -> {
+                try {
+                  AuditHelper.onAuditExecuteSuccess("sql-migration-success",
+                      aRM.getVersion().toString(),
+                      aRM.getDescription(),
+                      aRM.getScript(),
+                      aRM.getType().name(),
+                      aRM.getPhysicalLocation());
+                } catch (Exception e) {
+                  System.err.println("Error during audit logging: " + e.getMessage());
+                }
+
+                return true;
+              });
+            }
           }
         }
       }
