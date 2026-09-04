@@ -42,13 +42,9 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
-import com.helger.phoss.smp.domain.user.SMPCurrentUserIDProvider;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
-import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.jdbc.PhotonBasicManagerFactoryJDBC;
 import com.helger.photon.jdbc.PhotonSecurityManagerFactoryJDBC;
-import com.helger.photon.jdbc.audit.AuditManagerJDBC;
-import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
  * A JDBC based implementation of the {@link ISMPManagerProvider} interface.
@@ -76,19 +72,7 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
     // Set the special PhotonSecurityManager factory
     // Must be before Flyway, so that auditing of Flyway actions (may) work
-    PhotonSecurityManager.setFactory (new PhotonSecurityManagerFactoryJDBC (SMPDBExecutor::new,
-                                                                            SMPDBExecutor.TABLE_NAME_CUSTOMIZER)
-    {
-      @Override
-      @NonNull
-      public IAuditManager createAuditMgr ()
-      {
-        return new AuditManagerJDBC (SMPDBExecutor::new,
-                                     SMPDBExecutor.TABLE_NAME_CUSTOMIZER,
-                                     SMPCurrentUserIDProvider.INSTANCE);
-      }
-    });
-    PhotonSecurityManager.getInstance ();
+    PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Build Flyway configuration with fallback to main JDBC settings
     final IJdbcConfiguration aJdbcConfig = SMPDataSourceSingleton.getJdbcConfiguration ();

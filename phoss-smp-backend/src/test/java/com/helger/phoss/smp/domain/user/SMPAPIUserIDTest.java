@@ -27,7 +27,9 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.login.ELoginResult;
+import com.helger.photon.security.login.GlobalUserIDProvider;
 import com.helger.photon.security.login.LoggedInUserManager;
+import com.helger.photon.security.login.RequestUserIDProvider;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.IUserTokenManager;
@@ -38,27 +40,25 @@ import com.helger.web.scope.mgr.WebScoped;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Test class for class {@link SMPCurrentUserIDProvider}.
+ * Test the request-scoped user identity used by SMP REST authentication.
  *
  * @author vinit-thummar
  */
-public final class SMPCurrentUserIDProviderTest
+public final class SMPAPIUserIDTest
 {
   @Rule
   public final SMPServerTestRule m_aTestRule = new SMPServerTestRule ();
 
   @Test
-  public void testRequestUserOverridesFallbackWithoutCreatingSession ()
+  public void testRequestUserWithoutCreatingSession ()
   {
     try (final WebScoped aWebScoped = new WebScoped ())
     {
-      final SMPCurrentUserIDProvider aProvider = new SMPCurrentUserIDProvider ( () -> "ui-user");
-
-      assertEquals ("ui-user", aProvider.getCurrentUserID ());
+      assertNull (GlobalUserIDProvider.getCurrentUserID ());
       assertNull (aWebScoped.getRequestScope ().getSession (false));
 
-      SMPCurrentUserIDProvider.setCurrentAPIUserID ("api-user");
-      assertEquals ("api-user", aProvider.getCurrentUserID ());
+      RequestUserIDProvider.setCurrentUserID ("api-user");
+      assertEquals ("api-user", GlobalUserIDProvider.getCurrentUserID ());
       assertNull (aWebScoped.getRequestScope ().getSession (false));
     }
   }
@@ -68,14 +68,14 @@ public final class SMPCurrentUserIDProviderTest
   {
     try (final WebScoped aWebScoped = new WebScoped ())
     {
-      SMPCurrentUserIDProvider.setCurrentAPIUserID ("api-user");
-      assertEquals ("api-user", SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+      RequestUserIDProvider.setCurrentUserID ("api-user");
+      assertEquals ("api-user", GlobalUserIDProvider.getCurrentUserID ());
       assertNull (aWebScoped.getRequestScope ().getSession (false));
     }
 
     try (final WebScoped aWebScoped = new WebScoped ())
     {
-      assertNull (SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+      assertNull (GlobalUserIDProvider.getCurrentUserID ());
       assertNull (aWebScoped.getRequestScope ().getSession (false));
     }
   }
@@ -98,10 +98,10 @@ public final class SMPCurrentUserIDProviderTest
                                            CSecurity.USER_ADMINISTRATOR_PASSWORD));
         aSession = aWebScoped.getRequestScope ().getSession (false);
         assertNotNull (aSession);
-        assertEquals (CSecurity.USER_ADMINISTRATOR_ID, SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+        assertEquals (CSecurity.USER_ADMINISTRATOR_ID, GlobalUserIDProvider.getCurrentUserID ());
 
-        SMPCurrentUserIDProvider.setCurrentAPIUserID ("api-user");
-        assertEquals ("api-user", SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+        RequestUserIDProvider.setCurrentUserID ("api-user");
+        assertEquals ("api-user", GlobalUserIDProvider.getCurrentUserID ());
         assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aLoginMgr.getCurrentUserID ());
         assertSame (aSession, aWebScoped.getRequestScope ().getSession (false));
       }
@@ -112,7 +112,7 @@ public final class SMPCurrentUserIDProviderTest
                                                                              false).setSession (aSession);
       try (final WebScoped aWebScoped = new WebScoped (aNextRequest))
       {
-        assertEquals (CSecurity.USER_ADMINISTRATOR_ID, SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+        assertEquals (CSecurity.USER_ADMINISTRATOR_ID, GlobalUserIDProvider.getCurrentUserID ());
         assertSame (aSession, aWebScoped.getRequestScope ().getSession (false));
       }
     }
@@ -133,11 +133,11 @@ public final class SMPCurrentUserIDProviderTest
                                                                                      "incorrect-password");
       assertThrows (SMPUnauthorizedException.class,
                     () -> SMPUserManagerPhoton.validateUserCredentials (SMPAPICredentials.createForBasicAuth (aBasicAuth)));
-      assertNull (SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+      assertNull (GlobalUserIDProvider.getCurrentUserID ());
 
       assertThrows (SMPUnknownUserException.class,
                     () -> SMPUserManagerPhoton.validateUserCredentials (SMPAPICredentials.createForBearerToken ("invalid-token")));
-      assertNull (SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+      assertNull (GlobalUserIDProvider.getCurrentUserID ());
       assertNull (aWebScoped.getRequestScope ().getSession (false));
     }
   }
@@ -153,7 +153,7 @@ public final class SMPCurrentUserIDProviderTest
       final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
       assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aUser.getID ());
-      assertEquals (CSecurity.USER_ADMINISTRATOR_ID, SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+      assertEquals (CSecurity.USER_ADMINISTRATOR_ID, GlobalUserIDProvider.getCurrentUserID ());
       assertNull (aWebScoped.getRequestScope ().getSession (false));
     }
   }
@@ -175,11 +175,11 @@ public final class SMPCurrentUserIDProviderTest
 
       try (final WebScoped aWebScoped = new WebScoped ())
       {
-        assertNull (SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+        assertNull (GlobalUserIDProvider.getCurrentUserID ());
 
         final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (SMPAPICredentials.createForBearerToken (sToken));
         assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aUser.getID ());
-        assertEquals (CSecurity.USER_ADMINISTRATOR_ID, SMPCurrentUserIDProvider.INSTANCE.getCurrentUserID ());
+        assertEquals (CSecurity.USER_ADMINISTRATOR_ID, GlobalUserIDProvider.getCurrentUserID ());
         assertNull (aWebScoped.getRequestScope ().getSession (false));
       }
     }

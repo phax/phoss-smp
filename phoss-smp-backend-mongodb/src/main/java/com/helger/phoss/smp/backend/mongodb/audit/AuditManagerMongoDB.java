@@ -24,10 +24,10 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.phoss.smp.domain.user.SMPCurrentUserIDProvider;
 import com.helger.photon.audit.IAuditItem;
 import com.helger.photon.audit.IAuditManager;
 import com.helger.photon.audit.IAuditor;
+import com.helger.photon.security.login.GlobalUserIDProvider;
 
 /**
  * The MongoDB based implementation of {@link IAuditManager}
@@ -40,7 +40,7 @@ public class AuditManagerMongoDB implements IAuditManager
 
   public AuditManagerMongoDB ()
   {
-    m_aAuditor = new AuditorMongoDB (SMPCurrentUserIDProvider.INSTANCE);
+    m_aAuditor = new AuditorMongoDB (GlobalUserIDProvider::getCurrentUserID);
   }
 
   public boolean isInMemory ()

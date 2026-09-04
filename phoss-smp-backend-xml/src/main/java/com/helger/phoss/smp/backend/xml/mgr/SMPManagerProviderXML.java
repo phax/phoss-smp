@@ -35,14 +35,8 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
-import com.helger.phoss.smp.domain.user.SMPCurrentUserIDProvider;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.phoss.smp.settings.SMPSettingsManagerXML;
-import com.helger.photon.audit.AbstractAuditor;
-import com.helger.photon.audit.AuditManager;
-import com.helger.photon.audit.IAuditManager;
-import com.helger.photon.audit.IAuditor;
-import com.helger.photon.security.mgr.PhotonSecurityManager;
 
 /**
  * {@link ISMPManagerProvider} implementation for this backend.
@@ -62,30 +56,6 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
 
   public SMPManagerProviderXML ()
   {}
-
-  @Override
-  public void beforeInitManagers ()
-  {
-    if (PhotonSecurityManager.isAlreadyInitialized ())
-    {
-      final IAuditor aAuditor = PhotonSecurityManager.getAuditMgr ().getAuditor ();
-      if (aAuditor instanceof final AbstractAuditor aAbstractAuditor)
-        aAbstractAuditor.setCurrentUserIDProvider (SMPCurrentUserIDProvider.INSTANCE);
-      else
-        throw new IllegalStateException ("The XML audit manager uses an unsupported auditor of type " +
-                                         aAuditor.getClass ().getName ());
-    }
-    else
-      PhotonSecurityManager.setFactory (new PhotonSecurityManager.FactoryXML ()
-      {
-        @Override
-        @NonNull
-        public IAuditManager createAuditMgr () throws DAOException
-        {
-          return new AuditManager (DIRECTORY_AUDITS, SMPCurrentUserIDProvider.INSTANCE);
-        }
-      });
-  }
 
   @NonNull
   public ETriState getBackendConnectionEstablishedDefaultState ()

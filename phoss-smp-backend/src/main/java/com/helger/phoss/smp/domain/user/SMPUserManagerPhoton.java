@@ -26,6 +26,7 @@ import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPUnauthorizedException;
 import com.helger.phoss.smp.exception.SMPUnknownUserException;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
+import com.helger.photon.security.login.RequestUserIDProvider;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.IUserTokenManager;
@@ -132,7 +133,7 @@ public final class SMPUserManagerPhoton
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("The provided BasicAuth credentials resolved to the user '" + aUser.getLoginName () + "'");
 
-      SMPCurrentUserIDProvider.setCurrentAPIUserID (aUser.getID ());
+      RequestUserIDProvider.setCurrentUserID (aUser.getID ());
       return aUser;
     }
 
@@ -175,7 +176,7 @@ public final class SMPUserManagerPhoton
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("The provided Bearer token resolved to the user '" + aUser.getLoginName () + "'");
 
-      SMPCurrentUserIDProvider.setCurrentAPIUserID (aUser.getID ());
+      RequestUserIDProvider.setCurrentUserID (aUser.getID ());
       return aUser;
     }
 
