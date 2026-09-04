@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.flywaydb.core.api.callback.BaseCallback;
 import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.callback.Context;
@@ -25,6 +27,8 @@ import org.flywaydb.core.api.resolver.ResolvedMigration;
 import org.flywaydb.core.internal.info.MigrationInfoImpl;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
@@ -46,8 +50,6 @@ import com.helger.phoss.smp.backend.sql.migration.V31__MigrateLongRunningJobsToD
 import com.helger.phoss.smp.backend.sql.migration.V5__MigrateTransportProfilesToDB;
 import com.helger.photon.audit.AuditHelper;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * This class has the sole purpose of encapsulating the org.flywaydb classes, so that it's usage can
  * be turned off (for whatever reason).
@@ -65,6 +67,8 @@ final class FlywayMigrator
     private Singleton ()
     {}
   }
+
+  private static final Logger LOGGER = LoggerFactory.getLogger (FlywayMigrator.class);
 
   private FlywayMigrator ()
   {}
@@ -90,24 +94,28 @@ final class FlywayMigrator
             final ResolvedMigration aRM = aMII.getResolvedMigration ();
             // Version 6 establishes the audit table - so don't audit anything
             // before that version
-            if (aRM != null && aRM.getVersion ().isAtLeast ("7")) {
+            if (aRM != null && aRM.getVersion ().isAtLeast ("7"))
+            {
               // if migration affects the table smp_audit directly (live V36 migration),
-              // then this insert gets stuck because the migration uses transaction that is in progress
+              // then this insert gets stuck because the migration uses transaction that is in
+              // progress
               // causing a deadlock. So we run the audit insert in a separate thread to avoid this.
 
-              CompletableFuture.supplyAsync(() -> {
-                try {
-                  AuditHelper.onAuditExecuteSuccess("sql-migration-success",
-                      aRM.getVersion().toString(),
-                      aRM.getDescription(),
-                      aRM.getScript(),
-                      aRM.getType().name(),
-                      aRM.getPhysicalLocation());
-                } catch (Exception e) {
-                  System.err.println("Error during audit logging: " + e.getMessage());
+              CompletableFuture.supplyAsync (() -> {
+                try
+                {
+                  AuditHelper.onAuditExecuteSuccess ("sql-migration-success",
+                                                     aRM.getVersion ().toString (),
+                                                     aRM.getDescription (),
+                                                     aRM.getScript (),
+                                                     aRM.getType ().name (),
+                                                     aRM.getPhysicalLocation ());
                 }
-
-                return true;
+                catch (final Exception e)
+                {
+                  LOGGER.error ("Error during audit logging: " + e.getMessage ());
+                }
+                return Boolean.TRUE;
               });
             }
           }
@@ -117,14 +125,10 @@ final class FlywayMigrator
 
     // Avoid scanning the ClassPath by enumerating Java migrations explicitly
     final JavaMigration [] aJavaMigrations = { new V2__MigrateDBUsersToPhotonUsers (),
-                                               new V5__MigrateTransportProfilesToDB (),
-                                               new V10__MigrateRolesToDB (),
-                                               new V11__MigrateUsersToDB (),
-                                               new V12__MigrateUserGroupsToDB (),
-                                               new V14__MigrateSettingsToDB (),
-                                               new V15__MigrateDBUsersToPhotonUsers (),
-                                               new V21__MigrateUserTokensToDB (),
-                                               new V25__MigrateSMLInfoToDB (),
+                                               new V5__MigrateTransportProfilesToDB (), new V10__MigrateRolesToDB (),
+                                               new V11__MigrateUsersToDB (), new V12__MigrateUserGroupsToDB (),
+                                               new V14__MigrateSettingsToDB (), new V15__MigrateDBUsersToPhotonUsers (),
+                                               new V21__MigrateUserTokensToDB (), new V25__MigrateSMLInfoToDB (),
                                                new V27__MigrateSystemMigrationsToDB (),
                                                new V29__MigrateSystemMessageToDB (),
                                                new V31__MigrateLongRunningJobsToDB () };
