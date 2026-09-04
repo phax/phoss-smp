@@ -28,6 +28,8 @@ import com.helger.phoss.smp.backend.SMPBackendRegistry;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.LoggingSMPBusinessCardCallback;
+import com.helger.phoss.smp.domain.spf.ISMPSPF4PeppolPolicyManager;
+import com.helger.phoss.smp.domain.spf.LoggingSMPSPF4PeppolCallback;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.LoggingSMPRedirectCallback;
@@ -72,6 +74,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPRedirectManager m_aRedirectMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
+  private ISMPSPF4PeppolPolicyManager m_aSPFPolicyMgr;
   private ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
   private ETriState m_eBackendConnectionState = ETriState.UNDEFINED;
   private Consumer <ETriState> m_aBackendConnectionStateChangeCallback;
@@ -139,6 +142,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
 
       // Always log
       m_aBusinessCardMgr.bcCallbacks ().add (new LoggingSMPBusinessCardCallback ());
+    }
+
+    if (m_aSPFPolicyMgr != null)
+    {
+      // Always log
+      m_aSPFPolicyMgr.spfCallbacks ().add (new LoggingSMPSPF4PeppolCallback ());
     }
   }
 
@@ -242,6 +251,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       // May be null!
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
 
+      // May be null!
+      m_aSPFPolicyMgr = s_aManagerProvider.createSPFPolicyMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
+
       _initCallbacks ();
 
       _performMigrations ();
@@ -336,6 +348,22 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static boolean hasBusinessCardMgr ()
   {
     return getBusinessCardMgr () != null;
+  }
+
+  @Nullable
+  public static ISMPSPF4PeppolPolicyManager getSPFPolicyMgr ()
+  {
+    return getInstance ().m_aSPFPolicyMgr;
+  }
+
+  /**
+   * @return <code>true</code> if an {@link ISMPSPF4PeppolPolicyManager} is present,
+   *         <code>false</code> if not.
+   * @since 8.0.13
+   */
+  public static boolean hasSPFPolicyMgr ()
+  {
+    return getSPFPolicyMgr () != null;
   }
 
   @NonNull

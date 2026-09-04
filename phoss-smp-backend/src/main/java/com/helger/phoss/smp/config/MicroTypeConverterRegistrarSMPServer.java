@@ -27,6 +27,8 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcessMicroTypeConverter;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformationMicroTypeConverter;
+import com.helger.phoss.smp.domain.spf.SMPSPF4PeppolPolicy;
+import com.helger.phoss.smp.domain.spf.SMPSPF4PeppolPolicyMicroTypeConverter;
 import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyListMicroTypeConverter;
@@ -53,6 +55,8 @@ public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeCon
     aRegistry.registerMicroElementTypeConverter (SMPServiceGroup.class, new SMPServiceGroupMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPServiceInformation.class,
                                                  new SMPServiceInformationMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SMPSPF4PeppolPolicy.class,
+                                                 new SMPSPF4PeppolPolicyMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SGCustomProperty.class, new SGCustomPropertyMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SGCustomPropertyList.class,
                                                  new SGCustomPropertyListMicroTypeConverter ());
