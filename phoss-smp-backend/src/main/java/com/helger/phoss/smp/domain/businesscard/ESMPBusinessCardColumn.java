@@ -45,7 +45,7 @@ public enum ESMPBusinessCardColumn implements ISMPTableColumn <ISMPBusinessCard>
    * each, so this column can be searched but not sorted by.
    */
   NAME ("name",
-        new String [] { "name" },
+        new String [] { "name", "names" },
         new String [] { "entities.names.name" },
         false,
         true,

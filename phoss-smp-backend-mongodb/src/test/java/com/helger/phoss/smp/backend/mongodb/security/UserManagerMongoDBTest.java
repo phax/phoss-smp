@@ -167,6 +167,7 @@ public final class UserManagerMongoDBTest
       assertEquals (aUser, aUserMgr.getUserOfLoginName ("UserMgrTest"));
       assertEquals (aUser, aUserMgr.getUserOfEmailAddress ("usermgr@smp.localhost"));
       assertEquals (aUser, aUserMgr.getUserOfEmailAddressIgnoreCase ("UserMgr@sMp.lOcalHost"));
+      assertNull (aUserMgr.getUserOfEmailAddressIgnoreCase ("sermgr@smp.localhost"));
 
       assertNull (aUserMgr.getUserOfID ("im Not Here"));
       assertNull (aUserMgr.getUserOfLoginName ("im Not Here"));

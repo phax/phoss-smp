@@ -141,6 +141,19 @@ public final class SMPJDBCQueryHelperTest
   }
 
   @Test
+  public void testSearchConditionBusinessCardNames ()
+  {
+    final SearchCondition aSC;
+    aSC = SMPJDBCQueryHelper.createSearchCondition (com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn.values (),
+                                                     "Acme");
+
+    // Service Group ID, the legacy single name and the multilingual names JSON
+    assertEquals (3, aSC.getAllParams ().size ());
+    assertTrue (aSC.getSQL ().contains ("LOWER(name) LIKE ?"));
+    assertTrue (aSC.getSQL ().contains ("LOWER(names) LIKE ?"));
+  }
+
+  @Test
   public void testLikePatternEscaping ()
   {
     // The search text is lower cased and enclosed in wildcards

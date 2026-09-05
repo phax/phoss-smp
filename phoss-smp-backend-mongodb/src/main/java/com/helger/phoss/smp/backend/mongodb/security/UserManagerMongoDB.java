@@ -301,7 +301,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
       return null;
 
     // Use case-insensitive RegEx for case-insensitive comparison
-    return findFirst (Filters.regex (BSON_USER_EMAIL, Pattern.quote (sEmailAddress), "i"));
+    return findFirst (Filters.regex (BSON_USER_EMAIL, "^" + Pattern.quote (sEmailAddress) + "$", "i"));
   }
 
   @Override
