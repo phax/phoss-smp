@@ -39,6 +39,7 @@ import com.helger.collection.paging.SortField;
  * @author Philip Helger
  * @since 8.2.1
  */
+// TODO replace with the ph-oton version com.helger.photon.core.paging.TableColumnHelper (since ph-oton 10.6.0)
 @Immutable
 public final class SMPTableColumnHelper
 {
