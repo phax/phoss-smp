@@ -67,7 +67,7 @@
   </developers>
 
   <properties>
-    <flyway.version>13.4.0</flyway.version>
+    <flyway.version>13.5.0</flyway.version>
     <log4j.version>2.26.1</log4j.version>
     <mongodb.version>5.11.0</mongodb.version>
     <protobuf.version>4.36.1</protobuf.version>
@@ -113,7 +113,7 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>11.4.4</version>
+        <version>11.4.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -141,14 +141,14 @@
       <dependency>
         <groupId>com.helger.peppol.ui</groupId>
         <artifactId>peppol-shared-ui-parent-pom</artifactId>
-        <version>0.10.1</version>
+        <version>0.10.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.17.1</version>
+        <version>0.17.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -162,7 +162,7 @@
       <dependency>
         <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
