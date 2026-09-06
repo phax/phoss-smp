@@ -26,7 +26,7 @@ import com.helger.db.api.EDatabaseSystemType;
 import com.helger.db.api.paging.DBPagingHelper;
 import com.helger.db.api.paging.IDBColumnNameResolver;
 import com.helger.phoss.smp.domain.ISMPTableColumn;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * Helper class to turn the {@link ISMPTableColumn}s of a domain object into the SQL clauses for
@@ -68,7 +68,6 @@ public final class SMPJDBCQueryHelper
       return null;
     };
   }
-
 
   /**
    * Create the combined <code>ORDER BY</code> and paging clause for the provided paging
@@ -114,7 +113,7 @@ public final class SMPJDBCQueryHelper
     return DBPagingHelper.getOrderByAndPagingClause (eDBType,
                                                      aPagingSpec,
                                                      createColumnNameResolver (aColumns),
-                                                     SMPTableColumnHelper.getAllDefaultSortFields (aColumns));
+                                                     TableColumnHelper.getAllDefaultSortFields (aColumns));
   }
 
   /**

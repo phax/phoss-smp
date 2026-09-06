@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
@@ -22,6 +23,7 @@ import com.helger.base.lang.EnumHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.domain.ISMPTableColumn;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * The sortable and searchable columns of an {@link ISMPServiceGroup}.
@@ -40,16 +42,20 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
                   ESortOrder.ASCENDING,
                   ISMPServiceGroup::getID),
   /** The ID of the owning user */
-  OWNER ("owner", new String [] { "so.username" }, new String [] { "ownerid" }, true, false,
-                  null, ISMPServiceGroup::getOwnerID);
+  OWNER ("owner",
+         new String [] { "so.username" },
+         new String [] { "ownerid" },
+         true,
+         false,
+         null,
+         ISMPServiceGroup::getOwnerID);
 
   private final String m_sID;
   private final String [] m_aSQLColumnNames;
   private final String [] m_aMongoFieldNames;
-  private final boolean m_bSortable;
-  private final boolean m_bSearchable;
   private final ESortOrder m_eDefaultSortOrder;
-  private final Function <ISMPServiceGroup, String> m_aValueProvider;
+  private final Comparator <ISMPServiceGroup> m_aComparator;
+  private final Function <ISMPServiceGroup, String> m_aSearchValueProvider;
 
   ESMPServiceGroupColumn (@NonNull @Nonempty final String sID,
                           final String @Nullable [] aSQLColumnNames,
@@ -62,10 +68,9 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
     m_sID = sID;
     m_aSQLColumnNames = aSQLColumnNames;
     m_aMongoFieldNames = aMongoFieldNames;
-    m_bSortable = bSortable;
-    m_bSearchable = bSearchable;
     m_eDefaultSortOrder = eDefaultSortOrder;
-    m_aValueProvider = aValueProvider;
+    m_aComparator = bSortable ? TableColumnHelper.createComparator (aValueProvider) : null;
+    m_aSearchValueProvider = bSearchable ? aValueProvider : null;
   }
 
   @NonNull
@@ -89,26 +94,22 @@ public enum ESMPServiceGroupColumn implements ISMPTableColumn <ISMPServiceGroup>
     return m_aMongoFieldNames == null ? null : new CommonsArrayList <> (m_aMongoFieldNames);
   }
 
-  public boolean isSortable ()
+  @Nullable
+  public Function <ISMPServiceGroup, String> getSearchValueProvider ()
   {
-    return m_bSortable;
+    return m_aSearchValueProvider;
   }
 
-  public boolean isSearchable ()
+  @Nullable
+  public Comparator <ISMPServiceGroup> getComparator ()
   {
-    return m_bSearchable;
+    return m_aComparator;
   }
 
   @Nullable
   public ESortOrder getDefaultSortOrder ()
   {
     return m_eDefaultSortOrder;
-  }
-
-  @NonNull
-  public Function <ISMPServiceGroup, String> getValueProvider ()
-  {
-    return m_aValueProvider;
   }
 
   @Nullable

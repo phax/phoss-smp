@@ -26,7 +26,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * Manager for {@link ISMPBusinessCard} objects. Business card objects require a service group to be
@@ -107,10 +107,10 @@ public interface ISMPBusinessCardManager
   default ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@NonNull final IPagingSpec aPagingSpec,
                                                                   @Nullable final String sSearchText)
   {
-    return SMPTableColumnHelper.getPage (ESMPBusinessCardColumn.values (),
-                                         getAllSMPBusinessCards (),
-                                         aPagingSpec,
-                                         sSearchText);
+    return TableColumnHelper.getPage (ESMPBusinessCardColumn.values (),
+                                      getAllSMPBusinessCards (),
+                                      aPagingSpec,
+                                      sSearchText);
   }
 
   /**
@@ -163,6 +163,6 @@ public interface ISMPBusinessCardManager
     if (StringHelper.isEmpty (sSearchText))
       return getSMPBusinessCardCount ();
 
-    return SMPTableColumnHelper.getCount (ESMPBusinessCardColumn.values (), getAllSMPBusinessCards (), sSearchText);
+    return TableColumnHelper.getCount (ESMPBusinessCardColumn.values (), getAllSMPBusinessCards (), sSearchText);
   }
 }

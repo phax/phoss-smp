@@ -89,7 +89,6 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
@@ -135,6 +134,7 @@ import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandHelper;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -353,7 +353,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     });
   }
 
-  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = DataTablesOnDemandHelper.registerAjaxFunction (this::_getOnDemandData,
+                                                                                                          CAjax.FILTER_IS_USER_LOGGED_IN);
 
   public PageSecureServiceGroup (@NonNull @Nonempty final String sID)
   {
@@ -1304,10 +1305,12 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable)
-             .addChild (SMPDataTablesOnDemand.createDataTables (aWPEC,
-                                                                aTable,
-                                                                m_aAjaxOnDemand,
-                                                                ESMPServiceGroupColumn.values ()));
+    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+    DataTablesOnDemandHelper.applyOnDemandMode (aDataTables,
+                                                aTable,
+                                                m_aAjaxOnDemand,
+                                                aWPEC.getRequestScope (),
+                                                ESMPServiceGroupColumn.values ());
+    aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

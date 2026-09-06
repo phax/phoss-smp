@@ -41,6 +41,7 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
@@ -53,15 +54,13 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
+import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
-import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
-import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
-import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -70,6 +69,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * A JDBC based implementation of the {@link ISMPServiceInformationManager} interface.
@@ -150,7 +150,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final MutableBoolean aUpdated = new MutableBoolean (false);
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Simply delete the old one
       final EChange eDeleted = _deleteSMPServiceInformationNoCallback (aExecutor, aSMPServiceInformation);
       aUpdated.set (eDeleted.isChanged ());
@@ -269,7 +269,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                           @NonNull final ISMPServiceInformation aSMPServiceInformation)
   {
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (-1));
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final long nCountEP = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
@@ -330,7 +330,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
     final Wrapper <ICommonsList <ISMPServiceInformation>> aAllDeleted = new Wrapper <> ();
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // get the old ones first
       aAllDeleted.set (_getAllSMPServiceInformationOfServiceGroup (aExecutor, aParticipantID));
 
@@ -377,7 +377,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       final IParticipantIdentifier aPID = aSMPServiceInformation.getServiceGroupParticipantIdentifier ();
       final IDocumentTypeIdentifier aDocTypeID = aSMPServiceInformation.getDocumentTypeIdentifier ();
       final IProcessIdentifier aProcessID = aProcess.getProcessIdentifier ();
@@ -432,7 +432,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                    aSearch.getAllParams (),
                                    ret::add);
     // The DB result is grouped in a Map, so the order needs to be restored
-    final Comparator <ISMPServiceInformation> aComparator = SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec);
+    final Comparator <ISMPServiceInformation> aComparator = TableColumnHelper.getComparator (COLUMNS, aPagingSpec);
     if (aComparator != null)
       ret.sort (aComparator);
     return ret;
@@ -462,30 +462,30 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     // Service Metadata level, because the joins create multiple rows per
     // Service Information object
     final String sServiceMetadataTable = sServiceMetadataSuffix == null ? m_sTableNameSM
-                                                                       : "(SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension FROM " +
-                                                                         m_sTableNameSM +
-                                                                         " sm" +
-                                                                         sServiceMetadataSuffix +
-                                                                         ")";
-    final String sSQL = "SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
-                                                                          "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                          "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
-                                                                          "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
-                                                                          "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
-                                                                          " FROM " +
-                                                                          sServiceMetadataTable +
+                                                                        : "(SELECT businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, extension FROM " +
+                                                                          m_sTableNameSM +
                                                                           " sm" +
-                                                                          " INNER JOIN " +
-                                                                          m_sTableNameP +
-                                                                          " sp" +
-                                                                          "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
-                                                                          "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
-                                                                          " INNER JOIN " +
-                                                                          m_sTableNameE +
-                                                                          " se" +
-                                                                          "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
-                                                                          "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
-                                                                          "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier";
+                                                                          sServiceMetadataSuffix +
+                                                                          ")";
+    final String sSQL = "SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
+                        "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
+                        "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                        "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                        "     se.technicalContactUrl, se.technicalInformationUrl, se.extension" +
+                        " FROM " +
+                        sServiceMetadataTable +
+                        " sm" +
+                        " INNER JOIN " +
+                        m_sTableNameP +
+                        " sp" +
+                        "   ON sm.businessIdentifierScheme=sp.businessIdentifierScheme AND sm.businessIdentifier=sp.businessIdentifier" +
+                        "   AND sm.documentIdentifierScheme=sp.documentIdentifierScheme AND sm.documentIdentifier=sp.documentIdentifier" +
+                        " INNER JOIN " +
+                        m_sTableNameE +
+                        " se" +
+                        "   ON sp.businessIdentifierScheme=se.businessIdentifierScheme AND sp.businessIdentifier=se.businessIdentifier" +
+                        "   AND sp.documentIdentifierScheme=se.documentIdentifierScheme AND sp.documentIdentifier=se.documentIdentifier" +
+                        "   AND sp.processIdentifierType=se.processIdentifierType AND sp.processIdentifier=se.processIdentifier";
     final ICommonsList <DBResultRow> aDBResult = aParams == null || aParams.isEmpty () ? newExecutor ().queryAll (sSQL)
                                                                                        : newExecutor ().queryAll (sSQL,
                                                                                                                   new ConstantPreparedStatementDataProvider (aParams));

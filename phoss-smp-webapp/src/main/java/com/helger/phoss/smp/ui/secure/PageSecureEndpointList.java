@@ -41,15 +41,18 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.rest.SMPRestDataProvider;
-import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
+import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.cache.SMPTransportProfileCache;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandHelper;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -66,7 +69,8 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 {
-  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = DataTablesOnDemandHelper.registerAjaxFunction (this::_getOnDemandData,
+                                                                                                          CAjax.FILTER_IS_USER_LOGGED_IN);
 
   public PageSecureEndpointList (@NonNull @Nonempty final String sID)
   {
@@ -186,6 +190,12 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPServiceInformationColumn.values ()));
+    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+    DataTablesOnDemandHelper.applyOnDemandMode (aDataTables,
+                                                aTable,
+                                                m_aAjaxOnDemand,
+                                                aWPEC.getRequestScope (),
+                                                ESMPServiceInformationColumn.values ());
+    aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

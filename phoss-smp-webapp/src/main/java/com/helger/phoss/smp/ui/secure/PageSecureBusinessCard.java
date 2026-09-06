@@ -77,7 +77,6 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -100,6 +99,7 @@ import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageAction
 import com.helger.photon.bootstrap5.table.BootstrapTable;
 import com.helger.photon.bootstrap5.traits.IHCBootstrap5Trait;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap5.uictrls.datetimepicker.BootstrapDateTimePicker;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
@@ -118,6 +118,8 @@ import com.helger.photon.uicore.js.JSJQueryHelper;
 import com.helger.photon.uicore.page.EShowList;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandHelper;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -296,7 +298,8 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     }
   }
 
-  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = DataTablesOnDemandHelper.registerAjaxFunction (this::_getOnDemandData,
+                                                                                                          CAjax.FILTER_IS_USER_LOGGED_IN);
 
   public PageSecureBusinessCard (@NonNull @Nonempty final String sID)
   {
@@ -1395,6 +1398,12 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPBusinessCardColumn.values ()));
+    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+    DataTablesOnDemandHelper.applyOnDemandMode (aDataTables,
+                                                aTable,
+                                                m_aAjaxOnDemand,
+                                                aWPEC.getRequestScope (),
+                                                ESMPBusinessCardColumn.values ());
+    aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

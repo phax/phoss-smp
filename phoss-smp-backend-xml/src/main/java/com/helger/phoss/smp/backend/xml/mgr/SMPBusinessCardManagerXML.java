@@ -34,18 +34,18 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
-import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
@@ -79,7 +79,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _createSMPBusinessCard (@NonNull final SMPBusinessCard aSMPBusinessCard)
   {
-    m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMPBusinessCard); });
+    m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPBusinessCard); });
     AuditHelper.onAuditCreateSuccess (SMPBusinessCard.OT,
                                       aSMPBusinessCard.getID (),
                                       Integer.valueOf (aSMPBusinessCard.getEntityCount ()));
@@ -90,7 +90,7 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   @IsLocked (ELockType.WRITE)
   private ISMPBusinessCard _updateSMPBusinessCard (@NonNull final SMPBusinessCard aSMPBusinessCard)
   {
-    m_aRWLock.writeLocked ( () -> { internalUpdateItem (aSMPBusinessCard); });
+    m_aRWLock.writeLocked (() -> { internalUpdateItem (aSMPBusinessCard); });
     AuditHelper.onAuditModifySuccess (SMPBusinessCard.OT,
                                       "set-all",
                                       aSMPBusinessCard.getID (),
@@ -189,15 +189,15 @@ public final class SMPBusinessCardManagerXML extends AbstractPhotonMapBasedWALDA
   public ICommonsList <ISMPBusinessCard> getAllSMPBusinessCards (@NonNull final IPagingSpec aPagingSpec,
                                                                  @Nullable final String sSearchText)
   {
-    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+    return getAllPaged (TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
                         aPagingSpec,
-                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+                        TableColumnHelper.getComparator (COLUMNS, aPagingSpec));
   }
 
   @Override
   public long getSMPBusinessCardCount (@Nullable final String sSearchText)
   {
-    final Predicate <ISMPBusinessCard> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    final Predicate <ISMPBusinessCard> aFilter = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
     return aFilter == null ? getSMPBusinessCardCount () : getCount (aFilter);
   }
 

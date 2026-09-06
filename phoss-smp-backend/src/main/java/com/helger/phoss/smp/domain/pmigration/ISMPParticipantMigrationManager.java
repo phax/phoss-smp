@@ -20,8 +20,8 @@ import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * This is the interface for managing participant migrations.
@@ -32,34 +32,31 @@ import com.helger.peppolid.IParticipantIdentifier;
 public interface ISMPParticipantMigrationManager
 {
   /**
-   * Create a new outbound participant migration for the provided participant
-   * identifier. This means the participant is migrated FROM this SMP to another
-   * SMP.
+   * Create a new outbound participant migration for the provided participant identifier. This means
+   * the participant is migrated FROM this SMP to another SMP.
    *
    * @param aParticipantID
    *        The participant ID to use. May not be <code>null</code>.
    * @param sMigrationKey
-   *        The migration key send to the SMK/SML. May neither be
-   *        <code>null</code> nor empty.
-   * @return The created migration domain object. May be <code>null</code> in
-   *         case persistence failed.
+   *        The migration key send to the SMK/SML. May neither be <code>null</code> nor empty.
+   * @return The created migration domain object. May be <code>null</code> in case persistence
+   *         failed.
    */
   @Nullable
   ISMPParticipantMigration createOutboundParticipantMigration (@NonNull IParticipantIdentifier aParticipantID,
                                                                @NonNull @Nonempty String sMigrationKey);
 
   /**
-   * Create a new inbound participant migration for the provided participant
-   * identifier. This means, the participant is migrated from another SMP TO
-   * this SMP.
+   * Create a new inbound participant migration for the provided participant identifier. This means,
+   * the participant is migrated from another SMP TO this SMP.
    *
    * @param aParticipantID
    *        The participant ID to use. May not be <code>null</code>.
    * @param sMigrationKey
-   *        The migration key received from the other SMP. May neither be
-   *        <code>null</code> nor empty.
-   * @return The created migration domain object. May be <code>null</code> in
-   *         case persistence failed.
+   *        The migration key received from the other SMP. May neither be <code>null</code> nor
+   *        empty.
+   * @return The created migration domain object. May be <code>null</code> in case persistence
+   *         failed.
    */
   @Nullable
   ISMPParticipantMigration createInboundParticipantMigration (@NonNull IParticipantIdentifier aParticipantID,
@@ -89,11 +86,9 @@ public interface ISMPParticipantMigrationManager
    * Change the participant migration state of the provided participant ID.
    *
    * @param sParticipantMigrationID
-   *        The ID of the participant migration to be deleted. May be
-   *        <code>null</code>.
+   *        The ID of the participant migration to be deleted. May be <code>null</code>.
    * @param eNewState
-   *        The new participant migration state to use. May not be
-   *        <code>null</code>.
+   *        The new participant migration state to use. May not be <code>null</code>.
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @NonNull
@@ -116,14 +111,13 @@ public interface ISMPParticipantMigrationManager
    * @param eDirection
    *        The direction to query. May not be <code>null</code>.
    * @param eState
-   *        The state the entry must have. May not be <code>null</code>. If this
-   *        state is "cancelled" the result could be a list, so it's not
-   *        advisable to use this URL.
+   *        The state the entry must have. May not be <code>null</code>. If this state is
+   *        "cancelled" the result could be a list, so it's not advisable to use this URL.
    * @param aParticipantID
-   *        The participant ID to check. May be <code>null</code> in which case
-   *        the result is always <code>null</code>.
-   * @return <code>null</code> if no such participant migration is contained.
-   *         The first matching participant otherwise.
+   *        The participant ID to check. May be <code>null</code> in which case the result is always
+   *        <code>null</code>.
+   * @return <code>null</code> if no such participant migration is contained. The first matching
+   *         participant otherwise.
    */
   @Nullable
   ISMPParticipantMigration getParticipantMigrationOfParticipantID (@NonNull EParticipantMigrationDirection eDirection,
@@ -135,8 +129,8 @@ public interface ISMPParticipantMigrationManager
    *
    * @param eState
    *        The state to be used to filter. May be <code>null</code>.
-   * @return A list of all contained outbound participant migrations. Never
-   *         <code>null</code> but maybe empty.
+   * @return A list of all contained outbound participant migrations. Never <code>null</code> but
+   *         maybe empty.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -147,8 +141,8 @@ public interface ISMPParticipantMigrationManager
    *
    * @param eState
    *        The state to be used to filter. May be <code>null</code>.
-   * @return A list of all contained inbound participant migrations. Never
-   *         <code>null</code> but maybe empty.
+   * @return A list of all contained inbound participant migrations. Never <code>null</code> but
+   *         maybe empty.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -205,10 +199,10 @@ public interface ISMPParticipantMigrationManager
                                                                                @NonNull final IPagingSpec aPagingSpec,
                                                                                @Nullable final String sSearchText)
   {
-    return SMPTableColumnHelper.getPage (ESMPParticipantMigrationColumn.values (),
-                                         getAllParticipantMigrations (eDirection, eState),
-                                         aPagingSpec,
-                                         sSearchText);
+    return TableColumnHelper.getPage (ESMPParticipantMigrationColumn.values (),
+                                      getAllParticipantMigrations (eDirection, eState),
+                                      aPagingSpec,
+                                      sSearchText);
   }
 
   /**
@@ -231,32 +225,30 @@ public interface ISMPParticipantMigrationManager
                                              @Nullable final EParticipantMigrationState eState,
                                              @Nullable final String sSearchText)
   {
-    return SMPTableColumnHelper.getCount (ESMPParticipantMigrationColumn.values (),
-                                          getAllParticipantMigrations (eDirection, eState),
-                                          sSearchText);
+    return TableColumnHelper.getCount (ESMPParticipantMigrationColumn.values (),
+                                       getAllParticipantMigrations (eDirection, eState),
+                                       sSearchText);
   }
 
   /**
-   * Check if an outbound migration for the provided participant identifier is
-   * already running.
+   * Check if an outbound migration for the provided participant identifier is already running.
    *
    * @param aParticipantID
-   *        The participant ID to check. May be <code>null</code> in which case
-   *        the result is always <code>false</code>.
-   * @return <code>true</code> if an outbound migration is already running,
-   *         <code>false</code> if not.
+   *        The participant ID to check. May be <code>null</code> in which case the result is always
+   *        <code>false</code>.
+   * @return <code>true</code> if an outbound migration is already running, <code>false</code> if
+   *         not.
    */
   boolean containsOutboundMigrationInProgress (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
-   * Check if an inbound migration for the provided participant identifier is
-   * already contained.
+   * Check if an inbound migration for the provided participant identifier is already contained.
    *
    * @param aParticipantID
-   *        The participant ID to check. May be <code>null</code> in which case
-   *        the result is always <code>false</code>.
-   * @return <code>true</code> if an inbound migration is already contained,
-   *         <code>false</code> if not.
+   *        The participant ID to check. May be <code>null</code> in which case the result is always
+   *        <code>false</code>.
+   * @return <code>true</code> if an inbound migration is already contained, <code>false</code> if
+   *         not.
    */
   boolean containsInboundMigration (@Nullable IParticipantIdentifier aParticipantID);
 }

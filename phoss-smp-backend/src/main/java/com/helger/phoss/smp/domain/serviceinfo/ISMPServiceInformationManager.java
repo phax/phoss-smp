@@ -29,7 +29,7 @@ import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * Manager for {@link ISMPServiceInformation} objects. Service information objects require a service
@@ -131,11 +131,13 @@ public interface ISMPServiceInformationManager
 
   /**
    * Get a single "page" of all entries matching the provided search text. This method is meant to
-   * be used for server side pagination in combination with {@link #getSMPServiceInformationCount(String)}.<br>
-   * The sort fields of the paging specification are resolved via {@link ESMPServiceInformationColumn} - unknown or
-   * non-sortable field names are ignored, because they are provided by a client. If no sort field
-   * remains, the first column of {@link ESMPServiceInformationColumn} is used, so that consecutive page requests return
-   * disjunct results.
+   * be used for server side pagination in combination with
+   * {@link #getSMPServiceInformationCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via
+   * {@link ESMPServiceInformationColumn} - unknown or non-sortable field names are ignored, because
+   * they are provided by a client. If no sort field remains, the first column of
+   * {@link ESMPServiceInformationColumn} is used, so that consecutive page requests return disjunct
+   * results.
    *
    * @param aPagingSpec
    *        The paging specification to be applied. May not be <code>null</code>.
@@ -151,10 +153,11 @@ public interface ISMPServiceInformationManager
   default ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@NonNull final IPagingSpec aPagingSpec,
                                                                              @Nullable final String sSearchText)
   {
-    return SMPTableColumnHelper.getPage (ESMPServiceInformationColumn.values (), getAllSMPServiceInformation (), aPagingSpec, sSearchText);
+    return TableColumnHelper.getPage (ESMPServiceInformationColumn.values (),
+                                      getAllSMPServiceInformation (),
+                                      aPagingSpec,
+                                      sSearchText);
   }
-
-
 
   /**
    * Iterate each Service Information element and invoke the provided consumer for it.
@@ -187,9 +190,10 @@ public interface ISMPServiceInformationManager
     if (StringHelper.isEmpty (sSearchText))
       return getSMPServiceInformationCount ();
 
-    return SMPTableColumnHelper.getCount (ESMPServiceInformationColumn.values (), getAllSMPServiceInformation (), sSearchText);
+    return TableColumnHelper.getCount (ESMPServiceInformationColumn.values (),
+                                       getAllSMPServiceInformation (),
+                                       sSearchText);
   }
-
 
   /**
    * Get all service information objects that belong to the provided service group.

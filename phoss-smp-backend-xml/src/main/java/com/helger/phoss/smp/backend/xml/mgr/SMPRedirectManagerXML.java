@@ -37,16 +37,16 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
-import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
@@ -79,7 +79,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _createSMPRedirect (@NonNull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMPRedirect); });
+    m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPRedirect); });
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
@@ -95,7 +95,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _updateSMPRedirect (@NonNull final SMPRedirect aSMPRedirect)
   {
-    m_aRWLock.writeLocked ( () -> { internalUpdateItem (aSMPRedirect); });
+    m_aRWLock.writeLocked (() -> { internalUpdateItem (aSMPRedirect); });
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                       "set-all",
                                       aSMPRedirect.getID (),
@@ -236,15 +236,15 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   public ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
                                                          @Nullable final String sSearchText)
   {
-    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+    return getAllPaged (TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
                         aPagingSpec,
-                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+                        TableColumnHelper.getComparator (COLUMNS, aPagingSpec));
   }
 
   @Override
   public long getSMPRedirectCount (@Nullable final String sSearchText)
   {
-    final Predicate <ISMPRedirect> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    final Predicate <ISMPRedirect> aFilter = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
     return aFilter == null ? getSMPRedirectCount () : getCount (aFilter);
   }
 

@@ -53,7 +53,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
-import com.helger.phoss.smp.ui.SMPDataTablesOnDemand;
+import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -63,6 +63,7 @@ import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap5.form.BootstrapViewForm;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
+import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
@@ -71,6 +72,8 @@ import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
+import com.helger.photon.uictrls.datatables.DataTables;
+import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandHelper;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
@@ -95,7 +98,8 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   private static final String ATTR_DOCTYPE_ID = "$doctypeid";
 
   /** Provides the rows of a single page - see {@link #_getOnDemandData(DataTablesOnDemandRequest, IRequestWebScopeWithoutResponse)} */
-  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = SMPDataTablesOnDemand.registerSecure (this::_getOnDemandData);
+  private final IAjaxFunctionDeclaration m_aAjaxOnDemand = DataTablesOnDemandHelper.registerAjaxFunction (this::_getOnDemandData,
+                                                                                                          CAjax.FILTER_IS_USER_LOGGED_IN);
 
   public PageSecureRedirect (@NonNull @Nonempty final String sID)
   {
@@ -534,6 +538,12 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
 
     // The rows are filled by the AJAX function only
     final HCTable aTable = _createTable (aWPEC);
-    aNodeList.addChild (aTable).addChild (SMPDataTablesOnDemand.createDataTables (aWPEC, aTable, m_aAjaxOnDemand, ESMPRedirectColumn.values ()));
+    final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+    DataTablesOnDemandHelper.applyOnDemandMode (aDataTables,
+                                                aTable,
+                                                m_aAjaxOnDemand,
+                                                aWPEC.getRequestScope (),
+                                                ESMPRedirectColumn.values ());
+    aNodeList.addChild (aTable).addChild (aDataTables);
   }
 }

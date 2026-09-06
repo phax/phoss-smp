@@ -16,8 +16,8 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import java.util.Comparator;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -43,6 +43,7 @@ import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
@@ -57,11 +58,9 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.json.serialize.JsonWriterSettings;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.collection.paging.IPagingSpec;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardCallback;
@@ -72,6 +71,7 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * A JDBC based implementation of the {@link ISMPBusinessCardManager} interface.
@@ -213,7 +213,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
 
     final MutableBoolean aUpdated = new MutableBoolean (false);
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSucces = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSucces = aExecutor.performInTransaction (() -> {
       // Delete all existing entities
       final String sPID = aParticipantID.getURIEncoded ();
       final long nDeleted = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " + m_sTableName + " WHERE pid=?",
@@ -395,7 +395,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
                                                                                                new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
     final ICommonsList <ISMPBusinessCard> ret = _convertToBusinessCards (aDBResult);
     // The DB result is grouped in a Map, so the order needs to be restored
-    final Comparator <ISMPBusinessCard> aComparator = SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec);
+    final Comparator <ISMPBusinessCard> aComparator = TableColumnHelper.getComparator (COLUMNS, aPagingSpec);
     if (aComparator != null)
       ret.sort (aComparator);
     return ret;

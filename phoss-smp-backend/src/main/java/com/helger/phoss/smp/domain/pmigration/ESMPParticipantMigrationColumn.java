@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.pmigration;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
@@ -22,14 +23,15 @@ import com.helger.base.lang.EnumHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.domain.ISMPTableColumn;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * The sortable and searchable columns of an {@link ISMPParticipantMigration}.<br>
  * Note: no MongoDB field names are provided, because the MongoDB backend stores the participant
  * identifier as a sub document and not as a single string, so a native filter would not behave
  * identical to the other backends. The MongoDB backend therefore uses the in-memory implementation
- * of {@link com.helger.phoss.smp.domain.SMPTableColumnHelper}, which is unproblematic because the
- * number of participant migrations is bound by the number of migrations ever performed.
+ * of {@code TableColumnHelper}, which is unproblematic because the number of participant migrations
+ * is bound by the number of migrations ever performed.
  *
  * @author Philip Helger
  * @since 8.2.1
@@ -51,15 +53,18 @@ public enum ESMPParticipantMigrationColumn implements ISMPTableColumn <ISMPParti
                         null,
                         x -> x.getInitiationDateTime () == null ? null : x.getInitiationDateTime ().toString ()),
   /** The migration key exchanged with the SML */
-  MIGRATION_KEY ("migrationkey", new String [] { "migkey" }, true, true,
-                  null, ISMPParticipantMigration::getMigrationKey);
+  MIGRATION_KEY ("migrationkey",
+                 new String [] { "migkey" },
+                 true,
+                 true,
+                 null,
+                 ISMPParticipantMigration::getMigrationKey);
 
   private final String m_sID;
   private final String [] m_aSQLColumnNames;
-  private final boolean m_bSortable;
-  private final boolean m_bSearchable;
   private final ESortOrder m_eDefaultSortOrder;
-  private final Function <ISMPParticipantMigration, String> m_aValueProvider;
+  private final Comparator <ISMPParticipantMigration> m_aComparator;
+  private final Function <ISMPParticipantMigration, String> m_aSearchValueProvider;
 
   ESMPParticipantMigrationColumn (@NonNull @Nonempty final String sID,
                                   final String @Nullable [] aSQLColumnNames,
@@ -70,10 +75,9 @@ public enum ESMPParticipantMigrationColumn implements ISMPTableColumn <ISMPParti
   {
     m_sID = sID;
     m_aSQLColumnNames = aSQLColumnNames;
-    m_bSortable = bSortable;
-    m_bSearchable = bSearchable;
     m_eDefaultSortOrder = eDefaultSortOrder;
-    m_aValueProvider = aValueProvider;
+    m_aComparator = bSortable ? TableColumnHelper.createComparator (aValueProvider) : null;
+    m_aSearchValueProvider = bSearchable ? aValueProvider : null;
   }
 
   @NonNull
@@ -98,26 +102,22 @@ public enum ESMPParticipantMigrationColumn implements ISMPTableColumn <ISMPParti
     return null;
   }
 
-  public boolean isSortable ()
+  @Nullable
+  public Function <ISMPParticipantMigration, String> getSearchValueProvider ()
   {
-    return m_bSortable;
+    return m_aSearchValueProvider;
   }
 
-  public boolean isSearchable ()
+  @Nullable
+  public Comparator <ISMPParticipantMigration> getComparator ()
   {
-    return m_bSearchable;
+    return m_aComparator;
   }
 
   @Nullable
   public ESortOrder getDefaultSortOrder ()
   {
     return m_eDefaultSortOrder;
-  }
-
-  @NonNull
-  public Function <ISMPParticipantMigration, String> getValueProvider ()
-  {
-    return m_aValueProvider;
   }
 
   @Nullable

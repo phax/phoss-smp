@@ -26,13 +26,13 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
- * Manager for {@link ISMPRedirect} objects. Redirect objects require a service
- * group to be present first.
+ * Manager for {@link ISMPRedirect} objects. Redirect objects require a service group to be present
+ * first.
  *
  * @author Philip Helger
  */
@@ -60,24 +60,21 @@ public interface ISMPRedirectManager
    * Create or update a redirect for a service group.
    *
    * @param aParticipantID
-   *        Service group participant ID the redirect belongs to. May not be
-   *        <code>null</code>.
+   *        Service group participant ID the redirect belongs to. May not be <code>null</code>.
    * @param aDocumentTypeIdentifier
    *        Document type identifier effected. May not be <code>null</code>.
    * @param sTargetHref
-   *        Target URL of the new SMP. May neither be <code>null</code> nor
-   *        empty.
+   *        Target URL of the new SMP. May neither be <code>null</code> nor empty.
    * @param sSubjectUniqueIdentifier
-   *        The subject unique identifier of the target SMPs certificate used to
-   *        sign its resources. May neither be <code>null</code> nor empty.
+   *        The subject unique identifier of the target SMPs certificate used to sign its resources.
+   *        May neither be <code>null</code> nor empty.
    * @param aCertificate
-   *        The certificate of the target SMP. Required for OASIS BDXR SMP v2
-   *        May be <code>null</code>.
+   *        The certificate of the target SMP. Required for OASIS BDXR SMP v2 May be
+   *        <code>null</code>.
    * @param sExtension
-   *        Optional extension element. May be <code>null</code>. If present it
-   *        must be well-formed XML content.
-   * @return The new or updated {@link ISMPRedirect}. <code>null</code> if
-   *         persistence failed.
+   *        Optional extension element. May be <code>null</code>. If present it must be well-formed
+   *        XML content.
+   * @return The new or updated {@link ISMPRedirect}. <code>null</code> if persistence failed.
    */
   @Nullable
   ISMPRedirect createOrUpdateSMPRedirect (@NonNull IParticipantIdentifier aParticipantID,
@@ -108,8 +105,7 @@ public interface ISMPRedirectManager
   EChange deleteAllSMPRedirectsOfServiceGroup (@Nullable IParticipantIdentifier aParticipantID);
 
   /**
-   * @return All contained SMP redirects. Never <code>null</code> but maybe
-   *         empty.
+   * @return All contained SMP redirects. Never <code>null</code> but maybe empty.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -117,11 +113,12 @@ public interface ISMPRedirectManager
 
   /**
    * Get a single "page" of all entries matching the provided search text. This method is meant to
-   * be used for server side pagination in combination with {@link #getSMPRedirectCount(String)}.<br>
-   * The sort fields of the paging specification are resolved via {@link ESMPRedirectColumn} - unknown or
-   * non-sortable field names are ignored, because they are provided by a client. If no sort field
-   * remains, the first column of {@link ESMPRedirectColumn} is used, so that consecutive page requests return
-   * disjunct results.
+   * be used for server side pagination in combination with
+   * {@link #getSMPRedirectCount(String)}.<br>
+   * The sort fields of the paging specification are resolved via {@link ESMPRedirectColumn} -
+   * unknown or non-sortable field names are ignored, because they are provided by a client. If no
+   * sort field remains, the first column of {@link ESMPRedirectColumn} is used, so that consecutive
+   * page requests return disjunct results.
    *
    * @param aPagingSpec
    *        The paging specification to be applied. May not be <code>null</code>.
@@ -137,18 +134,16 @@ public interface ISMPRedirectManager
   default ICommonsList <ISMPRedirect> getAllSMPRedirects (@NonNull final IPagingSpec aPagingSpec,
                                                           @Nullable final String sSearchText)
   {
-    return SMPTableColumnHelper.getPage (ESMPRedirectColumn.values (), getAllSMPRedirects (), aPagingSpec, sSearchText);
+    return TableColumnHelper.getPage (ESMPRedirectColumn.values (), getAllSMPRedirects (), aPagingSpec, sSearchText);
   }
-
-
 
   /**
    * Get all redirects of the passed service group.
    *
    * @param aParticipantID
    *        The service group ID to use. May be <code>null</code>.
-   * @return All contained SMP redirects for the passed service group. Never
-   *         <code>null</code> but maybe empty.
+   * @return All contained SMP redirects for the passed service group. Never <code>null</code> but
+   *         maybe empty.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -176,22 +171,19 @@ public interface ISMPRedirectManager
     if (StringHelper.isEmpty (sSearchText))
       return getSMPRedirectCount ();
 
-    return SMPTableColumnHelper.getCount (ESMPRedirectColumn.values (), getAllSMPRedirects (), sSearchText);
+    return TableColumnHelper.getCount (ESMPRedirectColumn.values (), getAllSMPRedirects (), sSearchText);
   }
 
-
   /**
-   * Find the redirect that matches the passed tuple of service group and
-   * document type.
+   * Find the redirect that matches the passed tuple of service group and document type.
    *
    * @param aParticipantID
    *        The service group ID to query. May be <code>null</code>.
    * @param aDocTypeID
    *        The document type to query. May be <code>null</code>.
-   * @return <code>null</code> if the passed service group is <code>null</code>
-   *         or not contained, or if the passed document type is
-   *         <code>null</code> or if it is not contained as a redirect in the
-   *         passed service group.
+   * @return <code>null</code> if the passed service group is <code>null</code> or not contained, or
+   *         if the passed document type is <code>null</code> or if it is not contained as a
+   *         redirect in the passed service group.
    */
   @Nullable
   ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable IParticipantIdentifier aParticipantID,

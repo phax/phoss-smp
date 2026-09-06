@@ -38,14 +38,13 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
-import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -57,6 +56,7 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
@@ -132,7 +132,7 @@ public final class SMPServiceInformationManagerXML extends
     if (bChangeExisting)
     {
       // Edit existing
-      m_aRWLock.writeLocked ( () -> { internalUpdateItem (aOldInformation); });
+      m_aRWLock.writeLocked (() -> { internalUpdateItem (aOldInformation); });
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
@@ -319,15 +319,15 @@ public final class SMPServiceInformationManagerXML extends
   public ICommonsList <ISMPServiceInformation> getAllSMPServiceInformation (@NonNull final IPagingSpec aPagingSpec,
                                                                             @Nullable final String sSearchText)
   {
-    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+    return getAllPaged (TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
                         aPagingSpec,
-                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+                        TableColumnHelper.getComparator (COLUMNS, aPagingSpec));
   }
 
   @Override
   public long getSMPServiceInformationCount (@Nullable final String sSearchText)
   {
-    final Predicate <ISMPServiceInformation> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    final Predicate <ISMPServiceInformation> aFilter = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
     return aFilter == null ? getSMPServiceInformationCount () : getCount (aFilter);
   }
 
@@ -456,7 +456,7 @@ public final class SMPServiceInformationManagerXML extends
     ValueEnforcer.notNull (sNewURL, "NewURL");
 
     final MutableLong aEndpointsChanged = new MutableLong (0);
-    performWithoutAutoSave ( () -> {
+    performWithoutAutoSave (() -> {
       final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
       for (final ISMPServiceInformation aSI : aAllSIs)
       {
@@ -473,7 +473,7 @@ public final class SMPServiceInformationManagerXML extends
               aEndpointsChanged.inc ();
             }
         if (bSIChanged)
-          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
       }
     });
     return aEndpointsChanged.longValue ();
@@ -488,7 +488,7 @@ public final class SMPServiceInformationManagerXML extends
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
     final MutableLong aEndpointsChanged = new MutableLong (0);
-    performWithoutAutoSave ( () -> {
+    performWithoutAutoSave (() -> {
       final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
       for (final ISMPServiceInformation aSI : aAllSIs)
       {
@@ -509,7 +509,7 @@ public final class SMPServiceInformationManagerXML extends
             }
           }
         if (bSIChanged)
-          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
       }
     });
     return aEndpointsChanged.longValue ();

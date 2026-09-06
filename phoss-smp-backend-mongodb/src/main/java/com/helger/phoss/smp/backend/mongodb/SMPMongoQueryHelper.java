@@ -23,8 +23,8 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.phoss.smp.domain.ISMPTableColumn;
-import com.helger.phoss.smp.domain.SMPSortColumn;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
+import com.helger.photon.core.paging.SortColumn;
+import com.helger.photon.core.paging.TableColumnHelper;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 
@@ -61,9 +61,10 @@ public final class SMPMongoQueryHelper
     ValueEnforcer.notNull (aPagingSpec, "PagingSpec");
 
     final ICommonsList <Bson> aSorts = new CommonsArrayList <> ();
-    for (final SMPSortColumn <?> aSortColumn : SMPTableColumnHelper.getAllSortColumns (_cast (aColumns), aPagingSpec))
+    for (final SortColumn <?> aSortColumn : TableColumnHelper.getAllSortColumns (_cast (aColumns), aPagingSpec))
     {
-      final ICommonsList <String> aFieldNames = aSortColumn.getColumn ().getAllMongoFieldNames ();
+      final ISMPTableColumn <?> aColumn = (ISMPTableColumn <?>) aSortColumn.getColumn ();
+      final ICommonsList <String> aFieldNames = aColumn.getAllMongoFieldNames ();
       if (aFieldNames == null || aFieldNames.isEmpty ())
         continue;
 

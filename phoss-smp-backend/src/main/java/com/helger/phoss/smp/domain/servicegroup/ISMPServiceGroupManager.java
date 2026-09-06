@@ -25,11 +25,11 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPServerException;
+import com.helger.photon.core.paging.TableColumnHelper;
 
 /**
  * Base interface for a manager for {@link ISMPServiceGroup} objects.
@@ -189,10 +189,10 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   default ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
                                                                   @Nullable final String sSearchText)
   {
-    return SMPTableColumnHelper.getPage (ESMPServiceGroupColumn.values (),
-                                         getAllSMPServiceGroups (),
-                                         aPagingSpec,
-                                         sSearchText);
+    return TableColumnHelper.getPage (ESMPServiceGroupColumn.values (),
+                                      getAllSMPServiceGroups (),
+                                      aPagingSpec,
+                                      sSearchText);
   }
 
   /**
@@ -257,6 +257,6 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
     if (StringHelper.isEmpty (sSearchText))
       return getSMPServiceGroupCount ();
 
-    return SMPTableColumnHelper.getCount (ESMPServiceGroupColumn.values (), getAllSMPServiceGroups (), sSearchText);
+    return TableColumnHelper.getCount (ESMPServiceGroupColumn.values (), getAllSMPServiceGroups (), sSearchText);
   }
 }

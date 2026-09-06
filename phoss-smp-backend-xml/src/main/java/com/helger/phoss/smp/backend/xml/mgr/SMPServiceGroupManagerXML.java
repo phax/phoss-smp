@@ -32,22 +32,21 @@ import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.paging.IPagingSpec;
-import com.helger.phoss.smp.domain.SMPTableColumnHelper;
-import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
-import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.exception.SMPServerException;
@@ -55,6 +54,7 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
@@ -105,7 +105,10 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                     bCreateInSML +
                     ")");
 
-    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension, aCustomProperties);
+    final SMPServiceGroup aSMPServiceGroup = new SMPServiceGroup (sOwnerID,
+                                                                  aParticipantID,
+                                                                  sExtension,
+                                                                  aCustomProperties);
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -354,15 +357,15 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
                                                                  @Nullable final String sSearchText)
   {
-    return getAllPaged (SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+    return getAllPaged (TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
                         aPagingSpec,
-                        SMPTableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+                        TableColumnHelper.getComparator (COLUMNS, aPagingSpec));
   }
 
   @Override
   public long getSMPServiceGroupCount (@Nullable final String sSearchText)
   {
-    final Predicate <ISMPServiceGroup> aFilter = SMPTableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    final Predicate <ISMPServiceGroup> aFilter = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
     return aFilter == null ? getSMPServiceGroupCount () : getCount (aFilter);
   }
 
