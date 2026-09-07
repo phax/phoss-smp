@@ -33,7 +33,6 @@ import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
-import com.helger.base.equals.EqualsHelper;
 import com.helger.base.numeric.mutable.MutableBoolean;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
@@ -301,29 +300,21 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
 
     // Check for an update
-    boolean bChangedExisting = false;
     final ISMPServiceInformation aOldInformation = getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroupParticipantIdentifier (),
                                                                                                           aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
-      // If a service information is present, it must be the provided object!
-      // This is not true for the REST API
-      if (EqualsHelper.identityEqual (aOldInformation, aSMPServiceInformation))
-        bChangedExisting = true;
-    }
-
-    if (bChangedExisting)
-    {
-      // Edit existing
+      // Replace existing in a single database operation. In particular, REST
+      // API calls pass a newly created object rather than the stored instance.
       getCollection ().replaceOne (new Document (BSON_ID, aOldInformation.getID ()), toBson (aSMPServiceInformation));
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
-                                        aOldInformation.getID (),
-                                        aOldInformation.getServiceGroupID (),
-                                        aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
-                                        aOldInformation.getAllProcesses (),
-                                        aOldInformation.getExtensions ().getExtensionsAsJsonString ());
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtensions ().getExtensionsAsJsonString ());
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - updated");
@@ -332,33 +323,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     }
     else
     {
-      // (Optionally delete the old one and) create the new one
-      boolean bRemovedOld = false;
-      if (aOldInformation != null)
-      {
-        // Delete only if present
-        final DeleteResult aDR = getCollection ().deleteOne (new Document (BSON_ID, aOldInformation.getID ()));
-        bRemovedOld = aDR.wasAcknowledged () && aDR.getDeletedCount () > 0;
-      }
-
+      // Create the new one
       if (!getCollection ().insertOne (toBson (aSMPServiceInformation)).wasAcknowledged ())
         throw new IllegalStateException ("Failed to insert into MongoDB Collection");
-
-      if (bRemovedOld)
-      {
-        AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
-                                          aOldInformation.getID (),
-                                          aOldInformation.getServiceGroupID (),
-                                          aOldInformation.getDocumentTypeIdentifier ().getURIEncoded ());
-      }
-      else
-        if (aOldInformation != null)
-        {
-          AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT,
-                                            aOldInformation.getID (),
-                                            aOldInformation.getServiceGroupID (),
-                                            aOldInformation.getDocumentTypeIdentifier ().getURIEncoded ());
-        }
 
       AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
                                         aSMPServiceInformation.getID (),
@@ -369,10 +336,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
 
-      if (aOldInformation != null)
-        m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
-      else
-        m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
+      m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
     }
     return ESuccess.SUCCESS;
   }
