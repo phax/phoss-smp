@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.rules.TestRule;
 
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -47,6 +48,9 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
+import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.audit.EAuditActionType;
+import com.helger.photon.audit.IAuditor;
 import com.helger.photon.security.CSecurity;
 
 /**
@@ -208,7 +212,7 @@ public final class SMPServiceInformationManagerMongoDBTest
   }
 
   @Test
-  public void testMergeReplacementFiresUpdateCallback () throws SMPServerException
+  public void testMergeReplacementUsesUpdateSemantics () throws SMPServerException
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -234,6 +238,8 @@ public final class SMPServiceInformationManagerMongoDBTest
 
     final AtomicInteger aCreatedCount = new AtomicInteger ();
     final AtomicInteger aUpdatedCount = new AtomicInteger ();
+    final ICommonsList <EAuditActionType> aAuditActions = new CommonsArrayList <> ();
+    final IAuditor aOldAuditor = AuditHelper.getAuditor ();
     final ISMPServiceInformationCallback aCallback = new ISMPServiceInformationCallback ()
     {
       @Override
@@ -251,6 +257,11 @@ public final class SMPServiceInformationManagerMongoDBTest
     aServiceInformationMgr.serviceInformationCallbacks ().add (aCallback);
     try
     {
+      AuditHelper.setAuditor ((eActionType, eSuccess, aActionObjectType, sAction, aArgs) -> {
+        if (SMPServiceInformation.OT.equals (aActionObjectType))
+          aAuditActions.add (eActionType);
+      });
+
       assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (_createServiceInformation (aPI,
                                                                                                 aDocTypeID,
                                                                                                 aProcessID,
@@ -258,7 +269,9 @@ public final class SMPServiceInformationManagerMongoDBTest
                                         .isSuccess ());
       assertEquals (1, aCreatedCount.get ());
       assertEquals (0, aUpdatedCount.get ());
+      assertEquals (new CommonsArrayList <> (EAuditActionType.CREATE), aAuditActions);
 
+      aAuditActions.clear ();
       assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (_createServiceInformation (aPI,
                                                                                                 aDocTypeID,
                                                                                                 aProcessID,
@@ -266,9 +279,15 @@ public final class SMPServiceInformationManagerMongoDBTest
                                         .isSuccess ());
       assertEquals (1, aCreatedCount.get ());
       assertEquals (1, aUpdatedCount.get ());
+      assertEquals (new CommonsArrayList <> (EAuditActionType.MODIFY), aAuditActions);
+      assertTrue (aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI, aDocTypeID)
+                                        .getExtensions ()
+                                        .getExtensionsAsJsonString ()
+                                        .contains ("ext2"));
     }
     finally
     {
+      AuditHelper.setAuditor (aOldAuditor);
       aServiceInformationMgr.serviceInformationCallbacks ().removeObject (aCallback);
       aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
     }
