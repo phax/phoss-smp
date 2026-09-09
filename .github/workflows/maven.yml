@@ -52,7 +52,7 @@ jobs:
           ${{ runner.os }}-maven-
  
     - name: Start PostgreSQL
-      uses: ikalnytskyi/action-setup-postgres@v6
+      uses: ikalnytskyi/action-setup-postgres@v8
       with:
         username: peppol
         password: peppol
