@@ -32,29 +32,10 @@ jobs:
         java: [ 17, 21, 25, 26 ]
     name: Java ${{ matrix.java }} build
 
-    services:
-      mysql:
-        image: mysql:8
-        env:
-          # The MySQL docker container requires these environment variables to be set
-          # so we can create and migrate the test database.
-          # See: https://hub.docker.com/_/mysql
-          MYSQL_DATABASE: smp
-          MYSQL_ROOT_PASSWORD: smp
-          # Additional properties for testing
-          MYSQL_USER: smp
-          MYSQL_PASSWORD: smp
-        ports:
-          # Opens port 3306 on service container and host
-          # https://docs.github.com/en/actions/using-containerized-services/about-service-containers
-          - 3306:3306
-          # Before continuing, verify the mysql container is reachable from the ubuntu host
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up JDK ${{ matrix.java }}
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
@@ -63,13 +44,23 @@ jobs:
         server-password: MAVEN_PASSWORD
 
     - name: Cache local Maven repository
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
  
+    - name: Start PostgreSQL
+      uses: ikalnytskyi/action-setup-postgres@v8
+      with:
+        username: peppol
+        password: peppol
+        database: postgres
+        port: 5432
+        postgres-version: "18"
+      id: postgres
+
     - name: Start MongoDB
       uses: supercharge/mongodb-github-action@1.12.1
       with:

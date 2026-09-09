@@ -20,16 +20,17 @@
 # docker compose -f unittest-db-docker-compose.yml up
 # docker compose -f unittest-db-docker-compose.yml down
 services:
-  mysql:
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: smp
-      MYSQL_USER: smp
-      MYSQL_PASSWORD: smp
-      MYSQL_NATIVE_PASSWORD_PLUGIN: yes
+  postgres:
+    image: postgres:18
+    restart: always
     ports:
-      - "3306:3306"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: peppol
+      POSTGRES_PASSWORD: peppol
+    volumes:
+      - pg18data:/var/lib/postgresql
 
   mongodb:
     image: mongo:6
@@ -37,3 +38,6 @@ services:
       MONGO_INITDB_DATABASE: phoss-smp-test
     ports:
       - "27017:27017"
+
+volumes:
+  pg18data:

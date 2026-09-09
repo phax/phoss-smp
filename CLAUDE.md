@@ -40,7 +40,7 @@ Integration tests require live database services. Start them with Docker before 
 docker compose -f unittest-db-docker-compose.yml up
 ```
 
-This starts MySQL on port 3306 and MongoDB on port 27017. Test configuration lives in `src/test/resources/test-smp-server-sql.properties` (and equivalent for other backends).
+This starts PostgreSQL on port 5432 and MongoDB on port 27017. Test configuration lives in `src/test/resources/test-smp-server-sql.properties` (and equivalent for other backends).
 
 ### Local Development with Jetty
 
