@@ -21,6 +21,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
+import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
@@ -106,6 +107,14 @@ public interface ISMPManagerProvider
    */
   @NonNull
   ISMPParticipantMigrationManager createParticipantMigrationMgr ();
+
+  /**
+   * @return A new SMP user TOTP manager, used for the two-factor authentication of the management
+   *         GUI. May not be <code>null</code>.
+   * @since 8.4.3
+   */
+  @NonNull
+  ISMPUserTotpManager createUserTotpMgr ();
 
   /**
    * @param aIdentifierFactory

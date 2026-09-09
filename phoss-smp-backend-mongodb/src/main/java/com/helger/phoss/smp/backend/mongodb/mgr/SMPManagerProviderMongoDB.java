@@ -41,6 +41,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
+import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.io.WebFileIO;
@@ -405,6 +406,12 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     return new SMPParticipantMigrationManagerMongoDB ();
+  }
+
+  @NonNull
+  public ISMPUserTotpManager createUserTotpMgr ()
+  {
+    return new SMPUserTotpManagerMongoDB ();
   }
 
   @Nullable

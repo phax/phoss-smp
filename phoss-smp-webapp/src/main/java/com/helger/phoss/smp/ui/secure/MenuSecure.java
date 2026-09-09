@@ -158,6 +158,7 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin, new PageSecureSMPIdentifierMappings (CMenuSecure.MENU_SMP_IDENTIFIER_MAPPINGS));
       aMenuTree.createItem (aAdmin, new PageSecureTransportProfiles (CMenuSecure.MENU_TRANSPORT_PROFILES));
       aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <> (CMenuSecure.MENU_CHANGE_PASSWORD));
+      aMenuTree.createItem (aAdmin, new PageSecureUserTotp (CMenuSecure.MENU_USER_TOTP));
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMPServer.DEFAULT_LOCALE);
 
       if (SMPWebAppConfiguration.isWebAppPageSessionManagmentDisabled ())

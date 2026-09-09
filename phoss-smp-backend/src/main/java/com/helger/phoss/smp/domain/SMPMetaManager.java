@@ -39,6 +39,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
+import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
@@ -73,6 +74,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
   private ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
+  private ISMPUserTotpManager m_aUserTotpMgr;
   private ETriState m_eBackendConnectionState = ETriState.UNDEFINED;
   private Consumer <ETriState> m_aBackendConnectionStateChangeCallback;
 
@@ -239,6 +241,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aParticipantMigrationMgr == null)
         throw new IllegalStateException ("Failed to create ParticipantMigration manager!");
 
+      m_aUserTotpMgr = s_aManagerProvider.createUserTotpMgr ();
+      if (m_aUserTotpMgr == null)
+        throw new IllegalStateException ("Failed to create User TOTP manager!");
+
       // May be null!
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
 
@@ -321,6 +327,17 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPParticipantMigrationManager getParticipantMigrationMgr ()
   {
     return getInstance ().m_aParticipantMigrationMgr;
+  }
+
+  /**
+   * @return The user TOTP manager, used for the two-factor authentication of the management GUI.
+   *         Never <code>null</code>.
+   * @since 8.4.3
+   */
+  @NonNull
+  public static ISMPUserTotpManager getUserTotpMgr ()
+  {
+    return getInstance ().m_aUserTotpMgr;
   }
 
   @Nullable

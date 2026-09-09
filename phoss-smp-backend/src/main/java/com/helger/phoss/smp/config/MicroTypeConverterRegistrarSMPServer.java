@@ -31,6 +31,8 @@ import com.helger.phoss.smp.domain.sgprops.SGCustomProperty;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyListMicroTypeConverter;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyMicroTypeConverter;
+import com.helger.phoss.smp.domain.totp.SMPUserTotp;
+import com.helger.phoss.smp.domain.totp.SMPUserTotpMicroTypeConverter;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistrarSPI;
 import com.helger.xml.microdom.convert.IMicroTypeConverterRegistry;
 
@@ -56,5 +58,6 @@ public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeCon
     aRegistry.registerMicroElementTypeConverter (SGCustomProperty.class, new SGCustomPropertyMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SGCustomPropertyList.class,
                                                  new SGCustomPropertyListMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SMPUserTotp.class, new SMPUserTotpMicroTypeConverter ());
   }
 }

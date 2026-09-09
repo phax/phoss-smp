@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.http.EHttpMethod;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.ui.SMPSecondFactorHelper;
 import com.helger.photon.ajax.GlobalAjaxInvoker;
 import com.helger.photon.ajax.IAjaxRegistry;
 import com.helger.photon.ajax.decl.AjaxFunctionDeclaration;
@@ -46,7 +47,8 @@ public final class CAjax
   public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () ==
                                                                                                   EHttpMethod.POST;
   public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_IS_USER_LOGGED_IN = x -> LoggedInUserManager.getInstance ()
-                                                                                                                             .isUserLoggedInInCurrentSession ();
+                                                                                                                             .isUserLoggedInInCurrentSession () &&
+                                                                                                        SMPSecondFactorHelper.isSecureAccessAllowed ();
 
   public static final IAjaxFunctionDeclaration DATATABLES = AjaxFunctionDeclaration.builder ("dataTables")
                                                                                    .executor (AjaxExecutorDataTables.class)

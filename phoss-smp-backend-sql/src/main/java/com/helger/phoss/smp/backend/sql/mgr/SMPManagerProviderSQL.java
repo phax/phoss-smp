@@ -41,6 +41,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
+import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.jdbc.PhotonBasicManagerFactoryJDBC;
@@ -148,6 +149,12 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     return new SMPParticipantMigrationManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
+  }
+
+  @NonNull
+  public ISMPUserTotpManager createUserTotpMgr ()
+  {
+    return new SMPUserTotpManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
   }
 
   @Nullable

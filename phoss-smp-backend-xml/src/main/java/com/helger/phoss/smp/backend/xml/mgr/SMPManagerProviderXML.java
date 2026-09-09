@@ -33,6 +33,8 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.sml.SMLInfoManagerXML;
+import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
+import com.helger.phoss.smp.domain.totp.SMPUserTotpManagerXML;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
@@ -53,6 +55,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
   public static final String SMP_PARTICIPANT_MIGRATION_XML = "smp-participant-migration.xml";
   public static final String SMP_BUSINESS_CARD_XML = "smp-business-card.xml";
+  public static final String SMP_USER_TOTP_XML = "smp-user-totp.xml";
 
   public SMPManagerProviderXML ()
   {}
@@ -147,6 +150,19 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
     try
     {
       return new SMPParticipantMigrationManagerXML (SMP_PARTICIPANT_MIGRATION_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new InitializationException (ex.getMessage (), ex);
+    }
+  }
+
+  @NonNull
+  public ISMPUserTotpManager createUserTotpMgr ()
+  {
+    try
+    {
+      return new SMPUserTotpManagerXML (SMP_USER_TOTP_XML);
     }
     catch (final DAOException ex)
     {
