@@ -48,6 +48,19 @@ final class MockSMPUserTotpManager implements ISMPUserTotpManager
   }
 
   @NonNull
+  public EChange setRecoveryCodeHashes (@Nullable final String sUserID,
+                                        @Nullable final ICommonsList <String> aRecoveryCodeHashes)
+  {
+    return EChange.UNCHANGED;
+  }
+
+  @NonNull
+  public EChange consumeRecoveryCodeHash (@Nullable final String sUserID, @Nullable final String sRecoveryCodeHash)
+  {
+    return EChange.UNCHANGED;
+  }
+
+  @NonNull
   public EChange deleteTotp (@Nullable final String sUserID)
   {
     return EChange.UNCHANGED;

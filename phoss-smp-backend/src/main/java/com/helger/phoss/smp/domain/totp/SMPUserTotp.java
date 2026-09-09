@@ -18,11 +18,14 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.NotThreadSafe;
+import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.state.EChange;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.base.type.ObjectType;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.helper.PDTFactory;
 
 /**
@@ -41,12 +44,14 @@ public class SMPUserTotp implements ISMPUserTotp
   private boolean m_bEnabled;
   private final LocalDateTime m_aRegistrationDT;
   private Long m_aLastUsedTimeSlot;
+  private final ICommonsList <String> m_aRecoveryCodeHashes = new CommonsArrayList <> ();
 
   public SMPUserTotp (@NonNull @Nonempty final String sUserID,
                       @NonNull @Nonempty final String sSecret,
                       final boolean bEnabled,
                       @NonNull final LocalDateTime aRegistrationDT,
-                      @Nullable final Long aLastUsedTimeSlot)
+                      @Nullable final Long aLastUsedTimeSlot,
+                      @Nullable final Iterable <String> aRecoveryCodeHashes)
   {
     ValueEnforcer.notEmpty (sUserID, "UserID");
     ValueEnforcer.notEmpty (sSecret, "Secret");
@@ -57,6 +62,8 @@ public class SMPUserTotp implements ISMPUserTotp
     m_bEnabled = bEnabled;
     m_aRegistrationDT = aRegistrationDT;
     m_aLastUsedTimeSlot = aLastUsedTimeSlot;
+    if (aRecoveryCodeHashes != null)
+      m_aRecoveryCodeHashes.addAll (aRecoveryCodeHashes);
   }
 
   @NonNull
@@ -108,6 +115,45 @@ public class SMPUserTotp implements ISMPUserTotp
     return EChange.CHANGED;
   }
 
+  @NonNull
+  @ReturnsMutableCopy
+  public final ICommonsList <String> getAllRecoveryCodeHashes ()
+  {
+    return m_aRecoveryCodeHashes.getClone ();
+  }
+
+  /**
+   * Replace all recovery code hashes of this enrollment.
+   *
+   * @param aRecoveryCodeHashes
+   *        The new recovery code hashes. May be <code>null</code> to remove all of them.
+   * @return {@link EChange#CHANGED} if something changed.
+   */
+  @NonNull
+  public final EChange setAllRecoveryCodeHashes (@Nullable final Iterable <String> aRecoveryCodeHashes)
+  {
+    final ICommonsList <String> aNewList = new CommonsArrayList <> (aRecoveryCodeHashes);
+    if (aNewList.equals (m_aRecoveryCodeHashes))
+      return EChange.UNCHANGED;
+    m_aRecoveryCodeHashes.setAll (aNewList);
+    return EChange.CHANGED;
+  }
+
+  /**
+   * Remove a single recovery code hash, because the respective recovery code was used.
+   *
+   * @param sRecoveryCodeHash
+   *        The hash to be removed. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the hash was present and removed.
+   */
+  @NonNull
+  public final EChange removeRecoveryCodeHash (@Nullable final String sRecoveryCodeHash)
+  {
+    if (sRecoveryCodeHash == null)
+      return EChange.UNCHANGED;
+    return EChange.valueOf (m_aRecoveryCodeHashes.remove (sRecoveryCodeHash));
+  }
+
   @Override
   public boolean equals (final Object o)
   {
@@ -134,6 +180,7 @@ public class SMPUserTotp implements ISMPUserTotp
                                        .append ("Enabled", m_bEnabled)
                                        .append ("RegistrationDateTime", m_aRegistrationDT)
                                        .append ("LastUsedTimeSlot", m_aLastUsedTimeSlot)
+                                       .append ("RecoveryCodeCount", m_aRecoveryCodeHashes.size ())
                                        .getToString ();
   }
 
@@ -150,6 +197,6 @@ public class SMPUserTotp implements ISMPUserTotp
   public static SMPUserTotp createPending (@NonNull @Nonempty final String sUserID,
                                            @NonNull @Nonempty final String sSecret)
   {
-    return new SMPUserTotp (sUserID, sSecret, false, PDTFactory.getCurrentLocalDateTime (), null);
+    return new SMPUserTotp (sUserID, sSecret, false, PDTFactory.getCurrentLocalDateTime (), null, null);
   }
 }

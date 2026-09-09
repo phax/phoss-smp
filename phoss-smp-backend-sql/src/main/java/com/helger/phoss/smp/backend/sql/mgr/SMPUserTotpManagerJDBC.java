@@ -42,6 +42,8 @@ import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotp;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.totp.SMPUserTotp;
+import com.helger.phoss.smp.domain.totp.SMPUserTotpEnabledCache;
+import com.helger.phoss.smp.domain.totp.SMPUserTotpRecoveryCodeHelper;
 import com.helger.photon.audit.AuditHelper;
 
 /**
@@ -76,6 +78,14 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
   {
     ValueEnforcer.notEmpty (sUserID, "UserID");
     ValueEnforcer.notEmpty (sSecret, "Secret");
+    // Never silently truncate a credential - that would create an enrollment that can never be
+    // verified again
+    if (sSecret.length () > ISMPUserTotp.SECRET_MAX_LENGTH)
+      throw new IllegalArgumentException ("The provided TOTP secret is too long (" +
+                                          sSecret.length () +
+                                          " chars) - a maximum of " +
+                                          ISMPUserTotp.SECRET_MAX_LENGTH +
+                                          " chars is supported");
 
     final LocalDateTime aRegistrationDT = PDTFactory.getCurrentLocalDateTime ();
 
@@ -87,14 +97,14 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
 
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                                               m_sTableName +
-                                                              " (userid, secret, enabled, regdt, lastslot)" +
-                                                              " VALUES (?, ?, ?, ?, ?)",
+                                                              " (userid, secret, enabled, regdt, lastslot, reccodes)" +
+                                                              " VALUES (?, ?, ?, ?, ?, ?)",
                                                               new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sUserID,
                                                                                                                                            CSMPServer.MAX_LEN_ID),
-                                                                                                         DBValueHelper.getTrimmedToLength (sSecret,
-                                                                                                                                           ISMPUserTotp.SECRET_MAX_LENGTH),
+                                                                                                         sSecret,
                                                                                                          Boolean.FALSE,
                                                                                                          DBValueHelper.toTimestamp (aRegistrationDT),
+                                                                                                         null,
                                                                                                          null));
       if (nCreated != 1)
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
@@ -103,9 +113,11 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
     if (eSuccess.isFailure ())
       throw new IllegalStateException ("Failed to insert the TOTP enrollment of user '" + sUserID + "' into the DB");
 
+    SMPUserTotpEnabledCache.clearCache (sUserID);
+
     // Never audit the secret itself
     AuditHelper.onAuditCreateSuccess (SMPUserTotp.OT, sUserID);
-    return new SMPUserTotp (sUserID, sSecret, false, aRegistrationDT, null);
+    return new SMPUserTotp (sUserID, sSecret, false, aRegistrationDT, null, null);
   }
 
   @NonNull
@@ -133,6 +145,8 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
     if (aUpdated.is0 ())
       return EChange.UNCHANGED;
 
+    SMPUserTotpEnabledCache.clearCache (sUserID);
+
     AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "set-enabled", sUserID, Boolean.valueOf (bEnabled));
     return EChange.CHANGED;
   }
@@ -143,13 +157,84 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    // Deliberately not audited - this happens on every single login
+    // Conditional update, so that two parallel submissions of the same one-time password cannot
+    // both succeed. Deliberately audited, even though this happens on every single login.
+    final Long aTimeSlot = Long.valueOf (nTimeSlot);
     final long nUpdated = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
                                                                  m_sTableName +
-                                                                 " SET lastslot=? WHERE userid=?",
-                                                                 new ConstantPreparedStatementDataProvider (Long.valueOf (nTimeSlot),
+                                                                 " SET lastslot=?" +
+                                                                 " WHERE userid=? AND (lastslot IS NULL OR lastslot<?)",
+                                                                 new ConstantPreparedStatementDataProvider (aTimeSlot,
+                                                                                                            sUserID,
+                                                                                                            aTimeSlot));
+    if (nUpdated <= 0)
+    {
+      AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-last-used-time-slot", sUserID, "not-newer-or-no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "set-last-used-time-slot", sUserID, aTimeSlot);
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange setRecoveryCodeHashes (@Nullable final String sUserID,
+                                        @Nullable final ICommonsList <String> aRecoveryCodeHashes)
+  {
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
+    final String sValue = SMPUserTotpRecoveryCodeHelper.getAsStorageValue (aRecoveryCodeHashes);
+    final long nUpdated = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                 m_sTableName +
+                                                                 " SET reccodes=? WHERE userid=?",
+                                                                 new ConstantPreparedStatementDataProvider (sValue,
                                                                                                             sUserID));
-    return EChange.valueOf (nUpdated > 0);
+    if (nUpdated <= 0)
+    {
+      AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-recovery-codes", sUserID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    // Never audit the recovery codes themselves
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT,
+                                      "set-recovery-codes",
+                                      sUserID,
+                                      Integer.valueOf (aRecoveryCodeHashes == null ? 0 : aRecoveryCodeHashes.size ()));
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange consumeRecoveryCodeHash (@Nullable final String sUserID, @Nullable final String sRecoveryCodeHash)
+  {
+    if (StringHelper.isEmpty (sUserID) || StringHelper.isEmpty (sRecoveryCodeHash))
+      return EChange.UNCHANGED;
+
+    final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
+    newExecutor ().querySingle ("SELECT reccodes FROM " + m_sTableName + " WHERE userid=?",
+                                new ConstantPreparedStatementDataProvider (sUserID),
+                                aDBResult::set);
+    if (aDBResult.isNotSet ())
+      return EChange.UNCHANGED;
+
+    final String sOldValue = aDBResult.get ().getAsString (0);
+    final ICommonsList <String> aRemaining = SMPUserTotpRecoveryCodeHelper.getAsList (sOldValue);
+    if (!aRemaining.remove (sRecoveryCodeHash))
+      return EChange.UNCHANGED;
+
+    // Compare and swap, so that the same recovery code cannot be used twice in parallel. If
+    // somebody else modified the value in between, the code is rejected.
+    final long nUpdated = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                 m_sTableName +
+                                                                 " SET reccodes=? WHERE userid=? AND reccodes=?",
+                                                                 new ConstantPreparedStatementDataProvider (SMPUserTotpRecoveryCodeHelper.getAsStorageValue (aRemaining),
+                                                                                                            sUserID,
+                                                                                                            sOldValue));
+    if (nUpdated <= 0)
+      return EChange.UNCHANGED;
+
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "consume-recovery-code", sUserID);
+    return EChange.CHANGED;
   }
 
   @NonNull
@@ -166,6 +251,8 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
       return EChange.UNCHANGED;
     }
 
+    SMPUserTotpEnabledCache.clearCache (sUserID);
+
     AuditHelper.onAuditDeleteSuccess (SMPUserTotp.OT, sUserID);
     return EChange.CHANGED;
   }
@@ -177,7 +264,9 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
       return null;
 
     final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
-    newExecutor ().querySingle ("SELECT secret, enabled, regdt, lastslot FROM " + m_sTableName + " WHERE userid=?",
+    newExecutor ().querySingle ("SELECT secret, enabled, regdt, lastslot, reccodes FROM " +
+                                m_sTableName +
+                                " WHERE userid=?",
                                 new ConstantPreparedStatementDataProvider (sUserID),
                                 aDBResult::set);
     if (aDBResult.isNotSet ())
@@ -188,7 +277,8 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
                             aRow.getAsString (0),
                             aRow.getAsBoolean (1, false),
                             aRow.getAsLocalDateTime (2),
-                            aRow.getAsLongObj (3));
+                            aRow.getAsLongObj (3),
+                            SMPUserTotpRecoveryCodeHelper.getAsList (aRow.getAsString (4)));
   }
 
   @NonNull
@@ -196,7 +286,7 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
   public ICommonsList <ISMPUserTotp> getAllTotps ()
   {
     final ICommonsList <ISMPUserTotp> ret = new CommonsArrayList <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT userid, secret, enabled, regdt, lastslot FROM " +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT userid, secret, enabled, regdt, lastslot, reccodes FROM " +
                                                                           m_sTableName);
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
@@ -204,7 +294,8 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
                                   aRow.getAsString (1),
                                   aRow.getAsBoolean (2, false),
                                   aRow.getAsLocalDateTime (3),
-                                  aRow.getAsLongObj (4)));
+                                  aRow.getAsLongObj (4),
+                                  SMPUserTotpRecoveryCodeHelper.getAsList (aRow.getAsString (5))));
     return ret;
   }
 }

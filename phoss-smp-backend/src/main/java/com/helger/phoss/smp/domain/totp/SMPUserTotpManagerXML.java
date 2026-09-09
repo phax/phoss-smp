@@ -48,6 +48,8 @@ public final class SMPUserTotpManagerXML extends AbstractPhotonMapBasedWALDAO <I
       internalCreateItem (aTotp);
     });
 
+    SMPUserTotpEnabledCache.clearCache (sUserID);
+
     // Never audit the secret itself
     AuditHelper.onAuditCreateSuccess (SMPUserTotp.OT, sUserID);
     return aTotp;
@@ -75,6 +77,8 @@ public final class SMPUserTotpManagerXML extends AbstractPhotonMapBasedWALDAO <I
       m_aRWLock.writeLock ().unlock ();
     }
 
+    SMPUserTotpEnabledCache.clearCache (sUserID);
+
     AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "set-enabled", sUserID, Boolean.valueOf (bEnabled));
     return EChange.CHANGED;
   }
@@ -84,12 +88,47 @@ public final class SMPUserTotpManagerXML extends AbstractPhotonMapBasedWALDAO <I
   {
     final SMPUserTotp aTotp = getOfID (sUserID);
     if (aTotp == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-last-used-time-slot", sUserID, "no-such-id");
       return EChange.UNCHANGED;
+    }
 
     m_aRWLock.writeLock ().lock ();
     try
     {
-      if (aTotp.setLastUsedTimeSlot (Long.valueOf (nTimeSlot)).isUnchanged ())
+      // Check and set inside the write lock, so that two parallel submissions of the same code
+      // cannot both succeed
+      final Long aLastUsedTimeSlot = aTotp.getLastUsedTimeSlot ();
+      if (aLastUsedTimeSlot != null && nTimeSlot <= aLastUsedTimeSlot.longValue ())
+        return EChange.UNCHANGED;
+
+      aTotp.setLastUsedTimeSlot (Long.valueOf (nTimeSlot));
+      internalUpdateItem (aTotp);
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
+
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "set-last-used-time-slot", sUserID, Long.valueOf (nTimeSlot));
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange setRecoveryCodeHashes (@Nullable final String sUserID,
+                                        @Nullable final ICommonsList <String> aRecoveryCodeHashes)
+  {
+    final SMPUserTotp aTotp = getOfID (sUserID);
+    if (aTotp == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-recovery-codes", sUserID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      if (aTotp.setAllRecoveryCodeHashes (aRecoveryCodeHashes).isUnchanged ())
         return EChange.UNCHANGED;
       internalUpdateItem (aTotp);
     }
@@ -97,7 +136,40 @@ public final class SMPUserTotpManagerXML extends AbstractPhotonMapBasedWALDAO <I
     {
       m_aRWLock.writeLock ().unlock ();
     }
-    // Deliberately not audited - this happens on every single login
+
+    // Never audit the recovery codes themselves
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT,
+                                      "set-recovery-codes",
+                                      sUserID,
+                                      Integer.valueOf (aRecoveryCodeHashes == null ? 0 : aRecoveryCodeHashes.size ()));
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange consumeRecoveryCodeHash (@Nullable final String sUserID, @Nullable final String sRecoveryCodeHash)
+  {
+    if (StringHelper.isEmpty (sRecoveryCodeHash))
+      return EChange.UNCHANGED;
+
+    final SMPUserTotp aTotp = getOfID (sUserID);
+    if (aTotp == null)
+      return EChange.UNCHANGED;
+
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      // Remove inside the write lock, so that the same recovery code cannot be used twice in
+      // parallel
+      if (aTotp.removeRecoveryCodeHash (sRecoveryCodeHash).isUnchanged ())
+        return EChange.UNCHANGED;
+      internalUpdateItem (aTotp);
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
+
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "consume-recovery-code", sUserID);
     return EChange.CHANGED;
   }
 
@@ -120,6 +192,8 @@ public final class SMPUserTotpManagerXML extends AbstractPhotonMapBasedWALDAO <I
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
+    SMPUserTotpEnabledCache.clearCache (sUserID);
 
     AuditHelper.onAuditDeleteSuccess (SMPUserTotp.OT, sUserID);
     return EChange.CHANGED;

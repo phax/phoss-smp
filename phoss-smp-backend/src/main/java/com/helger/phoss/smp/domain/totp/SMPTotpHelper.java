@@ -10,6 +10,9 @@
  */
 package com.helger.phoss.smp.domain.totp;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -17,13 +20,18 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
+import com.helger.security.messagedigest.EMessageDigestAlgorithm;
+import com.helger.security.messagedigest.MessageDigestValue;
 import com.helger.totp.CTotp;
 import com.helger.totp.code.DefaultCodeGenerator;
 import com.helger.totp.code.DefaultCodeVerifier;
 import com.helger.totp.code.EHashingAlgorithm;
-import com.helger.totp.code.ICodeVerifier;
 import com.helger.totp.qr.QrData;
+import com.helger.totp.recovery.RecoveryCodeGenerator;
 import com.helger.totp.secret.DefaultSecretGenerator;
 import com.helger.totp.time.ITimeProvider;
 import com.helger.totp.time.SystemTimeProvider;
@@ -46,14 +54,17 @@ public final class SMPTotpHelper
   public static final int TIME_PERIOD_SECS = CTotp.DEFAULT_TIME_PERIOD_SECS;
   /** The number of time slots before and after the current one that are accepted. */
   public static final int TIME_PERIOD_DISCREPANCY = CTotp.DEFAULT_TIME_PERIOD_DISCREPANCY;
+  /** The number of recovery codes that are created at once. */
+  public static final int RECOVERY_CODE_COUNT = 10;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPTotpHelper.class);
 
   private static final ITimeProvider TIME_PROVIDER = new SystemTimeProvider ();
-  private static final ICodeVerifier CODE_VERIFIER = new DefaultCodeVerifier (new DefaultCodeGenerator (HASHING_ALGORITHM,
-                                                                                                        CODE_DIGITS),
-                                                                              TIME_PROVIDER).setTimePeriod (TIME_PERIOD_SECS)
-                                                                                            .setAllowedTimePeriodDiscrepancy (TIME_PERIOD_DISCREPANCY);
+  private static final DefaultCodeVerifier CODE_VERIFIER = new DefaultCodeVerifier (new DefaultCodeGenerator (HASHING_ALGORITHM,
+                                                                                                              CODE_DIGITS),
+                                                                                    TIME_PROVIDER).setTimePeriod (TIME_PERIOD_SECS)
+                                                                                                  .setAllowedTimePeriodDiscrepancy (TIME_PERIOD_DISCREPANCY);
+  private static final RecoveryCodeGenerator RECOVERY_CODE_GENERATOR = new RecoveryCodeGenerator ();
 
   private SMPTotpHelper ()
   {}
@@ -73,7 +84,36 @@ public final class SMPTotpHelper
    */
   public static long getCurrentTimeSlot ()
   {
-    return Math.floorDiv (TIME_PROVIDER.getTime (), TIME_PERIOD_SECS);
+    return CODE_VERIFIER.getCurrentTimeSlot ();
+  }
+
+  /**
+   * Determine the time slot the provided one-time password is valid for. This is the basis of the
+   * replay protection: a code is accepted anywhere inside the discrepancy window, so the
+   * <em>current</em> time slot is not sufficient to remember.
+   *
+   * @param sSecret
+   *        The Base32 encoded shared secret. May be <code>null</code>.
+   * @param sCode
+   *        The one-time password provided by the user. May be <code>null</code>.
+   * @return The time slot the code matched or <code>null</code> if the code is invalid.
+   */
+  @Nullable
+  public static Long getMatchingTimeSlot (@Nullable final String sSecret, @Nullable final String sCode)
+  {
+    if (StringHelper.isEmpty (sSecret) || StringHelper.isEmpty (sCode))
+      return null;
+
+    try
+    {
+      return CODE_VERIFIER.getMatchingTimeSlot (sSecret, sCode.trim ());
+    }
+    catch (final RuntimeException ex)
+    {
+      // Never let a malformed secret or code break the login
+      LOGGER.warn ("Failed to verify the provided TOTP code: " + ex.getMessage ());
+      return null;
+    }
   }
 
   /**
@@ -84,22 +124,50 @@ public final class SMPTotpHelper
    * @param sCode
    *        The one-time password provided by the user. May be <code>null</code>.
    * @return <code>true</code> if the code is valid, <code>false</code> otherwise.
+   * @see #getMatchingTimeSlot(String, String) for the variant needed for the replay protection
    */
   public static boolean isValidCode (@Nullable final String sSecret, @Nullable final String sCode)
   {
-    if (StringHelper.isEmpty (sSecret) || StringHelper.isEmpty (sCode))
-      return false;
+    return getMatchingTimeSlot (sSecret, sCode) != null;
+  }
 
-    try
-    {
-      return CODE_VERIFIER.isValidCode (sSecret, sCode.trim ());
-    }
-    catch (final RuntimeException ex)
-    {
-      // Never let a malformed secret or code break the login
-      LOGGER.warn ("Failed to verify the provided TOTP code: " + ex.getMessage ());
-      return false;
-    }
+  /**
+   * Create a new set of {@link #RECOVERY_CODE_COUNT} recovery codes. They are only ever shown once
+   * to the user - only their hashes are stored.
+   *
+   * @return A new list of plain text recovery codes. Never <code>null</code>.
+   */
+  @NonNull
+  @Nonempty
+  @ReturnsMutableCopy
+  public static ICommonsList <String> createNewRecoveryCodes ()
+  {
+    return new CommonsArrayList <> (RECOVERY_CODE_GENERATOR.generateCodes (RECOVERY_CODE_COUNT));
+  }
+
+  /**
+   * Create the hash of a single recovery code, as it is stored in the backend. Recovery codes have
+   * ~82 bits of entropy, so a plain unsalted SHA-512 is sufficient - the codes cannot be brute
+   * forced or attacked with a rainbow table.
+   *
+   * @param sRecoveryCode
+   *        The plain text recovery code, as provided by the user. May be <code>null</code>.
+   * @return <code>null</code> if the provided recovery code is empty, the hex encoded hash
+   *         otherwise.
+   */
+  @Nullable
+  public static String getRecoveryCodeHash (@Nullable final String sRecoveryCode)
+  {
+    if (StringHelper.isEmpty (sRecoveryCode))
+      return null;
+
+    // Ignore the dashes and the casing, as the user may retype the code manually
+    final String sNormalized = sRecoveryCode.trim ().toLowerCase (Locale.ROOT).replace ("-", "");
+    if (StringHelper.isEmpty (sNormalized))
+      return null;
+
+    return MessageDigestValue.create (sNormalized.getBytes (StandardCharsets.UTF_8), EMessageDigestAlgorithm.SHA_512)
+                             .getHexEncodedDigestString ();
   }
 
   /**
@@ -121,14 +189,7 @@ public final class SMPTotpHelper
                                       @NonNull @Nonempty final String sLabel,
                                       @NonNull @Nonempty final String sSecret)
   {
-    return new QrData.Builder ().label (sLabel)
-                                .secret (sSecret)
-                                .issuer (sIssuer)
-                                .algorithm (HASHING_ALGORITHM)
-                                .digits (CODE_DIGITS)
-                                .period (TIME_PERIOD_SECS)
-                                .build ()
-                                .getUri ();
+    return getQrData (sIssuer, sLabel, sSecret).getUri ();
   }
 
   /**

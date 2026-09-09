@@ -16,7 +16,10 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
+import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.id.IHasID;
+import com.helger.collection.commons.ICommonsList;
 
 /**
  * Contains the TOTP (Time-based One-Time Password) enrollment data of a single user. The ID of this
@@ -53,10 +56,8 @@ public interface ISMPUserTotp extends IHasID <String>
   LocalDateTime getRegistrationDateTime ();
 
   /**
-   * The last successfully used TOTP time slot. It is stored to prevent a replay of the very same
-   * one-time password within its validity window.
-   *
-   * @return The last used time slot or <code>null</code> if no code was used so far.
+   * @return The last successfully used TOTP time slot. It is stored to prevent a replay of the very
+   *         same one-time password within its validity window.
    */
   @Nullable
   Long getLastUsedTimeSlot ();
@@ -67,5 +68,25 @@ public interface ISMPUserTotp extends IHasID <String>
   default boolean hasLastUsedTimeSlot ()
   {
     return getLastUsedTimeSlot () != null;
+  }
+
+  /**
+   * The hashes of the recovery codes that were not yet used. A recovery code may be used instead of
+   * a one-time password, e.g. if the authenticator device was lost. Each of them can be used only
+   * once. The plain text codes are only known to the user.
+   *
+   * @return A copy of all unused recovery code hashes. Never <code>null</code> but maybe empty.
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsList <String> getAllRecoveryCodeHashes ();
+
+  /**
+   * @return The number of recovery codes that can still be used. Always &ge; 0.
+   */
+  @Nonnegative
+  default int getRecoveryCodeCount ()
+  {
+    return getAllRecoveryCodeHashes ().size ();
   }
 }

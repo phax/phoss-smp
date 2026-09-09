@@ -22,8 +22,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.base.state.EContinue;
 import com.helger.base.concurrent.ThreadHelper;
+import com.helger.base.state.EContinue;
 import com.helger.http.CHttp;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.ui.SMPLoginManager;
@@ -48,8 +48,12 @@ import jakarta.servlet.ServletException;
  */
 public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
 {
-  /** The duration to wait after an invalid second factor was provided. */
-  private static final Duration FAILED_TOTP_WAIT_TIME = Duration.ofSeconds (1);
+  /** The base duration to wait after the first invalid second factor was provided. */
+  private static final Duration FAILED_TOTP_BASE_WAIT_TIME = Duration.ofSeconds (1);
+  /** The maximum duration to wait after an invalid second factor was provided. */
+  private static final Duration FAILED_TOTP_MAX_WAIT_TIME = Duration.ofSeconds (30);
+  /** The maximum exponent to be used for the exponential backoff. */
+  private static final int FAILED_TOTP_MAX_EXPONENT = 16;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SecureLoginFilter.class);
 
@@ -82,14 +86,32 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
       return EContinue.BREAK;
     }
 
-    // The credentials are valid - check the second factor, but only if the user enabled it
-    if (SMPSecondFactorHelper.isSecondFactorRequired (sCurrentUserID) &&
-        !SMPSecondFactorHelper.isSecondFactorProvided ())
+    // The credentials are valid - check the second factor, but only if the user enabled it.
+    // The session check comes first, because it avoids the backend lookup for the majority of the
+    // requests
+    if (!SMPSecondFactorHelper.isSecondFactorProvided (sCurrentUserID) &&
+        SMPSecondFactorHelper.isSecondFactorRequired (sCurrentUserID))
     {
       return _checkSecondFactor (sCurrentUserID, aRequestScope, aUnifiedResponse);
     }
 
     return EContinue.CONTINUE;
+  }
+
+  /**
+   * Determine the time to wait after a failed second factor validation, using an exponential
+   * backoff, capped at {@link #FAILED_TOTP_MAX_WAIT_TIME}.
+   *
+   * @param nFailureCount
+   *        The number of consecutive failures. Must be &ge; 1.
+   * @return The duration to wait. Never <code>null</code>.
+   */
+  @NonNull
+  private static Duration _getBackoffWaitTime (final int nFailureCount)
+  {
+    final int nExponent = Math.min (Math.max (nFailureCount, 1) - 1, FAILED_TOTP_MAX_EXPONENT);
+    final Duration aWaitTime = FAILED_TOTP_BASE_WAIT_TIME.multipliedBy (1L << nExponent);
+    return aWaitTime.compareTo (FAILED_TOTP_MAX_WAIT_TIME) > 0 ? FAILED_TOTP_MAX_WAIT_TIME : aWaitTime;
   }
 
   @NonNull
@@ -116,7 +138,10 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
         final String sCode = aRequestScope.params ().getAsStringTrimmed (SMPSecondFactorHelper.REQUEST_ATTR_TOTP_CODE);
         if (SMPSecondFactorHelper.isValidSecondFactor (sCurrentUserID, sCode))
         {
-          SMPSecondFactorHelper.markSecondFactorProvided ();
+          SMPSecondFactorHelper.markSecondFactorProvided (sCurrentUserID);
+          // Session fixation hardening: a new CSRF nonce is created. The HTTP session ID itself
+          // cannot be changed here, because the ph-oton login state is bound to the session scope
+          // ID and would be lost on a session renewal.
           CSRFSessionManager.getInstance ().generateNewNonce ();
 
           LOGGER.info ("Successfully verified the second authentication factor of user ID '" + sCurrentUserID + "'");
@@ -127,10 +152,19 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
         }
 
         bError = true;
-        sErrorMsg = "The provided authenticator code is invalid. Please try again.";
+        sErrorMsg = "The provided authenticator code or recovery code is invalid. Please try again.";
 
-        // Slow down brute force attempts on the second factor
-        ThreadHelper.sleep (FAILED_TOTP_WAIT_TIME);
+        // Slow down brute force attempts on the second factor, using an exponential backoff
+        final int nFailureCount = SMPSecondFactorHelper.incrementSecondFactorFailureCount ();
+        final Duration aWaitTime = _getBackoffWaitTime (nFailureCount);
+        LOGGER.warn ("The second factor of user ID '" +
+                     sCurrentUserID +
+                     "' failed " +
+                     nFailureCount +
+                     " consecutive time(s) - waiting " +
+                     aWaitTime.toMillis () +
+                     " milliseconds");
+        ThreadHelper.sleep (aWaitTime);
       }
     }
 

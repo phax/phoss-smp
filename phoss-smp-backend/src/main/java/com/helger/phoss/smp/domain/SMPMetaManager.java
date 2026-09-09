@@ -40,6 +40,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.LoggingSMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
+import com.helger.phoss.smp.domain.totp.SMPUserTotpEnabledCache;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
@@ -244,6 +245,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       m_aUserTotpMgr = s_aManagerProvider.createUserTotpMgr ();
       if (m_aUserTotpMgr == null)
         throw new IllegalStateException ("Failed to create User TOTP manager!");
+
+      // The new manager may have totally different data than the old one
+      SMPUserTotpEnabledCache.clearCache ();
 
       // May be null!
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);

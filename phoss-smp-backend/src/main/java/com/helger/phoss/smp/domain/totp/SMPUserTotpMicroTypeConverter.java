@@ -16,7 +16,10 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
 import com.helger.base.string.StringParser;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.MicroQName;
@@ -35,6 +38,8 @@ public final class SMPUserTotpMicroTypeConverter implements IMicroTypeConverter 
   private static final MicroQName ATTR_ENABLED = new MicroQName ("enabled");
   private static final MicroQName ATTR_REGISTRATION_DATETIME = new MicroQName ("regdt");
   private static final MicroQName ATTR_LAST_USED_TIME_SLOT = new MicroQName ("lastslot");
+  private static final String ELEMENT_RECOVERY_CODE = "recoverycode";
+  private static final MicroQName ATTR_RECOVERY_CODE_HASH = new MicroQName ("hash");
 
   @NonNull
   public IMicroElement convertToMicroElement (@NonNull final SMPUserTotp aValue,
@@ -48,6 +53,9 @@ public final class SMPUserTotpMicroTypeConverter implements IMicroTypeConverter 
     aElement.setAttributeWithConversion (ATTR_REGISTRATION_DATETIME, aValue.getRegistrationDateTime ());
     if (aValue.hasLastUsedTimeSlot ())
       aElement.setAttribute (ATTR_LAST_USED_TIME_SLOT, aValue.getLastUsedTimeSlot ().longValue ());
+    for (final String sRecoveryCodeHash : aValue.getAllRecoveryCodeHashes ())
+      aElement.appendElement (sNamespaceURI, ELEMENT_RECOVERY_CODE)
+              .setAttribute (ATTR_RECOVERY_CODE_HASH, sRecoveryCodeHash);
     return aElement;
   }
 
@@ -56,12 +64,20 @@ public final class SMPUserTotpMicroTypeConverter implements IMicroTypeConverter 
   {
     final String sUserID = aElement.getAttributeValue (ATTR_USER_ID);
     final String sSecret = aElement.getAttributeValue (ATTR_SECRET);
-    final boolean bEnabled = StringParser.parseBool (aElement.getAttributeValue (ATTR_ENABLED), false);
+    final boolean bEnabled = aElement.getAttributeValueAsBool (ATTR_ENABLED, false);
     final LocalDateTime aRegistrationDT = aElement.getAttributeValueWithConversion (ATTR_REGISTRATION_DATETIME,
                                                                                     LocalDateTime.class);
     final String sLastUsedTimeSlot = aElement.getAttributeValue (ATTR_LAST_USED_TIME_SLOT);
-    final Long aLastUsedTimeSlot = sLastUsedTimeSlot == null ? null : Long.valueOf (sLastUsedTimeSlot);
+    final Long aLastUsedTimeSlot = sLastUsedTimeSlot == null ? null : StringParser.parseLongObj (sLastUsedTimeSlot);
 
-    return new SMPUserTotp (sUserID, sSecret, bEnabled, aRegistrationDT, aLastUsedTimeSlot);
+    final ICommonsList <String> aRecoveryCodeHashes = new CommonsArrayList <> ();
+    for (final IMicroElement aChild : aElement.getAllChildElements (ELEMENT_RECOVERY_CODE))
+    {
+      final String sHash = aChild.getAttributeValue (ATTR_RECOVERY_CODE_HASH);
+      if (StringHelper.isNotEmpty (sHash))
+        aRecoveryCodeHashes.add (sHash);
+    }
+
+    return new SMPUserTotp (sUserID, sSecret, bEnabled, aRegistrationDT, aLastUsedTimeSlot, aRecoveryCodeHashes);
   }
 }

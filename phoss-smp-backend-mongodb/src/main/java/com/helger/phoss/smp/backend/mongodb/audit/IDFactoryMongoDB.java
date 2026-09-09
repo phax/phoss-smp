@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.mongodb.audit;
 
 import java.util.Date;
 
+import com.helger.base.string.StringParser;
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -116,7 +117,7 @@ public class IDFactoryMongoDB extends AbstractPersistingLongIDFactory
     }
     aDoc.remove (BSON_LONG_VALUE);
     final long nNewValue = nRead + nReserveCount;
-    aDoc.append (BSON_LONG_VALUE, Long.valueOf (nNewValue));
+    aDoc.append (BSON_LONG_VALUE, StringParser.parseLongObj (nNewValue));
     aDoc.append ("last-modification", new Date ());
     if (bCreate)
     {

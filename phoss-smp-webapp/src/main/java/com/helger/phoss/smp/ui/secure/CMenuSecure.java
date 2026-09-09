@@ -62,6 +62,7 @@ public final class CMenuSecure
   public static final String MENU_SMP_IDENTIFIER_MAPPINGS = "smp_id_mappings";
   public static final String MENU_CHANGE_PASSWORD = "change_pw";
   public static final String MENU_USER_TOTP = "user_totp";
+  public static final String MENU_USER_TOTP_ADMIN = "user_totp_admin";
 
   private CMenuSecure ()
   {}

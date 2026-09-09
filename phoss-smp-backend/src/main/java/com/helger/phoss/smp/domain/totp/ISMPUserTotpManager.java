@@ -54,16 +54,45 @@ public interface ISMPUserTotpManager
 
   /**
    * Remember the last successfully used TOTP time slot of a user, to prevent a replay of the same
-   * one-time password.
+   * one-time password. The update is performed atomically and only succeeds, if the provided time
+   * slot is newer than the currently stored one. A return value of {@link EChange#UNCHANGED}
+   * therefore means, that the provided one-time password must be rejected.
    *
    * @param sUserID
    *        The ID of the user. May be <code>null</code>.
    * @param nTimeSlot
-   *        The time slot that was just used.
-   * @return {@link EChange#CHANGED} if something was changed.
+   *        The time slot the provided one-time password matched.
+   * @return {@link EChange#CHANGED} if the time slot was stored, {@link EChange#UNCHANGED} if the
+   *         stored time slot is already greater or equal.
    */
   @NonNull
   EChange setTotpLastUsedTimeSlot (@Nullable String sUserID, long nTimeSlot);
+
+  /**
+   * Replace all recovery code hashes of the provided user.
+   *
+   * @param sUserID
+   *        The ID of the user. May be <code>null</code>.
+   * @param aRecoveryCodeHashes
+   *        The new recovery code hashes. May be <code>null</code> to remove all of them.
+   * @return {@link EChange#CHANGED} if something was changed.
+   */
+  @NonNull
+  EChange setRecoveryCodeHashes (@Nullable String sUserID, @Nullable ICommonsList <String> aRecoveryCodeHashes);
+
+  /**
+   * Atomically consume a single recovery code of the provided user. Each recovery code can be used
+   * only once, so this method must be used instead of a read-check-write sequence.
+   *
+   * @param sUserID
+   *        The ID of the user. May be <code>null</code>.
+   * @param sRecoveryCodeHash
+   *        The hash of the recovery code provided by the user. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the recovery code was present and was consumed by this call,
+   *         {@link EChange#UNCHANGED} if it is unknown or was already used.
+   */
+  @NonNull
+  EChange consumeRecoveryCodeHash (@Nullable String sUserID, @Nullable String sRecoveryCodeHash);
 
   /**
    * Delete the enrollment of the provided user.

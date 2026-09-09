@@ -26,7 +26,6 @@ import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.root.HCHtml;
 import com.helger.html.hc.html.sections.HCBody;
 import com.helger.html.hc.html.textlevel.HCSmall;
-import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
 import com.helger.photon.bootstrap5.CBootstrapCSS;
@@ -93,15 +92,14 @@ public class SMPSecondFactorHTMLProvider extends AbstractSWECHTMLProvider
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Authenticator code")
                                                  .setCtrl (new HCEdit (SMPSecondFactorHelper.REQUEST_ATTR_TOTP_CODE).setPlaceholder ("123456")
                                                                                                                     .setAutoFocus (true))
-                                                 .setHelpText ("Enter the current one-time password of your authenticator app"));
+                                                 .setHelpText ("Enter the current one-time password of your authenticator app. If you don't have access to it, you may enter one of your recovery codes instead."));
 
     aForm.addChild (new BootstrapSubmitButton ().addChild ("Verify"));
 
-    final HCSpan aSpan = new HCSpan ();
-    aSpan.addStyle (CCSSProperties.MIN_HEIGHT.newValue ("100%"));
-    aSpan.addStyle (CCSSProperties.MIN_HEIGHT.newValue ("100vh"));
-    aSpan.addStyle (CCSSProperties.DISPLAY.newValue ("flex"));
-    aSpan.addStyle (CCSSProperties.ALIGN_ITEMS.newValue ("center"));
+    final HCDiv aPageWrapper = new HCDiv ();
+    aPageWrapper.addStyle (CCSSProperties.MIN_HEIGHT.newValue ("100vh"));
+    aPageWrapper.addStyle (CCSSProperties.DISPLAY.newValue ("flex"));
+    aPageWrapper.addStyle (CCSSProperties.ALIGN_ITEMS.newValue ("center"));
 
     final BootstrapContainer aContainer = new BootstrapContainer ();
     aContainer.addChild (new HCDiv ().addClass (CBootstrapCSS.MB_3)
@@ -115,10 +113,10 @@ public class SMPSecondFactorHTMLProvider extends AbstractSWECHTMLProvider
     aContainer.addChild (new HCDiv ().addClass (CBootstrapCSS.D_FLEX)
                                      .addClass (CBootstrapCSS.MT_3)
                                      .addChild (new HCSmall ().addChild (CSMP.getApplicationTitleAndVersion ())));
-    aSpan.addChild (aContainer);
+    aPageWrapper.addChild (aContainer);
 
     final HCBody aBody = aHtml.body ();
-    aBody.addChild (aSpan);
+    aBody.addChild (aPageWrapper);
   }
 
   @Override

@@ -18,6 +18,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
@@ -32,8 +33,10 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotp;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.totp.SMPUserTotp;
+import com.helger.phoss.smp.domain.totp.SMPUserTotpEnabledCache;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.typeconvert.impl.TypeConverter;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
@@ -51,6 +54,7 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
   private static final String BSON_ENABLED = "enabled";
   private static final String BSON_REGISTRATION_DT = "regdt";
   private static final String BSON_LAST_USED_TIME_SLOT = "lastslot";
+  private static final String BSON_RECOVERY_CODES = "reccodes";
 
   public SMPUserTotpManagerMongoDB ()
   {
@@ -69,6 +73,7 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
                                                  TypeConverter.convert (aValue.getRegistrationDateTime (), Date.class));
     if (aValue.hasLastUsedTimeSlot ())
       ret.append (BSON_LAST_USED_TIME_SLOT, aValue.getLastUsedTimeSlot ());
+    ret.append (BSON_RECOVERY_CODES, aValue.getAllRecoveryCodeHashes ());
     return ret;
   }
 
@@ -82,11 +87,18 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
     final LocalDateTime aRegistrationDT = TypeConverter.convert (aDoc.getDate (BSON_REGISTRATION_DT),
                                                                  LocalDateTime.class);
     final Long aLastUsedTimeSlot = aDoc.getLong (BSON_LAST_USED_TIME_SLOT);
+    final ICommonsList <String> aRecoveryCodeHashes = new CommonsArrayList <> ();
+    final List <?> aRecoveryCodes = aDoc.get (BSON_RECOVERY_CODES, List.class);
+    if (aRecoveryCodes != null)
+      for (final Object aItem : aRecoveryCodes)
+        if (aItem != null)
+          aRecoveryCodeHashes.add (aItem.toString ());
     return new SMPUserTotp (sUserID,
                             sSecret,
                             aEnabled != null && aEnabled.booleanValue (),
                             aRegistrationDT,
-                            aLastUsedTimeSlot);
+                            aLastUsedTimeSlot,
+                            aRecoveryCodeHashes);
   }
 
   @NonNull
@@ -99,6 +111,8 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
     getCollection ().deleteOne (new Document (BSON_USER_ID, sUserID));
     if (!getCollection ().insertOne (toBson (aTotp)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+
+    SMPUserTotpEnabledCache.clearCache (sUserID);
 
     // Never audit the secret itself
     AuditHelper.onAuditCreateSuccess (SMPUserTotp.OT, sUserID);
@@ -124,6 +138,8 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
     if (aOldEnabled != null && aOldEnabled.booleanValue () == bEnabled)
       return EChange.UNCHANGED;
 
+    SMPUserTotpEnabledCache.clearCache (sUserID);
+
     AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "set-enabled", sUserID, Boolean.valueOf (bEnabled));
     return EChange.CHANGED;
   }
@@ -134,11 +150,69 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
     if (StringHelper.isEmpty (sUserID))
       return EChange.UNCHANGED;
 
-    // Deliberately not audited - this happens on every single login
-    final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_USER_ID, sUserID),
-                                                                Updates.set (BSON_LAST_USED_TIME_SLOT,
-                                                                             Long.valueOf (nTimeSlot)));
-    return EChange.valueOf (aOldDoc != null);
+    // Conditional update, so that two parallel submissions of the same one-time password cannot
+    // both succeed. Deliberately audited, even though this happens on every single login.
+    final Long aTimeSlot = Long.valueOf (nTimeSlot);
+    final Document aOldDoc = getCollection ().findOneAndUpdate (Filters.and (Filters.eq (BSON_USER_ID, sUserID),
+                                                                             Filters.or (Filters.exists (BSON_LAST_USED_TIME_SLOT,
+                                                                                                         false),
+                                                                                         Filters.eq (BSON_LAST_USED_TIME_SLOT,
+                                                                                                     null),
+                                                                                         Filters.lt (BSON_LAST_USED_TIME_SLOT,
+                                                                                                     aTimeSlot))),
+                                                                Updates.set (BSON_LAST_USED_TIME_SLOT, aTimeSlot));
+    if (aOldDoc == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-last-used-time-slot", sUserID, "not-newer-or-no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "set-last-used-time-slot", sUserID, aTimeSlot);
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange setRecoveryCodeHashes (@Nullable final String sUserID,
+                                        @Nullable final ICommonsList <String> aRecoveryCodeHashes)
+  {
+    if (StringHelper.isEmpty (sUserID))
+      return EChange.UNCHANGED;
+
+    final ICommonsList <String> aNewList = aRecoveryCodeHashes == null ? new CommonsArrayList <> ()
+                                                                       : aRecoveryCodeHashes.getClone ();
+    final Document aOldDoc = getCollection ().findOneAndUpdate (Filters.eq (BSON_USER_ID, sUserID),
+                                                                Updates.set (BSON_RECOVERY_CODES, aNewList));
+    if (aOldDoc == null)
+    {
+      AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-recovery-codes", sUserID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+
+    // Never audit the recovery codes themselves
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT,
+                                      "set-recovery-codes",
+                                      sUserID,
+                                      Integer.valueOf (aNewList.size ()));
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange consumeRecoveryCodeHash (@Nullable final String sUserID, @Nullable final String sRecoveryCodeHash)
+  {
+    if (StringHelper.isEmpty (sUserID) || StringHelper.isEmpty (sRecoveryCodeHash))
+      return EChange.UNCHANGED;
+
+    // Atomic "remove if present", so that the same recovery code cannot be used twice in parallel
+    final Document aOldDoc = getCollection ().findOneAndUpdate (Filters.and (Filters.eq (BSON_USER_ID, sUserID),
+                                                                             Filters.eq (BSON_RECOVERY_CODES,
+                                                                                         sRecoveryCodeHash)),
+                                                                Updates.pull (BSON_RECOVERY_CODES,
+                                                                              sRecoveryCodeHash));
+    if (aOldDoc == null)
+      return EChange.UNCHANGED;
+
+    AuditHelper.onAuditModifySuccess (SMPUserTotp.OT, "consume-recovery-code", sUserID);
+    return EChange.CHANGED;
   }
 
   @NonNull
@@ -153,6 +227,8 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
       AuditHelper.onAuditDeleteFailure (SMPUserTotp.OT, sUserID, "no-such-id");
       return EChange.UNCHANGED;
     }
+
+    SMPUserTotpEnabledCache.clearCache (sUserID);
 
     AuditHelper.onAuditDeleteSuccess (SMPUserTotp.OT, sUserID);
     return EChange.CHANGED;

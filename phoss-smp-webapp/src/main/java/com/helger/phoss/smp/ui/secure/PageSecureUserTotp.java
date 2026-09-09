@@ -24,11 +24,14 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
+import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.html.embedded.HCImg;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.grouping.HCDiv;
+import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.CSMP;
@@ -38,6 +41,7 @@ import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.totp.SMPTotpHelper;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPSecondFactorHelper;
+import com.helger.photon.app.csrf.CSRFSessionManager;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
@@ -47,6 +51,7 @@ import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
+import com.helger.photon.uicore.page.WebPageCSRFHandler;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.totp.qr.image.DataUriEncoder;
 import com.helger.totp.qr.image.ZxingPngQrCodeImageGenerator;
@@ -64,6 +69,8 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
   private static final String ACTION_ENROLL = "enroll";
   private static final String ACTION_CONFIRM = "confirm";
   private static final String ACTION_DISABLE = "disable";
+  private static final String ACTION_CANCEL = "cancel";
+  private static final String ACTION_NEW_RECOVERY_CODES = "newrecoverycodes";
 
   private static final String FIELD_CODE = "totpcode";
 
@@ -79,6 +86,50 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
   {
     final String sLoginName = aUser.getLoginName ();
     return StringHelper.isNotEmpty (sLoginName) ? sLoginName : aUser.getID ();
+  }
+
+  /**
+   * Create a link to this page, that contains an action and the current CSRF nonce. All actions of
+   * this page are state changing, so they must not be triggerable via a plain link from a foreign
+   * page.
+   */
+  @NonNull
+  private static SimpleURL _getActionHref (@NonNull final WebPageExecutionContext aWPEC, @NonNull final String sAction)
+  {
+    return aWPEC.getSelfHref ()
+                .add (CPageParam.PARAM_ACTION, sAction)
+                .add (CPageParam.FIELD_NONCE, CSRFSessionManager.getInstance ().getNonce ());
+  }
+
+  /**
+   * Create the new recovery codes of the provided user, store their hashes and show them to the
+   * user. This is the only time, the codes are visible.
+   */
+  private void _createAndShowRecoveryCodes (@NonNull final WebPageExecutionContext aWPEC,
+                                            @NonNull final ISMPUserTotpManager aTotpMgr,
+                                            @NonNull final String sUserID)
+  {
+    final ICommonsList <String> aRecoveryCodes = SMPTotpHelper.createNewRecoveryCodes ();
+    final ICommonsList <String> aHashes = new CommonsArrayList <> ();
+    for (final String sRecoveryCode : aRecoveryCodes)
+      aHashes.add (SMPTotpHelper.getRecoveryCodeHash (sRecoveryCode));
+
+    if (aTotpMgr.setRecoveryCodeHashes (sUserID, aHashes).isUnchanged ())
+    {
+      aWPEC.getNodeList ().addChild (error ("Failed to create new recovery codes."));
+      return;
+    }
+
+    LOGGER.info ("Created " + aRecoveryCodes.size () + " new TOTP recovery codes for user ID '" + sUserID + "'");
+
+    final HCUL aUL = new HCUL ();
+    for (final String sRecoveryCode : aRecoveryCodes)
+      aUL.addItem (new HCCode ().addChild (sRecoveryCode));
+
+    aWPEC.getNodeList ()
+         .addChild (warn (new HCDiv ().addChild ("These are your recovery codes. Store them in a safe place - each of them can be used exactly once, if you don't have access to your authenticator app."))
+                                                                                                                                                                                                      .addChild (new HCDiv ().addChild ("This is the only time they are shown. All previously created recovery codes are now invalid."))
+                                                                                                                                                                                                      .addChild (aUL));
   }
 
   @Override
@@ -103,13 +154,25 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
 
     final FormErrorList aFormErrors = new FormErrorList ();
 
-    // Disable
-    if (aWPEC.hasAction (ACTION_DISABLE))
+    // All actions of this page are state changing, so all of them require a valid CSRF nonce
+    final boolean bIsStateChangingAction = aWPEC.hasAction (ACTION_ENROLL) ||
+                                           aWPEC.hasAction (ACTION_CONFIRM) ||
+                                           aWPEC.hasAction (ACTION_DISABLE) ||
+                                           aWPEC.hasAction (ACTION_CANCEL) ||
+                                           aWPEC.hasAction (ACTION_NEW_RECOVERY_CODES);
+    if (bIsStateChangingAction && WebPageCSRFHandler.INSTANCE.checkCSRFNonce (aWPEC).isBreak ())
+      return;
+
+    // Disable an active or cancel a pending enrollment
+    if (aWPEC.hasAction (ACTION_DISABLE) || aWPEC.hasAction (ACTION_CANCEL))
     {
+      final boolean bIsCancel = aWPEC.hasAction (ACTION_CANCEL);
       if (aTotpMgr.deleteTotp (sUserID).isChanged ())
       {
-        LOGGER.info ("Successfully disabled TOTP for user ID '" + sUserID + "'");
-        aWPEC.postRedirectGetInternal (success ("Two-factor authentication was successfully disabled."));
+        LOGGER.info ((bIsCancel ? "Successfully cancelled the pending TOTP enrollment"
+                                : "Successfully disabled TOTP") + " for user ID '" + sUserID + "'");
+        aWPEC.postRedirectGetInternal (success (bIsCancel ? "The setup of two-factor authentication was cancelled."
+                                                          : "Two-factor authentication was successfully disabled."));
       }
       else
         aWPEC.postRedirectGetInternal (warn ("Two-factor authentication was not enabled."));
@@ -127,6 +190,16 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
 
     ISMPUserTotp aTotp = aTotpMgr.getTotpOfUserID (sUserID);
 
+    // Create new recovery codes for an already enabled second factor
+    if (aWPEC.hasAction (ACTION_NEW_RECOVERY_CODES))
+    {
+      if (aTotp == null || !aTotp.isEnabled ())
+        aWPEC.postRedirectGetInternal (warn ("Two-factor authentication is not enabled."));
+      else
+        _createAndShowRecoveryCodes (aWPEC, aTotpMgr, sUserID);
+      return;
+    }
+
     // Confirm a pending enrollment
     if (aWPEC.hasAction (ACTION_CONFIRM))
     {
@@ -141,18 +214,23 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
           if (StringHelper.isEmpty (sCode))
             aFormErrors.addFieldError (FIELD_CODE, "A code from your authenticator app must be provided");
           else
-            if (!SMPTotpHelper.isValidCode (aTotp.getSecret (), sCode))
+          {
+            final Long aMatchingTimeSlot = SMPTotpHelper.getMatchingTimeSlot (aTotp.getSecret (), sCode);
+            if (aMatchingTimeSlot == null)
               aFormErrors.addFieldError (FIELD_CODE, "The provided code is invalid. Please try again.");
             else
             {
-              aTotpMgr.setTotpLastUsedTimeSlot (sUserID, SMPTotpHelper.getCurrentTimeSlot ());
+              aTotpMgr.setTotpLastUsedTimeSlot (sUserID, aMatchingTimeSlot.longValue ());
               aTotpMgr.setTotpEnabled (sUserID, true);
               // The user just proved that he owns the second factor
-              SMPSecondFactorHelper.markSecondFactorProvided ();
+              SMPSecondFactorHelper.markSecondFactorProvided (sUserID);
               LOGGER.info ("Successfully enabled TOTP for user ID '" + sUserID + "'");
-              aWPEC.postRedirectGetInternal (success ("Two-factor authentication was successfully enabled. It is required the next time you login."));
+              aNodeList.addChild (success ("Two-factor authentication was successfully enabled. It is required the next time you login."));
+              // Show the recovery codes exactly once
+              _createAndShowRecoveryCodes (aWPEC, aTotpMgr, sUserID);
               return;
             }
+          }
           // Re-read, because the last used time slot may have changed
           aTotp = aTotpMgr.getTotpOfUserID (sUserID);
         }
@@ -168,15 +246,18 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
                                                           "'."))
                                                                 .addChild (new HCDiv ().addChild ("Enabled since " +
                                                                                                   PDTToString.getAsString (aTotp.getRegistrationDateTime (),
-                                                                                                                           aDisplayLocale))));
+                                                                                                                           aDisplayLocale)))
+                                                                .addChild (new HCDiv ().addChild (aTotp.getRecoveryCodeCount () +
+                                                                                                  " unused recovery code(s) left")));
 
       final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
       aToolbar.addButton ("Disable two-factor authentication",
-                          aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_DISABLE),
+                          _getActionHref (aWPEC, ACTION_DISABLE),
                           EDefaultIcon.DELETE);
-      aToolbar.addButton ("Create a new secret",
-                          aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_ENROLL),
-                          EDefaultIcon.REFRESH);
+      aToolbar.addButton ("Create a new secret", _getActionHref (aWPEC, ACTION_ENROLL), EDefaultIcon.REFRESH);
+      aToolbar.addButton ("Create new recovery codes",
+                          _getActionHref (aWPEC, ACTION_NEW_RECOVERY_CODES),
+                          EDefaultIcon.NEW);
       return;
     }
 
@@ -189,9 +270,7 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
       aNodeList.addChild (div ("With two-factor authentication enabled, an additional one-time password from an authenticator app (like Google Authenticator, Microsoft Authenticator, FreeOTP, ...) is required to login."));
 
       final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
-      aToolbar.addButton ("Enable two-factor authentication",
-                          aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_ENROLL),
-                          EDefaultIcon.YES);
+      aToolbar.addButton ("Enable two-factor authentication", _getActionHref (aWPEC, ACTION_ENROLL), EDefaultIcon.YES);
       return;
     }
 
@@ -215,6 +294,7 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
 
     final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
     aForm.addChild (new HCHiddenField (CPageParam.PARAM_ACTION, ACTION_CONFIRM));
+    aForm.addChild (WebPageCSRFHandler.INSTANCE.createCSRFNonceField ());
 
     if (sDataURI != null)
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("QR code")
@@ -232,6 +312,6 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
 
     final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
     aToolbar.addSubmitButton ("Confirm and enable", EDefaultIcon.SAVE);
-    aToolbar.addButton ("Cancel", aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_DISABLE), EDefaultIcon.CANCEL);
+    aToolbar.addButton ("Cancel", _getActionHref (aWPEC, ACTION_CANCEL), EDefaultIcon.CANCEL);
   }
 }
