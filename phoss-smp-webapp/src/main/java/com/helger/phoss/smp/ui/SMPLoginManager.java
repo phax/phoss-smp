@@ -19,6 +19,7 @@ package com.helger.phoss.smp.ui;
 import java.time.Duration;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
@@ -37,11 +38,13 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  */
 public final class SMPLoginManager extends BootstrapLoginManager
 {
+  public static final Duration FAILED_LOGIN_WAITING_TIME = Duration.ofSeconds (1);
+
   public SMPLoginManager ()
   {
     super (CSMP.getApplicationTitle () + " Administration - Login");
     setRequiredRoleIDs (CSMP.REQUIRED_ROLE_IDS_CONFIG);
-    setFailedLoginWaitingTime (Duration.ofSeconds (1));
+    setFailedLoginWaitingTime (FAILED_LOGIN_WAITING_TIME);
   }
 
   @Override
@@ -49,6 +52,20 @@ public final class SMPLoginManager extends BootstrapLoginManager
                                              @NonNull final ICredentialValidationResult aLoginResult)
   {
     return new SMPLoginHTMLProvider (bLoginError, aLoginResult, getPageTitle ());
+  }
+
+  /**
+   * Widened to <code>public</code>, so that {@code SecureLoginFilter} can throttle the failed
+   * validations of the second authentication factor per IP address the very same way - including
+   * the evaluation of the <code>X-Forwarded-For</code> and <code>Forwarded</code> headers.
+   *
+   * @since 8.4.3
+   */
+  @Override
+  @Nullable
+  public String getRemoteAddressForThrottling (@NonNull final IRequestWebScopeWithoutResponse aRequestScope)
+  {
+    return super.getRemoteAddressForThrottling (aRequestScope);
   }
 
   @Override
