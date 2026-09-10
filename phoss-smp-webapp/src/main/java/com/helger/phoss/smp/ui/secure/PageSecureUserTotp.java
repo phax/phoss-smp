@@ -78,7 +78,7 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
 
   public PageSecureUserTotp (@NonNull @Nonempty final String sID)
   {
-    super (sID, "Two-factor authentication");
+    super (sID, "Two-factor Authentication");
   }
 
   @NonNull
@@ -127,9 +127,8 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
       aUL.addItem (new HCCode ().addChild (sRecoveryCode));
 
     aWPEC.getNodeList ()
-         .addChild (warn (new HCDiv ().addChild ("These are your recovery codes. Store them in a safe place - each of them can be used exactly once, if you don't have access to your authenticator app."))
-                                                                                                                                                                                                      .addChild (new HCDiv ().addChild ("This is the only time they are shown. All previously created recovery codes are now invalid."))
-                                                                                                                                                                                                      .addChild (aUL));
+         .addChild (warn (new HCDiv ().addChild ("These are your recovery codes. Store them in a safe place - each of them can be used exactly once, if you don't have access to your authenticator app.")).addChild (new HCDiv ().addChild ("This is the only time they are shown. All previously created recovery codes are now invalid."))
+                                                                                                                                                                                                           .addChild (aUL));
   }
 
   @Override
@@ -169,8 +168,10 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
       final boolean bIsCancel = aWPEC.hasAction (ACTION_CANCEL);
       if (aTotpMgr.deleteTotp (sUserID).isChanged ())
       {
-        LOGGER.info ((bIsCancel ? "Successfully cancelled the pending TOTP enrollment"
-                                : "Successfully disabled TOTP") + " for user ID '" + sUserID + "'");
+        LOGGER.info ((bIsCancel ? "Successfully cancelled the pending TOTP enrollment" : "Successfully disabled TOTP") +
+                     " for user ID '" +
+                     sUserID +
+                     "'");
         aWPEC.postRedirectGetInternal (success (bIsCancel ? "The setup of two-factor authentication was cancelled."
                                                           : "Two-factor authentication was successfully disabled."));
       }
@@ -216,9 +217,7 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
           else
           {
             final Long aMatchingTimeSlot = SMPTotpHelper.getMatchingTimeSlot (aTotp.getSecret (), sCode);
-            if (aMatchingTimeSlot == null)
-              aFormErrors.addFieldError (FIELD_CODE, "The provided code is invalid. Please try again.");
-            else
+            if (aMatchingTimeSlot != null)
             {
               aTotpMgr.setTotpLastUsedTimeSlot (sUserID, aMatchingTimeSlot.longValue ());
               aTotpMgr.setTotpEnabled (sUserID, true);
@@ -230,6 +229,7 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
               _createAndShowRecoveryCodes (aWPEC, aTotpMgr, sUserID);
               return;
             }
+            aFormErrors.addFieldError (FIELD_CODE, "The provided code is invalid. Please try again.");
           }
           // Re-read, because the last used time slot may have changed
           aTotp = aTotpMgr.getTotpOfUserID (sUserID);
@@ -241,14 +241,17 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
     if (aTotp != null && aTotp.isEnabled ())
     {
       // Already enabled
-      aNodeList.addChild (success (new HCDiv ().addChild ("Two-factor authentication is enabled for user '" +
-                                                          _getAccountLabel (aUser) +
-                                                          "'."))
-                                                                .addChild (new HCDiv ().addChild ("Enabled since " +
-                                                                                                  PDTToString.getAsString (aTotp.getRegistrationDateTime (),
-                                                                                                                           aDisplayLocale)))
-                                                                .addChild (new HCDiv ().addChild (aTotp.getRecoveryCodeCount () +
-                                                                                                  " unused recovery code(s) left")));
+      final int nRecoveryCodes = aTotp.getRecoveryCodeCount ();
+      aNodeList.addChild (success ().addChild (div ().addChild ("Two-factor authentication is enabled for user ")
+                                                     .addChild (code (_getAccountLabel (aUser)))
+                                                     .addChild ("."))
+                                    .addChild (div ().addChild ("Enabled since: " +
+                                                                PDTToString.getAsString (aTotp.getRegistrationDateTime (),
+                                                                                         aDisplayLocale)))
+                                    .addChild (div ().addChild (nRecoveryCodes +
+                                                                " unused recovery code" +
+                                                                (nRecoveryCodes == 1 ? "" : "s") +
+                                                                " left")));
 
       final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
       aToolbar.addButton ("Disable two-factor authentication",
@@ -282,8 +285,9 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
     try
     {
       final ZxingPngQrCodeImageGenerator aGenerator = new ZxingPngQrCodeImageGenerator ();
-      final byte [] aImage = aGenerator.generate (SMPTotpHelper.getQrData (CSMP.getApplicationTitle (),
-                                                                           _getAccountLabel (aUser),
+      final String sIssuer = CSMP.getApplicationTitle ();
+      final byte [] aImage = aGenerator.generate (SMPTotpHelper.getQrData (sIssuer,
+                                                                           sIssuer + ":" + _getAccountLabel (aUser),
                                                                            sSecret));
       sDataURI = DataUriEncoder.getDataUriForImage (aImage, aGenerator.getImageMimeType ());
     }
@@ -298,16 +302,16 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
 
     if (sDataURI != null)
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("QR code")
-                                                   .setCtrl (new HCImg ().setSrc (new SimpleURL (sDataURI))
-                                                                         .setAlt ("TOTP QR code"))
+                                                   .setCtrl (div (new HCImg ().setSrc (new SimpleURL (sDataURI))
+                                                                              .setAlt ("TOTP QR code")))
                                                    .setHelpText ("Scan this QR code with your authenticator app"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Secret key")
-                                                 .setCtrl (new HCCode ().addChild (sSecret))
+                                                 .setCtrl (div (code ().addChild (sSecret)))
                                                  .setHelpText ("Alternatively enter this key manually into your authenticator app. Never share it with anybody else."));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Code from your authenticator app")
-                                                 .setCtrl (new HCEdit (new RequestField (FIELD_CODE)).setPlaceholder ("123456"))
+                                                 .setCtrl (new HCEdit (new RequestField (FIELD_CODE)).setPlaceholder ("000000"))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CODE)));
 
     final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));

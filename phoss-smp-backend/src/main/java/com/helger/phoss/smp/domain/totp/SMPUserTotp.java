@@ -17,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
@@ -152,6 +153,12 @@ public class SMPUserTotp implements ISMPUserTotp
     if (sRecoveryCodeHash == null)
       return EChange.UNCHANGED;
     return EChange.valueOf (m_aRecoveryCodeHashes.remove (sRecoveryCodeHash));
+  }
+
+  @Nonnegative
+  public int getRecoveryCodeCount ()
+  {
+    return m_aRecoveryCodeHashes.size ();
   }
 
   @Override

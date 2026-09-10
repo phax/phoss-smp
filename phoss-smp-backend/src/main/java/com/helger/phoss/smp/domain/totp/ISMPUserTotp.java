@@ -85,8 +85,5 @@ public interface ISMPUserTotp extends IHasID <String>
    * @return The number of recovery codes that can still be used. Always &ge; 0.
    */
   @Nonnegative
-  default int getRecoveryCodeCount ()
-  {
-    return getAllRecoveryCodeHashes ().size ();
-  }
+  int getRecoveryCodeCount ();
 }

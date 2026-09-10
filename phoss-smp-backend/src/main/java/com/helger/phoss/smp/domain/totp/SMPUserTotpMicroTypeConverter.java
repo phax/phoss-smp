@@ -53,8 +53,9 @@ public final class SMPUserTotpMicroTypeConverter implements IMicroTypeConverter 
     aElement.setAttributeWithConversion (ATTR_REGISTRATION_DATETIME, aValue.getRegistrationDateTime ());
     if (aValue.hasLastUsedTimeSlot ())
       aElement.setAttribute (ATTR_LAST_USED_TIME_SLOT, aValue.getLastUsedTimeSlot ().longValue ());
+
     for (final String sRecoveryCodeHash : aValue.getAllRecoveryCodeHashes ())
-      aElement.appendElement (sNamespaceURI, ELEMENT_RECOVERY_CODE)
+      aElement.addElementNS (sNamespaceURI, ELEMENT_RECOVERY_CODE)
               .setAttribute (ATTR_RECOVERY_CODE_HASH, sRecoveryCodeHash);
     return aElement;
   }

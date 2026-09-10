@@ -36,6 +36,7 @@ import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.security.SMPKeyManager;
+import com.helger.phoss.smp.servlet.SMPLogoutServlet;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.pub.SMPRendererPublic;
@@ -55,7 +56,6 @@ import com.helger.photon.core.EPhotonCoreText;
 import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 import com.helger.photon.core.html.CLayout;
 import com.helger.photon.core.servlet.AbstractPublicApplicationServlet;
-import com.helger.photon.core.servlet.LogoutServlet;
 import com.helger.photon.security.user.IUser;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.icon.EDefaultIcon;
@@ -102,7 +102,7 @@ public final class SMPRendererSecure
                  .addChild (new HCStrong ().addChild (SecurityHelper.getUserDisplayName (aUser, aDisplayLocale)));
       aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.MX_2)
                                                   .setOnClick (LinkHelper.getURLWithContext (aRequestScope,
-                                                                                             LogoutServlet.SERVLET_DEFAULT_PATH))
+                                                                                             SMPLogoutServlet.SERVLET_DEFAULT_PATH))
                                                   .addChild (EPhotonCoreText.LOGIN_LOGOUT.getDisplayText (aDisplayLocale)));
     }
     return aNavbar;

@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.http.EHttpMethod;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
 import com.helger.photon.core.servlet.LogoutXServletHandler;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.url.ISimpleURL;
@@ -56,7 +57,8 @@ public final class SMPLogoutServlet extends AbstractXServlet
         else
           sRedirectURL = StaticServerInfo.getInstance ().getFullContextPath ();
 
-        return new SimpleURL (sRedirectURL);
+        // Redirect back to login screen
+        return new SimpleURL (sRedirectURL + AbstractSecureApplicationServlet.SERVLET_DEFAULT_PATH);
       }
     });
     handlerRegistry ().copyHandler (EHttpMethod.GET, EnumSet.of (EHttpMethod.POST));

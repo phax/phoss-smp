@@ -56,7 +56,7 @@ public final class MenuSecure
   /**
    * Cache the check if the current user is in a user group or not, to avoid that too many queries
    * are performed. If necessary, this class can be made more public if required on other places.
-   * 
+   *
    * @author Philip Helger
    * @since v7.2.7
    */
@@ -69,7 +69,7 @@ public final class MenuSecure
     public CurrentUserToUserGroupAssignmentCache ()
     {}
 
-    public static final CurrentUserToUserGroupAssignmentCache getInstance ()
+    public static CurrentUserToUserGroupAssignmentCache getInstance ()
     {
       return getRequestSingleton (CurrentUserToUserGroupAssignmentCache.class);
     }
@@ -161,15 +161,10 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <> (CMenuSecure.MENU_CHANGE_PASSWORD));
       if (SMPServerConfiguration.isTotpEnabled ())
       {
-        // The pages are not created at all, so that they are also not reachable by URL
+        // Page for current user
         aMenuTree.createItem (aAdmin, new PageSecureUserTotp (CMenuSecure.MENU_USER_TOTP));
-        aMenuTree.createItem (aAdmin, new PageSecureUserTotpAdmin (CMenuSecure.MENU_USER_TOTP_ADMIN))
-                 .setDisplayFilter (aFilterAdministrators);
       }
-      else
-        LOGGER.info ("The two-factor authentication pages are disabled, because '" +
-                     SMPServerConfiguration.KEY_SMP_TOTP_ENABLED +
-                     "' is not enabled.");
+
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMPServer.DEFAULT_LOCALE);
 
       if (SMPWebAppConfiguration.isWebAppPageSessionManagmentDisabled ())
@@ -181,6 +176,14 @@ public final class MenuSecure
       {
         LOGGER.warn ("The 'Administration / System Information / Environment Variables' page was explicitly disabled via the configuration.");
         aMenuTree.removeItemWithID (BootstrapPagesMenuConfigurator.MENU_ADMIN_SYSINFO_ENVVARS);
+      }
+
+      if (SMPServerConfiguration.isTotpEnabled ())
+      {
+        final IMenuItemPage aSecurityItem = (IMenuItemPage) aMenuTree.getMenuObjectOfID (BootstrapPagesMenuConfigurator.MENU_ADMIN_SECURITY);
+        // The pages are not created at all, so that they are also not reachable by URL
+        aMenuTree.createItem (aSecurityItem, new PageSecureUserTotpAdmin (CMenuSecure.MENU_USER_TOTP_ADMIN))
+                 .setDisplayFilter (aFilterAdministrators);
       }
     }
 
