@@ -48,7 +48,7 @@ public final class SMPUserTotpMicroTypeConverterTest
 
     assertEquals (aSrc.getID (), aDst.getID ());
     assertEquals (aSrc.getSecret (), aDst.getSecret ());
-    assertEquals (aSrc.isEnabled (), aDst.isEnabled ());
+    assertTrue (aSrc.isEnabled () == aDst.isEnabled ());
     assertEquals (aSrc.getRegistrationDateTime (), aDst.getRegistrationDateTime ());
     assertEquals (aSrc.getLastUsedTimeSlot (), aDst.getLastUsedTimeSlot ());
     assertEquals (aSrc.getAllRecoveryCodeHashes (), aDst.getAllRecoveryCodeHashes ());

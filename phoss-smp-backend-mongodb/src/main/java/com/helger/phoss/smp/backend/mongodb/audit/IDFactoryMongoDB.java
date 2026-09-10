@@ -18,7 +18,6 @@ package com.helger.phoss.smp.backend.mongodb.audit;
 
 import java.util.Date;
 
-import com.helger.base.string.StringParser;
 import org.bson.Document;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -58,12 +57,10 @@ public class IDFactoryMongoDB extends AbstractPersistingLongIDFactory
   private final long m_nInitialCount;
 
   /**
-   * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the
-   * collection name.
+   * Default constructor using {@link #DEFAULT_COLLECTION_NAME} as the collection name.
    *
    * @param nInitialCount
-   *        Initial count to be used, if no MongoDB document exists. Must be
-   *        &ge; 0.
+   *        Initial count to be used, if no MongoDB document exists. Must be &ge; 0.
    */
   public IDFactoryMongoDB (@Nonnegative final long nInitialCount)
   {
@@ -76,11 +73,9 @@ public class IDFactoryMongoDB extends AbstractPersistingLongIDFactory
    * @param sCollectionName
    *        Collection name to use. May neither be <code>null</code> nor empty.
    * @param nReserveCount
-   *        The number of IDs to reserve per persistence layer access. Must be
-   *        &gt; 0.
+   *        The number of IDs to reserve per persistence layer access. Must be &gt; 0.
    * @param nInitialCount
-   *        Initial count to be used, if no MongoDB document exists. Must be
-   *        &ge; 0.
+   *        Initial count to be used, if no MongoDB document exists. Must be &ge; 0.
    */
   public IDFactoryMongoDB (@NonNull @Nonempty final String sCollectionName,
                            @Nonnegative final int nReserveCount,
@@ -117,7 +112,7 @@ public class IDFactoryMongoDB extends AbstractPersistingLongIDFactory
     }
     aDoc.remove (BSON_LONG_VALUE);
     final long nNewValue = nRead + nReserveCount;
-    aDoc.append (BSON_LONG_VALUE, StringParser.parseLongObj (nNewValue));
+    aDoc.append (BSON_LONG_VALUE, Long.valueOf (nNewValue));
     aDoc.append ("last-modification", new Date ());
     if (bCreate)
     {
