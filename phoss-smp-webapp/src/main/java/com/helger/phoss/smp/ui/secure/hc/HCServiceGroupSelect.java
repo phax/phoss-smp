@@ -86,9 +86,9 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
     return containsEffectiveOption ();
   }
 
-  private static class MySelect2 extends HCSelect2 implements IHCServiceGroupSelect
+  private static class AjaxHCSelect2 extends HCSelect2 implements IHCServiceGroupSelect
   {
-    public MySelect2 (@NonNull final IHCRequestField aRF)
+    public AjaxHCSelect2(@NonNull final IHCRequestField aRF)
     {
       super (aRF);
     }
@@ -99,9 +99,9 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
     }
   }
 
-  private static class MyReadOnlySelect extends HCSelect implements IHCServiceGroupSelect
+  private static class ReadOnlyHSelect extends HCSelect implements IHCServiceGroupSelect
   {
-    public MyReadOnlySelect (@NonNull final IHCRequestField aRF)
+    public ReadOnlyHSelect(@NonNull final IHCRequestField aRF)
     {
       super (aRF);
       setReadOnly (true);
@@ -119,12 +119,12 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
    *
    * @author Philip Helger
    */
-  private static final class MyAjaxSelect2 extends HCSelect2 implements IHCServiceGroupSelect
+  private static final class HCAjaxSelect2 extends HCSelect2 implements IHCServiceGroupSelect
   {
     private final String m_sAjaxURL;
     private final String m_sFilterID;
 
-    MyAjaxSelect2 (@NonNull final IHCRequestField aRF, @NonNull final String sAjaxURL, @NonNull final String sFilterID)
+    HCAjaxSelect2(@NonNull final IHCRequestField aRF, @NonNull final String sAjaxURL, @NonNull final String sFilterID)
     {
       super (aRF);
       m_sAjaxURL = sAjaxURL;
@@ -238,13 +238,13 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
       // Using a simple read-only edit does not work, because it has no possibility to separate
       // display text and value
       // So we create a simple select with a single entry
-      final MyReadOnlySelect aSelect = new MyReadOnlySelect (aRF);
+      final ReadOnlyHSelect aSelect = new ReadOnlyHSelect(aRF);
       if (aSelectedServiceGroup != null)
         aSelect.addOption (aSelectedServiceGroup.getID (), getDisplayName (aSelectedServiceGroup));
       return aSelect;
     }
 
-    final MyAjaxSelect2 aSelect2 = new MyAjaxSelect2 (aRF,
+    final HCAjaxSelect2 aSelect2 = new HCAjaxSelect2(aRF,
                                                       CAjax.FUNCTION_SERVICE_GROUP_SELECT.getInvocationURI (aRequestScope),
                                                       sFilterID);
     // Only add the currently selected option - all others are loaded on demand
@@ -273,13 +273,13 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
                                                                   .parseParticipantIdentifier (aRF.getRequestValue ());
         final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
                                                              .getSMPServiceGroupOfID (aSelectedPID);
-        final MyReadOnlySelect aSelect = new MyReadOnlySelect (aRF);
+        final ReadOnlyHSelect aSelect = new ReadOnlyHSelect(aRF);
         if (aServiceGroup != null)
           aSelect.addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup));
         return aSelect;
       }
 
-      final MySelect2 aSelect2 = new MySelect2 (aRF);
+      final AjaxHCSelect2 aSelect2 = new AjaxHCSelect2(aRF);
       _iterateMatchingSG (aIncludeFilter,
                           aServiceGroup -> aSelect2.addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup)));
       return aSelect2;
