@@ -71,12 +71,12 @@ import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardContact;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardEntity;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardIdentifier;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardName;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
-import com.helger.phoss.smp.ui.ajax.AjaxExecutorSecureServiceGroupSelect;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -1170,7 +1170,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                                                                                 aSelectedObject != null ? aSelectedObject.getID ()
                                                                                                                                         : null),
                                                                                               aDisplayLocale,
-                                                                                              AjaxExecutorSecureServiceGroupSelect.FILTER_NO_BUSINESS_CARD,
+                                                                                              ESMPServiceGroupFilter.NO_BUSINESS_CARD,
                                                                                               false))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     }

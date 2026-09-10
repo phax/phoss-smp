@@ -26,10 +26,8 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.state.EValidity;
 import com.helger.base.string.StringHelper;
-import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsIterable;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
@@ -46,6 +44,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.SmpSmlHelper;
@@ -327,24 +326,13 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
-    final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-    // State is filtered below
-    final ICommonsList <ISMPParticipantMigration> aExistingOutgoingMigrations = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null);
-
-    // Get all participant identifiers for which NO new migration can be
-    // initiated (because they were already migrated or migration is currently
-    // in progress)
-    final ICommonsSet <IParticipantIdentifier> aPIDsThatCannotBeUsed = new CommonsHashSet <> ();
-    aPIDsThatCannotBeUsed.addAllMapped (aExistingOutgoingMigrations,
-                                        x -> x.getState ().preventsNewMigration (),
-                                        ISMPParticipantMigration::getParticipantIdentifier);
-
-    // Filter out all for which it makes no sense
-    final IHCServiceGroupSelect aSGSelect = HCServiceGroupSelect.create (new RequestField (FIELD_PARTICIPANT_ID),
-                                                                         aDisplayLocale,
-                                                                         x -> aPIDsThatCannotBeUsed.containsNone (y -> x.getParticipantIdentifier ()
-                                                                                                                        .hasSameContent (y)),
-                                                                         false);
+    // Filter out all Service Groups for which a new migration makes no sense (because a migration
+    // is currently in progress)
+    final IHCServiceGroupSelect aSGSelect = HCServiceGroupSelect.createAjax (aWPEC.getRequestScope (),
+                                                                            new RequestField (FIELD_PARTICIPANT_ID),
+                                                                            aDisplayLocale,
+                                                                            ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION,
+                                                                            false);
     if (!aSGSelect.containsAnyServiceGroup ())
     {
       aForm.addChild (warn ("No Service Group on this SMP can currently be migrated."));

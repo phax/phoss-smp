@@ -26,6 +26,8 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
+import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
@@ -103,11 +105,81 @@ public final class SMPServiceGroupPagingFuncTest
       assertEquals (4,
                     aMgr.getAllSMPServiceGroups (new PagingSpec (0, 10, SortField.ascending ("no-such-field")), null)
                         .size ());
+
+      // No filtering at all
+      assertEquals (4, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.ALL, null));
+      assertEquals (4, aMgr.getAllSMPServiceGroups (ESMPServiceGroupFilter.ALL, new PagingSpec (0, 10), null).size ());
     }
     finally
     {
       for (final IParticipantIdentifier aPI : aCreated)
         aMgr.deleteSMPServiceGroupNoEx (aPI, true);
+    }
+  }
+
+  @Test
+  public void testFilters () throws SMPServerException
+  {
+    final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
+    assertNotNull (aTestUser);
+
+    final IIdentifierFactory aIF = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
+    assertNotNull (aBusinessCardMgr);
+    final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+    assertNotNull (aParticipantMigrationMgr);
+
+    final ICommonsList <IParticipantIdentifier> aCreated = new CommonsArrayList <> ();
+    try
+    {
+      for (final String sValue : VALUES)
+      {
+        final IParticipantIdentifier aPI = aIF.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                            sValue);
+        aMgr.deleteSMPServiceGroupNoEx (aPI, true);
+        assertNotNull (aMgr.createSMPServiceGroup (aTestUser.getID (), aPI, null, null, true));
+        aCreated.add (aPI);
+      }
+
+      // The first one gets a Business Card
+      final IParticipantIdentifier aPIWithBC = aCreated.getFirstOrNull ();
+      assertNotNull (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPIWithBC, new CommonsArrayList <> (), false));
+
+      assertEquals (VALUES.length - 1, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BUSINESS_CARD, null));
+
+      final ICommonsList <ISMPServiceGroup> aNoBC = aMgr.getAllSMPServiceGroups (ESMPServiceGroupFilter.NO_BUSINESS_CARD,
+                                                                                 new PagingSpec (0, 10),
+                                                                                 null);
+      assertEquals (VALUES.length - 1, aNoBC.size ());
+      assertTrue ("The Service Group with a Business Card must not be contained",
+                  aNoBC.findFirst (x -> x.getParticipantIdentifier ().hasSameContent (aPIWithBC)) == null);
+
+      // The search text must be applied on top of the filter - "0088:paging1"
+      // has a Business Card, so only 2 of the 3 remain
+      assertEquals (2, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BUSINESS_CARD, "paging"));
+
+      // The last one gets an outbound migration
+      final IParticipantIdentifier aPIMigrating = aCreated.getLastOrNull ();
+      assertNotNull (aParticipantMigrationMgr.createOutboundParticipantMigration (aPIMigrating, "migration-key"));
+
+      assertEquals (VALUES.length - 1,
+                    aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION, null));
+
+      final ICommonsList <ISMPServiceGroup> aNoMig = aMgr.getAllSMPServiceGroups (ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION,
+                                                                                  new PagingSpec (0, 10),
+                                                                                  null);
+      assertEquals (VALUES.length - 1, aNoMig.size ());
+      assertTrue ("The Service Group with a migration in progress must not be contained",
+                  aNoMig.findFirst (x -> x.getParticipantIdentifier ().hasSameContent (aPIMigrating)) == null);
+    }
+    finally
+    {
+      for (final IParticipantIdentifier aPI : aCreated)
+      {
+        aParticipantMigrationMgr.deleteAllParticipantMigrationsOfParticipant (aPI);
+        aMgr.deleteSMPServiceGroupNoEx (aPI, true);
+      }
     }
   }
 }

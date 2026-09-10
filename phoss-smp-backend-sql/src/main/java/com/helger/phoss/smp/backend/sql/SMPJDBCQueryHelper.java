@@ -15,6 +15,7 @@ import java.util.Locale;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
@@ -114,6 +115,52 @@ public final class SMPJDBCQueryHelper
                                                      aPagingSpec,
                                                      createColumnNameResolver (aColumns),
                                                      TableColumnHelper.getAllDefaultSortFields (aColumns));
+  }
+
+  /**
+   * Create the database specific SQL expression that concatenates the provided SQL expressions to a
+   * single string.
+   *
+   * @param aExpressions
+   *        The SQL expressions to be concatenated. May neither be <code>null</code> nor empty.
+   * @return The SQL expression. Never <code>null</code>.
+   * @since 8.4.3
+   */
+  @NonNull
+  public static String getStringConcat (@NonNull @Nonempty final String... aExpressions)
+  {
+    return getStringConcat (SMPDataSourceSingleton.getDatabaseType (), aExpressions);
+  }
+
+  /**
+   * Create the database specific SQL expression that concatenates the provided SQL expressions to a
+   * single string. MySQL cannot use the <code>||</code> operator, because it is the logical OR by
+   * default, and SQL Server does not support it at all.
+   *
+   * @param eDBType
+   *        The database system to create the expression for. May not be <code>null</code>.
+   * @param aExpressions
+   *        The SQL expressions to be concatenated. May neither be <code>null</code> nor empty.
+   * @return The SQL expression. Never <code>null</code>.
+   * @since 8.4.3
+   */
+  @NonNull
+  public static String getStringConcat (@NonNull final EDatabaseSystemType eDBType,
+                                        @NonNull @Nonempty final String... aExpressions)
+  {
+    ValueEnforcer.notEmpty (aExpressions, "Expressions");
+
+    if (aExpressions.length == 1)
+      return aExpressions[0];
+
+    switch (eDBType)
+    {
+      case MYSQL:
+      case SQLSERVER:
+        return "CONCAT(" + String.join (", ", aExpressions) + ")";
+      default:
+        return "(" + String.join (" || ", aExpressions) + ")";
+    }
   }
 
   /**

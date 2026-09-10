@@ -16,27 +16,17 @@
  */
 package com.helger.phoss.smp.ui.ajax;
 
-import java.util.function.Predicate;
-
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
-import com.helger.annotation.Nonnegative;
-import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.string.StringHelper;
-import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.collection.commons.ICommonsSet;
-import com.helger.collection.paging.PagingSpec;
-import com.helger.collection.paging.SortField;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
-import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
-import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.ui.cache.SMPOwnerNameCache;
+import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.phoss.smp.ui.secure.hc.SMPServiceGroupSelectHelper;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
 
@@ -61,120 +51,11 @@ public final class AjaxExecutorSecureServiceGroupSelect extends AbstractSMPAjaxE
   /** Name of the request parameter containing the optional filter ID */
   public static final String PARAM_FILTER = "filter";
 
-  /** Filter ID: no filtering at all */
-  public static final String FILTER_NONE = "none";
-  /** Filter ID: only Service Groups that have no Business Card yet */
-  public static final String FILTER_NO_BUSINESS_CARD = "nobc";
-
-  /** The maximum number of Service Groups delivered per request */
-  public static final int PAGE_SIZE = 25;
-
   public static final String JSON_RESULTS = "results";
   public static final String JSON_ID = "id";
   public static final String JSON_TEXT = "text";
   public static final String JSON_PAGINATION = "pagination";
   public static final String JSON_MORE = "more";
-
-  /**
-   * The number of entries read at once from the backend, in case a filter needs to be applied on
-   * top of the backend paging.
-   */
-  private static final int SCAN_CHUNK_SIZE = 500;
-
-  /**
-   * Resolve a filter ID to the respective predicate.
-   *
-   * @param sFilterID
-   *        The filter ID to be resolved. May be <code>null</code>.
-   * @return <code>null</code> if no filtering should take place.
-   */
-  @Nullable
-  public static Predicate <ISMPServiceGroup> getFilterPredicate (@Nullable final String sFilterID)
-  {
-    if (FILTER_NO_BUSINESS_CARD.equals (sFilterID))
-    {
-      final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-      if (aBusinessCardMgr == null)
-        return null;
-
-      // Show only Service Groups that don't have a Business Card already
-      final ICommonsSet <String> aAllPIDsWithBusinessCards = aBusinessCardMgr.getAllSMPBusinessCardIDs ();
-      return x -> !aAllPIDsWithBusinessCards.contains (x.getParticipantIdentifier ().getURIEncoded ());
-    }
-    return null;
-  }
-
-  /**
-   * Get a single page of Service Groups, sorted by participant identifier ascending. To be able to
-   * determine whether more entries are available, this method returns at most
-   * <code>{@link #PAGE_SIZE} + 1</code> entries.
-   *
-   * @param sSearchText
-   *        The search text to filter by. May be <code>null</code> or empty, in which case no
-   *        filtering by text takes place.
-   * @param nPage
-   *        The 1-based number of the page to be returned. Must be &ge; 1.
-   * @param aFilter
-   *        An optional additional filter to be applied. May be <code>null</code>.
-   * @return A list with at most <code>{@link #PAGE_SIZE} + 1</code> entries. Never
-   *         <code>null</code>.
-   */
-  @NonNull
-  @ReturnsMutableCopy
-  public static ICommonsList <ISMPServiceGroup> getPagePlusOne (@Nullable final String sSearchText,
-                                                                @Nonnegative final int nPage,
-                                                                @Nullable final Predicate <ISMPServiceGroup> aFilter)
-  {
-    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    final SortField aSortField = SortField.ascending (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ());
-    final long nSkip = (long) (nPage - 1) * PAGE_SIZE;
-
-    if (aFilter == null)
-    {
-      // The backend can do all the work
-      return aServiceGroupMgr.getAllSMPServiceGroups (new PagingSpec (nSkip, PAGE_SIZE + 1L, aSortField), sSearchText);
-    }
-
-    // A filter is present - it can only be applied after the backend query, so all entries up to
-    // the end of the requested page need to be scanned
-    final long nNeeded = nSkip + PAGE_SIZE + 1L;
-    final ICommonsList <ISMPServiceGroup> aMatching = new CommonsArrayList <> ();
-    long nStartIndex = 0;
-    while (aMatching.size () < nNeeded)
-    {
-      final ICommonsList <ISMPServiceGroup> aChunk = aServiceGroupMgr.getAllSMPServiceGroups (new PagingSpec (nStartIndex,
-                                                                                                              SCAN_CHUNK_SIZE,
-                                                                                                              aSortField),
-                                                                                              sSearchText);
-      for (final ISMPServiceGroup aServiceGroup : aChunk)
-        if (aFilter.test (aServiceGroup))
-          aMatching.add (aServiceGroup);
-
-      if (aChunk.size () < SCAN_CHUNK_SIZE)
-      {
-        // Last chunk reached
-        break;
-      }
-      nStartIndex += aChunk.size ();
-    }
-
-    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
-    for (int i = (int) Math.min (nSkip, aMatching.size ()); i < aMatching.size () && ret.size () <= PAGE_SIZE; ++i)
-      ret.add (aMatching.get (i));
-    return ret;
-  }
-
-  /**
-   * Check if at least one Service Group matching the provided filter is present.
-   *
-   * @param aFilter
-   *        An optional filter to be applied. May be <code>null</code>.
-   * @return <code>true</code> if at least one matching Service Group is available.
-   */
-  public static boolean containsAnyServiceGroup (@Nullable final Predicate <ISMPServiceGroup> aFilter)
-  {
-    return getPagePlusOne (null, 1, aFilter).isNotEmpty ();
-  }
 
   @Override
   protected void mainHandleRequest (@NonNull final LayoutExecutionContext aLEC,
@@ -184,27 +65,28 @@ public final class AjaxExecutorSecureServiceGroupSelect extends AbstractSMPAjaxE
     int nPage = aLEC.params ().getAsInt (PARAM_PAGE, 1);
     if (nPage < 1)
       nPage = 1;
-    final String sFilterID = aLEC.params ().getAsStringTrimmed (PARAM_FILTER);
+    // Unknown filter IDs are provided by a client, so they are simply ignored
+    final ESMPServiceGroupFilter eFilter = ESMPServiceGroupFilter.getFromIDOrDefault (aLEC.params ()
+                                                                                          .getAsStringTrimmed (PARAM_FILTER),
+                                                                                      ESMPServiceGroupFilter.ALL);
 
-    final ICommonsList <ISMPServiceGroup> aList = getPagePlusOne (StringHelper.isEmpty (sSearchText) ? null
-                                                                                                     : sSearchText,
-                                                                  nPage,
-                                                                  getFilterPredicate (sFilterID));
-    final boolean bHasMore = aList.size () > PAGE_SIZE;
+    final ICommonsList <ISMPServiceGroup> aList = SMPServiceGroupSelectHelper.getPagePlusOne (eFilter,
+                                                                                             StringHelper.isEmpty (sSearchText) ? null
+                                                                                                                                : sSearchText,
+                                                                                             nPage);
+    final boolean bHasMore = aList.size () > SMPServiceGroupSelectHelper.PAGE_SIZE;
 
-    // Use an owner name cache to avoid too many DB queries
+    // Use an owner name cache, so that each owner is only resolved once
     final SMPOwnerNameCache aOwnerNameCache = new SMPOwnerNameCache ();
     final JsonArray aResults = new JsonArray ();
-    final int nMax = Math.min (aList.size (), PAGE_SIZE);
+    final int nMax = Math.min (aList.size (), SMPServiceGroupSelectHelper.PAGE_SIZE);
     for (int i = 0; i < nMax; ++i)
     {
       final ISMPServiceGroup aServiceGroup = aList.get (i);
       aResults.add (new JsonObject ().add (JSON_ID, aServiceGroup.getID ())
                                      .add (JSON_TEXT,
-                                           aServiceGroup.getParticipantIdentifier ().getURIEncoded () +
-                                                        " [" +
-                                                        aOwnerNameCache.getFromCache (aServiceGroup.getOwnerID ()) +
-                                                        "]"));
+                                           HCServiceGroupSelect.getDisplayName (aServiceGroup,
+                                                                                aOwnerNameCache.getFromCache (aServiceGroup.getOwnerID ()))));
     }
 
     aAjaxResponse.json (new JsonObject ().add (JSON_RESULTS, aResults)

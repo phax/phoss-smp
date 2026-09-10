@@ -17,12 +17,11 @@
 package com.helger.phoss.smp.ui.secure.hc;
 
 import java.util.Locale;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.string.StringHelper;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.html.jscode.JSAnonymousFunction;
@@ -32,76 +31,60 @@ import com.helger.html.jscode.JSParam;
 import com.helger.html.request.IHCRequestField;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.AjaxExecutorSecureServiceGroupSelect;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.photon.core.form.RequestField;
-import com.helger.photon.uicore.html.select.HCExtSelect;
 import com.helger.photon.uictrls.select2.HCSelect2;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 
 import jakarta.annotation.Nullable;
 
 /**
- * Select box for existing service groups.
+ * Factory for the select boxes of existing Service Groups.
  *
  * @author Philip Helger
  */
-public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroupSelect
+@Immutable
+public final class HCServiceGroupSelect
 {
+  private HCServiceGroupSelect ()
+  {}
+
   @NonNull
   @Nonempty
   public static String getDisplayName (@NonNull final ISMPServiceGroup aServiceGroup)
   {
-    final String sOwnerName = SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ());
+    return getDisplayName (aServiceGroup, SMPCommonUI.getOwnerName (aServiceGroup.getOwnerID ()));
+  }
+
+  /**
+   * Get the display name of the provided Service Group, based on an already resolved owner name.
+   *
+   * @param aServiceGroup
+   *        The Service Group to be displayed. May not be <code>null</code>.
+   * @param sOwnerName
+   *        The name of the owner of the Service Group. May not be <code>null</code>.
+   * @return Neither <code>null</code> nor empty.
+   * @since 8.4.3
+   */
+  @NonNull
+  @Nonempty
+  public static String getDisplayName (@NonNull final ISMPServiceGroup aServiceGroup, @NonNull final String sOwnerName)
+  {
     return aServiceGroup.getParticipantIdentifier ().getURIEncoded () + " [" + sOwnerName + "]";
   }
 
-  private static void _iterateMatchingSG (@Nullable final Predicate <? super ISMPServiceGroup> aIncludeFilter,
-                                          @NonNull final Consumer <ISMPServiceGroup> aSGConsumer)
+  /**
+   * A read-only select box, containing the currently selected Service Group only.
+   *
+   * @author Philip Helger
+   */
+  private static final class HCReadOnlyServiceGroupSelect extends HCSelect implements IHCServiceGroupSelect
   {
-    for (final ISMPServiceGroup aServiceGroup : SMPMetaManager.getServiceGroupMgr ()
-                                                              .getAllSMPServiceGroups ()
-                                                              .getSortedInline (ISMPServiceGroup.comparator ()))
-      if (aIncludeFilter == null || aIncludeFilter.test (aServiceGroup))
-        aSGConsumer.accept (aServiceGroup);
-  }
-
-  private HCServiceGroupSelect (@NonNull final RequestField aRF,
-                                @NonNull final Locale aDisplayLocale,
-                                @Nullable final Predicate <? super ISMPServiceGroup> aIncludeFilter)
-  {
-    super (aRF);
-
-    _iterateMatchingSG (aIncludeFilter,
-                        aServiceGroup -> addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup)));
-
-    if (!hasSelectedOption ())
-      addOptionPleaseSelect (aDisplayLocale);
-  }
-
-  public boolean containsAnyServiceGroup ()
-  {
-    return containsEffectiveOption ();
-  }
-
-  private static class AjaxHCSelect2 extends HCSelect2 implements IHCServiceGroupSelect
-  {
-    public AjaxHCSelect2(@NonNull final IHCRequestField aRF)
-    {
-      super (aRF);
-    }
-
-    public boolean containsAnyServiceGroup ()
-    {
-      return containsEffectiveOption ();
-    }
-  }
-
-  private static class ReadOnlyHSelect extends HCSelect implements IHCServiceGroupSelect
-  {
-    public ReadOnlyHSelect(@NonNull final IHCRequestField aRF)
+    HCReadOnlyServiceGroupSelect (@NonNull final IHCRequestField aRF)
     {
       super (aRF);
       setReadOnly (true);
@@ -115,20 +98,22 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
 
   /**
    * A select box that loads the Service Groups on demand via Ajax, delivering at most
-   * {@link AjaxExecutorSecureServiceGroupSelect#PAGE_SIZE} entries per request.
+   * {@link SMPServiceGroupSelectHelper#PAGE_SIZE} entries per request.
    *
    * @author Philip Helger
    */
-  private static final class HCAjaxSelect2 extends HCSelect2 implements IHCServiceGroupSelect
+  private static final class HCAjaxServiceGroupSelect2 extends HCSelect2 implements IHCServiceGroupSelect
   {
     private final String m_sAjaxURL;
-    private final String m_sFilterID;
+    private final ESMPServiceGroupFilter m_eFilter;
 
-    HCAjaxSelect2(@NonNull final IHCRequestField aRF, @NonNull final String sAjaxURL, @NonNull final String sFilterID)
+    HCAjaxServiceGroupSelect2 (@NonNull final IHCRequestField aRF,
+                               @NonNull final String sAjaxURL,
+                               @NonNull final ESMPServiceGroupFilter eFilter)
     {
       super (aRF);
       m_sAjaxURL = sAjaxURL;
-      m_sFilterID = sFilterID;
+      m_eFilter = eFilter;
     }
 
     @Override
@@ -143,7 +128,8 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
                                                   aDataParams.ref ("term"))
                                             .add (AjaxExecutorSecureServiceGroupSelect.PARAM_PAGE,
                                                   aDataParams.ref ("page").cor (JSExpr.lit (1)))
-                                            .add (AjaxExecutorSecureServiceGroupSelect.PARAM_FILTER, m_sFilterID));
+                                            .add (AjaxExecutorSecureServiceGroupSelect.PARAM_FILTER,
+                                                  m_eFilter.getID ()));
 
       // function (data, params) { params.page = params.page || 1; return data; }
       final JSAnonymousFunction aProcessFunc = new JSAnonymousFunction ();
@@ -174,7 +160,6 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
                                       new JSAssocArray ().add ("url", m_sAjaxURL)
                                                          .add ("dataType", "json")
                                                          .add ("delay", 250)
-                                                         .add ("cache", true)
                                                          .add ("global", false)
                                                          .add ("data", aDataFunc)
                                                          .add ("processResults", aProcessFunc)
@@ -184,7 +169,7 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
 
     public boolean containsAnyServiceGroup ()
     {
-      return AjaxExecutorSecureServiceGroupSelect.containsAnyServiceGroup (AjaxExecutorSecureServiceGroupSelect.getFilterPredicate (m_sFilterID));
+      return SMPServiceGroupSelectHelper.containsAnyServiceGroup (m_eFilter);
     }
   }
 
@@ -205,9 +190,8 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
   /**
    * Create a Service Group select box that loads its entries on demand via Ajax. Only the currently
    * selected Service Group (if any) is contained in the created HTML - all other entries are
-   * queried from the server in chunks of
-   * {@link AjaxExecutorSecureServiceGroupSelect#PAGE_SIZE} entries, based on the text entered by
-   * the user.
+   * queried from the server in chunks of {@link SMPServiceGroupSelectHelper#PAGE_SIZE} entries,
+   * based on the text entered by the user.
    *
    * @param aRequestScope
    *        The current request scope, needed to build the Ajax URL. May not be <code>null</code>.
@@ -215,9 +199,8 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
    *        The request field to be used. May not be <code>null</code>.
    * @param aDisplayLocale
    *        The display locale to be used. May not be <code>null</code>.
-   * @param sFilterID
-   *        The ID of the server side filter to be applied. See the <code>FILTER_*</code> constants
-   *        of {@link AjaxExecutorSecureServiceGroupSelect}. May not be <code>null</code>.
+   * @param eFilter
+   *        The server side filter to be applied. May not be <code>null</code>.
    * @param bReadOnly
    *        <code>true</code> if the select box should be read-only.
    * @return Never <code>null</code>.
@@ -227,7 +210,7 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
   public static IHCServiceGroupSelect createAjax (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                                                   @NonNull final RequestField aRF,
                                                   @NonNull final Locale aDisplayLocale,
-                                                  @NonNull final String sFilterID,
+                                                  @NonNull final ESMPServiceGroupFilter eFilter,
                                                   final boolean bReadOnly)
   {
     final ISMPServiceGroup aSelectedServiceGroup = _getSelectedServiceGroup (aRF.getRequestValue ());
@@ -238,55 +221,20 @@ public class HCServiceGroupSelect extends HCExtSelect implements IHCServiceGroup
       // Using a simple read-only edit does not work, because it has no possibility to separate
       // display text and value
       // So we create a simple select with a single entry
-      final ReadOnlyHSelect aSelect = new ReadOnlyHSelect(aRF);
+      final HCReadOnlyServiceGroupSelect aSelect = new HCReadOnlyServiceGroupSelect (aRF);
       if (aSelectedServiceGroup != null)
         aSelect.addOption (aSelectedServiceGroup.getID (), getDisplayName (aSelectedServiceGroup));
       return aSelect;
     }
 
-    final HCAjaxSelect2 aSelect2 = new HCAjaxSelect2(aRF,
-                                                      CAjax.FUNCTION_SERVICE_GROUP_SELECT.getInvocationURI (aRequestScope),
-                                                      sFilterID);
+    final HCAjaxServiceGroupSelect2 aSelect2 = new HCAjaxServiceGroupSelect2 (aRF,
+                                                                             CAjax.FUNCTION_SERVICE_GROUP_SELECT.getInvocationURI (aRequestScope),
+                                                                             eFilter);
     // Only add the currently selected option - all others are loaded on demand
     if (aSelectedServiceGroup != null)
       aSelect2.addOption (aSelectedServiceGroup.getID (), getDisplayName (aSelectedServiceGroup));
     else
       aSelect2.addOptionPleaseSelect (aDisplayLocale);
     return aSelect2;
-  }
-
-  @NonNull
-  public static IHCServiceGroupSelect create (@NonNull final RequestField aRF,
-                                              @NonNull final Locale aDisplayLocale,
-                                              @Nullable final Predicate <? super ISMPServiceGroup> aIncludeFilter,
-                                              final boolean bReadOnly)
-  {
-    if (true)
-    {
-      if (bReadOnly)
-      {
-        // Less HTML code
-        // Using a simple read-only edit does not work, because it has no possibility to separate
-        // display text and value
-        // So we create a simple select with a single entry
-        final IParticipantIdentifier aSelectedPID = SMPMetaManager.getIdentifierFactory ()
-                                                                  .parseParticipantIdentifier (aRF.getRequestValue ());
-        final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()
-                                                             .getSMPServiceGroupOfID (aSelectedPID);
-        final ReadOnlyHSelect aSelect = new ReadOnlyHSelect(aRF);
-        if (aServiceGroup != null)
-          aSelect.addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup));
-        return aSelect;
-      }
-
-      final AjaxHCSelect2 aSelect2 = new AjaxHCSelect2(aRF);
-      _iterateMatchingSG (aIncludeFilter,
-                          aServiceGroup -> aSelect2.addOption (aServiceGroup.getID (), getDisplayName (aServiceGroup)));
-      return aSelect2;
-    }
-
-    final HCServiceGroupSelect ret = new HCServiceGroupSelect (aRF, aDisplayLocale, aIncludeFilter);
-    ret.setReadOnly (bReadOnly);
-    return ret;
   }
 }

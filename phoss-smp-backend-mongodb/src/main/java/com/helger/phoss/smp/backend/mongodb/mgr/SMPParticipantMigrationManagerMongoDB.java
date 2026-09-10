@@ -52,16 +52,38 @@ import com.mongodb.client.result.DeleteResult;
 public final class SMPParticipantMigrationManagerMongoDB extends AbstractManagerMongoDB implements
                                                          ISMPParticipantMigrationManager
 {
+  /**
+   * The name of the MongoDB collection used by this manager.
+   *
+   * @since 8.4.3
+   */
+  public static final String COLLECTION_NAME = "smp-participant-migration";
+  /**
+   * The name of the field containing the migration direction.
+   *
+   * @since 8.4.3
+   */
+  public static final String BSON_DIRECTION = "direction";
+  /**
+   * The name of the field containing the migration state.
+   *
+   * @since 8.4.3
+   */
+  public static final String BSON_STATE = "state";
+  /**
+   * The name of the field containing the participant identifier.
+   *
+   * @since 8.4.3
+   */
+  public static final String BSON_PARTICIPANT_ID = "pid";
+
   private static final String BSON_ID = "id";
-  private static final String BSON_DIRECTION = "direction";
-  private static final String BSON_STATE = "state";
-  private static final String BSON_PARTICIPANT_ID = "pid";
   private static final String BSON_INIT_DT = "initdt";
   private static final String BSON_MIGRATION_KEY = "migkey";
 
   public SMPParticipantMigrationManagerMongoDB ()
   {
-    super ("smp-participant-migration");
+    super (COLLECTION_NAME);
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
   }
 
