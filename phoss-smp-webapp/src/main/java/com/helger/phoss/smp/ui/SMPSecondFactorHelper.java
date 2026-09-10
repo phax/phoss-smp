@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
@@ -58,7 +57,6 @@ public final class SMPSecondFactorHelper
   /** The session attribute that remembers the user ID that provided the second factor. */
   private static final String SESSION_ATTR_TOTP_VERIFIED_USER_ID = "$phoss-smp.totp.verified.userid";
   /** The session attribute that counts the consecutive failed second factor validations. */
-  private static final String SESSION_ATTR_TOTP_FAILED_COUNT = "$phoss-smp.totp.failedcount";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPSecondFactorHelper.class);
 
@@ -131,7 +129,6 @@ public final class SMPSecondFactorHelper
 
     final ISessionWebScope aSessionScope = _getSessionScope (true);
     aSessionScope.attrs ().putIn (SESSION_ATTR_TOTP_VERIFIED_USER_ID, sUserID);
-    aSessionScope.attrs ().remove (SESSION_ATTR_TOTP_FAILED_COUNT);
   }
 
   /**
@@ -144,34 +141,7 @@ public final class SMPSecondFactorHelper
     if (aSessionScope != null)
     {
       aSessionScope.attrs ().remove (SESSION_ATTR_TOTP_VERIFIED_USER_ID);
-      aSessionScope.attrs ().remove (SESSION_ATTR_TOTP_FAILED_COUNT);
     }
-  }
-
-  /**
-   * Remember another failed second factor validation in the current session.
-   *
-   * @return The number of consecutive failed second factor validations of the current session,
-   *         including the current one. Always &ge; 1.
-   */
-  @Nonnegative
-  public static int incrementSecondFactorFailureCount ()
-  {
-    final ISessionWebScope aSessionScope = _getSessionScope (true);
-    final int nNewCount = aSessionScope.attrs ().getAsInt (SESSION_ATTR_TOTP_FAILED_COUNT, 0) + 1;
-    aSessionScope.attrs ().putIn (SESSION_ATTR_TOTP_FAILED_COUNT, nNewCount);
-    return nNewCount;
-  }
-
-  /**
-   * @return The number of consecutive failed second factor validations of the current session.
-   *         Always &ge; 0.
-   */
-  @Nonnegative
-  public static int getSecondFactorFailureCount ()
-  {
-    final ISessionWebScope aSessionScope = _getSessionScope (false);
-    return aSessionScope == null ? 0 : aSessionScope.attrs ().getAsInt (SESSION_ATTR_TOTP_FAILED_COUNT, 0);
   }
 
   /**

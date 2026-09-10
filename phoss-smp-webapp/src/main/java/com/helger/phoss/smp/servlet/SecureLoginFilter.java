@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.concurrent.ThreadHelper;
 import com.helger.base.state.EContinue;
 import com.helger.http.CHttp;
@@ -33,6 +34,7 @@ import com.helger.photon.app.csrf.CSRFSessionManager;
 import com.helger.photon.app.html.PhotonHTMLHelper;
 import com.helger.photon.core.servlet.AbstractUnifiedResponseFilter;
 import com.helger.photon.security.login.LoggedInUserManager;
+import com.helger.photon.security.login.LoginThrottlePerIP;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.servlet.response.UnifiedResponse;
@@ -41,19 +43,33 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import jakarta.servlet.ServletException;
 
 /**
- * A special servlet filter that checks that a user can only access the config
- * application after authenticating.
+ * A special servlet filter that checks that a user can only access the config application after
+ * authenticating.
  *
  * @author Philip Helger
  */
 public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
 {
   /** The base duration to wait after the first invalid second factor was provided. */
-  private static final Duration FAILED_TOTP_BASE_WAIT_TIME = Duration.ofSeconds (1);
+  private static final Duration FAILED_TOTP_BASE_WAIT_TIME = SMPLoginManager.FAILED_LOGIN_WAITING_TIME;
   /** The maximum duration to wait after an invalid second factor was provided. */
   private static final Duration FAILED_TOTP_MAX_WAIT_TIME = Duration.ofSeconds (30);
   /** The maximum exponent to be used for the exponential backoff. */
   private static final int FAILED_TOTP_MAX_EXPONENT = 16;
+  /**
+   * The suffix appended to the user ID to form the throttle key of the second factor.
+   * <p>
+   * The counter is kept per user and not per IP address, because the second factor is only ever
+   * reached after the password was accepted - so an attacker cannot drive up the counter of a user
+   * whose password they do not have, and rotating the source IP address does not help them either.
+   * <p>
+   * A dedicated suffix is used, so that the key can never collide with the plain IP address keys
+   * that the first factor writes into the very same cache. That matters, because the key of the
+   * first factor is cleared on every successful login - which the attacker that brute forces the
+   * second factor can trigger at will, as they know the password by definition.
+   */
+  @VisibleForTesting
+  static final String FAILED_TOTP_THROTTLE_KEY_SUFFIX = "-totp";
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SecureLoginFilter.class);
 
@@ -109,16 +125,21 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
   @NonNull
   private static Duration _getBackoffWaitTime (final int nFailureCount)
   {
-    final int nExponent = Math.min (Math.max (nFailureCount, 1) - 1, FAILED_TOTP_MAX_EXPONENT);
+    final int nExponent = Math.min (Math.max (nFailureCount - 1, 0), FAILED_TOTP_MAX_EXPONENT);
     final Duration aWaitTime = FAILED_TOTP_BASE_WAIT_TIME.multipliedBy (1L << nExponent);
     return aWaitTime.compareTo (FAILED_TOTP_MAX_WAIT_TIME) > 0 ? FAILED_TOTP_MAX_WAIT_TIME : aWaitTime;
   }
 
   @NonNull
-  private static EContinue _checkSecondFactor (@NonNull final String sCurrentUserID,
-                                               @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                                               @NonNull final UnifiedResponse aUnifiedResponse)
+  private EContinue _checkSecondFactor (@NonNull final String sCurrentUserID,
+                                        @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                                        @NonNull final UnifiedResponse aUnifiedResponse)
   {
+    // Throttling happens per user - see FAILED_TOTP_THROTTLE_KEY_SUFFIX
+    final String sThrottleKey = sCurrentUserID + FAILED_TOTP_THROTTLE_KEY_SUFFIX;
+    // Only used for logging, resolved the same way as for the first factor, so that a reverse
+    // proxy setup logs the same address for both
+    final String sIP = m_aLogin.getRemoteAddressForThrottling (aRequestScope);
     boolean bError = false;
     String sErrorMsg = null;
 
@@ -139,6 +160,8 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
         if (SMPSecondFactorHelper.isValidSecondFactor (sCurrentUserID, sCode))
         {
           SMPSecondFactorHelper.markSecondFactorProvided (sCurrentUserID);
+          // Successful second factor - remove the failed counter of this user
+          LoginThrottlePerIP.getInstance ().onSuccessfulLogin (sThrottleKey);
           // Session fixation hardening: a new CSRF nonce is created. The HTTP session ID itself
           // cannot be changed here, because the ph-oton login state is bound to the session scope
           // ID and would be lost on a session renewal.
@@ -154,14 +177,17 @@ public final class SecureLoginFilter extends AbstractUnifiedResponseFilter
         bError = true;
         sErrorMsg = "The provided authenticator code or recovery code is invalid. Please try again.";
 
-        // Slow down brute force attempts on the second factor, using an exponential backoff
-        final int nFailureCount = SMPSecondFactorHelper.incrementSecondFactorFailureCount ();
+        // Slow down brute force attempts on the second factor, using an exponential backoff.
+        // A counter in the session would be reset by simply discarding the session cookie
+        final int nFailureCount = LoginThrottlePerIP.getInstance ().onFailedLogin (sThrottleKey);
         final Duration aWaitTime = _getBackoffWaitTime (nFailureCount);
         LOGGER.warn ("The second factor of user ID '" +
                      sCurrentUserID +
                      "' failed " +
                      nFailureCount +
-                     " consecutive time(s) - waiting " +
+                     " consecutive time(s), the last one from IP address '" +
+                     sIP +
+                     "' - waiting " +
                      aWaitTime.toMillis () +
                      " milliseconds");
         ThreadHelper.sleep (aWaitTime);
