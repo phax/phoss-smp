@@ -126,8 +126,7 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
       return EChange.UNCHANGED;
 
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_USER_ID, sUserID),
-                                                                Updates.set (BSON_ENABLED,
-                                                                             Boolean.valueOf (bEnabled)));
+                                                                Updates.set (BSON_ENABLED, Boolean.valueOf (bEnabled)));
     if (aOldDoc == null)
     {
       AuditHelper.onAuditModifyFailure (SMPUserTotp.OT, "set-enabled", sUserID, "no-such-id");
@@ -206,8 +205,7 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
     final Document aOldDoc = getCollection ().findOneAndUpdate (Filters.and (Filters.eq (BSON_USER_ID, sUserID),
                                                                              Filters.eq (BSON_RECOVERY_CODES,
                                                                                          sRecoveryCodeHash)),
-                                                                Updates.pull (BSON_RECOVERY_CODES,
-                                                                              sRecoveryCodeHash));
+                                                                Updates.pull (BSON_RECOVERY_CODES, sRecoveryCodeHash));
     if (aOldDoc == null)
       return EChange.UNCHANGED;
 

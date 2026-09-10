@@ -78,7 +78,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     ValueEnforcer.notEmpty (sID, "ID");
     ValueEnforcer.notNull (aFactory, "Factory");
 
-    m_aRWLock.writeLocked ( () -> {
+    m_aRWLock.writeLocked (() -> {
       if (m_aMap.containsKey (sID))
         throw new IllegalArgumentException ("Another SMP backend with ID '" + sID + "' is already registered!");
       m_aMap.put (sID, aFactory);
@@ -99,7 +99,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
     if (StringHelper.isEmpty (sBackendID))
       return null;
 
-    final Supplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLockedGet ( () -> m_aMap.get (sBackendID));
+    final Supplier <? extends ISMPManagerProvider> aFactory = m_aRWLock.readLockedGet (() -> m_aMap.get (sBackendID));
     return aFactory == null ? null : aFactory.get ();
   }
 
@@ -118,7 +118,7 @@ public final class SMPBackendRegistry implements ISMPBackendRegistry
    */
   public void reinitialize ()
   {
-    m_aRWLock.writeLocked ( () -> {
+    m_aRWLock.writeLocked (() -> {
       m_aMap.clear ();
 
       // register all SPI implementations

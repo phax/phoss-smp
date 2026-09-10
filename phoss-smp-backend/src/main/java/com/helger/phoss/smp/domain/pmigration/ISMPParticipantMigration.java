@@ -43,8 +43,7 @@ public interface ISMPParticipantMigration extends IHasID <String>
    * Check if the current states matches the provided state.
    *
    * @param eState
-   *        The state to compare to. May be <code>null</code> which matches all
-   *        states.
+   *        The state to compare to. May be <code>null</code> which matches all states.
    * @return <code>true</code> if it matches, <code>false</code> if not.
    */
   default boolean isMatchingState (@Nullable final EParticipantMigrationState eState)
@@ -53,16 +52,14 @@ public interface ISMPParticipantMigration extends IHasID <String>
   }
 
   /**
-   * @return The participant identifier that is going to be migrated away. Never
-   *         <code>null</code>.
+   * @return The participant identifier that is going to be migrated away. Never <code>null</code>.
    */
   @NonNull
   IParticipantIdentifier getParticipantIdentifier ();
 
   /**
-   * @return The date and time, when the migration was initiated. This is
-   *         relevant, as the migration key is only valid for some time. Never
-   *         <code>null</code>.
+   * @return The date and time, when the migration was initiated. This is relevant, as the migration
+   *         key is only valid for some time. Never <code>null</code>.
    */
   @NonNull
   LocalDateTime getInitiationDateTime ();

@@ -148,9 +148,7 @@ public final class ServiceGroupExportFuncTest
                                                   "tc",
                                                   "ti",
                                                   null);
-        final SMPProcess aProcess = new SMPProcess (aProcessID,
-                                                    new CommonsArrayList <> (aEP1, aEP2),
-                                                    "<extproc />");
+        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP1, aEP2), "<extproc />");
         assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI1,
                                                                                                   aDocTypeID,
                                                                                                   new CommonsArrayList <> (aProcess),
@@ -164,9 +162,7 @@ public final class ServiceGroupExportFuncTest
         final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity ();
         aEntity.names ().add (new SMPBusinessCardName ("Test Name", null));
         aEntity.setCountryCode ("AT");
-        assertNotNull (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1,
-                                                                       new CommonsArrayList <> (aEntity),
-                                                                       false));
+        assertNotNull (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI1, new CommonsArrayList <> (aEntity), false));
 
         final ICommonsList <ISMPServiceGroup> aAllSGs = aServiceGroupMgr.getAllSMPServiceGroups ();
         assertEquals (2, aAllSGs.size ());

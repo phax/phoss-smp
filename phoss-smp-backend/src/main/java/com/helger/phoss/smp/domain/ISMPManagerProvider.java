@@ -26,9 +26,8 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
 /**
- * An abstract manager provider interface. This must be implemented for each
- * supported backend. The correct implementation must be set in the MetaManager
- * before instantiating it.
+ * An abstract manager provider interface. This must be implemented for each supported backend. The
+ * correct implementation must be set in the MetaManager before instantiating it.
  *
  * @author Philip Helger
  */
@@ -43,8 +42,8 @@ public interface ISMPManagerProvider
   {}
 
   /**
-   * Callback to perform actions AFTER the managers were initialized. This
-   * method is only called if initialization was successful.
+   * Callback to perform actions AFTER the managers were initialized. This method is only called if
+   * initialization was successful.
    *
    * @see #beforeInitManagers()
    */
@@ -52,8 +51,8 @@ public interface ISMPManagerProvider
   {}
 
   /**
-   * @return The default backend connection state (e.g. to a database). For XML
-   *         this should be TRUE for databases it should be UNDEFINED.
+   * @return The default backend connection state (e.g. to a database). For XML this should be TRUE
+   *         for databases it should be UNDEFINED.
    * @since 5.2.4
    */
   @NonNull
@@ -94,15 +93,13 @@ public interface ISMPManagerProvider
   /**
    * @param aIdentifierFactory
    *        The identifier factory to be used. May not be <code>null</code>.
-   * @return A new SMP service information manager. May not be
-   *         <code>null</code>.
+   * @return A new SMP service information manager. May not be <code>null</code>.
    */
   @NonNull
   ISMPServiceInformationManager createServiceInformationMgr (@NonNull IIdentifierFactory aIdentifierFactory);
 
   /**
-   * @return A new SMP participant migration manager. May not be
-   *         <code>null</code>.
+   * @return A new SMP participant migration manager. May not be <code>null</code>.
    * @since 5.3.1
    */
   @NonNull

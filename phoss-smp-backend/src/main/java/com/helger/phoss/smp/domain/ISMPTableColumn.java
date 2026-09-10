@@ -21,8 +21,8 @@ import com.helger.photon.core.paging.ITableColumn;
 /**
  * Adds the mapping onto the underlying data stores to an {@link ITableColumn}. It is the single
  * source of truth that ties the column shown in the UI to the SQL column, to the MongoDB field and
- * to an in-memory {@link Comparator}, so that these four cannot drift apart. It is implemented as an
- * enum per domain object.
+ * to an in-memory {@link Comparator}, so that these four cannot drift apart. It is implemented as
+ * an enum per domain object.
  *
  * @author Philip Helger
  * @param <DATATYPE>

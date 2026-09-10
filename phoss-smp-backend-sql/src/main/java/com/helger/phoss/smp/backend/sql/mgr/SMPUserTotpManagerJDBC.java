@@ -90,7 +90,7 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
     final LocalDateTime aRegistrationDT = PDTFactory.getCurrentLocalDateTime ();
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // An existing enrollment - confirmed or not - is always replaced
       aExecutor.insertOrUpdateOrDelete ("DELETE FROM " + m_sTableName + " WHERE userid=?",
                                         new ConstantPreparedStatementDataProvider (sUserID));
@@ -128,7 +128,7 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
 
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
                                                               m_sTableName +
                                                               " SET enabled=? WHERE userid=?",

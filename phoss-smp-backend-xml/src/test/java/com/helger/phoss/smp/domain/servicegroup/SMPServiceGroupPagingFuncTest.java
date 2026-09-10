@@ -79,9 +79,8 @@ public final class SMPServiceGroupPagingFuncTest
       final ICommonsList <ISMPServiceGroup> aPage2 = aMgr.getAllSMPServiceGroups (new PagingSpec (2, 2), null);
       assertEquals (2, aPage2.size ());
       for (final ISMPServiceGroup aSG : aPage2)
-        assertTrue ("Page 2 must not contain an entry of page 1", aPage1.findFirst (x -> x.getID ()
-                                                                                          .equals (aSG.getID ())) ==
-                                                                  null);
+        assertTrue ("Page 2 must not contain an entry of page 1",
+                    aPage1.findFirst (x -> x.getID ().equals (aSG.getID ())) == null);
 
       // Descending must return the reverse order
       final ICommonsList <ISMPServiceGroup> aDesc = aMgr.getAllSMPServiceGroups (new PagingSpec (0,

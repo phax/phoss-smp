@@ -38,8 +38,7 @@ import com.helger.peppol.businesscard.generic.PDName;
 import com.helger.peppol.businesscard.v3.PD3BusinessEntityType;
 
 /**
- * This class represents a single Business Card entity - a part of a Business
- * card.
+ * This class represents a single Business Card entity - a part of a Business card.
  * <p>
  * The files in this package are licensed under Apache 2.0 license
  * </p>
@@ -96,8 +95,7 @@ public class SMPBusinessCardEntity implements IHasID <String>, Serializable
   }
 
   /**
-   * @return <code>true</code> if this entity has exactly one name without a
-   *         specific language code.
+   * @return <code>true</code> if this entity has exactly one name without a specific language code.
    * @since 5.7.0
    */
   public final boolean isSingleNameWithoutLanguage ()

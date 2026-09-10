@@ -101,8 +101,7 @@ public final class ServiceGroupExportJobFuncTest
       final IMicroDocument aDoc = MicroReader.readMicroXML (aExportFile);
       assertNotNull ("The export file must contain valid XML", aDoc);
       assertEquals (CSMPExchange.ELEMENT_SMP_DATA, aDoc.getDocumentElement ().getTagName ());
-      assertEquals (1,
-                    aDoc.getDocumentElement ().getAllChildElements (CSMPExchange.ELEMENT_SERVICEGROUP).size ());
+      assertEquals (1, aDoc.getDocumentElement ().getAllChildElements (CSMPExchange.ELEMENT_SERVICEGROUP).size ());
     }
     finally
     {

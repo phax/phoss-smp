@@ -75,7 +75,7 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
       for (int i = START_INDEX; i < START_INDEX + PARTICIPANT_COUNT; ++i)
       {
         final int idx = i;
-        es.submit ( () -> {
+        es.submit (() -> {
           final StopWatch aSW = StopWatch.createdStarted ();
           final PeppolParticipantIdentifier aPI = createPID (idx);
           final String sPI = aPI.getURIEncoded ();

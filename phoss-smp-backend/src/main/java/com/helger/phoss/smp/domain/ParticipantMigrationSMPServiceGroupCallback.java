@@ -22,8 +22,8 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 
 /**
- * Special {@link ISMPServiceGroupCallback} to delete the participant
- * migrations, if the service group is deleted.
+ * Special {@link ISMPServiceGroupCallback} to delete the participant migrations, if the service
+ * group is deleted.
  *
  * @author Philip Helger
  */

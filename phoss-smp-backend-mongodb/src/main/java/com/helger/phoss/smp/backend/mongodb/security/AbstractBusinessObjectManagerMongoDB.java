@@ -252,7 +252,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
       return null;
 
     final ICommonsMap <String, String> ret = new CommonsHashMap <> (aAttrs.size ());
-    aAttrs.forEach ( (key, value) -> ret.put (key, String.valueOf (value)));
+    aAttrs.forEach ((key, value) -> ret.put (key, String.valueOf (value)));
     return ret;
   }
 

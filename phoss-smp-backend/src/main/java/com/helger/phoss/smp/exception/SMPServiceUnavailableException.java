@@ -34,8 +34,6 @@ public class SMPServiceUnavailableException extends SMPServerException
    */
   public SMPServiceUnavailableException (@NonNull final String sMessage, @Nullable final URI aEffectedURI)
   {
-    super ("Service unavailable: " +
-           sMessage +
-           (aEffectedURI == null ? "" : " at '" + aEffectedURI.toString () + "'"));
+    super ("Service unavailable: " + sMessage + (aEffectedURI == null ? "" : " at '" + aEffectedURI.toString () + "'"));
   }
 }

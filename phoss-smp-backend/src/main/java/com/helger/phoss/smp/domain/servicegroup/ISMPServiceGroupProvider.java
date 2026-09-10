@@ -26,8 +26,8 @@ public interface ISMPServiceGroupProvider
    *
    * @param aParticipantIdentifier
    *        The participant identifier to search. May be <code>null</code>.
-   * @return <code>null</code> if the participant identifier is
-   *         <code>null</code> or if it is not contained.
+   * @return <code>null</code> if the participant identifier is <code>null</code> or if it is not
+   *         contained.
    */
   @Nullable
   ISMPServiceGroup getSMPServiceGroupOfID (@Nullable IParticipantIdentifier aParticipantIdentifier);

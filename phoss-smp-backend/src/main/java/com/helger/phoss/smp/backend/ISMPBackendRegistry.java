@@ -28,12 +28,11 @@ public interface ISMPBackendRegistry
    * Register a new SMP backend.
    *
    * @param sID
-   *        The ID to be used to identify this backend. May neither be
-   *        <code>null</code> nor empty. This is the ID that must be referenced
-   *        from the SMP configuration file.
+   *        The ID to be used to identify this backend. May neither be <code>null</code> nor empty.
+   *        This is the ID that must be referenced from the SMP configuration file.
    * @param aFactory
-   *        The factory to be used to create the backend manager instance. May
-   *        not be <code>null</code>.
+   *        The factory to be used to create the backend manager instance. May not be
+   *        <code>null</code>.
    * @throws IllegalArgumentException
    *         If another backend with the same ID is already registered.
    */

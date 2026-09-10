@@ -327,9 +327,10 @@ public final class SMPServerAPI
         throw new SMPBadRequestException ("Service Group Inconsistency. The URL points to '" +
                                           aPathServiceGroupID.getURIEncoded () +
                                           "' whereas the Service Group contains " +
-                                          (aPayloadServiceGroupID == null ? "<none>" : "'" +
-                                                                                       aPayloadServiceGroupID.getURIEncoded () +
-                                                                                       "'"),
+                                          (aPayloadServiceGroupID == null ? "<none>"
+                                                                          : "'" +
+                                                                            aPayloadServiceGroupID.getURIEncoded () +
+                                                                            "'"),
                                           m_aAPIDataProvider.getCurrentURI ());
       }
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
@@ -532,9 +533,10 @@ public final class SMPServerAPI
           // Participant ID in URL must match the one in XML structure
           throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
                                             "Service Infoformation Participant ID: " +
-                                            (aPayloadServiceGroupID == null ? "<none>" : "'" +
-                                                                                         aPayloadServiceGroupID.getURIEncoded () +
-                                                                                         "'") +
+                                            (aPayloadServiceGroupID == null ? "<none>"
+                                                                            : "'" +
+                                                                              aPayloadServiceGroupID.getURIEncoded () +
+                                                                              "'") +
                                             "\n" +
                                             "URL parameter value: '" +
                                             aPathServiceGroupID.getURIEncoded () +
@@ -593,8 +595,7 @@ public final class SMPServerAPI
                                                     aServiceMetadata.getRedirect ().getCertificateUID (),
                                                     aCertificate,
                                                     SMPExtensionConverter.convertToString (aServiceMetadata.getRedirect ()
-                                                                                                           .getExtension ())) ==
-            null)
+                                                                                                           .getExtension ())) == null)
         {
           LOGGER.error (sLog + " - ERROR - Redirect");
           STATS_COUNTER_ERROR.increment (sAction);
@@ -845,7 +846,7 @@ public final class SMPServerAPI
 
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
-                                                                                                                        aPathDocTypeID);
+                                                                                                                         aPathDocTypeID);
       if (aServiceInfo == null)
       {
         throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,

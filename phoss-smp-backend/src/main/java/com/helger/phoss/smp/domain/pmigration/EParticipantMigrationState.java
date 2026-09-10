@@ -57,8 +57,7 @@ public enum EParticipantMigrationState implements IHasID <String>, IHasDisplayNa
   }
 
   /**
-   * @return <code>true</code> if this state indicates, that the migration is in
-   *         progress.
+   * @return <code>true</code> if this state indicates, that the migration is in progress.
    */
   public boolean isInProgress ()
   {
@@ -66,8 +65,8 @@ public enum EParticipantMigrationState implements IHasID <String>, IHasDisplayNa
   }
 
   /**
-   * @return <code>true</code> if this state prevents a new participant for the
-   *         same migration to start.
+   * @return <code>true</code> if this state prevents a new participant for the same migration to
+   *         start.
    */
   public boolean preventsNewMigration ()
   {

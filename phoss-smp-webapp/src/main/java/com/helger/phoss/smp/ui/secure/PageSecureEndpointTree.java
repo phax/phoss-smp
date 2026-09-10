@@ -202,9 +202,7 @@ public final class PageSecureEndpointTree extends AbstractPageSecureEndpoint
         {
           aDiv.addChild (" ")
               .addChild (new HCA (aWPEC.getSelfHref ()
-                                       .addAll (createParamMap (aServiceInfo,
-                                                                (ISMPProcess) null,
-                                                                (ISMPEndpoint) null))
+                                       .addAll (createParamMap (aServiceInfo, (ISMPProcess) null, (ISMPEndpoint) null))
                                        .add (CPageParam.PARAM_ACTION, ACTION_DELETE_DOCUMENT_TYPE)).setTitle (
                                                                                                               "Delete document type")
                                                                                                    .addChild (EDefaultIcon.DELETE.getAsNode ()));

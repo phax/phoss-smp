@@ -64,7 +64,7 @@ public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
     final MutableLong aReadValue = new MutableLong (0);
 
     final DBExecutor aExecutor = new SMPDBExecutor ();
-    aExecutor.performInTransaction ( () -> {
+    aExecutor.performInTransaction (() -> {
       // Read existing value
       final String sExistingValue = SMPSettingsManagerJDBC.getSettingsValueFromDB (aExecutor, SETTINGS_KEY_LATEST_ID);
       final long nRead = StringParser.parseLong (sExistingValue, m_nInitialCount);

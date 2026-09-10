@@ -132,8 +132,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       aForm.addChild (error ("This will remove ALL participants / Service Groups from the network! Your local Service Groups will become unreachable."));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                aDefaultSML == null
-                                                                                                                    ? null
+                                                                                                aDefaultSML == null ? null
                                                                                                                     : aDefaultSML.getID ()),
                                                                               aDisplayLocale,
                                                                               aSMLFilter))

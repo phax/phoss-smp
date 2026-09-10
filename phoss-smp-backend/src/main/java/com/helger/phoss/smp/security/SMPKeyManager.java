@@ -227,11 +227,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
    * @throws XMLSignatureException
    *         Some XMLDSig specific stuff failed
    */
-  public void signXML (@NonNull final Element aElementToSign, @NonNull final ESMPRESTType eRESTType)
-                                                                                                     throws NoSuchAlgorithmException,
-                                                                                                     InvalidAlgorithmParameterException,
-                                                                                                     MarshalException,
-                                                                                                     XMLSignatureException
+  public void signXML (@NonNull final Element aElementToSign,
+                       @NonNull final ESMPRESTType eRESTType) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, MarshalException, XMLSignatureException
   {
     ValueEnforcer.notNull (aElementToSign, "ElementToSign");
     ValueEnforcer.notNull (eRESTType, "RESTType");

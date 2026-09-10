@@ -174,16 +174,14 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Name")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_DISPLAY_NAME,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getDisplayName ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getDisplayName ()
                                                                                                                  : null)))
                                                  .setHelpText ("The name of the SML configuration. This is for informational purposes only and has no effect on the functionality.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DISPLAY_NAME)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("DNS Zone")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_DNS_ZONE,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getDNSZone ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getDNSZone ()
                                                                                                                  : null)))
                                                  .setHelpText (new HCTextNode ("The name of the DNS Zone that this SML is working upon (e.g. "),
                                                                code ("acc.edelivery.tech.ec.europa.eu."),
@@ -192,33 +190,29 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Management Service URL")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_MANAGEMENT_ADDRESS_URL,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getManagementServiceURL ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getManagementServiceURL ()
                                                                                                                  : null)))
                                                  .setHelpText ("The service URL where the SML management application is running on including the host name. It must not contain the suffixes to manage SMPs or participants!")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_MANAGEMENT_ADDRESS_URL)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("URL suffix to manage SMPs")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_URL_SUFFIX_MANAGE_SMP,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getURLSuffixManageSMP ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getURLSuffixManageSMP ()
                                                                                                                  : SMLInfo.DEFAULT_SUFFIX_MANAGE_SMP)))
                                                  .setHelpText ("This suffix is appended to the Management Service URL. If may be empty or alternatively it must start with a slash ('/').")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_URL_SUFFIX_MANAGE_SMP)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("URL suffix to manage Participants")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT,
-                                                                                         aSelectedObject != null
-                                                                                                                 ? aSelectedObject.getURLSuffixManageParticipant ()
+                                                                                         aSelectedObject != null ? aSelectedObject.getURLSuffixManageParticipant ()
                                                                                                                  : SMLInfo.DEFAULT_SUFFIX_MANAGE_PARTICIPANT)))
                                                  .setHelpText ("This suffix is appended to the Management Service URL. If may be empty or alternatively it must start with a slash ('/').")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_URL_SUFFIX_MANAGE_PARTICIPANT)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Client Certificate required?")
                                                  .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_CLIENT_CERTIFICATE_REQUIRED,
-                                                                                                    aSelectedObject !=
-                                                                                                                                       null ? aSelectedObject.isClientCertificateRequired ()
-                                                                                                                                            : DEFAULT_CLIENT_CERTIFICATE_REQUIRED)))
+                                                                                                    aSelectedObject != null ? aSelectedObject.isClientCertificateRequired ()
+                                                                                                                            : DEFAULT_CLIENT_CERTIFICATE_REQUIRED)))
                                                  .setHelpText ("Check this if this SML requires a client certificate for access. Both Peppol production SML and SMK require a client certificate. Only a locally running SML software may not require a client certificate.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CLIENT_CERTIFICATE_REQUIRED)));
   }

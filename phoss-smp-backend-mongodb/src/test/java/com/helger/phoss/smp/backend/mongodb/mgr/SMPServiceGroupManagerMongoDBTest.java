@@ -48,17 +48,13 @@ public final class SMPServiceGroupManagerMongoDBTest
   {
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final IParticipantIdentifier aParticipantID = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
-                                                                                                   "0088:mongodb-service-group-ids");
+                                                                                                  "0088:mongodb-service-group-ids");
     assertNotNull (aParticipantID);
 
     final ISMPServiceGroupManager aMgr = SMPMetaManager.getServiceGroupMgr ();
     final String sOwnerID = "mongodb-service-group-owner";
     aMgr.deleteSMPServiceGroupNoEx (aParticipantID, false);
-    final ISMPServiceGroup aServiceGroup = aMgr.createSMPServiceGroup (sOwnerID,
-                                                                      aParticipantID,
-                                                                      null,
-                                                                      null,
-                                                                      false);
+    final ISMPServiceGroup aServiceGroup = aMgr.createSMPServiceGroup (sOwnerID, aParticipantID, null, null, false);
     try
     {
       assertTrue (aMgr.getAllSMPServiceGroupIDs ().contains (aServiceGroup.getID ()));

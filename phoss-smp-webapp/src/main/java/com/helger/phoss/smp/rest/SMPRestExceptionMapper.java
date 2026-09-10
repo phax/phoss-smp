@@ -128,8 +128,7 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     }
     if (aThrowable instanceof SMPNotFoundException)
     {
-      if (aRequestScope.getHttpMethod () == EHttpMethod.DELETE &&
-          SMPServerConfiguration.isRestDeleteNotFoundAsOk ())
+      if (aRequestScope.getHttpMethod () == EHttpMethod.DELETE && SMPServerConfiguration.isRestDeleteNotFoundAsOk ())
       {
         _logRestException ("Not found on DELETE (treated as OK)", aThrowable);
         aUnifiedResponse.setStatus (CHttp.HTTP_NO_CONTENT);
@@ -137,7 +136,9 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
       else
       {
         _logRestException ("Not found", aThrowable);
-        _setSimpleTextResponse (aUnifiedResponse, CHttp.HTTP_NOT_FOUND, getResponseEntityWithoutStackTrace (aThrowable));
+        _setSimpleTextResponse (aUnifiedResponse,
+                                CHttp.HTTP_NOT_FOUND,
+                                getResponseEntityWithoutStackTrace (aThrowable));
       }
       return EHandled.HANDLED;
     }
@@ -172,8 +173,7 @@ public class SMPRestExceptionMapper extends AbstractAPIExceptionMapper
     {
       // Forcing no stack trace, because the context should be self-explanatory
       _logRestException ("Service unavailable", aThrowable, true);
-      aUnifiedResponse.setCustomResponseHeader (CHttpHeader.RETRY_AFTER,
-                                                Integer.toString (RETRY_AFTER_SECONDS));
+      aUnifiedResponse.setCustomResponseHeader (CHttpHeader.RETRY_AFTER, Integer.toString (RETRY_AFTER_SECONDS));
       _setSimpleTextResponse (aUnifiedResponse,
                               CHttp.HTTP_SERVICE_UNAVAILABLE,
                               getResponseEntityWithoutStackTrace (aThrowable));

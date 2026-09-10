@@ -21,8 +21,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.peppol.smp.ISMPTransportProfile;
 
 /**
- * Base interface for a manager that handles {@link ISMPTransportProfile}
- * objects.
+ * Base interface for a manager that handles {@link ISMPTransportProfile} objects.
  *
  * @author Philip Helger
  */
@@ -34,13 +33,10 @@ public interface ISMPTransportProfileManager
    * @param sID
    *        The ID to use. May neither be <code>null</code> nor empty.
    * @param sName
-   *        The display name of the transport profile. May neither be
-   *        <code>null</code> nor empty.
+   *        The display name of the transport profile. May neither be <code>null</code> nor empty.
    * @param bIsDeprecated
-   *        <code>true</code> if the profile is deprecated, <code>false</code>
-   *        if not
-   * @return <code>null</code> if another transport profile with the same ID
-   *         already exists.
+   *        <code>true</code> if the profile is deprecated, <code>false</code> if not
+   * @return <code>null</code> if another transport profile with the same ID already exists.
    */
   @Nullable
   ISMPTransportProfile createSMPTransportProfile (@NonNull @Nonempty String sID,
@@ -51,14 +47,11 @@ public interface ISMPTransportProfileManager
    * Update an existing transport profile.
    *
    * @param sSMPTransportProfileID
-   *        The ID of the transport profile to be updated. May be
-   *        <code>null</code>.
+   *        The ID of the transport profile to be updated. May be <code>null</code>.
    * @param sName
-   *        The new name of the transport profile. May neither be
-   *        <code>null</code> nor empty.
+   *        The new name of the transport profile. May neither be <code>null</code> nor empty.
    * @param bIsDeprecated
-   *        <code>true</code> if the profile is deprecated, <code>false</code>
-   *        if not
+   *        <code>true</code> if the profile is deprecated, <code>false</code> if not
    * @return {@link EChange#CHANGED} if something was changed.
    */
   @NonNull
@@ -70,16 +63,15 @@ public interface ISMPTransportProfileManager
    * Delete an existing transport profile.
    *
    * @param sSMPTransportProfileID
-   *        The ID of the transport profile to be deleted. May be
-   *        <code>null</code>.
+   *        The ID of the transport profile to be deleted. May be <code>null</code>.
    * @return {@link EChange#CHANGED} if the removal was successful.
    */
   @NonNull
   EChange deleteSMPTransportProfile (@Nullable String sSMPTransportProfileID);
 
   /**
-   * @return An unsorted collection of all contained transport profile. Never
-   *         <code>null</code> but maybe empty.
+   * @return An unsorted collection of all contained transport profile. Never <code>null</code> but
+   *         maybe empty.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -99,10 +91,8 @@ public interface ISMPTransportProfileManager
    * Check if a transport profile with the passed ID is contained.
    *
    * @param sID
-   *        The ID of the transport profile to be checked. May be
-   *        <code>null</code>.
-   * @return <code>true</code> if the ID is contained, <code>false</code>
-   *         otherwise.
+   *        The ID of the transport profile to be checked. May be <code>null</code>.
+   * @return <code>true</code> if the ID is contained, <code>false</code> otherwise.
    */
   boolean containsSMPTransportProfileWithID (@Nullable String sID);
 

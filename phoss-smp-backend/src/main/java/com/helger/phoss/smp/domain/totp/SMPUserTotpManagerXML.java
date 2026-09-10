@@ -42,7 +42,7 @@ public final class SMPUserTotpManagerXML extends AbstractPhotonMapBasedWALDAO <I
   {
     final SMPUserTotp aTotp = SMPUserTotp.createPending (sUserID, sSecret);
 
-    m_aRWLock.writeLocked ( () -> {
+    m_aRWLock.writeLocked (() -> {
       if (containsWithID (sUserID))
         internalDeleteItem (sUserID);
       internalCreateItem (aTotp);

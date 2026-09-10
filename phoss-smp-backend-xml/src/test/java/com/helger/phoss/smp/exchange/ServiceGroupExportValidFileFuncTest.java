@@ -51,8 +51,8 @@ public final class ServiceGroupExportValidFileFuncTest
 
     final File aExport = new File (aExportDir,
                                    ServiceGroupExportJob.EXPORT_FILENAME_PREFIX +
-                                             "20260828120000" +
-                                             ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION);
+                                               "20260828120000" +
+                                               ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION);
     final File aForeign = new File (aExportDir, "something-else.xml");
     final File aOutside = WebFileIO.getDataIO ().getFile ("outside-the-export-dir.xml");
     SimpleFileIO.writeFile (aExport, "<smp-data />".getBytes ());
@@ -81,18 +81,19 @@ public final class ServiceGroupExportValidFileFuncTest
       assertNull ("A non-existing file must be rejected",
                   ServiceGroupExportJob.getValidExportFile (new File (aExportDir,
                                                                       ServiceGroupExportJob.EXPORT_FILENAME_PREFIX +
-                                                                                 "does-not-exist" +
-                                                                                 ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION)));
+                                                                                  "does-not-exist" +
+                                                                                  ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION)));
 
       // Path traversal out of the export directory must not work
       assertNull ("Path traversal must be rejected",
                   ServiceGroupExportJob.getValidExportFile (new File (aExportDir,
-                                                                      ".." + File.separator +
-                                                                                 aOutside.getName ())));
+                                                                      ".." + File.separator + aOutside.getName ())));
 
       // Path traversal that ends up in the export directory again is fine, because the canonical
       // file is the real export file
-      final File aTraversedBack = new File (aExportDir, ".." + File.separator +
+      final File aTraversedBack = new File (aExportDir,
+                                            ".." +
+                                                        File.separator +
                                                         aExportDir.getName () +
                                                         File.separator +
                                                         aExport.getName ());

@@ -107,13 +107,13 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     final MutableBoolean aCreatedNew = new MutableBoolean (true);
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       final ISMPRedirect aDBRedirect = _getSMPRedirectOfServiceGroupAndDocumentType (aExecutor,
                                                                                      aParticipantIdentifier,
                                                                                      aDocTypeID);
 
-      final String sCertificate = aCertificate == null ? null : CertificateHelper.getPEMEncodedCertificate (
-                                                                                                            aCertificate);
+      final String sCertificate = aCertificate == null ? null
+                                                       : CertificateHelper.getPEMEncodedCertificate (aCertificate);
 
       if (aDBRedirect == null)
       {

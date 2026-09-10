@@ -362,7 +362,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   @NonNull
   public ETriState getBackendConnectionState ()
   {
-    return m_aRWLock.readLockedGet ( () -> m_eBackendConnectionState);
+    return m_aRWLock.readLockedGet (() -> m_eBackendConnectionState);
   }
 
   public void setBackendConnectionState (@NonNull final ETriState eConnectionEstablished,
@@ -370,7 +370,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   {
     ValueEnforcer.notNull (eConnectionEstablished, "ConnectionEstablished");
 
-    m_aRWLock.writeLocked ( () -> {
+    m_aRWLock.writeLocked (() -> {
       m_eBackendConnectionState = eConnectionEstablished;
 
       // Avoid endless loop
@@ -389,7 +389,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
    */
   public void setBackendConnectionStateChangeCallback (@Nullable final Consumer <ETriState> aCB)
   {
-    m_aRWLock.writeLocked ( () -> m_aBackendConnectionStateChangeCallback = aCB);
+    m_aRWLock.writeLocked (() -> m_aBackendConnectionStateChangeCallback = aCB);
   }
 
   /**

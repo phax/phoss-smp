@@ -66,7 +66,7 @@ public final class APIExecutorCustomPropertiesGet extends AbstractSMPAPIExecutor
     }
 
     final SGCustomPropertyList aEffectiveCustomProperties = new CustomPropertiesServerAPI (aDataProvider).getCustomProperties (sPathServiceGroupID,
-                                                                                                                              aCredentials);
+                                                                                                                               aCredentials);
 
     final IMicroDocument ret = new MicroDocument ();
     ret.addChild (MicroTypeConverter.convertToMicroElement (aEffectiveCustomProperties,

@@ -267,13 +267,15 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
     // Inline function to add a visual indicator if a certificate problem was
     // found
-    final Function <IHCNode, IHCNode> addErrorHint = x -> x instanceof HCSpan ? x : new HCSpan ().addChild (x)
-                                                                                                 .addChild (" ")
-                                                                                                 .addChild (badgeDanger ("!!!"));
+    final Function <IHCNode, IHCNode> addErrorHint = x -> x instanceof HCSpan ? x
+                                                                              : new HCSpan ().addChild (x)
+                                                                                             .addChild (" ")
+                                                                                             .addChild (badgeDanger ("!!!"));
 
-    final Function <IHCNode, IHCNode> addSuccessHint = x -> x instanceof HCSpan ? x : new HCSpan ().addChild (x)
-                                                                                                   .addChild (" ")
-                                                                                                   .addChild (badgeSuccess ("OK"));
+    final Function <IHCNode, IHCNode> addSuccessHint = x -> x instanceof HCSpan ? x
+                                                                                : new HCSpan ().addChild (x)
+                                                                                               .addChild (" ")
+                                                                                               .addChild (badgeSuccess ("OK"));
 
     // SMP Key store
     {

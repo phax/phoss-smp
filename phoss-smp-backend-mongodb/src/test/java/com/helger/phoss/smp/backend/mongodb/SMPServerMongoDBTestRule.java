@@ -35,7 +35,7 @@ public class SMPServerMongoDBTestRule extends SMPServerTestRule
 
     // Set persistent ID provider: MongoDB based
     GlobalIDFactory.setPersistentLongIDFactory (new IDFactoryMongoDB (0));
-    GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
+    GlobalIDFactory.setPersistentIntIDFactory (() -> (int) GlobalIDFactory.getNewPersistentLongID ());
   }
 
   @Override

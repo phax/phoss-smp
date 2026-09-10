@@ -281,7 +281,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                        .add (CPageParam.PARAM_OBJECT,
                                                                                                                              aServiceGroup.getID ()))
                                                                                                      .setDisabled (bOffline ||
-                                                                                                       !aSettings.isSMLEnabled ()));
+                                                                                                                   !aSettings.isSMLEnabled ()));
         }
         else
         {
@@ -300,7 +300,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                             .add (CPageParam.PARAM_OBJECT,
                                                                                                   aServiceGroup.getID ()))
                                                                           .setDisabled (bOffline ||
-                                                                            !aSettings.isSMLEnabled ()));
+                                                                                        !aSettings.isSMLEnabled ()));
           }
         }
       }
@@ -1297,9 +1297,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (aSettings.getSMLDNSZone () == null ||
-                nTotalServiceGroupCount <= 0 ||
-                bTooMany ||
-                !aSettings.isSMLEnabled ());
+                            nTotalServiceGroupCount <= 0 ||
+                            bTooMany ||
+                            !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 

@@ -19,10 +19,9 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.smpclient.extension.SMPExtensionList;
 
 /**
- * Abstract implementation class for {@link ISMPHasExtension}. All extensions
- * are internally stored as instances of
- * {@link com.helger.xsds.bdxr.smp1.ExtensionType} since this the biggest data
- * type which can be used for Peppol SMP and BDXR SMP.
+ * Abstract implementation class for {@link ISMPHasExtension}. All extensions are internally stored
+ * as instances of {@link com.helger.xsds.bdxr.smp1.ExtensionType} since this the biggest data type
+ * which can be used for Peppol SMP and BDXR SMP.
  *
  * @author Philip Helger
  */

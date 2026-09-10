@@ -134,8 +134,7 @@ public final class ImportActionItem implements IHasErrorLevel
                             .addIfNotNull ("participantID", m_sPI)
                             .add ("message", m_sMsg)
                             .addIfNotNull ("exception",
-                                           m_aLinkedException != null ? StackTraceHelper.getStackAsString (
-                                                                                                           m_aLinkedException)
+                                           m_aLinkedException != null ? StackTraceHelper.getStackAsString (m_aLinkedException)
                                                                       : null);
   }
 

@@ -98,7 +98,7 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
   }
 
   public void forEachJobResult (@Nullable final String sJobType,
-                               @NonNull final Consumer <? super LongRunningJobData> aConsumer)
+                                @NonNull final Consumer <? super LongRunningJobData> aConsumer)
   {
     ValueEnforcer.notNull (aConsumer, "Consumer");
 

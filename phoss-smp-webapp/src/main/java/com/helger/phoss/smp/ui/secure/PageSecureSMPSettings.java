@@ -118,8 +118,8 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                           aDisplayLocale)));
 
       aTable.addFormGroup (new BootstrapFormGroup ().setLabel ("SML to be used")
-                                                    .setCtrl (aSmlInfo == null ? em ("none") : HCSMLSelect
-                                                                                                          .getDisplayNameNode (aSmlInfo))
+                                                    .setCtrl (aSmlInfo == null ? em ("none")
+                                                                               : HCSMLSelect.getDisplayNameNode (aSmlInfo))
                                                     .setHelpText (bIsOldSml ? div (badgeDanger ("You are still using an old Peppol SML based on the European Comission SMK/SML offering. Please modify it."))
                                                                             : null,
                                                                   bIsNewSml ? div (badgeSuccess ("You are using the new OpenPeppol SML. Great!"))

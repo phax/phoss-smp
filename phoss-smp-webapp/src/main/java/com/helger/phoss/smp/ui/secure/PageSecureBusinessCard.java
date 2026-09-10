@@ -326,10 +326,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
           aWPEC.postRedirectGetInternal (success ("The selected Business Card was successfully deleted!" +
                                                   (aSettings.isDirectoryIntegrationEnabled () &&
-                                                    aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
-                                                                                                    SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                    " server is updated in the background."
-                                                                                                  : "")));
+                                                   aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
+                                                                                                   SMPWebAppConfiguration.getDirectoryName () +
+                                                                                                   " server is updated in the background."
+                                                                                                 : "")));
         }
         else
           aWPEC.postRedirectGetInternal (error ("Failed to delete the selected Business Card!"));
@@ -731,9 +731,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                 aFormErrors.addFieldError (sFieldEmail, "The provided email address is invalid!");
 
             final boolean bIsAnySet = StringHelper.isNotEmpty (sType) ||
-              StringHelper.isNotEmpty (sName) ||
-              StringHelper.isNotEmpty (sPhoneNumber) ||
-              StringHelper.isNotEmpty (sEmail);
+                                      StringHelper.isNotEmpty (sName) ||
+                                      StringHelper.isNotEmpty (sPhoneNumber) ||
+                                      StringHelper.isNotEmpty (sEmail);
 
             if (aFormErrors.size () == nErrors2 && bIsAnySet)
             {
@@ -810,10 +810,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                 aServiceGroup.getID () +
                                                 "' was successfully saved." +
                                                 (aSettings.isDirectoryIntegrationEnabled () &&
-                                                  aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
-                                                                                                  SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                  " server is updated in the background."
-                                                                                                : "")));
+                                                 aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
+                                                                                                 SMPWebAppConfiguration.getDirectoryName () +
+                                                                                                 " server is updated in the background."
+                                                                                               : "")));
       }
       else
         aWPEC.postRedirectGetInternal (error ("Error creating the Business Card for Service Group '" +

@@ -289,8 +289,7 @@ public final class ServiceGroupExport
           aMicroSerializer.write (SMPBusinessCardMicroTypeConverter.convertToMicroElement (aBusinessCard,
                                                                                            null,
                                                                                            CSMPExchange.ELEMENT_BUSINESSCARD,
-                                                                                           true),
-                                  aEmitter);
+                                                                                           true), aEmitter);
         }
       }
     }

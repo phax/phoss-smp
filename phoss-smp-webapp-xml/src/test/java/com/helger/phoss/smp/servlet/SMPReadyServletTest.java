@@ -44,7 +44,10 @@ public final class SMPReadyServletTest
   public void testXMLBackendIsReady ()
   {
     try (final Client aClient = ClientBuilder.newClient ();
-         final Response aResponse = aClient.target (m_aRule.getFullURL ()).path (SMPReadyServlet.SERVLET_DEFAULT_NAME).request ().get ())
+         final Response aResponse = aClient.target (m_aRule.getFullURL ())
+                                           .path (SMPReadyServlet.SERVLET_DEFAULT_NAME)
+                                           .request ()
+                                           .get ())
     {
       assertEquals (200, aResponse.getStatus ());
       assertTrue (MediaType.APPLICATION_JSON_TYPE.isCompatible (aResponse.getMediaType ()));

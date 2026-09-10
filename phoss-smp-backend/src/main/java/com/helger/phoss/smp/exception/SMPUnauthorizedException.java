@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Exception to be thrown if there is an ownership mismatch between object. This
- * exception is only thrown if the provided user credentials are valid.
+ * Exception to be thrown if there is an ownership mismatch between object. This exception is only
+ * thrown if the provided user credentials are valid.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */

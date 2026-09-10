@@ -88,14 +88,13 @@ public final class SMPAPIUserIDTest
     try
     {
       final MockHttpServletRequest aUIRequest = new MockHttpServletRequest (m_aTestRule.getServletContext (),
-                                                                           EHttpMethod.GET,
-                                                                           false);
+                                                                            EHttpMethod.GET,
+                                                                            false);
       try (final WebScoped aWebScoped = new WebScoped (aUIRequest))
       {
         assertNull (aWebScoped.getRequestScope ().getSession (false));
         assertEquals (ELoginResult.SUCCESS,
-                      aLoginMgr.loginUser (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                           CSecurity.USER_ADMINISTRATOR_PASSWORD));
+                      aLoginMgr.loginUser (CSecurity.USER_ADMINISTRATOR_EMAIL, CSecurity.USER_ADMINISTRATOR_PASSWORD));
         aSession = aWebScoped.getRequestScope ().getSession (false);
         assertNotNull (aSession);
         assertEquals (CSecurity.USER_ADMINISTRATOR_ID, GlobalUserIDProvider.getCurrentUserID ());
@@ -108,8 +107,8 @@ public final class SMPAPIUserIDTest
 
       // Only the UI login persists when the next request reuses the same session
       final MockHttpServletRequest aNextRequest = new MockHttpServletRequest (m_aTestRule.getServletContext (),
-                                                                             EHttpMethod.GET,
-                                                                             false).setSession (aSession);
+                                                                              EHttpMethod.GET,
+                                                                              false).setSession (aSession);
       try (final WebScoped aWebScoped = new WebScoped (aNextRequest))
       {
         assertEquals (CSecurity.USER_ADMINISTRATOR_ID, GlobalUserIDProvider.getCurrentUserID ());
@@ -130,7 +129,7 @@ public final class SMPAPIUserIDTest
     try (final WebScoped aWebScoped = new WebScoped ())
     {
       final BasicAuthClientCredentials aBasicAuth = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                                                     "incorrect-password");
+                                                                                    "incorrect-password");
       assertThrows (SMPUnauthorizedException.class,
                     () -> SMPUserManagerPhoton.validateUserCredentials (SMPAPICredentials.createForBasicAuth (aBasicAuth)));
       assertNull (GlobalUserIDProvider.getCurrentUserID ());
@@ -148,7 +147,7 @@ public final class SMPAPIUserIDTest
     try (final WebScoped aWebScoped = new WebScoped ())
     {
       final BasicAuthClientCredentials aBasicAuth = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
-                                                                                     CSecurity.USER_ADMINISTRATOR_PASSWORD);
+                                                                                    CSecurity.USER_ADMINISTRATOR_PASSWORD);
       final SMPAPICredentials aCredentials = SMPAPICredentials.createForBasicAuth (aBasicAuth);
       final IUser aUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 

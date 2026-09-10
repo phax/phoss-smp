@@ -88,7 +88,7 @@ final class SMPUserManagerJDBC extends AbstractJDBCEnabledManager
     ValueEnforcer.notNull (aOldToNewUserNameMap, "OldToNewUserNameMap");
 
     final DBExecutor aExecutor = newExecutor ();
-    aExecutor.performInTransaction ( () -> {
+    aExecutor.performInTransaction (() -> {
       // Drop the Foreign Key Constraint - do this all the time
       try
       {

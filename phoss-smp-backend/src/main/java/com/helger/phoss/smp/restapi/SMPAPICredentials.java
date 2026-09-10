@@ -20,8 +20,8 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 
 /**
- * This class contains the different representations of the SMP API credentials.
- * That may either be a pair of username and password or a User Token.
+ * This class contains the different representations of the SMP API credentials. That may either be
+ * a pair of username and password or a User Token.
  *
  * @author Philip Helger
  * @since 6.1.0
@@ -35,17 +35,16 @@ public class SMPAPICredentials
   protected SMPAPICredentials (@Nullable final BasicAuthClientCredentials aBasicAuth,
                                @Nullable final String sBearerToken)
   {
-    ValueEnforcer.isFalse ( () -> aBasicAuth == null && sBearerToken == null,
-                            "One of the credentials must be provided");
-    ValueEnforcer.isFalse ( () -> aBasicAuth != null && sBearerToken != null,
-                            "Not more then one credential must be provided");
+    ValueEnforcer.isFalse (() -> aBasicAuth == null && sBearerToken == null, "One of the credentials must be provided");
+    ValueEnforcer.isFalse (() -> aBasicAuth != null && sBearerToken != null,
+                           "Not more then one credential must be provided");
     m_aBasicAuth = aBasicAuth;
     m_sBearerToken = sBearerToken;
   }
 
   /**
-   * @return <code>true</code> if this instance uses BasicAuth credentials,
-   *         <code>false</code> if not.
+   * @return <code>true</code> if this instance uses BasicAuth credentials, <code>false</code> if
+   *         not.
    * @see #hasBearerToken()
    */
   public final boolean hasBasicAuth ()
@@ -64,8 +63,7 @@ public class SMPAPICredentials
   }
 
   /**
-   * @return <code>true</code> if this instance uses a Bearer token,
-   *         <code>false</code> if not.
+   * @return <code>true</code> if this instance uses a Bearer token, <code>false</code> if not.
    * @see #hasBasicAuth()
    */
   public final boolean hasBearerToken ()

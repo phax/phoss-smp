@@ -66,11 +66,7 @@ public final class BusinessCardManagerTest extends AbstractSMPWebAppSQLTest
       ISMPBusinessCard aBusinessCard = null;
       try
       {
-        assertNotNull (aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
-                                                              aPI,
-                                                              null,
-                                                              null,
-                                                              true));
+        assertNotNull (aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null, null, true));
         assertFalse (aBusinessCardMgr.containsSMPBusinessCardOfID (aPI));
 
         final SMPBusinessCardEntity aEntity1 = new SMPBusinessCardEntity ();
@@ -80,15 +76,12 @@ public final class BusinessCardManagerTest extends AbstractSMPWebAppSQLTest
         aEntity2.names ().add (new SMPBusinessCardName ("Entity 2", null));
         aEntity2.setCountryCode ("AT");
 
-        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI,
-                                                                        new CommonsArrayList <> (aEntity1),
-                                                                        false);
+        aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI, new CommonsArrayList <> (aEntity1), false);
         assertNotNull (aBusinessCard);
         assertTrue (aBusinessCardMgr.containsSMPBusinessCardOfID (aPI));
 
         aBusinessCard = aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPI,
-                                                                        new CommonsArrayList <> (aEntity1,
-                                                                                                 aEntity2),
+                                                                        new CommonsArrayList <> (aEntity1, aEntity2),
                                                                         false);
         assertNotNull (aBusinessCard);
         assertTrue (aBusinessCardMgr.containsSMPBusinessCardOfID (aPI));

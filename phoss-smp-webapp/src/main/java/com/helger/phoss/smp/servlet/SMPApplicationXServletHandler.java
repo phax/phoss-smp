@@ -77,43 +77,43 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
                                            @Nullable final CSPReportingEndpoint aReportingEndpoint)
   {
     // srict-dynamic is needed for BusinessCard page, loading dynamic JS
-      // Note: with 'strict-dynamic' present, all host and scheme sources - including 'self' - are
-      // ignored by the browser, so adding 'self' here would only imply a fallback that does not exist
-      final CSPSourceList aScriptSrcList = new CSPSourceList ().addNonce (sNonce)
-                                                               .addKeywordStrictDynamic ()
-                                                               .addKeywordReportSample ();
-      final CSPSourceList aStyleSrcList = new CSPSourceList ().addKeywordSelf ()
-                                                              .addNonce (sNonce)
-                                                              .addKeywordReportSample ();
-      // Only 'unsafe-inline' and hashes are meaningful in style-src-attr
-      final CSPSourceList aStyleSrcAttrList = new CSPSourceList ().addKeywordUnsafeInline ();
-      // Allow data images for Bootstrap 4
-      final CSPSourceList aImgSrcList = new CSPSourceList ().addKeywordSelf ().addHost ("data:");
-      final CSPSourceList aConnectSrcList = new CSPSourceList ().addKeywordSelf ();
-      final CSPSourceList aFontSrcList = new CSPSourceList ().addKeywordSelf ();
+    // Note: with 'strict-dynamic' present, all host and scheme sources - including 'self' - are
+    // ignored by the browser, so adding 'self' here would only imply a fallback that does not exist
+    final CSPSourceList aScriptSrcList = new CSPSourceList ().addNonce (sNonce)
+                                                             .addKeywordStrictDynamic ()
+                                                             .addKeywordReportSample ();
+    final CSPSourceList aStyleSrcList = new CSPSourceList ().addKeywordSelf ()
+                                                            .addNonce (sNonce)
+                                                            .addKeywordReportSample ();
+    // Only 'unsafe-inline' and hashes are meaningful in style-src-attr
+    final CSPSourceList aStyleSrcAttrList = new CSPSourceList ().addKeywordUnsafeInline ();
+    // Allow data images for Bootstrap 4
+    final CSPSourceList aImgSrcList = new CSPSourceList ().addKeywordSelf ().addHost ("data:");
+    final CSPSourceList aConnectSrcList = new CSPSourceList ().addKeywordSelf ();
+    final CSPSourceList aFontSrcList = new CSPSourceList ().addKeywordSelf ();
 
-      final CSPPolicy aPolicy = new CSPPolicy ();
-      aPolicy.addDirective (CSPDirective.createDefaultSrc (new CSPSourceList ().addKeywordNone ()))
-             .addDirective (CSPDirective.createScriptSrc (aScriptSrcList))
-             .addDirective (CSPDirective.createStyleSrc (aStyleSrcList))
-             .addDirective (CSPDirective.createStyleSrcAttr (aStyleSrcAttrList))
-             .addDirective (CSPDirective.createImgSrc (aImgSrcList))
-             .addDirective (CSPDirective.createConnectSrc (aConnectSrcList))
-             .addDirective (CSPDirective.createFontSrc (aFontSrcList))
-             // Neither form-action nor frame-ancestors fall back to default-src, so they must be
-             // set explicitly
-             .addDirective (CSPDirective.createBaseURI (new CSPSourceList ().addKeywordSelf ().getAsString ()))
-             .addDirective (CSPDirective.createFormAction (new CSPSourceList ().addKeywordSelf ()))
-             .addDirective (CSPDirective.createFrameAncestors (new CSPSourceList ().addKeywordNone ()))
-             .addDirective (CSPDirective.createObjectSrc (new CSPSourceList ().addKeywordNone ()));
+    final CSPPolicy aPolicy = new CSPPolicy ();
+    aPolicy.addDirective (CSPDirective.createDefaultSrc (new CSPSourceList ().addKeywordNone ()))
+           .addDirective (CSPDirective.createScriptSrc (aScriptSrcList))
+           .addDirective (CSPDirective.createStyleSrc (aStyleSrcList))
+           .addDirective (CSPDirective.createStyleSrcAttr (aStyleSrcAttrList))
+           .addDirective (CSPDirective.createImgSrc (aImgSrcList))
+           .addDirective (CSPDirective.createConnectSrc (aConnectSrcList))
+           .addDirective (CSPDirective.createFontSrc (aFontSrcList))
+           // Neither form-action nor frame-ancestors fall back to default-src, so they must be
+           // set explicitly
+           .addDirective (CSPDirective.createBaseURI (new CSPSourceList ().addKeywordSelf ().getAsString ()))
+           .addDirective (CSPDirective.createFormAction (new CSPSourceList ().addKeywordSelf ()))
+           .addDirective (CSPDirective.createFrameAncestors (new CSPSourceList ().addKeywordNone ()))
+           .addDirective (CSPDirective.createObjectSrc (new CSPSourceList ().addKeywordNone ()));
 
-      if (aReportingEndpoint != null)
-      {
-        // "report-uri" is deprecated, but still the only mechanism some browsers honour, so both
-        // are emitted
-        aPolicy.addDirective (aReportingEndpoint.getAsReportURIDirective ())
-               .addDirective (aReportingEndpoint.getAsReportToDirective ());
-      }
+    if (aReportingEndpoint != null)
+    {
+      // "report-uri" is deprecated, but still the only mechanism some browsers honour, so both
+      // are emitted
+      aPolicy.addDirective (aReportingEndpoint.getAsReportURIDirective ())
+             .addDirective (aReportingEndpoint.getAsReportToDirective ());
+    }
     return aPolicy;
   }
 
@@ -134,8 +134,8 @@ public abstract class SMPApplicationXServletHandler extends AbstractApplicationX
         CSP_PARAM_PROVIDER.addReportingParameters (aRequestScope, aParams);
 
         aEndpoint = new CSPReportingEndpoint (CSPReportingEndpoint.createURI (aRequestScope.getContextPath () +
-                                                                             SMPCSPReportingServlet.SERVLET_DEFAULT_PATH,
-                                                                             aParams));
+                                                                              SMPCSPReportingServlet.SERVLET_DEFAULT_PATH,
+                                                                              aParams));
         // The named endpoint of "report-to" is declared in this header
         aUnifiedResponse.addCustomResponseHeader (CHttpHeader.REPORTING_ENDPOINTS,
                                                   aEndpoint.getReportingEndpointsHeaderValue ());
