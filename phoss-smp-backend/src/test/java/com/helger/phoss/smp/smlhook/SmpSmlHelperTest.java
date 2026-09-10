@@ -28,12 +28,12 @@ public final class SmpSmlHelperTest
   private static ManageParticipantIdentifierServiceCaller _createCaller (final String sManagementServiceURL)
   {
     return SmpSmlHelper.createSMLCallerPI (SMLInfo.builder ()
-                                                 .id ("test")
-                                                 .displayName ("Test")
-                                                 .dnsZone ("example.org")
-                                                 .managementServiceURL (sManagementServiceURL)
-                                                 .clientCertificateRequired (false)
-                                                 .build ());
+                                                  .id ("test")
+                                                  .displayName ("Test")
+                                                  .dnsZone ("example.org")
+                                                  .managementServiceURL (sManagementServiceURL)
+                                                  .clientCertificateRequired (false)
+                                                  .build ());
   }
 
   @Test

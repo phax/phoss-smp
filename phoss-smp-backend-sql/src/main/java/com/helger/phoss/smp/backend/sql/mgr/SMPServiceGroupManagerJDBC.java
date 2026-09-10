@@ -528,8 +528,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                         " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier" +
                         (sSuffix == null ? "" : sSuffix);
     final ICommonsList <DBResultRow> aDBResult = aParams == null || aParams.isEmpty () ? newExecutor ().queryAll (sSQL)
-                                                                                      : newExecutor ().queryAll (sSQL,
-                                                                                                                 new ConstantPreparedStatementDataProvider (aParams));
+                                                                                       : newExecutor ().queryAll (sSQL,
+                                                                                                                  new ConstantPreparedStatementDataProvider (aParams));
 
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
@@ -666,12 +666,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (m_aCache != null && m_aCache.isInCache (aParticipantID.getURIEncoded ()))
       return true;
 
-    return 1 ==
-           newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
-                                      m_sTableNameSG +
-                                      " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                      new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                 aParticipantID.getValue ()));
+    return 1 == newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
+                                           m_sTableNameSG +
+                                           " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                           new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                      aParticipantID.getValue ()));
   }
 
   @CheckForSigned

@@ -167,8 +167,9 @@ public final class BusinessCardServerAPI
       final ICommonsList <SMPBusinessCardEntity> aEntities = new CommonsArrayList <> ();
       for (final PDBusinessEntity aEntity : aBusinessCard.businessEntities ())
         aEntities.add (SMPBusinessCardEntity.createFromGenericObject (aEntity));
-      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (), aEntities, true) ==
-          null)
+      if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aServiceGroup.getParticipantIdentifier (),
+                                                          aEntities,
+                                                          true) == null)
       {
         LOGGER.warn (sLog + " ERROR");
         STATS_COUNTER_ERROR.increment (sAction);

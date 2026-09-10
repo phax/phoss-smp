@@ -144,8 +144,7 @@ public class AuditorMongoDB implements IAuditor
   {
     final String sUserID = StringHelper.getNotEmpty (m_aCurrentUserIDProvider.getCurrentUserID (),
                                                      CUserID.USER_ID_GUEST);
-    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType
-                                                                                                                   .getName ()
+    final String sFullAction = IAuditActionStringProvider.JSON.apply (aActionObjectType != null ? aActionObjectType.getName ()
                                                                                                 : sAction, aArgs);
     final IAuditItem aAuditItem = new AuditItem (sUserID, eActionType, eSuccess, sFullAction);
 

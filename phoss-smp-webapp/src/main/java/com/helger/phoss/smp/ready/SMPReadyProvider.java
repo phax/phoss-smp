@@ -125,7 +125,7 @@ public final class SMPReadyProvider
       return areAllReady (aProviders);
     }
 
-    final Future <Boolean> aFuture = EXECUTOR.submit ( () -> Boolean.valueOf (areAllReady (aProviders)));
+    final Future <Boolean> aFuture = EXECUTOR.submit (() -> Boolean.valueOf (areAllReady (aProviders)));
     try
     {
       return aFuture.get (aTimeout.toMillis (), TimeUnit.MILLISECONDS).booleanValue ();

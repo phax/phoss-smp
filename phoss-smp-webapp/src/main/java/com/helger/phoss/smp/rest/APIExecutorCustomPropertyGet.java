@@ -64,8 +64,8 @@ public final class APIExecutorCustomPropertyGet extends AbstractSMPAPIExecutor
     }
 
     final SGCustomProperty aCustomProperty = new CustomPropertiesServerAPI (aDataProvider).getCustomProperty (sPathServiceGroupID,
-                                                                                                             sPathPropertyName,
-                                                                                                             aCredentials);
+                                                                                                              sPathPropertyName,
+                                                                                                              aCredentials);
 
     aUnifiedResponse.text (aCustomProperty.getValue ());
   }

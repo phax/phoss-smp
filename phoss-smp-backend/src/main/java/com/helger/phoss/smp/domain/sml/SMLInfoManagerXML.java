@@ -60,7 +60,7 @@ public final class SMLInfoManagerXML extends AbstractPhotonMapBasedWALDAO <ISMLI
                                     .clientCertificateRequired (bClientCertificateRequired)
                                     .build ();
 
-    m_aRWLock.writeLocked ( () -> { internalCreateItem (aSMLInfo); });
+    m_aRWLock.writeLocked (() -> { internalCreateItem (aSMLInfo); });
     AuditHelper.onAuditCreateSuccess (SMLInfo.OT,
                                       aSMLInfo.getID (),
                                       sDisplayName,

@@ -46,7 +46,9 @@ import jakarta.annotation.Nullable;
 public final class SMPRestDataProviderTest
 {
   private static final String CONTEXT_PATH = "/smp";
-  private static final String REQUEST_URL = "http://internal.host:90" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest";
+  private static final String REQUEST_URL = "http://internal.host:90" +
+                                            CONTEXT_PATH +
+                                            "/iso6523-actorid-upis%3A%3A9915%3Atest";
 
   private IConfigWithFallback m_aOldConfig;
 
@@ -101,7 +103,7 @@ public final class SMPRestDataProviderTest
       aHttpRequest.addHeader ("X-Forwarded-Port", sXForwardedPort);
 
     final IRequestWebScopeWithoutResponse aRequestScope = new RequestWebScope (aHttpRequest,
-                                                                              new MockHttpServletResponse ());
+                                                                               new MockHttpServletResponse ());
     aRequestScope.initScope ();
     return new SMPRestDataProvider (aRequestScope);
   }
@@ -173,8 +175,7 @@ public final class SMPRestDataProviderTest
     final SMPRestDataProvider aDP = _createDataProvider (null);
     assertEquals ("http://internal.host:90" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
                   aDP.getCurrentURI ().toString ());
-    assertEquals ("http://internal.host:90" + CONTEXT_PATH,
-                  aDP.getBaseUriBuilder ());
+    assertEquals ("http://internal.host:90" + CONTEXT_PATH, aDP.getBaseUriBuilder ());
   }
 
   @Test
@@ -185,8 +186,7 @@ public final class SMPRestDataProviderTest
     final SMPRestDataProvider aDP = _createDataProvider (null, "https", "example.com:8443", "8443");
     assertEquals ("https://example.com:8443" + CONTEXT_PATH + "/iso6523-actorid-upis%3A%3A9915%3Atest",
                   aDP.getCurrentURI ().toString ());
-    assertEquals ("https://example.com:8443" + CONTEXT_PATH,
-                  aDP.getBaseUriBuilder ());
+    assertEquals ("https://example.com:8443" + CONTEXT_PATH, aDP.getBaseUriBuilder ());
   }
 
   @Test
@@ -213,7 +213,6 @@ public final class SMPRestDataProviderTest
   public void testServiceGroupHrefWithNonDefaultPort ()
   {
     final SMPRestDataProvider aDP = _createDataProvider ("for=192.0.2.1;proto=https;host=\"example.com:8443\"");
-    assertEquals ("https://example.com:8443" + CONTEXT_PATH,
-                  aDP.getBaseUriBuilder ());
+    assertEquals ("https://example.com:8443" + CONTEXT_PATH, aDP.getBaseUriBuilder ());
   }
 }

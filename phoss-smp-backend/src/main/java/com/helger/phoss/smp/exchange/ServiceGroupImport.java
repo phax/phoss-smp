@@ -159,7 +159,7 @@ public final class ServiceGroupImport
       // Safe to run in parallelStream
       // 1. Read service group and service information
       eRoot.forAllChildElements (IMicroElement.filterName (CSMPExchange.ELEMENT_SERVICEGROUP),
-                                 eServiceGroup -> aExecutorSvc.submit ( () -> {
+                                 eServiceGroup -> aExecutorSvc.submit (() -> {
                                    // Convert XML to domain object
                                    final ISMPServiceGroup aServiceGroup;
                                    try
@@ -257,7 +257,7 @@ public final class ServiceGroupImport
       final AtomicInteger aBCCount = new AtomicInteger (0);
       // Safe to run in parallelStream
       eRoot.forAllChildElements (IMicroElement.filterName (CSMPExchange.ELEMENT_BUSINESSCARD),
-                                 eBusinessCard -> aExecutorSvc.submit ( () -> {
+                                 eBusinessCard -> aExecutorSvc.submit (() -> {
                                    // Read business card
                                    ISMPBusinessCard aBusinessCard = null;
                                    try
@@ -433,7 +433,7 @@ public final class ServiceGroupImport
             final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
 
             // This requires more sophisticated threading, as scopes are needed
-            aServiceGroupsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit ( () -> {
+            aServiceGroupsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
               try (final WebScoped aWebScoped = new WebScoped ())
               {
                 final String sServiceGroupID = aEntry.getKey ();
@@ -476,7 +476,7 @@ public final class ServiceGroupImport
             final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
 
             final AtomicInteger aSGCount = new AtomicInteger (0);
-            aServiceGroupsToImport.entrySet ().forEach (aEntry -> aExecutorSvc.submit ( () -> {
+            aServiceGroupsToImport.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
               try (final WebScoped aWebScoped = new WebScoped ())
               {
                 final ISMPServiceGroup aImportServiceGroup = aEntry.getKey ();
@@ -595,7 +595,7 @@ public final class ServiceGroupImport
             final StopWatch aSW = StopWatch.createdStarted ();
             final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
 
-            aBusinessCardsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit ( () -> {
+            aBusinessCardsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
               try (final WebScoped aWebScoped = new WebScoped ())
               {
                 final String sServiceGroupID = aEntry.getKey ();
@@ -642,7 +642,7 @@ public final class ServiceGroupImport
             final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
 
             final AtomicInteger aBCCount = new AtomicInteger (0);
-            aBusinessCardsToImport.values ().forEach (aImportBusinessCard -> aExecutorSvc.submit ( () -> {
+            aBusinessCardsToImport.values ().forEach (aImportBusinessCard -> aExecutorSvc.submit (() -> {
               try (final WebScoped aWebScoped = new WebScoped ())
               {
                 final String sParticipantCardID = aImportBusinessCard.getID ();
@@ -694,7 +694,7 @@ public final class ServiceGroupImport
             final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
 
             final AtomicInteger aBCCount = new AtomicInteger (0);
-            aServiceGroupsWithDocTypesForBC.forEach (aParticipantID -> aExecutorSvc.submit ( () -> {
+            aServiceGroupsWithDocTypesForBC.forEach (aParticipantID -> aExecutorSvc.submit (() -> {
               try (final WebScoped aWebScoped = new WebScoped ())
               {
                 aMainPushToDirectory.pushToDirectory (aParticipantID);

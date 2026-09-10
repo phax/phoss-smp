@@ -202,8 +202,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   {
     final com.helger.xsds.peppol.smp1.EndpointType ret = new com.helger.xsds.peppol.smp1.EndpointType ();
     // EndpointReference element is mandatory
-    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null
-                                                                                                               ? m_sEndpointReference
+    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null ? m_sEndpointReference
                                                                                                                : ""));
     ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);

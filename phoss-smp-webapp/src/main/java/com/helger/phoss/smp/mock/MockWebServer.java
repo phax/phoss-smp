@@ -22,8 +22,8 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.photon.jetty.JettyRunner;
 
 /**
- * WebServer based on Jetty for standalone SMP server testing. It starts a
- * server on Port 9090 using the context path "/unittest".
+ * WebServer based on Jetty for standalone SMP server testing. It starts a server on Port 9090 using
+ * the context path "/unittest".
  *
  * @author Philip Helger
  */

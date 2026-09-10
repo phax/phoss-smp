@@ -60,7 +60,7 @@ public final class APIExecutorCustomPropertiesDelete extends AbstractSMPAPIExecu
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
     final int nDeletedProperties = new CustomPropertiesServerAPI (aDataProvider).deleteCustomProperties (sPathServiceGroupID,
-                                                                                                        aCredentials);
+                                                                                                         aCredentials);
 
     aUnifiedResponse.text (Integer.toString (nDeletedProperties));
   }

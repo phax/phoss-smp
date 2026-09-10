@@ -54,8 +54,7 @@ public final class SMPMongoQueryHelper
    * @return <code>null</code> if no sort field could be resolved to a MongoDB field.
    */
   @Nullable
-  public static Bson createSort (@NonNull final ISMPTableColumn <?> [] aColumns,
-                                 @NonNull final IPagingSpec aPagingSpec)
+  public static Bson createSort (@NonNull final ISMPTableColumn <?> [] aColumns, @NonNull final IPagingSpec aPagingSpec)
   {
     ValueEnforcer.notNull (aColumns, "Columns");
     ValueEnforcer.notNull (aPagingSpec, "PagingSpec");

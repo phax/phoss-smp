@@ -366,9 +366,8 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
                                                                                    Updates.set (BSON_USER_DESCRIPTION,
                                                                                                 sNewDescription),
                                                                                    Updates.set (BSON_USER_PREFERRED_LOCALE,
-                                                                                                aNewDesiredLocale ==
-                                                                                                                            null ? null
-                                                                                                                                 : aNewDesiredLocale.toString ()),
+                                                                                                aNewDesiredLocale == null ? null
+                                                                                                                          : aNewDesiredLocale.toString ()),
                                                                                    Updates.set (BSON_USER_DISABLED,
                                                                                                 Boolean.valueOf (bNewDisabled)),
                                                                                    Updates.set (BSON_ATTRIBUTES,

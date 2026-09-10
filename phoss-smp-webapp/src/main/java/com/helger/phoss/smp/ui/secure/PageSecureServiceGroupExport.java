@@ -97,9 +97,8 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
       else
       {
         aNodeList.addChild (info ("Export " +
-                                  (nServiceGroupCount == 1 ? "service group" : "all " +
-                                                                               nServiceGroupCount +
-                                                                               " service groups") +
+                                  (nServiceGroupCount == 1 ? "service group"
+                                                           : "all " + nServiceGroupCount + " service groups") +
                                   (bExportBusinessCards ? " and business card" + (nServiceGroupCount == 1 ? "" : "s")
                                                         : "") +
                                   " to an XML file. The export runs in the background and the created file is stored on the server."));
@@ -111,10 +110,10 @@ public final class PageSecureServiceGroupExport extends AbstractSMPWebPage
     {
       final LocalDateTime aStartDT = ServiceGroupExportJob.LOCK.getStartDateTime ();
       aNodeList.addChild (warn ("An export is currently running in the background" +
-                                (aStartDT == null ? "" : " (started at " +
-                                                         PDTToString.getAsString (aStartDT,
-                                                                                  aWPEC.getDisplayLocale ()) +
-                                                         ")") +
+                                (aStartDT == null ? ""
+                                                  : " (started at " +
+                                                    PDTToString.getAsString (aStartDT, aWPEC.getDisplayLocale ()) +
+                                                    ")") +
                                 ". Please wait until it is finished before starting a new one."));
     }
 

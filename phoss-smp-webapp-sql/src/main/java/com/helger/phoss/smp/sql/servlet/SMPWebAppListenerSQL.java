@@ -55,6 +55,6 @@ public class SMPWebAppListenerSQL extends SMPWebAppListener
 
     // Set persistent ID provider: SQL based
     GlobalIDFactory.setPersistentLongIDFactory (new SMPIDFactoryJDBC (nInitialCount));
-    GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
+    GlobalIDFactory.setPersistentIntIDFactory (() -> (int) GlobalIDFactory.getNewPersistentLongID ());
   }
 }

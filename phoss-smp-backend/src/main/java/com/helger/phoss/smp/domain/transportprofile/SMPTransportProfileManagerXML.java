@@ -61,9 +61,7 @@ public final class SMPTransportProfileManagerXML extends
                                                                               bIsDeprecated ? ESMPTransportProfileState.DEPRECATED
                                                                                             : ESMPTransportProfileState.ACTIVE);
 
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPTransportProfile);
-    });
+    m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPTransportProfile); });
     AuditHelper.onAuditCreateSuccess (SMPTransportProfile.OT, sID, sName, Boolean.valueOf (bIsDeprecated));
     return aSMPTransportProfile;
   }

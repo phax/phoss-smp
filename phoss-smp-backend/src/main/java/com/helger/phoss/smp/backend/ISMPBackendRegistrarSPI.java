@@ -15,8 +15,8 @@ import org.jspecify.annotations.NonNull;
 import com.helger.annotation.style.IsSPIInterface;
 
 /**
- * SPI interface to be implemented by SMP backend modules. They are than
- * automatically registered by the {@link SMPBackendRegistry}.
+ * SPI interface to be implemented by SMP backend modules. They are than automatically registered by
+ * the {@link SMPBackendRegistry}.
  *
  * @author Philip Helger
  */
@@ -27,8 +27,7 @@ public interface ISMPBackendRegistrarSPI
    * Register your backend(s) at the provided {@link ISMPBackendRegistry}.
    *
    * @param aRegistry
-   *        The registry to register your backend(s) at. Never <code>null</code>
-   *        .
+   *        The registry to register your backend(s) at. Never <code>null</code> .
    */
   void registerSMPBackend (@NonNull ISMPBackendRegistry aRegistry);
 }

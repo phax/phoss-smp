@@ -221,8 +221,7 @@ public class SMPPagination
   @NonNull
   private SimpleURL _getPageURLNoSearch (@Nonnegative final int nPageIndex, @Nonnegative final int nPageSize)
   {
-    return new SimpleURL (m_aBaseURL).add (PARAM_PAGE_INDEX, nPageIndex)
-                                     .add (PARAM_PAGE_SIZE, nPageSize);
+    return new SimpleURL (m_aBaseURL).add (PARAM_PAGE_INDEX, nPageIndex).add (PARAM_PAGE_SIZE, nPageSize);
   }
 
   @NonNull

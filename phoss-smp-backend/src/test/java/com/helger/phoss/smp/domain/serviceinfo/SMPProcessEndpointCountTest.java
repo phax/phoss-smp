@@ -44,9 +44,7 @@ public final class SMPProcessEndpointCountTest
   public void testMultipleEndpointsPerTransportProfile ()
   {
     final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
-                                                                             "test-process"),
-                                                null,
-                                                null);
+                                                                             "test-process"), null, null);
     aProcess.addEndpoint (_createEndpoint ("endpoint-1", "transport-profile-1"));
     aProcess.addEndpoint (_createEndpoint ("endpoint-2", "transport-profile-1"));
     aProcess.addEndpoint (_createEndpoint ("endpoint-3", "transport-profile-2"));

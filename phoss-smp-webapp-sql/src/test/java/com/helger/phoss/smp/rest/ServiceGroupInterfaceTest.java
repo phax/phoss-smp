@@ -123,8 +123,8 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
       try
       {
         // PUT 1 - create
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                        .createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Both regular and upper case must work
@@ -134,11 +134,11 @@ public final class ServiceGroupInterfaceTest extends AbstractSMPWebAppSQLTest
         assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
 
         // PUT 2 - overwrite
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                        .createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
-        aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
-                                               .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG)));
+        aResponseMsg = _addCredentials (aTarget.path (sPI_UC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                        .createServiceGroup (aSG)));
         _testResponseJerseyClient (aResponseMsg, 200);
 
         // Both regular and upper case must work

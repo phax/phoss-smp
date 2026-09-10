@@ -63,8 +63,8 @@ public final class AuditUserInterfaceTest extends AbstractSMPWebAppSQLTest
   private void _testAuditUser (final String sAuthorization)
   {
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme (PID_PREFIX_9999_PHOSS +
-                                                                                                                     "-audit-" +
-                                                                                                                     UUID.randomUUID ());
+                                                                                                                      "-audit-" +
+                                                                                                                      UUID.randomUUID ());
     final String sParticipantID = aPI.getURIEncoded ();
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
@@ -77,8 +77,8 @@ public final class AuditUserInterfaceTest extends AbstractSMPWebAppSQLTest
       {
         // Exercise the HTTP authentication and SQL persistence paths together.
         try (final Response aResponse = aTarget.request ()
-                                              .header (CHttpHeader.AUTHORIZATION, sAuthorization)
-                                              .put (Entity.xml (new ObjectFactory ().createServiceGroup (aSG))))
+                                               .header (CHttpHeader.AUTHORIZATION, sAuthorization)
+                                               .put (Entity.xml (new ObjectFactory ().createServiceGroup (aSG))))
         {
           assertEquals (aResponse.readEntity (String.class), 200, aResponse.getStatus ());
         }
@@ -100,8 +100,8 @@ public final class AuditUserInterfaceTest extends AbstractSMPWebAppSQLTest
       {
         if (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI))
           try (final Response aResponse = aTarget.request ()
-                                                .header (CHttpHeader.AUTHORIZATION, sAuthorization)
-                                                .delete ())
+                                                 .header (CHttpHeader.AUTHORIZATION, sAuthorization)
+                                                 .delete ())
           {
             assertEquals (aResponse.readEntity (String.class), 200, aResponse.getStatus ());
           }

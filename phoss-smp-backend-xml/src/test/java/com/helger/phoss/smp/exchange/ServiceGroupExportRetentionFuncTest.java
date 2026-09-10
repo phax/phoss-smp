@@ -48,8 +48,8 @@ public final class ServiceGroupExportRetentionFuncTest
     WebFileIO.getDataIO ().createDirectory (ServiceGroupExportJob.EXPORT_DIRECTORY, true);
     final File aFile = new File (ServiceGroupExportJob.getExportDirectory (),
                                  ServiceGroupExportJob.EXPORT_FILENAME_PREFIX +
-                                                                               sSuffix +
-                                                                               ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION);
+                                                                              sSuffix +
+                                                                              ServiceGroupExportJob.EXPORT_FILENAME_EXTENSION);
     SimpleFileIO.writeFile (aFile, "<smp-data />".getBytes ());
     assertTrue (aFile.isFile ());
     assertTrue (aFile.setLastModified (System.currentTimeMillis () - TimeUnit.DAYS.toMillis (nAgeDays)));

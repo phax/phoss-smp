@@ -200,12 +200,12 @@ public final class CustomPropertiesServerAPI
       }
 
       final SGCustomPropertyList aCustomProperties = aServiceGroup.getCustomProperties ();
-      final SGCustomProperty aCustomProperty = aCustomProperties == null ? null : bAuthenticated ? aCustomProperties
-                                                                                                                    .findFirst (x -> x.getName ()
-                                                                                                                                      .equals (sPropertyName))
-                                                                                                 : aCustomProperties.findFirst (x -> x.isPublic () &&
-                                                                                                                                     x.getName ()
-                                                                                                                                      .equals (sPropertyName));
+      final SGCustomProperty aCustomProperty = aCustomProperties == null ? null
+                                                                         : bAuthenticated ? aCustomProperties.findFirst (x -> x.getName ()
+                                                                                                                               .equals (sPropertyName))
+                                                                                          : aCustomProperties.findFirst (x -> x.isPublic () &&
+                                                                                                                              x.getName ()
+                                                                                                                               .equals (sPropertyName));
       if (aCustomProperty == null)
         throw new SMPNotFoundException ("Custom property '" +
                                         sPropertyName +

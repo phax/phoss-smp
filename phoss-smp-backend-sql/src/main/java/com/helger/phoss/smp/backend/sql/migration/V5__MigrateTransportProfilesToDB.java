@@ -63,9 +63,7 @@ public final class V5__MigrateTransportProfilesToDB extends BaseJavaMigration
           for (final ISMPTransportProfile aTransportProfile : aTransportProfiles)
             if (aMgrNew.createSMPTransportProfile (aTransportProfile.getID (),
                                                    aTransportProfile.getName (),
-                                                   aTransportProfile.getState () ==
-                                                                                 ESMPTransportProfileState.DEPRECATED) ==
-                null)
+                                                   aTransportProfile.getState () == ESMPTransportProfileState.DEPRECATED) == null)
               LOGGER.error ("Failed to migrate " + aTransportProfile + " to DB");
         }
 

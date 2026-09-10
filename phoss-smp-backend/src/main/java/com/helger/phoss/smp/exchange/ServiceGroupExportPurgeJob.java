@@ -45,10 +45,7 @@ public final class ServiceGroupExportPurgeJob extends AbstractScopeAwareJob
   {
     final int nDeleted = ServiceGroupExportJob.purgeOldExportFiles ();
     if (nDeleted > 0)
-      LOGGER.info ("Deleted " +
-                   nDeleted +
-                   " outdated Service Group export " +
-                   (nDeleted == 1 ? "file" : "files"));
+      LOGGER.info ("Deleted " + nDeleted + " outdated Service Group export " + (nDeleted == 1 ? "file" : "files"));
   }
 
   /**

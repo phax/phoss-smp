@@ -15,8 +15,8 @@ import org.jspecify.annotations.NonNull;
 import com.helger.smpclient.extension.SMPExtensionList;
 
 /**
- * Base interface for objects having an extension (service group, redirect,
- * endpoint, process and service metadata)
+ * Base interface for objects having an extension (service group, redirect, endpoint, process and
+ * service metadata)
  *
  * @author Philip Helger
  */

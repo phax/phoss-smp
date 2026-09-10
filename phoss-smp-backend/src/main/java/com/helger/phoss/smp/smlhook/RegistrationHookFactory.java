@@ -16,8 +16,8 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
- * This class provides the {@link IRegistrationHook} instance that matches the
- * current "write to SML" settings.
+ * This class provides the {@link IRegistrationHook} instance that matches the current "write to
+ * SML" settings.
  *
  * @author PEPPOL.AT, BRZ, Philip Helger
  */
@@ -33,10 +33,9 @@ public final class RegistrationHookFactory
   /**
    * Get the one and only instance.
    *
-   * @return A non-<code>null</code> instance of {@link IRegistrationHook}
-   *         according to the current setting. This can be either an instance of
-   *         {@link RegistrationHookDoNothing} or an instance of
-   *         {@link RegistrationHookWriteToSML}.
+   * @return A non-<code>null</code> instance of {@link IRegistrationHook} according to the current
+   *         setting. This can be either an instance of {@link RegistrationHookDoNothing} or an
+   *         instance of {@link RegistrationHookWriteToSML}.
    */
   @NonNull
   public static IRegistrationHook getInstance ()

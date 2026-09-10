@@ -30,9 +30,7 @@ public final class SMPProcessEndpointLookupTest
   public void testAlwaysReturnsAList ()
   {
     final SMPProcess aProcess = new SMPProcess (new SimpleProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
-                                                                             "test-process"),
-                                                null,
-                                                null);
+                                                                             "test-process"), null, null);
 
     assertTrue (aProcess.getAllEndpointsOfTransportProfile (null).isEmpty ());
     assertTrue (aProcess.getAllEndpointsOfTransportProfile ("").isEmpty ());

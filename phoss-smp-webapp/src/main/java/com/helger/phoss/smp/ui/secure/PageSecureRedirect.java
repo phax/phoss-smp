@@ -97,7 +97,10 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   private static final String ATTR_SERVICE_GROUP = "$servicegroup";
   private static final String ATTR_DOCTYPE_ID = "$doctypeid";
 
-  /** Provides the rows of a single page - see {@link #_getOnDemandData(DataTablesOnDemandRequest, IRequestWebScopeWithoutResponse)} */
+  /**
+   * Provides the rows of a single page - see
+   * {@link #_getOnDemandData(DataTablesOnDemandRequest, IRequestWebScopeWithoutResponse)}
+   */
   private final IAjaxFunctionDeclaration m_aAjaxOnDemand = DataTablesOnDemandHelper.registerAjaxFunction (this::_getOnDemandData,
                                                                                                           CAjax.FILTER_IS_USER_LOGGED_IN);
 
@@ -180,9 +183,9 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                                      @Nullable final ISMPRedirect aSelectedObject)
   {
     if (eFormAction == EWebPageFormAction.VIEW ||
-      eFormAction == EWebPageFormAction.COPY ||
-      eFormAction == EWebPageFormAction.EDIT ||
-      eFormAction == EWebPageFormAction.DELETE)
+        eFormAction == EWebPageFormAction.COPY ||
+        eFormAction == EWebPageFormAction.EDIT ||
+        eFormAction == EWebPageFormAction.DELETE)
     {
       final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
       final String sServiceGroupID = aWPEC.params ().getAsStringTrimmed (FIELD_SERVICE_GROUP_ID);
@@ -486,8 +489,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
                   new HCA (aCopyURL).setTitle ("Create a copy of " + sDisplayName)
                                     .addChild (EDefaultIcon.COPY.getAsNode ()),
                   new HCTextNode (" "),
-                  new HCA (aDeleteURL).setTitle ("Delete " + sDisplayName)
-                                      .addChild (EDefaultIcon.DELETE.getAsNode ()),
+                  new HCA (aDeleteURL).setTitle ("Delete " + sDisplayName).addChild (EDefaultIcon.DELETE.getAsNode ()),
                   new HCTextNode (" "),
                   new HCA (aPreviewURL).setTitle ("Perform SMP query on " + sDisplayName)
                                        .setTargetBlank ()

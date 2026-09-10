@@ -125,13 +125,13 @@ public final class ServiceGroupInterfaceTest
     try
     {
       // PUT 1 - create
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG_LC)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                      .createServiceGroup (aSG_LC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // PUT 2 - upper case - already present
-      aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG_UC)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_UC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                      .createServiceGroup (aSG_UC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Both regular and upper case must work
@@ -141,11 +141,11 @@ public final class ServiceGroupInterfaceTest
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI_UC));
 
       // PUT 2 - overwrite
-      aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG_LC)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                      .createServiceGroup (aSG_LC)));
       _testResponseJerseyClient (aResponseMsg, 200);
-      aResponseMsg = _addCredentials (aTarget.path (sPI_UC)
-                                             .request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (aSG_UC)));
+      aResponseMsg = _addCredentials (aTarget.path (sPI_UC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                      .createServiceGroup (aSG_UC)));
       _testResponseJerseyClient (aResponseMsg, 200);
 
       // Both regular and upper case must work

@@ -74,10 +74,10 @@ public final class APIExecutorCustomPropertyPut extends AbstractSMPAPIExecutor
     final String sPropertyValue = new String (aPayloadBytes, StandardCharsets.UTF_8);
 
     new CustomPropertiesServerAPI (aDataProvider).setCustomProperty (sPathServiceGroupID,
-                                                                    sPathPropertyType,
-                                                                    sPathPropertyName,
-                                                                    sPropertyValue,
-                                                                    aCredentials);
+                                                                     sPathPropertyType,
+                                                                     sPathPropertyName,
+                                                                     sPropertyValue,
+                                                                     aCredentials);
 
     aUnifiedResponse.createNoContent ();
   }

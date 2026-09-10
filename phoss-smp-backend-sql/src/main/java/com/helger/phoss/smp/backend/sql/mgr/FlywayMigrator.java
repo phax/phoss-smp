@@ -125,10 +125,14 @@ final class FlywayMigrator
 
     // Avoid scanning the ClassPath by enumerating Java migrations explicitly
     final JavaMigration [] aJavaMigrations = { new V2__MigrateDBUsersToPhotonUsers (),
-                                               new V5__MigrateTransportProfilesToDB (), new V10__MigrateRolesToDB (),
-                                               new V11__MigrateUsersToDB (), new V12__MigrateUserGroupsToDB (),
-                                               new V14__MigrateSettingsToDB (), new V15__MigrateDBUsersToPhotonUsers (),
-                                               new V21__MigrateUserTokensToDB (), new V25__MigrateSMLInfoToDB (),
+                                               new V5__MigrateTransportProfilesToDB (),
+                                               new V10__MigrateRolesToDB (),
+                                               new V11__MigrateUsersToDB (),
+                                               new V12__MigrateUserGroupsToDB (),
+                                               new V14__MigrateSettingsToDB (),
+                                               new V15__MigrateDBUsersToPhotonUsers (),
+                                               new V21__MigrateUserTokensToDB (),
+                                               new V25__MigrateSMLInfoToDB (),
                                                new V27__MigrateSystemMigrationsToDB (),
                                                new V29__MigrateSystemMessageToDB (),
                                                new V31__MigrateLongRunningJobsToDB () };

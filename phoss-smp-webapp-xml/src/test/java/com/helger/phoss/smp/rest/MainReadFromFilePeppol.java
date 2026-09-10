@@ -41,8 +41,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Create one million endpoints. Run this AFTER
- * {@link MainCreateManyServiceGroups}.
+ * Create one million endpoints. Run this AFTER {@link MainCreateManyServiceGroups}.
  *
  * @author Philip Helger
  */

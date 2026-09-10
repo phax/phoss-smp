@@ -276,11 +276,11 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
                                  (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
       case REQUEST_SCOPE -> m_aRequestScope.getFullServerPath () +
                             (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());
-      case X_FORWARDED_HEADER -> _getXForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope
-                                                                                                                 .getContextPath ())
+      case X_FORWARDED_HEADER -> _getXForwardedHeaderBasedHostName ().append (bIsForceRoot ? ""
+                                                                                           : m_aRequestScope.getContextPath ())
                                                                      .toString ();
-      case FORWARDED_HEADER -> _getForwardedHeaderBasedHostName ().append (bIsForceRoot ? "" : m_aRequestScope
-                                                                                                              .getContextPath ())
+      case FORWARDED_HEADER -> _getForwardedHeaderBasedHostName ().append (bIsForceRoot ? ""
+                                                                                        : m_aRequestScope.getContextPath ())
                                                                   .toString ();
       default -> throw new IllegalStateException ("Unhandled server name mode");
     };

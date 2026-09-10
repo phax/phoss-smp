@@ -107,8 +107,8 @@ public interface ISMPProcess extends ISMPHasExtension
    *
    * @param sID
    *        The endpoint ID to search. May be <code>null</code>.
-   * @return <code>null</code> if the passed ID is <code>null</code> or empty or if no such
-   *         endpoint exists.
+   * @return <code>null</code> if the passed ID is <code>null</code> or empty or if no such endpoint
+   *         exists.
    */
   @Nullable
   ISMPEndpoint getEndpointOfID (@Nullable String sID);

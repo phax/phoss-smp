@@ -372,8 +372,8 @@ public final class SMPServerConfiguration
   }
 
   /**
-   * @return The maximum duration a readiness check may take, before the SMP is considered to be
-   *         not ready. This ensures that a readiness request never blocks an HTTP thread for an
+   * @return The maximum duration a readiness check may take, before the SMP is considered to be not
+   *         ready. This ensures that a readiness request never blocks an HTTP thread for an
    *         unbounded amount of time, e.g. because the database connection pool is exhausted. If
    *         the value is &le; 0, the readiness checks are executed without a time limit. The
    *         default value is 2 seconds.
@@ -439,9 +439,9 @@ public final class SMPServerConfiguration
 
   /**
    * @return The issuer to be shown in the authenticator app of a user, identifying this SMP
-   *         instance. Property <code>smp.totp.issuer</code>. May be <code>null</code>, in which case
-   *         the caller has to fall back to the application title. It should not contain a colon,
-   *         because that is the separator between the issuer and the account name.
+   *         instance. Property <code>smp.totp.issuer</code>. May be <code>null</code>, in which
+   *         case the caller has to fall back to the application title. It should not contain a
+   *         colon, because that is the separator between the issuer and the account name.
    * @since 8.4.3
    */
   @Nullable

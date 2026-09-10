@@ -26,9 +26,8 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
 /**
- * This {@link ISMPManagerProvider} implementation returns non-<code>null</code>
- * managers that all do nothing. This is only needed to access the identifier
- * factory.<br>
+ * This {@link ISMPManagerProvider} implementation returns non-<code>null</code> managers that all
+ * do nothing. This is only needed to access the identifier factory.<br>
  * Note: this class must be public
  *
  * @author Philip Helger

@@ -89,7 +89,7 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                                     .build ();
 
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                                               m_sTableName +
                                                               " (id, displayname, dnszone, serviceurl, managesmp, manageparticipant, clientcert)" +
@@ -153,7 +153,7 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
   {
     final MutableLong aUpdated = new MutableLong (-1);
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
                                                               m_sTableName +
                                                               " SET displayname=?, dnszone=?, serviceurl=?, managesmp=?, manageparticipant=?, clientcert=?" +

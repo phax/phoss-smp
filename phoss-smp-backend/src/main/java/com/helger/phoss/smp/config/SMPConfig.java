@@ -30,7 +30,7 @@ public class SMPConfig extends ConfigWithFallback
   {
     super (aValueProvider);
     setReplaceVariables (true);
-    setOutdatedNotifier ( (aConfigSrc, sOld, sNew) -> {
+    setOutdatedNotifier ((aConfigSrc, sOld, sNew) -> {
       LOGGER.warn ("Please rename the configuration property '" +
                    sOld +
                    "' to '" +
@@ -40,14 +40,14 @@ public class SMPConfig extends ConfigWithFallback
     if (LOGGER.isDebugEnabled ())
     {
       // Print details on every lookup
-      setFoundKeyConsumer ( (k, v) -> LOGGER.debug ("Found Configuration key '" +
-                                                    k +
-                                                    "' with value '" +
-                                                    v.getValue () +
-                                                    "' and prio " +
-                                                    v.getConfigurationSource ().getPriority () +
-                                                    " in " +
-                                                    v.getConfigurationSource ().getSourceType ()));
+      setFoundKeyConsumer ((k, v) -> LOGGER.debug ("Found Configuration key '" +
+                                                   k +
+                                                   "' with value '" +
+                                                   v.getValue () +
+                                                   "' and prio " +
+                                                   v.getConfigurationSource ().getPriority () +
+                                                   " in " +
+                                                   v.getConfigurationSource ().getSourceType ()));
       setKeyNotFoundConsumer (k -> LOGGER.debug ("Failed to find Configuration key '" + k + "'"));
     }
   }

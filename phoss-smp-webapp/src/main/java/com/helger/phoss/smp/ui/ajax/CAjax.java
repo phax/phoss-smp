@@ -44,11 +44,10 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 @Immutable
 public final class CAjax
 {
-  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () ==
-                                                                                                  EHttpMethod.POST;
+  public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_HTTP_POST = x -> x.getHttpMethod () == EHttpMethod.POST;
   public static final Predicate <? super IRequestWebScopeWithoutResponse> FILTER_IS_USER_LOGGED_IN = x -> LoggedInUserManager.getInstance ()
                                                                                                                              .isUserLoggedInInCurrentSession () &&
-                                                                                                        SMPSecondFactorHelper.isSecureAccessAllowed ();
+                                                                                                          SMPSecondFactorHelper.isSecureAccessAllowed ();
 
   public static final IAjaxFunctionDeclaration DATATABLES = AjaxFunctionDeclaration.builder ("dataTables")
                                                                                    .executor (AjaxExecutorDataTables.class)

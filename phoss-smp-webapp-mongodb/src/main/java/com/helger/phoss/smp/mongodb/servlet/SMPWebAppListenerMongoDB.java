@@ -60,7 +60,7 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
 
     // Set persistent ID provider: MongoDB based
     GlobalIDFactory.setPersistentLongIDFactory (new IDFactoryMongoDB (nInitialCount));
-    GlobalIDFactory.setPersistentIntIDFactory ( () -> (int) GlobalIDFactory.getNewPersistentLongID ());
+    GlobalIDFactory.setPersistentIntIDFactory (() -> (int) GlobalIDFactory.getNewPersistentLongID ());
   }
 
   @Override

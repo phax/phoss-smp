@@ -28,8 +28,8 @@ public interface ISMPServiceGroupCallback extends ICallback
    * @param aServiceGroup
    *        The created object. Never <code>null</code>.
    * @param bCreateInSML
-   *        <code>true</code> if the service group was also created in the SML,
-   *        <code>false</code> if not.
+   *        <code>true</code> if the service group was also created in the SML, <code>false</code>
+   *        if not.
    */
   void onSMPServiceGroupCreated (@NonNull ISMPServiceGroup aServiceGroup, boolean bCreateInSML);
 
@@ -47,8 +47,8 @@ public interface ISMPServiceGroupCallback extends ICallback
    * @param aParticipantID
    *        The ID of the deleted object. Never <code>null</code>.
    * @param bDeleteInSML
-   *        <code>true</code> if the service group was also deleted in the SML,
-   *        <code>false</code> if not.
+   *        <code>true</code> if the service group was also deleted in the SML, <code>false</code>
+   *        if not.
    */
   void onSMPServiceGroupDeleted (@NonNull IParticipantIdentifier aParticipantID, boolean bDeleteInSML);
 }

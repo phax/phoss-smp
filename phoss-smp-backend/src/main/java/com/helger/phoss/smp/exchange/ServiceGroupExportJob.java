@@ -103,7 +103,8 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
   }
 
   /**
-   * @return The unique name of the export file to be created now. Never <code>null</code> nor empty.
+   * @return The unique name of the export file to be created now. Never <code>null</code> nor
+   *         empty.
    */
   @NonNull
   @Nonempty
@@ -217,9 +218,7 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
         aDeletedFilenames.add (aFile.getAbsolutePath ());
       }
       else
-        LOGGER.warn ("Failed to delete the outdated Service Group export file '" +
-                     aFile.getAbsolutePath () +
-                     "'");
+        LOGGER.warn ("Failed to delete the outdated Service Group export file '" + aFile.getAbsolutePath () + "'");
     }
 
     if (aDeletedFilenames.isNotEmpty ())
@@ -272,7 +271,8 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
       WebFileIO.getDataIO ().deleteFileIfExisting (EXPORT_DIRECTORY + "/" + aFile.getName ());
       throw new IllegalStateException ("Failed to create the Service Group export in '" +
                                        aFile.getAbsolutePath () +
-                                       "'", ex);
+                                       "'",
+                                       ex);
     }
 
     LOGGER.info ("Successfully created the Service Group export in '" +

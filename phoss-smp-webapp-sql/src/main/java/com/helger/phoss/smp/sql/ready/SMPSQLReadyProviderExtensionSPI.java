@@ -24,8 +24,8 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
 
 /**
- * SQL specific readiness check. It takes a connection from the connection pool and validates it,
- * so that a database that went down after the connection was pooled is detected as well.
+ * SQL specific readiness check. It takes a connection from the connection pool and validates it, so
+ * that a database that went down after the connection was pooled is detected as well.
  *
  * @author vinit-thummar
  * @since 8.3.1

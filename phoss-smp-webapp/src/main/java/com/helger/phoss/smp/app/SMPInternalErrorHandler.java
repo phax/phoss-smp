@@ -79,15 +79,15 @@ public final class SMPInternalErrorHandler extends AbstractErrorCallback
     final long nSMTPSocketTimeoutMS = aConfig.getAsLong ("smp.smtp.sockettimeoutms", 10_000);
     final boolean bSMTPDebug = aConfig.getAsBoolean ("smp.smtp.debug", false);
     final SMTPSettings aSMTPSettings = StringHelper.isNotEmpty (sSMTPHostName) ? new SMTPSettings (sSMTPHostName,
-                                                                                                nSMTPPort,
-                                                                                                sSMTPUserName,
-                                                                                                sSMTPPassword,
-                                                                                                StandardCharsets.UTF_8,
-                                                                                                bSMTPSSLEnabled,
-                                                                                                bSMTPSTARTTLSEnabled,
-                                                                                                nSMTPConnectionTimeoutMS,
-                                                                                                nSMTPSocketTimeoutMS,
-                                                                                                bSMTPDebug) : null;
+                                                                                                   nSMTPPort,
+                                                                                                   sSMTPUserName,
+                                                                                                   sSMTPPassword,
+                                                                                                   StandardCharsets.UTF_8,
+                                                                                                   bSMTPSSLEnabled,
+                                                                                                   bSMTPSTARTTLSEnabled,
+                                                                                                   nSMTPConnectionTimeoutMS,
+                                                                                                   nSMTPSocketTimeoutMS,
+                                                                                                   bSMTPDebug) : null;
     if (StringHelper.isNotEmpty (sSenderAddress) &&
         StringHelper.isNotEmpty (sReceiverAddress) &&
         aSMTPSettings != null &&

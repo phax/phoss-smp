@@ -145,7 +145,7 @@ public final class SMPJDBCQueryHelperTest
   {
     final SearchCondition aSC;
     aSC = SMPJDBCQueryHelper.createSearchCondition (com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn.values (),
-                                                     "Acme");
+                                                    "Acme");
 
     // Service Group ID, the legacy single name and the multilingual names JSON
     assertEquals (3, aSC.getAllParams ().size ());

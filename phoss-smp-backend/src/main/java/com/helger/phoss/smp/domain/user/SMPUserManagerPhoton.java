@@ -101,8 +101,7 @@ public final class SMPUserManagerPhoton
    *      the error messages of the thrown exceptions
    */
   @NonNull
-  public static IUser validateUserCredentials (@NonNull final SMPAPICredentials aCredentials) throws SMPUnknownUserException,
-                                                                                              SMPUnauthorizedException
+  public static IUser validateUserCredentials (@NonNull final SMPAPICredentials aCredentials) throws SMPUnknownUserException, SMPUnauthorizedException
   {
     ValueEnforcer.notNull (aCredentials, "Credentials");
 
@@ -149,15 +148,13 @@ public final class SMPUserManagerPhoton
       {
         // Deleted users are handled like non-existing users
         LOGGER.warn ("Invalid Bearer token provided: '" + sMaskedToken + "'");
-        throw new SMPUnknownUserException ("{BearerToken}" + sMaskedToken,
-                                           _getAuthErrorMsg ("Unknown Bearer token"));
+        throw new SMPUnknownUserException ("{BearerToken}" + sMaskedToken, _getAuthErrorMsg ("Unknown Bearer token"));
       }
       if (aUserToken.isDeleted ())
       {
         // Deleted tokens are handled like non-existing token
         LOGGER.warn ("Deleted Bearer token provided: '" + sMaskedToken + "'");
-        throw new SMPUnknownUserException ("{BearerToken}" + sMaskedToken,
-                                           _getAuthErrorMsg ("Unknown Bearer token"));
+        throw new SMPUnknownUserException ("{BearerToken}" + sMaskedToken, _getAuthErrorMsg ("Unknown Bearer token"));
       }
       final IUser aUser = aUserToken.getUser ();
       if (aUser.isDeleted ())
@@ -197,8 +194,7 @@ public final class SMPUserManagerPhoton
    *         If the service group is owned by a different user.
    */
   public static void verifyOwnership (@NonNull final IParticipantIdentifier aServiceGroupID,
-                                      @NonNull final IUser aCurrentUser) throws SMPNotFoundException,
-                                                                         SMPUnauthorizedException
+                                      @NonNull final IUser aCurrentUser) throws SMPNotFoundException, SMPUnauthorizedException
   {
     // Resolve service group
     final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ()

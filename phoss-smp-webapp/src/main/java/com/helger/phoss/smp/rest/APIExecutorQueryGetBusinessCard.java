@@ -127,10 +127,11 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       final Exception aBCException = aBCExceptionWrapper.get ();
       LOGGER.error (sLogPrefix +
                     "Failed to perform the BusinessCard SMP lookup" +
-                    (aBCException == null ? "" : ". Technical details: " +
-                                                 aBCException.getClass ().getName () +
-                                                 " - " +
-                                                 aBCException.getMessage ()));
+                    (aBCException == null ? ""
+                                          : ". Technical details: " +
+                                            aBCException.getClass ().getName () +
+                                            " - " +
+                                            aBCException.getMessage ()));
       aUnifiedResponse.createNotFound ();
     }
     else

@@ -37,8 +37,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.Response;
 
 /**
- * Create many service groups - please make sure the SML connection is not
- * enabled.
+ * Create many service groups - please make sure the SML connection is not enabled.
  *
  * @author Philip Helger
  */

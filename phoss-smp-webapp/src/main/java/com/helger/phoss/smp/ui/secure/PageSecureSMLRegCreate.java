@@ -175,8 +175,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
       aForm.addChild (info ("Register this SMP to the SML. This must only be done once per SMP!"));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                aDefaultSML != null
-                                                                                                                    ? aDefaultSML.getID ()
+                                                                                                aDefaultSML != null ? aDefaultSML.getID ()
                                                                                                                     : null),
                                                                               aDisplayLocale,
                                                                               aSMLFilter))

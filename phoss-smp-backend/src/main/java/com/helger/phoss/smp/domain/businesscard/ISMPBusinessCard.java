@@ -24,8 +24,7 @@ import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppolid.IParticipantIdentifier;
 
 /**
- * This interface represents a single SMP business card for a certain service
- * group.
+ * This interface represents a single SMP business card for a certain service group.
  * <p>
  * The files in this package are licensed under Apache 2.0 license
  * </p>
@@ -36,15 +35,14 @@ import com.helger.peppolid.IParticipantIdentifier;
 public interface ISMPBusinessCard extends IHasID <String>
 {
   /**
-   * @return The participant ID of the service group to which this business card
-   *         belongs. Never <code>null</code>.
+   * @return The participant ID of the service group to which this business card belongs. Never
+   *         <code>null</code>.
    */
   @NonNull
   IParticipantIdentifier getParticipantIdentifier ();
 
   /**
-   * @return A copy of all {@link SMPBusinessCardEntity} objects. Never
-   *         <code>null</code>.
+   * @return A copy of all {@link SMPBusinessCardEntity} objects. Never <code>null</code>.
    */
   @NonNull
   @ReturnsMutableCopy
@@ -67,8 +65,7 @@ public interface ISMPBusinessCard extends IHasID <String>
   int getEntityCount ();
 
   /**
-   * @return This business card as a JAXB object for the REST interface. Never
-   *         <code>null</code>.
+   * @return This business card as a JAXB object for the REST interface. Never <code>null</code>.
    */
   @NonNull
   PD3BusinessCardType getAsJAXBObject ();

@@ -56,7 +56,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   @Override
   protected void onDestroy (@NonNull final IScope aScopeInDestruction)
   {
-    m_aRWLock.writeLocked ( () -> {
+    m_aRWLock.writeLocked (() -> {
       StreamHelper.close (m_aPDClient);
       m_aPDClient = null;
     });
@@ -67,7 +67,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
    */
   public void resetPDClient ()
   {
-    m_aRWLock.writeLocked ( () -> {
+    m_aRWLock.writeLocked (() -> {
       // Ensure to close the old one first
       StreamHelper.close (m_aPDClient);
       m_aPDClient = null;
@@ -81,7 +81,7 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   @Nullable
   public PDClient getPDClient ()
   {
-    PDClient ret = m_aRWLock.readLockedGet ( () -> m_aPDClient);
+    PDClient ret = m_aRWLock.readLockedGet (() -> m_aPDClient);
     if (ret == null)
     {
       final String sPDHostName = SMPMetaManager.getSettings ().getDirectoryHostName ();

@@ -46,9 +46,7 @@ public class SMPParticipantMigrationManagerXML extends
   @IsLocked (ELockType.WRITE)
   private ISMPParticipantMigration _createSMPParticipantMigration (@NonNull final SMPParticipantMigration aSMPParticipantMigration)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalCreateItem (aSMPParticipantMigration);
-    });
+    m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPParticipantMigration); });
     AuditHelper.onAuditCreateSuccess (SMPParticipantMigration.OT,
                                       aSMPParticipantMigration.getID (),
                                       aSMPParticipantMigration.getDirection (),
@@ -62,9 +60,7 @@ public class SMPParticipantMigrationManagerXML extends
   @IsLocked (ELockType.WRITE)
   private ISMPParticipantMigration _updateSMPParticipantMigration (@NonNull final SMPParticipantMigration aSMPParticipantMigration)
   {
-    m_aRWLock.writeLocked ( () -> {
-      internalUpdateItem (aSMPParticipantMigration);
-    });
+    m_aRWLock.writeLocked (() -> { internalUpdateItem (aSMPParticipantMigration); });
     AuditHelper.onAuditModifySuccess (SMPParticipantMigration.OT,
                                       aSMPParticipantMigration.getID (),
                                       aSMPParticipantMigration.getDirection (),

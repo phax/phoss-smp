@@ -172,8 +172,7 @@ public class PageSecureSMLRegUpdate extends AbstractPageSecureSMLReg
         aForm.addChild (info ("Update this SMP at the SML. This must only be done when the host name of the SMP changed!"));
         aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                      .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
-                                                                                                  aDefaultSML == null
-                                                                                                                      ? null
+                                                                                                  aDefaultSML == null ? null
                                                                                                                       : aDefaultSML.getID ()),
                                                                                 aDisplayLocale,
                                                                                 aSMLFilter))

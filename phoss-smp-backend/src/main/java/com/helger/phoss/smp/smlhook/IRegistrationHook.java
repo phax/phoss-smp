@@ -32,8 +32,7 @@ public interface IRegistrationHook
   void createServiceGroup (@NonNull IParticipantIdentifier aPI) throws RegistrationHookException;
 
   /**
-   * Delete a participant in the SML because the internal adding in the SMP
-   * failed
+   * Delete a participant in the SML because the internal adding in the SMP failed
    *
    * @param aPI
    *        The participant to be deleted

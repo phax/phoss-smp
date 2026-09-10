@@ -440,8 +440,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   @Override
   @NonNull
   protected EContinue onFilterBefore (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                                      @NonNull final UnifiedResponse aUnifiedResponse) throws IOException,
-                                                                                       ServletException
+                                      @NonNull final UnifiedResponse aUnifiedResponse) throws IOException, ServletException
   {
     if (LOGGER.isDebugEnabled ())
     {

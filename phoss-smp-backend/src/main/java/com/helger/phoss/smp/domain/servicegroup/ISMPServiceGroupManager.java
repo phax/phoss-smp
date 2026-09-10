@@ -130,8 +130,8 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @see ISMPRedirectManager#deleteAllSMPRedirectsOfServiceGroup(IParticipantIdentifier)
    */
   @NonNull
-  EChange deleteSMPServiceGroup (@NonNull IParticipantIdentifier aParticipantIdentifier, boolean bDeleteInSML)
-                                                                                                               throws SMPServerException;
+  EChange deleteSMPServiceGroup (@NonNull IParticipantIdentifier aParticipantIdentifier,
+                                 boolean bDeleteInSML) throws SMPServerException;
 
   /**
    * Delete the service group, and swallow all exceptions. This is only recommended for unit tests.

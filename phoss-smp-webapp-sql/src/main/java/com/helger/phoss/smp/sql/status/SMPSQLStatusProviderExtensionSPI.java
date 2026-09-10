@@ -64,8 +64,7 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
         // Since 5.4.0
         // It takes approximately 4 seconds on a local MySQL to say "no
         // connection" by default
-        ret.put ("smp.sql.db.connection-possible",
-                 Boolean.valueOf (SMPDataSourceSingleton.isDBConnectionPossible ()));
+        ret.put ("smp.sql.db.connection-possible", Boolean.valueOf (SMPDataSourceSingleton.isDBConnectionPossible ()));
       }
     }
     else

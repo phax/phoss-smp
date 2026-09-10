@@ -214,9 +214,10 @@ public final class BDXR2ServerAPI
         throw new SMPBadRequestException ("Service Group Inconsistency. The URL points to '" +
                                           aPathServiceGroupID.getURIEncoded () +
                                           "' whereas the Service Group contains " +
-                                          (aPayloadServiceGroupID == null ? "<none>" : "'" +
-                                                                                       aPayloadServiceGroupID.getURIEncoded () +
-                                                                                       "'"),
+                                          (aPayloadServiceGroupID == null ? "<none>"
+                                                                          : "'" +
+                                                                            aPayloadServiceGroupID.getURIEncoded () +
+                                                                            "'"),
                                           m_aAPIDataProvider.getCurrentURI ());
       }
       final IUser aSMPUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
@@ -413,9 +414,10 @@ public final class BDXR2ServerAPI
         // Participant ID in URL must match the one in XML structure
         throw new SMPBadRequestException ("Save Service Metadata was called with inconsistent values.\n" +
                                           "Service Metadata Participant ID: " +
-                                          (aPayloadServiceGroupID == null ? "<none>" : "'" +
-                                                                                       aPayloadServiceGroupID.getURIEncoded () +
-                                                                                       "'") +
+                                          (aPayloadServiceGroupID == null ? "<none>"
+                                                                          : "'" +
+                                                                            aPayloadServiceGroupID.getURIEncoded () +
+                                                                            "'") +
                                           "\n" +
                                           "URL parameter value: '" +
                                           aPathServiceGroupID.getURIEncoded () +
@@ -475,8 +477,8 @@ public final class BDXR2ServerAPI
                                                       aPM.getRedirect ().getPublisherURI ().getValue (),
                                                       sCertificateUID,
                                                       aCertificate,
-                                                      convertToJsonString (aPM.getRedirect ().getSMPExtensions ())) ==
-              null)
+                                                      convertToJsonString (aPM.getRedirect ()
+                                                                              .getSMPExtensions ())) == null)
           {
             LOGGER.error (sLog + " - ERROR - Redirect");
             STATS_COUNTER_ERROR.increment (sAction);
@@ -533,8 +535,8 @@ public final class BDXR2ServerAPI
                                                                null,
                                                                PDTFactory.createXMLOffsetDateTime (aJAXBEndpoint.getActivationDateValue ()),
                                                                PDTFactory.createXMLOffsetDateTime (aJAXBEndpoint.getExpirationDateValue ()),
-                                                               aCertBytes == null ? null : Base64.encodeBytes (
-                                                                                                               aCertBytes),
+                                                               aCertBytes == null ? null
+                                                                                  : Base64.encodeBytes (aCertBytes),
                                                                aJAXBEndpoint.getDescriptionValue (),
                                                                aJAXBEndpoint.getContactValue (),
                                                                null,
@@ -732,7 +734,7 @@ public final class BDXR2ServerAPI
       }
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
       final ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
-                                                                                                                        aPathDocTypeID);
+                                                                                                                         aPathDocTypeID);
       if (aServiceInfo == null)
       {
         throw SMPNotFoundException.unknownServiceInformation (sPathServiceGroupID,

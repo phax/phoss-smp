@@ -210,7 +210,7 @@ public final class PageSecureServiceGroupExportData extends AbstractSMPWebPage
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (PDTToString.getAsString (aJobData.getEndDateTime () != null ? aJobData.getEndDateTime ()
-                                                                               : aJobData.getStartDateTime (),
+                                                                                : aJobData.getStartDateTime (),
                                              aDisplayLocale));
       aRow.addCell (SecurityHelper.getUserDisplayName (aJobData.getStartingUserID (), aDisplayLocale));
       aRow.addCell (aFile.getName ());
