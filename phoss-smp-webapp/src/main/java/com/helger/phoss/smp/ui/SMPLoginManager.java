@@ -25,6 +25,7 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.photon.app.html.IHTMLProvider;
 import com.helger.photon.bootstrap5.uictrls.ext.BootstrapLoginManager;
 import com.helger.photon.core.servlet.AbstractSecureApplicationServlet;
+import com.helger.photon.security.login.LoginInfo;
 import com.helger.security.authentication.credentials.ICredentialValidationResult;
 import com.helger.servlet.StaticServerInfo;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
@@ -48,6 +49,21 @@ public final class SMPLoginManager extends BootstrapLoginManager
                                              @NonNull final ICredentialValidationResult aLoginResult)
   {
     return new SMPLoginHTMLProvider (bLoginError, aLoginResult, getPageTitle ());
+  }
+
+  @Override
+  protected void modifyLoginInfo (@NonNull final LoginInfo aLoginInfo,
+                                  @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                                  final boolean bLoggedInInThisRequest)
+  {
+    super.modifyLoginInfo (aLoginInfo, aRequestScope, bLoggedInInThisRequest);
+
+    if (bLoggedInInThisRequest)
+    {
+      // Every new login requires a new second factor, even if the same user logs in again in the
+      // same session
+      SMPSecondFactorHelper.resetSecondFactorProvided ();
+    }
   }
 
   @Override

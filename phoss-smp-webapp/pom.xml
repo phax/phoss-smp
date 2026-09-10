@@ -64,6 +64,10 @@
       <artifactId>phoss-smp-backend</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-totp-qrcode</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.helger.commons</groupId>
       <artifactId>ph-commons</artifactId>
     </dependency>

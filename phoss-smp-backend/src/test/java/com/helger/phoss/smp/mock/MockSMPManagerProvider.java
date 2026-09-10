@@ -21,6 +21,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
+import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.settings.ISMPSettingsManager;
 
@@ -80,6 +81,12 @@ public final class MockSMPManagerProvider implements ISMPManagerProvider
   public ISMPParticipantMigrationManager createParticipantMigrationMgr ()
   {
     return new MockSMPParticipantMigrationManager ();
+  }
+
+  @NonNull
+  public ISMPUserTotpManager createUserTotpMgr ()
+  {
+    return new MockSMPUserTotpManager ();
   }
 
   @NonNull
