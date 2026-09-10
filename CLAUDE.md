@@ -201,6 +201,7 @@ csp.enabled = true
 smp.rest.remote.queryapi.disabled = true
 smp.status.enabled = false     # /smp-status/ endpoint; off by default
 smp.ready.timeout = 2s         # time limit for the /smp-ready backend checks
+smp.totp.enabled = false       # two-factor auth (TOTP) for the management GUI; opt-in, restart required
 
 # Reverse proxy support
 smp.forceroot = false          # Set true when behind a reverse proxy stripping context path

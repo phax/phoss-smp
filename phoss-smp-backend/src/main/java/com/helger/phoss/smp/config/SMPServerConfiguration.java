@@ -71,6 +71,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
 
+  public static final String KEY_SMP_TOTP_ENABLED = "smp.totp.enabled";
+
   public static final String KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE = "smp.bdxr2.certificate.mimecode";
   public static final String KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE = "smp.bdxr2.certificate.typecode";
 
@@ -118,6 +120,12 @@ public final class SMPServerConfiguration
   public static final Duration DEFAULT_SMP_READY_TIMEOUT = Duration.ofSeconds (2);
 
   public static final boolean DEFAULT_SMP_STATUS_ENABLED = true;
+
+  /**
+   * The two-factor authentication of the management GUI is opt-in and therefore disabled by
+   * default.
+   */
+  public static final boolean DEFAULT_SMP_TOTP_ENABLED = false;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
 
   public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE = EMimeContentType.APPLICATION.buildMimeType ("base64")
@@ -414,6 +422,18 @@ public final class SMPServerConfiguration
   {
     return _getConfig ().getAsBoolean (KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES,
                                        DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES);
+  }
+
+  /**
+   * @return <code>true</code> if the two-factor authentication (TOTP) of the management GUI is
+   *         enabled, <code>false</code> if it is disabled. Defaults to <code>false</code>. Changing
+   *         this value requires a restart. Existing enrollments are retained while the feature is
+   *         disabled - they are simply not enforced.
+   * @since 8.4.3
+   */
+  public static boolean isTotpEnabled ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_TOTP_ENABLED, DEFAULT_SMP_TOTP_ENABLED);
   }
 
   /**

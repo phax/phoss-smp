@@ -26,6 +26,7 @@ import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotp;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
@@ -84,10 +85,14 @@ public final class SMPSecondFactorHelper
    *
    * @param sUserID
    *        The ID of the user in question. May be <code>null</code>.
-   * @return <code>true</code> if TOTP is enabled for that user.
+   * @return <code>true</code> if TOTP is globally enabled and enabled for that user.
    */
   public static boolean isSecondFactorRequired (@Nullable final String sUserID)
   {
+    // If the feature is globally disabled, existing enrollments are not enforced
+    if (!SMPServerConfiguration.isTotpEnabled ())
+      return false;
+
     return SMPUserTotpEnabledCache.isTotpEnabled (sUserID);
   }
 

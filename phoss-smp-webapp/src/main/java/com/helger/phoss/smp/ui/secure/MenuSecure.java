@@ -28,6 +28,7 @@ import com.helger.collection.commons.ICommonsMap;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.ISMPMenuExtensionSPI;
@@ -158,9 +159,17 @@ public final class MenuSecure
       aMenuTree.createItem (aAdmin, new PageSecureSMPIdentifierMappings (CMenuSecure.MENU_SMP_IDENTIFIER_MAPPINGS));
       aMenuTree.createItem (aAdmin, new PageSecureTransportProfiles (CMenuSecure.MENU_TRANSPORT_PROFILES));
       aMenuTree.createItem (aAdmin, new BasePageSecurityChangePassword <> (CMenuSecure.MENU_CHANGE_PASSWORD));
-      aMenuTree.createItem (aAdmin, new PageSecureUserTotp (CMenuSecure.MENU_USER_TOTP));
-      aMenuTree.createItem (aAdmin, new PageSecureUserTotpAdmin (CMenuSecure.MENU_USER_TOTP_ADMIN))
-               .setDisplayFilter (aFilterAdministrators);
+      if (SMPServerConfiguration.isTotpEnabled ())
+      {
+        // The pages are not created at all, so that they are also not reachable by URL
+        aMenuTree.createItem (aAdmin, new PageSecureUserTotp (CMenuSecure.MENU_USER_TOTP));
+        aMenuTree.createItem (aAdmin, new PageSecureUserTotpAdmin (CMenuSecure.MENU_USER_TOTP_ADMIN))
+                 .setDisplayFilter (aFilterAdministrators);
+      }
+      else
+        LOGGER.info ("The two-factor authentication pages are disabled, because '" +
+                     SMPServerConfiguration.KEY_SMP_TOTP_ENABLED +
+                     "' is not enabled.");
       BootstrapPagesMenuConfigurator.addAllItems (aMenuTree, aAdmin, aFilterAdministrators, CSMPServer.DEFAULT_LOCALE);
 
       if (SMPWebAppConfiguration.isWebAppPageSessionManagmentDisabled ())

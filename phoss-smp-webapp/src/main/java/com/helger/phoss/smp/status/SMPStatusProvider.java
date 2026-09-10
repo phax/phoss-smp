@@ -119,6 +119,8 @@ public final class SMPStatusProvider
     aStatusData.add ("smp.rest.log-exceptions", SMPServerConfiguration.isRestLogExceptions ());
     // New in 5.2.1
     aStatusData.add ("smp.rest.payload-on-error", SMPServerConfiguration.isRestPayloadOnError ());
+    // New in 8.4.3
+    aStatusData.add ("smp.totp.enabled", SMPServerConfiguration.isTotpEnabled ());
 
     // SML information
     aStatusData.add ("smp.sml.enabled", aSettings.isSMLEnabled ());
