@@ -34,7 +34,6 @@ import com.helger.cache.regex.RegExHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.format.PDTFromString;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
@@ -77,6 +76,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
+import com.helger.phoss.smp.ui.ajax.AjaxExecutorSecureServiceGroupSelect;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
@@ -1152,7 +1152,6 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     final boolean bEdit = eFormAction.isEdit ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final IRequestWebScopeWithoutResponse aRequestScope = aWPEC.getRequestScope ();
-    final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Business Card" : "Create new Business Card"));
 
@@ -1165,15 +1164,14 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
     else
     {
       // Show only service groups that don't have a BC already
-      final ICommonsSet <String> aAllParticipantIDsWithBusinessCards = aBusinessCardMgr.getAllSMPBusinessCardIDs ();
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                   .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                            aSelectedObject != null ? aSelectedObject.getID ()
-                                                                                                                                    : null),
-                                                                                          aDisplayLocale,
-                                                                                          x -> !aAllParticipantIDsWithBusinessCards.contains (x.getParticipantIdentifier ()
-                                                                                                                                               .getURIEncoded ()),
-                                                                                          false))
+                                                   .setCtrl (HCServiceGroupSelect.createAjax (aRequestScope,
+                                                                                              new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                                aSelectedObject != null ? aSelectedObject.getID ()
+                                                                                                                                        : null),
+                                                                                              aDisplayLocale,
+                                                                                              AjaxExecutorSecureServiceGroupSelect.FILTER_NO_BUSINESS_CARD,
+                                                                                              false))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     }
 

@@ -75,6 +75,7 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.ajax.AjaxExecutorSecureServiceGroupSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -807,13 +808,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aForm.addChild (new HCHiddenField (FIELD_ENDPOINT_ID, aSelectedEndpoint.getID ()));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                          aSelectedObject !=
-                                                                                                                                  null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                       : null),
-                                                                                        aDisplayLocale,
-                                                                                        null,
-                                                                                        bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.createAjax (aWPEC.getRequestScope (),
+                                                                                            new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                              aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                      : null),
+                                                                                            aDisplayLocale,
+                                                                                            AjaxExecutorSecureServiceGroupSelect.FILTER_NONE,
+                                                                                            bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     {
       final BootstrapRow aRow = new BootstrapRow ();

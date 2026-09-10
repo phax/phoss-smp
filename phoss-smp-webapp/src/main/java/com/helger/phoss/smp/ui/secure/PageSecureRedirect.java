@@ -53,6 +53,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.rest.SMPRestFilter;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.ajax.AjaxExecutorSecureServiceGroupSelect;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.app.url.LinkHelper;
@@ -379,12 +380,13 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Redirect" : "Create new Redirect"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                          aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                  : null),
-                                                                                        aDisplayLocale,
-                                                                                        null,
-                                                                                        bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.createAjax (aWPEC.getRequestScope (),
+                                                                                            new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                              aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                      : null),
+                                                                                            aDisplayLocale,
+                                                                                            AjaxExecutorSecureServiceGroupSelect.FILTER_NONE,
+                                                                                            bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document Type ID")

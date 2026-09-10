@@ -62,6 +62,11 @@ public final class CAjax
                                                                                                           .filter (FILTER_IS_USER_LOGGED_IN)
                                                                                                           .build ();
 
+  public static final IAjaxFunctionDeclaration FUNCTION_SERVICE_GROUP_SELECT = AjaxFunctionDeclaration.builder ("serviceGroupSelect")
+                                                                                                      .executor (AjaxExecutorSecureServiceGroupSelect.class)
+                                                                                                      .filter (FILTER_IS_USER_LOGGED_IN)
+                                                                                                      .build ();
+
   private static final Logger LOGGER = LoggerFactory.getLogger (CAjax.class);
 
   private CAjax ()
@@ -72,6 +77,7 @@ public final class CAjax
     aAjaxRegistry.registerFunction (DATATABLES);
     aAjaxRegistry.registerFunction (DATATABLES_I18N);
     aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);
+    aAjaxRegistry.registerFunction (FUNCTION_SERVICE_GROUP_SELECT);
     LOGGER.info ("Successfully registered the Ajax functions");
   }
 
