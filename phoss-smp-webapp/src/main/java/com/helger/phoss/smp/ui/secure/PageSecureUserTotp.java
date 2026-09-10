@@ -35,6 +35,7 @@ import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.textlevel.HCCode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.CSMP;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotp;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
@@ -270,7 +271,7 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
       aNodeList.addChild (info ("Two-factor authentication is currently not enabled for user '" +
                                 _getAccountLabel (aUser) +
                                 "'."));
-      aNodeList.addChild (div ("With two-factor authentication enabled, an additional one-time password from an authenticator app (like Google Authenticator, Microsoft Authenticator, FreeOTP, ...) is required to login."));
+      aNodeList.addChild (div ("With two-factor authentication enabled, an additional one-time password from an authenticator app (like Authy, Google Authenticator, Microsoft Authenticator, FreeOTP, ...) is required to login."));
 
       final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
       aToolbar.addButton ("Enable two-factor authentication", _getActionHref (aWPEC, ACTION_ENROLL), EDefaultIcon.YES);
@@ -285,7 +286,10 @@ public final class PageSecureUserTotp extends AbstractSMPWebPage
     try
     {
       final ZxingPngQrCodeImageGenerator aGenerator = new ZxingPngQrCodeImageGenerator ();
-      final String sIssuer = CSMP.getApplicationTitle ();
+      // The issuer identifies this SMP instance in the authenticator app of the user
+      final String sConfiguredIssuer = SMPServerConfiguration.getTotpIssuer ();
+      final String sIssuer = StringHelper.isNotEmpty (sConfiguredIssuer) ? sConfiguredIssuer
+                                                                         : CSMP.getApplicationTitle ();
       final byte [] aImage = aGenerator.generate (SMPTotpHelper.getQrData (sIssuer,
                                                                            sIssuer + ":" + _getAccountLabel (aUser),
                                                                            sSecret));

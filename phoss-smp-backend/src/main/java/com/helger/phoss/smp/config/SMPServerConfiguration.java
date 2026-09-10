@@ -72,6 +72,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
 
   public static final String KEY_SMP_TOTP_ENABLED = "smp.totp.enabled";
+  public static final String KEY_SMP_TOTP_ISSUER = "smp.totp.issuer";
 
   public static final String KEY_SMP_BDXR2_CERTIFICATE_MIME_CODE = "smp.bdxr2.certificate.mimecode";
   public static final String KEY_SMP_BDXR2_CERTIFICATE_TYPE_CODE = "smp.bdxr2.certificate.typecode";
@@ -434,6 +435,19 @@ public final class SMPServerConfiguration
   public static boolean isTotpEnabled ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_TOTP_ENABLED, DEFAULT_SMP_TOTP_ENABLED);
+  }
+
+  /**
+   * @return The issuer to be shown in the authenticator app of a user, identifying this SMP
+   *         instance. Property <code>smp.totp.issuer</code>. May be <code>null</code>, in which case
+   *         the caller has to fall back to the application title. It should not contain a colon,
+   *         because that is the separator between the issuer and the account name.
+   * @since 8.4.3
+   */
+  @Nullable
+  public static String getTotpIssuer ()
+  {
+    return _getConfig ().getAsString (KEY_SMP_TOTP_ISSUER);
   }
 
   /**
