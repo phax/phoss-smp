@@ -21,5 +21,6 @@ CREATE TABLE `smp_sectotp` (
   `enabled`  tinyint(1)   NOT NULL COMMENT 'Was the enrollment confirmed by the user?',
   `regdt`    datetime     NOT NULL COMMENT 'The date and time the enrollment was created',
   `lastslot` bigint                COMMENT 'The last successfully used TOTP time slot',
+  `reccodes` varchar(4000)         COMMENT 'The newline separated hashes of the unused recovery codes',
   PRIMARY KEY (`userid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SMP User TOTP enrollments';

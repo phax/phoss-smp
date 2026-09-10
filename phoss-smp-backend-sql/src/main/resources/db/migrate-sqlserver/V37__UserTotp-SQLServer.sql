@@ -21,6 +21,7 @@ CREATE TABLE smp_sectotp (
     enabled  bit          NOT NULL,
     regdt    datetime2    NOT NULL,
     lastslot bigint,
+    reccodes varchar(4000),
     CONSTRAINT pk_smp_sectotp PRIMARY KEY
       (userid)
   );

@@ -21,6 +21,7 @@ CREATE TABLE smp_sectotp (
   enabled  number(1)    NOT NULL,
   regdt    timestamp    NOT NULL,
   lastslot number(19),
+  reccodes varchar(4000),
   CONSTRAINT smp_sectotp_pk PRIMARY KEY (userid) USING INDEX tablespace USERS
 );
 
@@ -30,3 +31,4 @@ COMMENT ON COLUMN smp_sectotp.secret   IS 'The Base32 encoded shared secret';
 COMMENT ON COLUMN smp_sectotp.enabled  IS 'Was the enrollment confirmed by the user?';
 COMMENT ON COLUMN smp_sectotp.regdt    IS 'The date and time the enrollment was created';
 COMMENT ON COLUMN smp_sectotp.lastslot IS 'The last successfully used TOTP time slot';
+COMMENT ON COLUMN smp_sectotp.reccodes IS 'The newline separated hashes of the unused recovery codes';
