@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.NonNull;
@@ -54,7 +55,10 @@ import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -86,6 +90,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
   private final String m_sTableNameSG;
   private final String m_sTableNameO;
+  private final String m_sTableNameBC;
+  private final String m_sTableNamePM;
   private ManualCache <String, SMPServiceGroup> m_aCache;
 
   /**
@@ -103,6 +109,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
     m_sTableNameSG = sTableNamePrefix + "smp_service_group";
     m_sTableNameO = sTableNamePrefix + "smp_ownership";
+    m_sTableNameBC = sTableNamePrefix + "smp_bce";
+    m_sTableNamePM = sTableNamePrefix + "smp_pmigration";
   }
 
   public boolean isCacheEnabled ()
@@ -505,6 +513,120 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                       " AND " +
                                       aSearch.getSQL (),
                                       new ConstantPreparedStatementDataProvider (aSearch.getAllParams ()));
+  }
+
+  /**
+   * Create the SQL condition that applies the provided filter to the Service Group query. The
+   * filters are resolved with a <code>NOT EXISTS</code> sub select, so that no additional query is
+   * necessary and the database can use its indexes.
+   *
+   * @param eFilter
+   *        The filter to be applied. May not be <code>null</code>.
+   * @param aParams
+   *        The list to which the prepared statement parameters of the created condition are added.
+   *        May not be <code>null</code>.
+   * @return The SQL condition, starting with " AND ". Never <code>null</code> but empty if no
+   *         filtering is needed.
+   */
+  @NonNull
+  private String _getFilterClause (@NonNull final ESMPServiceGroupFilter eFilter,
+                                   @NonNull final ICommonsList <Object> aParams)
+  {
+    switch (eFilter)
+    {
+      case NO_BUSINESS_CARD:
+      {
+        return " AND NOT EXISTS (SELECT 1 FROM " +
+               m_sTableNameBC +
+               " bc WHERE bc.pid=" +
+               _getServiceGroupPIDSQL () +
+               ")";
+      }
+      case NO_BLOCKING_MIGRATION:
+      {
+        // All states that prevent a new migration
+        final ICommonsList <EParticipantMigrationState> aStates = new CommonsArrayList <> ();
+        for (final EParticipantMigrationState eState : EParticipantMigrationState.values ())
+          if (eState.preventsNewMigration ())
+            aStates.add (eState);
+        if (aStates.isEmpty ())
+          return "";
+
+        aParams.add (EParticipantMigrationDirection.OUTBOUND.getID ());
+        for (final EParticipantMigrationState eState : aStates)
+          aParams.add (eState.getID ());
+
+        return " AND NOT EXISTS (SELECT 1 FROM " +
+               m_sTableNamePM +
+               " pm WHERE pm.pid=" +
+               _getServiceGroupPIDSQL () +
+               " AND pm.direction=? AND pm.state IN (" +
+               String.join (",", Collections.nCopies (aStates.size (), "?")) +
+               "))";
+      }
+      default:
+        return "";
+    }
+  }
+
+  /**
+   * @return The SQL expression that creates the URI encoded participant identifier of the Service
+   *         Group table alias "sg". Never <code>null</code>.
+   */
+  @NonNull
+  private static String _getServiceGroupPIDSQL ()
+  {
+    return SMPJDBCQueryHelper.getStringConcat ("sg.businessIdentifierScheme",
+                                               "'" + CIdentifier.URL_SCHEME_VALUE_SEPARATOR + "'",
+                                               "sg.businessIdentifier");
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final ESMPServiceGroupFilter eFilter,
+                                                                 @NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getAllSMPServiceGroups(" + eFilter + ", " + aPagingSpec + ", " + sSearchText + ")");
+
+    if (aPagingSpec.isEmptyPage ())
+      return new CommonsArrayList <> ();
+
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    final ICommonsList <Object> aParams = aSearch.getAllParams ();
+    final String sFilterClause = _getFilterClause (eFilter, aParams);
+    return _getAllSMPServiceGroups ((aSearch.isEmpty () ? "" : " AND " + aSearch.getSQL ()) +
+                                    sFilterClause +
+                                    SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec),
+                                    aParams);
+  }
+
+  @Override
+  public long getSMPServiceGroupCount (@NonNull final ESMPServiceGroupFilter eFilter,
+                                       @Nullable final String sSearchText)
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getSMPServiceGroupCount(" + eFilter + ", " + sSearchText + ")");
+
+    final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
+    final ICommonsList <Object> aParams = aSearch.getAllParams ();
+    final String sFilterClause = _getFilterClause (eFilter, aParams);
+    if (aSearch.isEmpty () && sFilterClause.isEmpty ())
+      return getSMPServiceGroupCount ();
+
+    // Use the same FROM and JOIN as the list query, so that all searchable columns are available
+    return newExecutor ().queryCount ("SELECT COUNT(*)" +
+                                      " FROM " +
+                                      m_sTableNameSG +
+                                      " sg, " +
+                                      m_sTableNameO +
+                                      " so" +
+                                      " WHERE so.businessIdentifierScheme=sg.businessIdentifierScheme AND so.businessIdentifier=sg.businessIdentifier" +
+                                      (aSearch.isEmpty () ? "" : " AND " + aSearch.getSQL ()) +
+                                      sFilterClause,
+                                      new ConstantPreparedStatementDataProvider (aParams));
   }
 
   @NonNull
