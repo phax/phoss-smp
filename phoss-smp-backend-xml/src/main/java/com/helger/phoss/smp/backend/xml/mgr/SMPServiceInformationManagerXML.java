@@ -30,7 +30,6 @@ import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.annotation.style.ReturnsMutableObject;
 import com.helger.base.callback.CallbackList;
 import com.helger.base.enforce.ValueEnforcer;
-import com.helger.base.equals.EqualsHelper;
 import com.helger.base.numeric.mutable.MutableLong;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
@@ -118,29 +117,21 @@ public final class SMPServiceInformationManagerXML extends
       LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
 
     // Check for an update
-    boolean bChangeExisting = false;
     final SMPServiceInformation aOldInformation = (SMPServiceInformation) getSMPServiceInformationOfServiceGroupAndDocumentType (aSMPServiceInformation.getServiceGroupParticipantIdentifier (),
                                                                                                                                  aSMPServiceInformation.getDocumentTypeIdentifier ());
     if (aOldInformation != null)
     {
-      // If a service information is present, it must be the provided object!
-      // This is not true for the REST API
-      if (EqualsHelper.identityEqual (aOldInformation, aSMPServiceInformation))
-        bChangeExisting = true;
-    }
-
-    if (bChangeExisting)
-    {
-      // Edit existing
-      m_aRWLock.writeLocked (() -> { internalUpdateItem (aOldInformation); });
+      // Replace existing. In particular, REST API calls pass a newly created
+      // object rather than the stored instance.
+      m_aRWLock.writeLocked (() -> { internalUpdateItem (aSMPServiceInformation); });
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
-                                        aOldInformation.getID (),
-                                        aOldInformation.getServiceGroupID (),
-                                        aOldInformation.getDocumentTypeIdentifier ().getURIEncoded (),
-                                        aOldInformation.getAllProcesses (),
-                                        aOldInformation.getExtensions ().getExtensionsAsJsonString ());
+                                        aSMPServiceInformation.getID (),
+                                        aSMPServiceInformation.getServiceGroupID (),
+                                        aSMPServiceInformation.getDocumentTypeIdentifier ().getURIEncoded (),
+                                        aSMPServiceInformation.getAllProcesses (),
+                                        aSMPServiceInformation.getExtensions ().getExtensionsAsJsonString ());
 
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - updated");
@@ -149,40 +140,8 @@ public final class SMPServiceInformationManagerXML extends
     }
     else
     {
-      // (Optionally delete the old one and) create the new one
-      boolean bRemovedOld = false;
-      m_aRWLock.writeLock ().lock ();
-      try
-      {
-        if (aOldInformation != null)
-        {
-          // Delete only if present
-          final SMPServiceInformation aDeletedInformation = internalDeleteItem (aOldInformation.getID ());
-          bRemovedOld = EqualsHelper.identityEqual (aDeletedInformation, aOldInformation);
-        }
-
-        internalCreateItem (aSMPServiceInformation);
-      }
-      finally
-      {
-        m_aRWLock.writeLock ().unlock ();
-      }
-
-      if (bRemovedOld)
-      {
-        AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
-                                          aOldInformation.getID (),
-                                          aOldInformation.getServiceGroupID (),
-                                          aOldInformation.getDocumentTypeIdentifier ().getURIEncoded ());
-      }
-      else
-        if (aOldInformation != null)
-        {
-          AuditHelper.onAuditDeleteFailure (SMPServiceInformation.OT,
-                                            aOldInformation.getID (),
-                                            aOldInformation.getServiceGroupID (),
-                                            aOldInformation.getDocumentTypeIdentifier ().getURIEncoded ());
-        }
+      // Create the new one
+      m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPServiceInformation); });
 
       AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
                                         aSMPServiceInformation.getID (),
@@ -193,10 +152,7 @@ public final class SMPServiceInformationManagerXML extends
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug ("mergeSMPServiceInformation - success - created");
 
-      if (aOldInformation != null)
-        m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
-      else
-        m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
+      m_aCBs.forEach (x -> x.onSMPServiceInformationCreated (aSMPServiceInformation));
     }
     return ESuccess.SUCCESS;
   }

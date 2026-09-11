@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -45,6 +47,9 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.audit.EAuditActionType;
+import com.helger.photon.audit.IAuditor;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -119,6 +124,51 @@ public final class SMPServiceInformationManagerXMLTest
                                     .getAllProcesses ()
                                     .get (0)
                                     .getEndpointCount ());
+      }
+
+      {
+        // A REST-like replacement uses a different Java object and must still
+        // be handled and audited as an update.
+        final SMPEndpoint aEP = new SMPEndpoint ("epid",
+                                                 "tp",
+                                                 "http://localhost/as2-rest",
+                                                 false,
+                                                 "minauth",
+                                                 aStartDT,
+                                                 aEndDT,
+                                                 "cert",
+                                                 "sd",
+                                                 "tc",
+                                                 "ti",
+                                                 "<extep />");
+        final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc />");
+        final IAuditor aOldAuditor = AuditHelper.getAuditor ();
+        final AtomicReference <EAuditActionType> aAuditAction = new AtomicReference <> ();
+        try
+        {
+          AuditHelper.setAuditor ((eActionType, eSuccess, aActionObjectType, sAction, aArgs) -> {
+            if (SMPServiceInformation.OT.equals (aActionObjectType))
+              aAuditAction.set (eActionType);
+          });
+          assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI,
+                                                                                                    aDocTypeID,
+                                                                                                    new CommonsArrayList <> (aProcess),
+                                                                                                    "<extsi-rest />"))
+                                            .isSuccess ());
+          assertEquals (EAuditActionType.MODIFY, aAuditAction.get ());
+        }
+        finally
+        {
+          AuditHelper.setAuditor (aOldAuditor);
+        }
+
+        assertEquals ("http://localhost/as2-rest",
+                      CollectionFind.getFirstElement (aServiceInformationMgr.getAllSMPServiceInformation ())
+                                    .getAllProcesses ()
+                                    .get (0)
+                                    .getAllEndpoints ()
+                                    .get (0)
+                                    .getEndpointReference ());
       }
 
       {
