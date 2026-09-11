@@ -738,6 +738,43 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     return nEndpointsChanged;
   }
 
+  /**
+   * Count the endpoints referencing one of the provided Access Point IDs.
+   *
+   * @param aAccessPointIDs
+   *        The Access Point IDs to look for. May not be <code>null</code>.
+   * @param aServiceGroupID
+   *        Optional service group filter. May be <code>null</code>.
+   * @return The number of matching endpoints.
+   */
+  @Nonnegative
+  private long _countEndpointsUsingAccessPoints (@NonNull final ICommonsSet <String> aAccessPointIDs,
+                                                 @Nullable final IParticipantIdentifier aServiceGroupID)
+  {
+    if (aAccessPointIDs.isEmpty ())
+      return 0;
+
+    Bson aFilter = Filters.in (BSON_ACCESS_POINT_ID_PATH, aAccessPointIDs);
+    if (aServiceGroupID != null)
+      aFilter = Filters.and (aFilter, Filters.eq (BSON_SERVICE_GROUP_ID, aServiceGroupID.getURIEncoded ()));
+
+    long ret = 0;
+    for (final Document aDoc : getCollection ().find (aFilter))
+    {
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+              if (aAccessPointIDs.contains (aEndpoint.getString (BSON_ACCESS_POINT_ID)))
+                ret++;
+        }
+    }
+    return ret;
+  }
+
   @Nonnegative
   public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
                                      @NonNull final String sOldURL,
@@ -746,20 +783,50 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     ValueEnforcer.notNull (sOldURL, "OldURL");
     ValueEnforcer.notNull (sNewURL, "NewURL");
 
-    // Determine all Access Points that need to be re-pointed
-    final ICommonsMap <String, String> aOldToNewAPID = new CommonsHashMap <> ();
-    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
-      if (sOldURL.equals (aAP.getEndpointReference ()))
-      {
-        final ISMPAccessPoint aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (sNewURL, aAP.getCertificate ());
-        if (!aNewAP.getID ().equals (aAP.getID ()))
-          aOldToNewAPID.put (aAP.getID (), aNewAP.getID ());
-      }
+    if (sOldURL.equals (sNewURL))
+      return 0;
 
-    final long nEndpointsChanged = _replaceAccessPointIDs (aServiceGroupID, aOldToNewAPID);
-    if (nEndpointsChanged > 0)
+    final ISMPAccessPoint aOldAP = m_aAccessPointMgr.findAccessPoint (sOldURL);
+    if (aOldAP == null)
+      return 0;
+
+    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (new CommonsHashSet <> (aOldAP.getID ()),
+                                                                     aServiceGroupID);
+    if (nEndpointsChanged == 0)
+      return 0;
+
+    final ISMPAccessPoint aTargetAP = m_aAccessPointMgr.findAccessPoint (sNewURL);
+    if (aServiceGroupID == null && aTargetAP == null)
+    {
+      // Fast path: all endpoints of this Access Point are affected and the new URL is not yet in
+      // use, so simply rename the Access Point. No endpoint needs to be touched at all.
+      m_aAccessPointMgr.updateAccessPointEndpointReference (aOldAP.getID (), sNewURL);
+      return nEndpointsChanged;
+    }
+
+    // Only a part of the endpoints is affected and/or the new URL already exists, so the affected
+    // endpoints must be re-pointed to the Access Point of the new URL
+    final ISMPAccessPoint aNewAP;
+    if (aTargetAP != null)
+    {
+      if (!aTargetAP.hasSameCertificate (aOldAP.getCertificate ()))
+        LOGGER.warn ("The Access Point '" +
+                     sNewURL +
+                     "' already exists with a different certificate. The affected endpoints now use the certificate of '" +
+                     sNewURL +
+                     "'.");
+      aNewAP = aTargetAP;
+    }
+    else
+      aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (sNewURL, aOldAP.getCertificate ());
+
+    final ICommonsMap <String, String> aOldToNewAPID = new CommonsHashMap <> ();
+    aOldToNewAPID.put (aOldAP.getID (), aNewAP.getID ());
+
+    final long nChanged = _replaceAccessPointIDs (aServiceGroupID, aOldToNewAPID);
+    if (nChanged > 0)
       _deleteAllUnusedAccessPoints ();
-    return nEndpointsChanged;
+    return nChanged;
   }
 
   @Nonnegative
@@ -770,22 +837,15 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    // Determine all Access Points that need to be re-pointed
-    final ICommonsMap <String, String> aOldToNewAPID = new CommonsHashMap <> ();
-    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
-    {
-      final String sCert = aAP.getCertificate ();
-      if (sCert != null && sOldCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (sCert)))
-      {
-        final ISMPAccessPoint aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (aAP.getEndpointReference (), sNewCert);
-        if (!aNewAP.getID ().equals (aAP.getID ()))
-          aOldToNewAPID.put (aAP.getID (), aNewAP.getID ());
-      }
-    }
+    // The certificate is an attribute of the Access Point, so only the Access Points need to be
+    // updated - no endpoint is touched at all
+    final ICommonsSet <String> aAPIDs = m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized);
+    if (aAPIDs.isEmpty ())
+      return 0;
 
-    final long nEndpointsChanged = _replaceAccessPointIDs (null, aOldToNewAPID);
-    if (nEndpointsChanged > 0)
-      _deleteAllUnusedAccessPoints ();
+    // Determine the number of affected endpoints for the caller, before the change is applied
+    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (aAPIDs, null);
+    m_aAccessPointMgr.updateAllAccessPointCertificates (sOldCertNormalized, sNewCert);
     return nEndpointsChanged;
   }
 

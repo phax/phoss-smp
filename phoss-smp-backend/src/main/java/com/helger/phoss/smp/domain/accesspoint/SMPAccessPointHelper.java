@@ -28,9 +28,6 @@ import com.helger.base.string.StringHelper;
 @Immutable
 public final class SMPAccessPointHelper
 {
-  /** Separator that cannot occur in a URL nor in a PEM encoded certificate */
-  private static final char LOOKUP_KEY_SEPARATOR = '\u0000';
-
   private SMPAccessPointHelper ()
   {}
 
@@ -50,22 +47,19 @@ public final class SMPAccessPointHelper
 
   /**
    * Create the key that is used to identify identical Access Points. Two Access Points are
-   * considered identical if they have the same endpoint reference URL and the same certificate.
-   * <code>null</code> and empty values are treated identically, because that is how the different
-   * backends store "no value".
+   * considered identical if they have the same endpoint reference URL - a physical Access Point can
+   * technically only have one single public certificate, so the certificate is not part of the
+   * identity. <code>null</code> and empty values are treated identically, because that is how the
+   * different backends store "no value".
    *
    * @param sEndpointReference
    *        The endpoint reference URL. May be <code>null</code>.
-   * @param sCertificate
-   *        The certificate. May be <code>null</code>.
    * @return The non-<code>null</code> lookup key.
    */
   @NonNull
-  public static String createLookupKey (@Nullable final String sEndpointReference, @Nullable final String sCertificate)
+  public static String createLookupKey (@Nullable final String sEndpointReference)
   {
-    return StringHelper.getNotNull (sEndpointReference, "") +
-           LOOKUP_KEY_SEPARATOR +
-           StringHelper.getNotNull (sCertificate, "");
+    return StringHelper.getNotNull (sEndpointReference, "");
   }
 
   /**
@@ -78,6 +72,6 @@ public final class SMPAccessPointHelper
   @NonNull
   public static String createLookupKey (@NonNull final ISMPAccessPoint aAccessPoint)
   {
-    return createLookupKey (aAccessPoint.getEndpointReference (), aAccessPoint.getCertificate ());
+    return createLookupKey (aAccessPoint.getEndpointReference ());
   }
 }

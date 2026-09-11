@@ -138,13 +138,19 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final String sAccessPointID = aElement.getAttributeValue (ATTR_ACCESS_POINT_ID);
     if (StringHelper.isNotEmpty (sAccessPointID))
     {
+      // Important: use the managed object as-is and do not create a copy of it. Access Points are
+      // shared between all endpoints using the same URL, so that changing the certificate of an
+      // Access Point is immediately effective for all of them.
       final ISMPAccessPoint aResolved = aAccessPointMgr.getAccessPointOfID (sAccessPointID);
-      if (aResolved != null)
-        aAccessPoint = new SMPAccessPoint (aResolved.getID (),
-                                           aResolved.getEndpointReference (),
-                                           aResolved.getCertificate ());
+      if (aResolved instanceof SMPAccessPoint)
+        aAccessPoint = (SMPAccessPoint) aResolved;
       else
-        LOGGER.warn ("Failed to resolve SMP Access Point with ID '" + sAccessPointID + "'");
+        if (aResolved != null)
+          aAccessPoint = new SMPAccessPoint (aResolved.getID (),
+                                             aResolved.getEndpointReference (),
+                                             aResolved.getCertificate ());
+        else
+          LOGGER.warn ("Failed to resolve SMP Access Point with ID '" + sAccessPointID + "'");
     }
     if (aAccessPoint == null)
     {
@@ -153,9 +159,12 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
       final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
       final String sCertificate = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE);
       final ISMPAccessPoint aCreated = aAccessPointMgr.getOrCreateAccessPoint (sEndpointReference, sCertificate);
-      aAccessPoint = new SMPAccessPoint (aCreated.getID (),
-                                         aCreated.getEndpointReference (),
-                                         aCreated.getCertificate ());
+      if (aCreated instanceof SMPAccessPoint)
+        aAccessPoint = (SMPAccessPoint) aCreated;
+      else
+        aAccessPoint = new SMPAccessPoint (aCreated.getID (),
+                                           aCreated.getEndpointReference (),
+                                           aCreated.getCertificate ());
     }
 
     return new SMPEndpoint (sID,

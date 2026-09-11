@@ -933,7 +933,10 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                              aSelectedEndpoint != null ? aSelectedEndpoint.getCertificate ()
                                                                                                                        : null)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
                                                  .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
-                                                               "PEM encoded X509 DER formatted value.")
+                                                               "PEM encoded X509 DER formatted value. " +
+                                                               "Note: the certificate belongs to the Access Point identified by the " +
+                                                               "Endpoint Reference above. Changing it therefore changes the certificate " +
+                                                               "of all endpoints that use the very same Endpoint Reference.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CERTIFICATE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Description")

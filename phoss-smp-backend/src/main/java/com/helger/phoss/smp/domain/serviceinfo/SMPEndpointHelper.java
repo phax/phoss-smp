@@ -90,8 +90,12 @@ public final class SMPEndpointHelper
   /**
    * Resolve the Access Points of all endpoints contained in the provided service information. Every
    * endpoint gets the managed - and therefore de-duplicated - Access Point matching its endpoint
-   * reference URL and certificate assigned. This must be called by every backend before persisting
-   * a service information object.
+   * reference URL assigned. This must be called by every backend before persisting a service
+   * information object.
+   * <p>
+   * Note: if an endpoint carries a certificate that differs from the one of the already existing
+   * Access Point with the same URL, the certificate of that Access Point is updated - and therefore
+   * changed for all endpoints referencing it. A physical Access Point can only have one certificate.
    *
    * @param aAccessPointMgr
    *        The Access Point manager to use. May not be <code>null</code>.

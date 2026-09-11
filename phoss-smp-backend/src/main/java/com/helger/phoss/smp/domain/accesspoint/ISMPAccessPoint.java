@@ -16,17 +16,23 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.CompareHelper;
 import com.helger.base.compare.IComparator;
+import com.helger.base.equals.EqualsHelper;
 import com.helger.base.id.IHasID;
 import com.helger.base.string.StringHelper;
 
 /**
- * Represents a single physical Access Point - meaning the combination of an endpoint reference URL
- * and the public certificate of that Access Point.
+ * Represents a single physical Access Point - meaning the endpoint reference URL and the public
+ * certificate of that Access Point.
  * <p>
  * Because multiple SMP endpoints (of different participants, document types and processes)
  * regularly point to the very same physical Access Point, this data is stored only once and is
  * referenced from all the {@link com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint} objects using
  * it.
+ * <p>
+ * An Access Point is <b>identified by its endpoint reference URL</b>. A physical Access Point can
+ * technically only have one single public certificate, so the certificate is a mutable attribute of
+ * the Access Point and not part of its identity. As a consequence, changing the certificate of an
+ * Access Point is a single write that is immediately effective for all endpoints referencing it.
  *
  * @author Philip Helger
  * @since 8.4.4
@@ -82,18 +88,29 @@ public interface ISMPAccessPoint extends IHasID <String>
   }
 
   /**
-   * Check if this Access Point uses exactly the provided URL and certificate.
+   * Check if this Access Point uses exactly the provided endpoint reference URL. This is the
+   * identity check of an Access Point.
    *
    * @param sEndpointReference
    *        The endpoint reference to compare to. May be <code>null</code>.
+   * @return <code>true</code> if the endpoint reference matches.
+   */
+  default boolean hasSameEndpointReference (@Nullable final String sEndpointReference)
+  {
+    return SMPAccessPointHelper.createLookupKey (getEndpointReference ())
+                               .equals (SMPAccessPointHelper.createLookupKey (sEndpointReference));
+  }
+
+  /**
+   * Check if this Access Point uses exactly the provided certificate.
+   *
    * @param sCertificate
    *        The certificate to compare to. May be <code>null</code>.
-   * @return <code>true</code> if both values match.
+   * @return <code>true</code> if the certificate matches.
    */
-  default boolean hasSameContent (@Nullable final String sEndpointReference, @Nullable final String sCertificate)
+  default boolean hasSameCertificate (@Nullable final String sCertificate)
   {
-    return SMPAccessPointHelper.createLookupKey (getEndpointReference (), getCertificate ())
-                               .equals (SMPAccessPointHelper.createLookupKey (sEndpointReference, sCertificate));
+    return EqualsHelper.equals (getCertificate (), sCertificate);
   }
 
   @NonNull

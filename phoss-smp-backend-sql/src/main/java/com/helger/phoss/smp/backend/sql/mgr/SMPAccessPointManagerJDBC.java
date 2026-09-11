@@ -40,7 +40,6 @@ import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
-import com.helger.phoss.smp.domain.accesspoint.SMPAccessPointHelper;
 import com.helger.photon.audit.AuditHelper;
 
 /**
@@ -85,43 +84,41 @@ public final class SMPAccessPointManagerJDBC extends AbstractJDBCEnabledManager 
   }
 
   @Nullable
-  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference,
-                                          @Nullable final String sCertificate)
+  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference)
   {
-    // SQL cannot compare CLOBs portably, so pre-select by the URL and compare
-    // the certificate in Java. The number of Access Points per URL is small.
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference, sCertificate);
-    final ICommonsList <DBResultRow> aDBResult;
+    final Wrapper <DBResultRow> aDBResult = new Wrapper <> ();
     if (sEndpointReference == null)
-      aDBResult = newExecutor ().queryAll ("SELECT id, endpointReference, certificate FROM " +
-                                           m_sTableName +
-                                           " WHERE endpointReference IS NULL");
+      newExecutor ().querySingle ("SELECT id, endpointReference, certificate FROM " +
+                                  m_sTableName +
+                                  " WHERE endpointReference IS NULL", aDBResult::set);
     else
-      aDBResult = newExecutor ().queryAll ("SELECT id, endpointReference, certificate FROM " +
-                                           m_sTableName +
-                                           " WHERE endpointReference=?",
-                                           new ConstantPreparedStatementDataProvider (sEndpointReference));
-    if (aDBResult != null)
-      for (final DBResultRow aRow : aDBResult)
-      {
-        final SMPAccessPoint aAP = _toDomain (aRow);
-        if (SMPAccessPointHelper.createLookupKey (aAP).equals (sLookupKey))
-          return aAP;
-      }
-    return null;
+      newExecutor ().querySingle ("SELECT id, endpointReference, certificate FROM " +
+                                  m_sTableName +
+                                  " WHERE endpointReference=?",
+                                  new ConstantPreparedStatementDataProvider (sEndpointReference),
+                                  aDBResult::set);
+    return aDBResult.isSet () ? _toDomain (aDBResult.get ()) : null;
   }
 
   @NonNull
   public ISMPAccessPoint getOrCreateAccessPoint (@Nullable final String sEndpointReference,
                                                  @Nullable final String sCertificate)
   {
-    final ISMPAccessPoint aExisting = findAccessPoint (sEndpointReference, sCertificate);
+    final ISMPAccessPoint aExisting = findAccessPoint (sEndpointReference);
     if (aExisting != null)
+    {
+      // An Access Point can only have one certificate - the latest one wins
+      if (!aExisting.hasSameCertificate (sCertificate))
+      {
+        updateAccessPointCertificate (aExisting.getID (), sCertificate);
+        return new SMPAccessPoint (aExisting.getID (), sEndpointReference, sCertificate);
+      }
       return aExisting;
+    }
 
     final SMPAccessPoint aNew = SMPAccessPoint.createDetached (sEndpointReference, sCertificate);
     final DBExecutor aExecutor = newExecutor ();
-    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
+    final ESuccess eSuccess = aExecutor.performInTransaction ( () -> {
       final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                                               m_sTableName +
                                                               " (id, endpointReference, certificate) VALUES (?, ?, ?)",
@@ -134,10 +131,59 @@ public final class SMPAccessPointManagerJDBC extends AbstractJDBCEnabledManager 
         throw new IllegalStateException ("Failed to create new DB entry (" + nCreated + ")");
     });
     if (eSuccess.isFailure ())
+    {
+      // The endpoint reference is unique, so a concurrent thread may have created the very same
+      // Access Point in the meantime
+      final ISMPAccessPoint aConcurrent = findAccessPoint (sEndpointReference);
+      if (aConcurrent != null)
+        return aConcurrent;
       throw new IllegalStateException ("Failed to insert Access Point '" + aNew.getID () + "' into the database");
+    }
 
     AuditHelper.onAuditCreateSuccess (SMPAccessPoint.OT, aNew.getID (), sEndpointReference);
     return aNew;
+  }
+
+  @NonNull
+  public EChange updateAccessPointCertificate (@Nullable final String sID, @Nullable final String sNewCertificate)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final long nUpdated = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                 m_sTableName +
+                                                                 " SET certificate=? WHERE id=?",
+                                                                 new ConstantPreparedStatementDataProvider (sNewCertificate,
+                                                                                                            sID));
+    if (nUpdated <= 0)
+    {
+      AuditHelper.onAuditModifyFailure (SMPAccessPoint.OT, "set-certificate", sID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-certificate", sID);
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange updateAccessPointEndpointReference (@Nullable final String sID,
+                                                     @Nullable final String sNewEndpointReference)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final long nUpdated = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                 m_sTableName +
+                                                                 " SET endpointReference=? WHERE id=?",
+                                                                 new ConstantPreparedStatementDataProvider (DBValueHelper.getTrimmedToLength (sNewEndpointReference,
+                                                                                                                                              ENDPOINT_REFERENCE_MAX_LENGTH),
+                                                                                                            sID));
+    if (nUpdated <= 0)
+    {
+      AuditHelper.onAuditModifyFailure (SMPAccessPoint.OT, "set-endpoint-reference", sID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-endpoint-reference", sID, sNewEndpointReference);
+    return EChange.CHANGED;
   }
 
   @Nullable

@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.numeric.mutable.MutableBoolean;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
@@ -65,10 +66,9 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
   }
 
   @Nullable
-  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference,
-                                          @Nullable final String sCertificate)
+  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference)
   {
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference, sCertificate);
+    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference);
     return m_aRWLock.writeLockedGet ( () -> {
       _ensureIndexIsValid ();
       final String sID = m_aLookupIndex.get (sLookupKey);
@@ -80,11 +80,12 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
   public ISMPAccessPoint getOrCreateAccessPoint (@Nullable final String sEndpointReference,
                                                  @Nullable final String sCertificate)
   {
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference, sCertificate);
+    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference);
 
     // Try to find an existing one and create it if it is not yet present. This must happen
     // atomically to avoid creating duplicates.
-    final SMPAccessPoint aCreated = m_aRWLock.writeLockedGet ( () -> {
+    final MutableBoolean aCertChanged = new MutableBoolean (false);
+    final SMPAccessPoint aResolved = m_aRWLock.writeLockedGet ( () -> {
       _ensureIndexIsValid ();
 
       final String sExistingID = m_aLookupIndex.get (sLookupKey);
@@ -92,7 +93,15 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
       {
         final SMPAccessPoint aExisting = getOfID (sExistingID);
         if (aExisting != null)
+        {
+          // An Access Point can only have one certificate - the latest one wins
+          if (aExisting.setCertificate (sCertificate).isChanged ())
+          {
+            internalUpdateItem (aExisting);
+            aCertChanged.set (true);
+          }
           return aExisting;
+        }
         // Stale index entry
         m_aLookupIndex.remove (sLookupKey);
       }
@@ -102,7 +111,64 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
       m_aLookupIndex.put (sLookupKey, aNew.getID ());
       return aNew;
     });
-    return aCreated;
+
+    if (aCertChanged.booleanValue ())
+      AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-certificate", aResolved.getID ());
+    return aResolved;
+  }
+
+  @NonNull
+  public EChange updateAccessPointCertificate (@Nullable final String sID, @Nullable final String sNewCertificate)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final EChange eChange = m_aRWLock.writeLockedGet ( () -> {
+      final SMPAccessPoint aAP = getOfID (sID);
+      if (aAP == null)
+        return EChange.UNCHANGED;
+      if (aAP.setCertificate (sNewCertificate).isUnchanged ())
+        return EChange.UNCHANGED;
+      internalUpdateItem (aAP);
+      return EChange.CHANGED;
+    });
+
+    if (eChange.isUnchanged ())
+      return EChange.UNCHANGED;
+
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-certificate", sID);
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange updateAccessPointEndpointReference (@Nullable final String sID,
+                                                     @Nullable final String sNewEndpointReference)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final EChange eChange = m_aRWLock.writeLockedGet ( () -> {
+      _ensureIndexIsValid ();
+
+      final SMPAccessPoint aAP = getOfID (sID);
+      if (aAP == null)
+        return EChange.UNCHANGED;
+
+      final String sOldLookupKey = SMPAccessPointHelper.createLookupKey (aAP);
+      if (aAP.setEndpointReference (sNewEndpointReference).isUnchanged ())
+        return EChange.UNCHANGED;
+
+      m_aLookupIndex.remove (sOldLookupKey);
+      m_aLookupIndex.put (SMPAccessPointHelper.createLookupKey (aAP), sID);
+      internalUpdateItem (aAP);
+      return EChange.CHANGED;
+    });
+
+    if (eChange.isUnchanged ())
+      return EChange.UNCHANGED;
+
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-endpoint-reference", sID, sNewEndpointReference);
+    return EChange.CHANGED;
   }
 
   @Nullable

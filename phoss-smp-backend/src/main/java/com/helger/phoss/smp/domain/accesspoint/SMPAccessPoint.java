@@ -14,30 +14,37 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
-import com.helger.annotation.concurrent.Immutable;
+import com.helger.annotation.concurrent.NotThreadSafe;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.hashcode.HashCodeGenerator;
+import com.helger.base.state.EChange;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.base.type.ObjectType;
 
 /**
  * Default implementation of the {@link ISMPAccessPoint} interface.
  * <p>
- * Instances of this class are immutable. Changing the URL or the certificate of an endpoint
- * therefore never modifies an existing Access Point (which may be shared by many endpoints), but
- * always results in a new Access Point object that is de-duplicated by the backend upon saving.
+ * An Access Point is identified by its endpoint reference URL. The certificate is a mutable
+ * attribute that may only be changed via the {@link ISMPAccessPointManager} - because a single
+ * Access Point object is shared by all endpoints referencing it, such a change is immediately
+ * effective for all of them, which is exactly the desired behaviour.
+ * <p>
+ * Changing the URL or the certificate of a single <em>endpoint</em> on the other hand must never
+ * modify a shared Access Point. Therefore {@link #withEndpointReference(String)} and
+ * {@link #withCertificate(String)} create new detached Access Points that are de-duplicated by the
+ * backend upon saving.
  *
  * @author Philip Helger
  * @since 8.4.4
  */
-@Immutable
+@NotThreadSafe
 public class SMPAccessPoint implements ISMPAccessPoint
 {
   public static final ObjectType OT = new ObjectType ("smpaccesspoint");
 
   private final String m_sID;
-  private final String m_sEndpointReference;
-  private final String m_sCertificate;
+  private String m_sEndpointReference;
+  private String m_sCertificate;
 
   public SMPAccessPoint (@NonNull @Nonempty final String sID,
                          @Nullable final String sEndpointReference,
@@ -87,6 +94,41 @@ public class SMPAccessPoint implements ISMPAccessPoint
   }
 
   /**
+   * Set the endpoint reference URL of this Access Point. This changes the identity of the Access
+   * Point, so this method may only be called by an {@link ISMPAccessPointManager}.
+   *
+   * @param sEndpointReference
+   *        The new endpoint reference URL. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the value was changed.
+   */
+  @NonNull
+  public EChange setEndpointReference (@Nullable final String sEndpointReference)
+  {
+    if (hasSameEndpointReference (sEndpointReference))
+      return EChange.UNCHANGED;
+    m_sEndpointReference = sEndpointReference;
+    return EChange.CHANGED;
+  }
+
+  /**
+   * Set the certificate of this Access Point. Because a single Access Point object is shared by all
+   * endpoints referencing it, this change is immediately effective for all of them. This method may
+   * only be called by an {@link ISMPAccessPointManager}.
+   *
+   * @param sCertificate
+   *        The new certificate. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the value was changed.
+   */
+  @NonNull
+  public EChange setCertificate (@Nullable final String sCertificate)
+  {
+    if (hasSameCertificate (sCertificate))
+      return EChange.UNCHANGED;
+    m_sCertificate = sCertificate;
+    return EChange.CHANGED;
+  }
+
+  /**
    * @param sEndpointReference
    *        The new endpoint reference URL. May be <code>null</code>.
    * @return A new detached Access Point with the provided endpoint reference and the certificate of
@@ -95,7 +137,7 @@ public class SMPAccessPoint implements ISMPAccessPoint
   @NonNull
   public SMPAccessPoint withEndpointReference (@Nullable final String sEndpointReference)
   {
-    if (hasSameContent (sEndpointReference, m_sCertificate))
+    if (hasSameEndpointReference (sEndpointReference))
       return this;
     return createDetached (sEndpointReference, m_sCertificate);
   }
@@ -109,7 +151,7 @@ public class SMPAccessPoint implements ISMPAccessPoint
   @NonNull
   public SMPAccessPoint withCertificate (@Nullable final String sCertificate)
   {
-    if (hasSameContent (m_sEndpointReference, sCertificate))
+    if (hasSameCertificate (sCertificate))
       return this;
     return createDetached (m_sEndpointReference, sCertificate);
   }

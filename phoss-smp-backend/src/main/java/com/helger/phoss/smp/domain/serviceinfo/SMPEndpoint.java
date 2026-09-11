@@ -228,9 +228,10 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   /**
-   * Change the endpoint reference URL of this endpoint. Because Access Points are immutable and
-   * shared between endpoints, this results in a new detached Access Point that is de-duplicated by
-   * the backend upon saving.
+   * Change the endpoint reference URL of this endpoint. Because an Access Point is identified by
+   * its URL and shared between endpoints, this results in a new detached Access Point that is
+   * de-duplicated by the backend upon saving. The Access Point previously referenced by this
+   * endpoint is not modified.
    *
    * @param sEndpointReference
    *        The new endpoint reference URL. May be <code>null</code>.
@@ -290,9 +291,10 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   /**
-   * Change the certificate of this endpoint. Because Access Points are immutable and shared between
-   * endpoints, this results in a new detached Access Point that is de-duplicated by the backend upon
-   * saving.
+   * Change the certificate of this endpoint. This results in a new detached Access Point that is
+   * de-duplicated by the backend upon saving. Note that saving then updates the certificate of the
+   * Access Point with this endpoint's URL - and therefore of all endpoints using that very same URL
+   * - because a physical Access Point can only have one certificate.
    *
    * @param sCertificate
    *        The new certificate. May be <code>null</code>.

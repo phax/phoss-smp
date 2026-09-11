@@ -46,6 +46,7 @@ import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
@@ -460,6 +461,73 @@ public final class SMPServiceInformationManagerXML extends
     return ret;
   }
 
+  /**
+   * Count the endpoints referencing one of the provided Access Point IDs.
+   *
+   * @param aAccessPointIDs
+   *        The Access Point IDs to look for. May not be <code>null</code>.
+   * @param aServiceGroupID
+   *        Optional service group filter. May be <code>null</code>.
+   * @return The number of matching endpoints.
+   */
+  @Nonnegative
+  private long _countEndpointsUsingAccessPoints (@NonNull final ICommonsSet <String> aAccessPointIDs,
+                                                 @Nullable final IParticipantIdentifier aServiceGroupID)
+  {
+    if (aAccessPointIDs.isEmpty ())
+      return 0;
+
+    final MutableLong ret = new MutableLong (0);
+    forEachValue (aSI -> {
+      if (aServiceGroupID == null || aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+            if (aAccessPointIDs.contains (aEndpoint.getAccessPointID ()))
+              ret.inc ();
+    });
+    return ret.longValue ();
+  }
+
+  /**
+   * Re-point all endpoints that currently use the Access Point with the provided ID to the provided
+   * new Access Point.
+   *
+   * @param sOldAccessPointID
+   *        The ID of the Access Point to be replaced. May not be <code>null</code>.
+   * @param aNewAccessPoint
+   *        The new Access Point to be used. May not be <code>null</code>.
+   * @param aServiceGroupID
+   *        Optional service group filter. May be <code>null</code>.
+   * @return The number of changed endpoints.
+   */
+  @Nonnegative
+  private long _repointEndpoints (@NonNull final String sOldAccessPointID,
+                                  @NonNull final ISMPAccessPoint aNewAccessPoint,
+                                  @Nullable final IParticipantIdentifier aServiceGroupID)
+  {
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave ( () -> {
+      for (final ISMPServiceInformation aSI : getAllSMPServiceInformation ())
+      {
+        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+          continue;
+
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+            if (sOldAccessPointID.equals (aEndpoint.getAccessPointID ()))
+            {
+              ((SMPEndpoint) aEndpoint).setAccessPoint (aNewAccessPoint);
+              bSIChanged = true;
+              aEndpointsChanged.inc ();
+            }
+        if (bSIChanged)
+          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
+  }
+
   @Nonnegative
   public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
                                      @NonNull final String sOldURL,
@@ -468,32 +536,47 @@ public final class SMPServiceInformationManagerXML extends
     ValueEnforcer.notNull (sOldURL, "OldURL");
     ValueEnforcer.notNull (sNewURL, "NewURL");
 
-    final MutableLong aEndpointsChanged = new MutableLong (0);
-    performWithoutAutoSave (() -> {
-      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
-      for (final ISMPServiceInformation aSI : aAllSIs)
-      {
-        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
-          continue;
+    if (sOldURL.equals (sNewURL))
+      return 0;
 
-        boolean bSIChanged = false;
-        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-            if (sOldURL.equals (aEndpoint.getEndpointReference ()))
-            {
-              ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
-              // Re-resolve the Access Point, because the URL changed
-              SMPEndpointHelper.resolveAccessPoint (m_aAccessPointMgr, aEndpoint);
-              bSIChanged = true;
-              aEndpointsChanged.inc ();
-            }
-        if (bSIChanged)
-          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
-      }
-    });
-    if (aEndpointsChanged.isNot0 ())
+    final ISMPAccessPoint aOldAP = m_aAccessPointMgr.findAccessPoint (sOldURL);
+    if (aOldAP == null)
+      return 0;
+
+    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (new CommonsHashSet <> (aOldAP.getID ()),
+                                                                     aServiceGroupID);
+    if (nEndpointsChanged == 0)
+      return 0;
+
+    final ISMPAccessPoint aTargetAP = m_aAccessPointMgr.findAccessPoint (sNewURL);
+    if (aServiceGroupID == null && aTargetAP == null)
+    {
+      // Fast path: all endpoints of this Access Point are affected and the new URL is not yet in
+      // use, so simply rename the Access Point. No endpoint needs to be touched at all.
+      m_aAccessPointMgr.updateAccessPointEndpointReference (aOldAP.getID (), sNewURL);
+      return nEndpointsChanged;
+    }
+
+    // Only a part of the endpoints is affected and/or the new URL already exists, so the affected
+    // endpoints must be re-pointed to the Access Point of the new URL
+    final ISMPAccessPoint aNewAP;
+    if (aTargetAP != null)
+    {
+      if (!aTargetAP.hasSameCertificate (aOldAP.getCertificate ()))
+        LOGGER.warn ("The Access Point '" +
+                     sNewURL +
+                     "' already exists with a different certificate. The affected endpoints now use the certificate of '" +
+                     sNewURL +
+                     "'.");
+      aNewAP = aTargetAP;
+    }
+    else
+      aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (sNewURL, aOldAP.getCertificate ());
+
+    final long nChanged = _repointEndpoints (aOldAP.getID (), aNewAP, aServiceGroupID);
+    if (nChanged > 0)
       _deleteAllUnusedAccessPoints ();
-    return aEndpointsChanged.longValue ();
+    return nChanged;
   }
 
   @Nonnegative
@@ -504,36 +587,16 @@ public final class SMPServiceInformationManagerXML extends
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    final MutableLong aEndpointsChanged = new MutableLong (0);
-    performWithoutAutoSave (() -> {
-      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
-      for (final ISMPServiceInformation aSI : aAllSIs)
-      {
-        boolean bSIChanged = false;
-        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-          {
-            final String sCert = aEndpoint.getCertificate ();
-            if (sCert != null)
-            {
-              final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sCert);
-              if (sOldCertNormalized.equals (sStoredCertNormalized))
-              {
-                ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
-                // Re-resolve the Access Point, because the certificate changed
-                SMPEndpointHelper.resolveAccessPoint (m_aAccessPointMgr, aEndpoint);
-                bSIChanged = true;
-                aEndpointsChanged.inc ();
-              }
-            }
-          }
-        if (bSIChanged)
-          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
-      }
-    });
-    if (aEndpointsChanged.isNot0 ())
-      _deleteAllUnusedAccessPoints ();
-    return aEndpointsChanged.longValue ();
+    // The certificate is an attribute of the Access Point, so only the Access Points need to be
+    // updated - no endpoint is touched at all
+    final ICommonsSet <String> aAPIDs = m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized);
+    if (aAPIDs.isEmpty ())
+      return 0;
+
+    // Determine the number of affected endpoints for the caller, before the change is applied
+    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (aAPIDs, null);
+    m_aAccessPointMgr.updateAllAccessPointCertificates (sOldCertNormalized, sNewCert);
+    return nEndpointsChanged;
   }
 
   @NonNull

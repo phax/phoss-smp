@@ -32,15 +32,14 @@ import com.helger.phoss.smp.domain.accesspoint.SMPAccessPointHelper;
  *
  * @author Philip Helger
  */
-final class MockSMPAccessPointManager implements ISMPAccessPointManager
+public final class MockSMPAccessPointManager implements ISMPAccessPointManager
 {
   private final ICommonsOrderedMap <String, ISMPAccessPoint> m_aMap = new CommonsLinkedHashMap <> ();
 
   @Nullable
-  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference,
-                                          @Nullable final String sCertificate)
+  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference)
   {
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference, sCertificate);
+    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference);
     synchronized (m_aMap)
     {
       return m_aMap.findFirstValue (x -> SMPAccessPointHelper.createLookupKey (x.getValue ()).equals (sLookupKey));
@@ -53,13 +52,42 @@ final class MockSMPAccessPointManager implements ISMPAccessPointManager
   {
     synchronized (m_aMap)
     {
-      final ISMPAccessPoint aExisting = findAccessPoint (sEndpointReference, sCertificate);
+      final ISMPAccessPoint aExisting = findAccessPoint (sEndpointReference);
       if (aExisting != null)
+      {
+        // An Access Point can only have one certificate - the latest one wins
+        ((SMPAccessPoint) aExisting).setCertificate (sCertificate);
         return aExisting;
+      }
 
       final SMPAccessPoint aNew = SMPAccessPoint.createDetached (sEndpointReference, sCertificate);
       m_aMap.put (aNew.getID (), aNew);
       return aNew;
+    }
+  }
+
+  @NonNull
+  public EChange updateAccessPointCertificate (@Nullable final String sID, @Nullable final String sNewCertificate)
+  {
+    synchronized (m_aMap)
+    {
+      final ISMPAccessPoint aAP = getAccessPointOfID (sID);
+      if (aAP == null)
+        return EChange.UNCHANGED;
+      return ((SMPAccessPoint) aAP).setCertificate (sNewCertificate);
+    }
+  }
+
+  @NonNull
+  public EChange updateAccessPointEndpointReference (@Nullable final String sID,
+                                                     @Nullable final String sNewEndpointReference)
+  {
+    synchronized (m_aMap)
+    {
+      final ISMPAccessPoint aAP = getAccessPointOfID (sID);
+      if (aAP == null)
+        return EChange.UNCHANGED;
+      return ((SMPAccessPoint) aAP).setEndpointReference (sNewEndpointReference);
     }
   }
 

@@ -30,11 +30,14 @@ import com.helger.collection.commons.ICommonsSet;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
-import com.helger.phoss.smp.domain.accesspoint.SMPAccessPointHelper;
 import com.helger.photon.audit.AuditHelper;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 /**
  * Implementation of {@link ISMPAccessPointManager} for MongoDB
@@ -51,7 +54,8 @@ public final class SMPAccessPointManagerMongoDB extends AbstractManagerMongoDB i
   {
     super ("smp-accesspoint");
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
-    getCollection ().createIndex (Indexes.ascending (BSON_ENDPOINT_REFERENCE));
+    // An Access Point is identified by its endpoint reference URL
+    getCollection ().createIndex (Indexes.ascending (BSON_ENDPOINT_REFERENCE), new IndexOptions ().unique (true));
   }
 
   @NonNull
@@ -73,38 +77,83 @@ public final class SMPAccessPointManagerMongoDB extends AbstractManagerMongoDB i
   }
 
   @Nullable
-  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference,
-                                          @Nullable final String sCertificate)
+  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference)
   {
-    // Note: null and "" must be distinguished, so pre-select by endpoint
-    // reference and compare the full content in Java
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference, sCertificate);
-    for (final Document aDoc : getCollection ().find (sEndpointReference == null ? Filters.eq (BSON_ENDPOINT_REFERENCE,
-                                                                                               null)
-                                                                                 : Filters.eq (BSON_ENDPOINT_REFERENCE,
-                                                                                               sEndpointReference)))
-    {
-      final SMPAccessPoint aAP = toDomain (aDoc);
-      if (SMPAccessPointHelper.createLookupKey (aAP).equals (sLookupKey))
-        return aAP;
-    }
-    return null;
+    return getCollection ().find (Filters.eq (BSON_ENDPOINT_REFERENCE, sEndpointReference))
+                           .map (SMPAccessPointManagerMongoDB::toDomain)
+                           .first ();
   }
 
   @NonNull
   public ISMPAccessPoint getOrCreateAccessPoint (@Nullable final String sEndpointReference,
                                                  @Nullable final String sCertificate)
   {
-    final ISMPAccessPoint aExisting = findAccessPoint (sEndpointReference, sCertificate);
+    final ISMPAccessPoint aExisting = findAccessPoint (sEndpointReference);
     if (aExisting != null)
+    {
+      // An Access Point can only have one certificate - the latest one wins
+      if (!aExisting.hasSameCertificate (sCertificate))
+      {
+        updateAccessPointCertificate (aExisting.getID (), sCertificate);
+        return new SMPAccessPoint (aExisting.getID (), sEndpointReference, sCertificate);
+      }
       return aExisting;
+    }
 
     final SMPAccessPoint aNew = SMPAccessPoint.createDetached (sEndpointReference, sCertificate);
-    if (!getCollection ().insertOne (toBson (aNew)).wasAcknowledged ())
-      throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    try
+    {
+      if (!getCollection ().insertOne (toBson (aNew)).wasAcknowledged ())
+        throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+    }
+    catch (final MongoWriteException ex)
+    {
+      // The endpoint reference is unique, so a concurrent thread may have created the very same
+      // Access Point in the meantime
+      final ISMPAccessPoint aConcurrent = findAccessPoint (sEndpointReference);
+      if (aConcurrent != null)
+        return aConcurrent;
+      throw ex;
+    }
 
     AuditHelper.onAuditCreateSuccess (SMPAccessPoint.OT, aNew.getID (), sEndpointReference);
     return aNew;
+  }
+
+  @NonNull
+  public EChange updateAccessPointCertificate (@Nullable final String sID, @Nullable final String sNewCertificate)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final UpdateResult aUR = getCollection ().updateOne (Filters.eq (BSON_ID, sID),
+                                                         Updates.set (BSON_CERTIFICATE, sNewCertificate));
+    if (!aUR.wasAcknowledged () || aUR.getMatchedCount () == 0)
+    {
+      AuditHelper.onAuditModifyFailure (SMPAccessPoint.OT, "set-certificate", sID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-certificate", sID);
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange updateAccessPointEndpointReference (@Nullable final String sID,
+                                                     @Nullable final String sNewEndpointReference)
+  {
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final UpdateResult aUR = getCollection ().updateOne (Filters.eq (BSON_ID, sID),
+                                                         Updates.set (BSON_ENDPOINT_REFERENCE,
+                                                                      sNewEndpointReference));
+    if (!aUR.wasAcknowledged () || aUR.getMatchedCount () == 0)
+    {
+      AuditHelper.onAuditModifyFailure (SMPAccessPoint.OT, "set-endpoint-reference", sID, "no-such-id");
+      return EChange.UNCHANGED;
+    }
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-endpoint-reference", sID, sNewEndpointReference);
+    return EChange.CHANGED;
   }
 
   @Nullable

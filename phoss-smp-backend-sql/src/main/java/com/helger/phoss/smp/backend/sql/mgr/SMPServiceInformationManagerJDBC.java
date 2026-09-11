@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -868,6 +869,51 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return ret;
   }
 
+  /** Maximum number of elements in a single SQL "IN" clause (Oracle limit is 1000) */
+  private static final int MAX_IN_CLAUSE_ELEMENTS = 500;
+
+  /**
+   * Count the endpoints referencing one of the provided Access Point IDs.
+   *
+   * @param aAccessPointIDs
+   *        The Access Point IDs to look for. May not be <code>null</code>.
+   * @param aServiceGroupID
+   *        Optional service group filter. May be <code>null</code>.
+   * @return The number of matching endpoints.
+   */
+  @Nonnegative
+  private long _countEndpointsUsingAccessPoints (@NonNull final ICommonsSet <String> aAccessPointIDs,
+                                                 @Nullable final IParticipantIdentifier aServiceGroupID)
+  {
+    if (aAccessPointIDs.isEmpty ())
+      return 0;
+
+    // Chunk the IDs, because some databases (e.g. Oracle) limit the number of elements of a single
+    // "IN" clause
+    final ICommonsList <String> aAllIDs = new CommonsArrayList <> (aAccessPointIDs);
+    long ret = 0;
+    for (int nStart = 0; nStart < aAllIDs.size (); nStart += MAX_IN_CLAUSE_ELEMENTS)
+    {
+      final List <String> aChunk = aAllIDs.subList (nStart,
+                                                    Math.min (nStart + MAX_IN_CLAUSE_ELEMENTS, aAllIDs.size ()));
+      final ICommonsList <Object> aParams = new CommonsArrayList <> (aChunk);
+      final StringBuilder aSQL = new StringBuilder ("SELECT COUNT(*) FROM ").append (m_sTableNameE)
+                                                                            .append (" WHERE accessPointID IN (")
+                                                                            .append (StringHelper.getRepeated ("?,",
+                                                                                                               aChunk.size () -
+                                                                                                                     1))
+                                                                            .append ("?)");
+      if (aServiceGroupID != null)
+      {
+        aSQL.append (" AND businessIdentifierScheme=? AND businessIdentifier=?");
+        aParams.add (aServiceGroupID.getScheme ());
+        aParams.add (aServiceGroupID.getValue ());
+      }
+      ret += newExecutor ().queryCount (aSQL.toString (), new ConstantPreparedStatementDataProvider (aParams));
+    }
+    return ret;
+  }
+
   @Nonnegative
   public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
                                      @NonNull final String sOldURL,
@@ -876,34 +922,61 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     ValueEnforcer.notNull (sOldURL, "OldURL");
     ValueEnforcer.notNull (sNewURL, "NewURL");
 
-    // Re-point all endpoints from the old Access Points to the new ones
-    long nEndpointsChanged = 0;
-    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
-      if (sOldURL.equals (aAP.getEndpointReference ()))
-      {
-        final ISMPAccessPoint aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (sNewURL, aAP.getCertificate ());
-        if (aNewAP.getID ().equals (aAP.getID ()))
-          continue;
+    if (sOldURL.equals (sNewURL))
+      return 0;
 
-        if (aServiceGroupID != null)
-          nEndpointsChanged += newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                                      m_sTableNameE +
-                                                                      " SET accessPointID=? WHERE accessPointID=? AND businessIdentifierScheme=? AND businessIdentifier=?",
-                                                                      new ConstantPreparedStatementDataProvider (aNewAP.getID (),
-                                                                                                                 aAP.getID (),
-                                                                                                                 aServiceGroupID.getScheme (),
-                                                                                                                 aServiceGroupID.getValue ()));
-        else
-          nEndpointsChanged += newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                                      m_sTableNameE +
-                                                                      " SET accessPointID=? WHERE accessPointID=?",
-                                                                      new ConstantPreparedStatementDataProvider (aNewAP.getID (),
-                                                                                                                 aAP.getID ()));
-      }
+    final ISMPAccessPoint aOldAP = m_aAccessPointMgr.findAccessPoint (sOldURL);
+    if (aOldAP == null)
+      return 0;
 
-    if (nEndpointsChanged > 0)
+    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (new CommonsHashSet <> (aOldAP.getID ()),
+                                                                     aServiceGroupID);
+    if (nEndpointsChanged == 0)
+      return 0;
+
+    final ISMPAccessPoint aTargetAP = m_aAccessPointMgr.findAccessPoint (sNewURL);
+    if (aServiceGroupID == null && aTargetAP == null)
+    {
+      // Fast path: all endpoints of this Access Point are affected and the new URL is not yet in
+      // use, so simply rename the Access Point. No endpoint row needs to be touched at all.
+      m_aAccessPointMgr.updateAccessPointEndpointReference (aOldAP.getID (), sNewURL);
+      return nEndpointsChanged;
+    }
+
+    // Only a part of the endpoints is affected and/or the new URL already exists, so the affected
+    // endpoints must be re-pointed to the Access Point of the new URL
+    final ISMPAccessPoint aNewAP;
+    if (aTargetAP != null)
+    {
+      if (!aTargetAP.hasSameCertificate (aOldAP.getCertificate ()))
+        LOGGER.warn ("The Access Point '" +
+                     sNewURL +
+                     "' already exists with a different certificate. The affected endpoints now use the certificate of '" +
+                     sNewURL +
+                     "'.");
+      aNewAP = aTargetAP;
+    }
+    else
+      aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (sNewURL, aOldAP.getCertificate ());
+
+    final long nChanged;
+    if (aServiceGroupID != null)
+      nChanged = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                        m_sTableNameE +
+                                                        " SET accessPointID=? WHERE accessPointID=? AND businessIdentifierScheme=? AND businessIdentifier=?",
+                                                        new ConstantPreparedStatementDataProvider (aNewAP.getID (),
+                                                                                                   aOldAP.getID (),
+                                                                                                   aServiceGroupID.getScheme (),
+                                                                                                   aServiceGroupID.getValue ()));
+    else
+      nChanged = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                        m_sTableNameE +
+                                                        " SET accessPointID=? WHERE accessPointID=?",
+                                                        new ConstantPreparedStatementDataProvider (aNewAP.getID (),
+                                                                                                   aOldAP.getID ()));
+    if (nChanged > 0)
       _deleteAllUnusedAccessPoints ();
-    return nEndpointsChanged;
+    return Math.max (nChanged, 0);
   }
 
   @Nonnegative
@@ -914,27 +987,15 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    long nEndpointsChanged = 0;
-    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
-    {
-      final String sStoredCert = aAP.getCertificate ();
-      if (StringHelper.isNotEmpty (sStoredCert) &&
-          sOldCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (sStoredCert)))
-      {
-        final ISMPAccessPoint aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (aAP.getEndpointReference (), sNewCert);
-        if (aNewAP.getID ().equals (aAP.getID ()))
-          continue;
+    // The certificate is an attribute of the Access Point, so only the (few) Access Point rows need
+    // to be updated - no endpoint row is touched at all
+    final ICommonsSet <String> aAPIDs = m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized);
+    if (aAPIDs.isEmpty ())
+      return 0;
 
-        nEndpointsChanged += newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                                    m_sTableNameE +
-                                                                    " SET accessPointID=? WHERE accessPointID=?",
-                                                                    new ConstantPreparedStatementDataProvider (aNewAP.getID (),
-                                                                                                               aAP.getID ()));
-      }
-    }
-
-    if (nEndpointsChanged > 0)
-      _deleteAllUnusedAccessPoints ();
+    // Determine the number of affected endpoints for the caller, before the change is applied
+    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (aAPIDs, null);
+    m_aAccessPointMgr.updateAllAccessPointCertificates (sOldCertNormalized, sNewCert);
     return nEndpointsChanged;
   }
 

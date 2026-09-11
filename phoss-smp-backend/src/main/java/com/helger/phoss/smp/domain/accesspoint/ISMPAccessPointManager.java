@@ -15,14 +15,21 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.phoss.smp.security.SMPCertificateHelper;
 
 /**
  * Manager for {@link ISMPAccessPoint} objects. Access Points are shared between all SMP endpoints
- * that use the very same endpoint reference URL and certificate, so that this - potentially large -
- * data is only stored once.
+ * that use the very same endpoint reference URL, so that this - potentially large - data is only
+ * stored once.
+ * <p>
+ * An Access Point is identified by its endpoint reference URL only, because a physical Access Point
+ * can technically only have one single public certificate. Changing the certificate of an Access
+ * Point is therefore a single write that is immediately effective for all endpoints referencing it.
  *
  * @author Philip Helger
  * @since 8.4.4
@@ -33,21 +40,24 @@ public interface ISMPAccessPointManager
   int ENDPOINT_REFERENCE_MAX_LENGTH = 256;
 
   /**
-   * Find the Access Point with the exact provided endpoint reference and certificate.
+   * Find the Access Point with the exact provided endpoint reference URL.
    *
    * @param sEndpointReference
    *        The endpoint reference URL to search. May be <code>null</code>.
-   * @param sCertificate
-   *        The certificate to search. May be <code>null</code>.
    * @return <code>null</code> if no such Access Point exists.
    */
   @Nullable
-  ISMPAccessPoint findAccessPoint (@Nullable String sEndpointReference, @Nullable String sCertificate);
+  ISMPAccessPoint findAccessPoint (@Nullable String sEndpointReference);
 
   /**
-   * Get the existing Access Point with the provided endpoint reference and certificate or create a
-   * new one, if no such Access Point exists yet. This is the main entry point for the backends when
-   * saving service information.
+   * Get the existing Access Point with the provided endpoint reference URL or create a new one, if
+   * no such Access Point exists yet. This is the main entry point for the backends when saving
+   * service information.
+   * <p>
+   * If an Access Point with the provided URL already exists but has a different certificate, the
+   * certificate of that Access Point is updated to the provided one. This is intentional: a
+   * physical Access Point can only have one certificate, so the change is effective for all
+   * endpoints referencing this Access Point.
    *
    * @param sEndpointReference
    *        The endpoint reference URL. May be <code>null</code>.
@@ -80,6 +90,81 @@ public interface ISMPAccessPointManager
    */
   @Nonnegative
   long getAccessPointCount ();
+
+  /**
+   * Change the certificate of a single Access Point. The change is immediately effective for all
+   * endpoints referencing this Access Point.
+   *
+   * @param sID
+   *        The ID of the Access Point to be changed. May be <code>null</code>.
+   * @param sNewCertificate
+   *        The new certificate to be set. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if something was changed.
+   */
+  @NonNull
+  EChange updateAccessPointCertificate (@Nullable String sID, @Nullable String sNewCertificate);
+
+  /**
+   * Change the endpoint reference URL of a single Access Point. The change is immediately effective
+   * for all endpoints referencing this Access Point. The caller must ensure that no other Access
+   * Point with the new URL exists.
+   *
+   * @param sID
+   *        The ID of the Access Point to be changed. May be <code>null</code>.
+   * @param sNewEndpointReference
+   *        The new endpoint reference URL to be set. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if something was changed.
+   */
+  @NonNull
+  EChange updateAccessPointEndpointReference (@Nullable String sID, @Nullable String sNewEndpointReference);
+
+  /**
+   * Find the IDs of all Access Points that use the provided certificate. The comparison is
+   * performed on the normalized form of the certificate, as created by
+   * {@link SMPCertificateHelper#getNormalizedCert(String)}.
+   *
+   * @param sUnifiedCertificate
+   *        The normalized certificate to search for. May not be <code>null</code>.
+   * @return A non-<code>null</code> mutable set of Access Point IDs.
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  default ICommonsSet <String> getAllAccessPointIDsWithCertificate (@NonNull final String sUnifiedCertificate)
+  {
+    ValueEnforcer.notNull (sUnifiedCertificate, "UnifiedCertificate");
+
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    for (final ISMPAccessPoint aAP : getAllAccessPoints ())
+      if (aAP.hasCertificate () &&
+          sUnifiedCertificate.equals (SMPCertificateHelper.getNormalizedCert (aAP.getCertificate ())))
+        ret.add (aAP.getID ());
+    return ret;
+  }
+
+  /**
+   * Bulk-change the certificate of all Access Points that currently use the provided certificate.
+   * Because each endpoint only references an Access Point, no endpoint needs to be touched at all -
+   * this is what makes a certificate rollover cheap, no matter how many endpoints are affected.
+   *
+   * @param sUnifiedOldCertificate
+   *        The normalized old certificate to search for. May not be <code>null</code>.
+   * @param sNewCertificate
+   *        The new certificate to be set (stored as-is). May not be <code>null</code>.
+   * @return The number of changed Access Points. Always &ge; 0.
+   */
+  @Nonnegative
+  default long updateAllAccessPointCertificates (@NonNull final String sUnifiedOldCertificate,
+                                                 @NonNull final String sNewCertificate)
+  {
+    ValueEnforcer.notNull (sUnifiedOldCertificate, "UnifiedOldCertificate");
+    ValueEnforcer.notNull (sNewCertificate, "NewCertificate");
+
+    long nChanged = 0;
+    for (final String sID : getAllAccessPointIDsWithCertificate (sUnifiedOldCertificate))
+      if (updateAccessPointCertificate (sID, sNewCertificate).isChanged ())
+        nChanged++;
+    return nChanged;
+  }
 
   /**
    * Delete the Access Point with the provided ID.
