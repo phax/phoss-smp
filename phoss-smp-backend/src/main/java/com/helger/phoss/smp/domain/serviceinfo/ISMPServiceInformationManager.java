@@ -25,6 +25,7 @@ import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -310,4 +311,15 @@ public interface ISMPServiceInformationManager
    */
   @Nonnegative
   long updateAllEndpointCertificates (@NonNull String sOldCert, @NonNull String sNewCert);
+
+  /**
+   * Get the IDs of all Access Points that are currently referenced by at least one endpoint. This is
+   * used to garbage collect Access Points that are no longer in use.
+   *
+   * @return A non-<code>null</code> mutable set of Access Point IDs.
+   * @since 8.4.4
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsSet <String> getAllUsedAccessPointIDs ();
 }

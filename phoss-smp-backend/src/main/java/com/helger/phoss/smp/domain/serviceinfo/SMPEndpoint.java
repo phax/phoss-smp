@@ -24,6 +24,8 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
+import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
@@ -42,16 +44,45 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 
   private final String m_sID;
   private String m_sTransportProfile;
-  private String m_sEndpointReference;
+  private SMPAccessPoint m_aAccessPoint;
   private boolean m_bRequireBusinessLevelSignature;
   private String m_sMinimumAuthenticationLevel;
   private XMLOffsetDateTime m_aServiceActivationDT;
   private XMLOffsetDateTime m_aServiceExpirationDT;
-  private String m_sCertificate;
   private String m_sServiceDescription;
   private String m_sTechnicalContactUrl;
   private String m_sTechnicalInformationUrl;
 
+  /**
+   * Constructor using an explicit endpoint reference URL and certificate. A new detached Access
+   * Point is created for them. The backends de-duplicate the Access Point when the endpoint is
+   * saved.
+   *
+   * @param sID
+   *        Endpoint ID. May neither be <code>null</code> nor empty.
+   * @param sTransportProfile
+   *        Transport profile. May neither be <code>null</code> nor empty.
+   * @param sEndpointReference
+   *        Endpoint reference URL. May be <code>null</code>.
+   * @param bRequireBusinessLevelSignature
+   *        Business level signature flag.
+   * @param sMinimumAuthenticationLevel
+   *        Minimum authentication level. May be <code>null</code>.
+   * @param aServiceActivationDT
+   *        Service activation date time. May be <code>null</code>.
+   * @param aServiceExpirationDT
+   *        Service expiration date time. May be <code>null</code>.
+   * @param sCertificate
+   *        The AP certificate. May be <code>null</code>.
+   * @param sServiceDescription
+   *        Service description. May be <code>null</code>.
+   * @param sTechnicalContactUrl
+   *        Technical contact URL. May be <code>null</code>.
+   * @param sTechnicalInformationUrl
+   *        Technical information URL. May be <code>null</code>.
+   * @param sExtension
+   *        Optional extension. May be <code>null</code>.
+   */
   public SMPEndpoint (@NonNull @Nonempty final String sID,
                       @NonNull @Nonempty final String sTransportProfile,
                       @Nullable final String sEndpointReference,
@@ -65,15 +96,67 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sTechnicalInformationUrl,
                       @Nullable final String sExtension)
   {
+    this (sID,
+          sTransportProfile,
+          SMPAccessPoint.createDetached (sEndpointReference, sCertificate),
+          bRequireBusinessLevelSignature,
+          sMinimumAuthenticationLevel,
+          aServiceActivationDT,
+          aServiceExpirationDT,
+          sServiceDescription,
+          sTechnicalContactUrl,
+          sTechnicalInformationUrl,
+          sExtension);
+  }
+
+  /**
+   * Constructor using an already resolved Access Point.
+   *
+   * @param sID
+   *        Endpoint ID. May neither be <code>null</code> nor empty.
+   * @param sTransportProfile
+   *        Transport profile. May neither be <code>null</code> nor empty.
+   * @param aAccessPoint
+   *        The Access Point holding the endpoint reference URL and the certificate. May not be
+   *        <code>null</code>.
+   * @param bRequireBusinessLevelSignature
+   *        Business level signature flag.
+   * @param sMinimumAuthenticationLevel
+   *        Minimum authentication level. May be <code>null</code>.
+   * @param aServiceActivationDT
+   *        Service activation date time. May be <code>null</code>.
+   * @param aServiceExpirationDT
+   *        Service expiration date time. May be <code>null</code>.
+   * @param sServiceDescription
+   *        Service description. May be <code>null</code>.
+   * @param sTechnicalContactUrl
+   *        Technical contact URL. May be <code>null</code>.
+   * @param sTechnicalInformationUrl
+   *        Technical information URL. May be <code>null</code>.
+   * @param sExtension
+   *        Optional extension. May be <code>null</code>.
+   * @since 8.4.4
+   */
+  public SMPEndpoint (@NonNull @Nonempty final String sID,
+                      @NonNull @Nonempty final String sTransportProfile,
+                      @NonNull final ISMPAccessPoint aAccessPoint,
+                      final boolean bRequireBusinessLevelSignature,
+                      @Nullable final String sMinimumAuthenticationLevel,
+                      @Nullable final XMLOffsetDateTime aServiceActivationDT,
+                      @Nullable final XMLOffsetDateTime aServiceExpirationDT,
+                      @Nullable final String sServiceDescription,
+                      @Nullable final String sTechnicalContactUrl,
+                      @Nullable final String sTechnicalInformationUrl,
+                      @Nullable final String sExtension)
+  {
     ValueEnforcer.notEmpty (sID, "ID");
     m_sID = sID;
     setTransportProfile (sTransportProfile);
-    setEndpointReference (sEndpointReference);
+    setAccessPoint (aAccessPoint);
     setRequireBusinessLevelSignature (bRequireBusinessLevelSignature);
     setMinimumAuthenticationLevel (sMinimumAuthenticationLevel);
     setServiceActivationDateTime (aServiceActivationDT);
     setServiceExpirationDateTime (aServiceExpirationDT);
-    setCertificate (sCertificate);
     setServiceDescription (sServiceDescription);
     setTechnicalContactUrl (sTechnicalContactUrl);
     setTechnicalInformationUrl (sTechnicalInformationUrl);
@@ -100,15 +183,61 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     m_sTransportProfile = sTransportProfile;
   }
 
+  /**
+   * @return The Access Point (endpoint reference URL + certificate) referenced by this endpoint.
+   *         Never <code>null</code>.
+   * @since 8.4.4
+   */
+  @NonNull
+  public SMPAccessPoint getAccessPoint ()
+  {
+    return m_aAccessPoint;
+  }
+
+  /**
+   * @return The ID of the referenced Access Point. Never <code>null</code> nor empty.
+   * @since 8.4.4
+   */
+  @NonNull
+  @Nonempty
+  public String getAccessPointID ()
+  {
+    return m_aAccessPoint.getID ();
+  }
+
+  /**
+   * Set the Access Point to be referenced by this endpoint.
+   *
+   * @param aAccessPoint
+   *        The new Access Point. May not be <code>null</code>.
+   * @since 8.4.4
+   */
+  public final void setAccessPoint (@NonNull final ISMPAccessPoint aAccessPoint)
+  {
+    ValueEnforcer.notNull (aAccessPoint, "AccessPoint");
+    m_aAccessPoint = aAccessPoint instanceof SMPAccessPoint ? (SMPAccessPoint) aAccessPoint
+                                                            : new SMPAccessPoint (aAccessPoint.getID (),
+                                                                                  aAccessPoint.getEndpointReference (),
+                                                                                  aAccessPoint.getCertificate ());
+  }
+
   @Nullable
   public String getEndpointReference ()
   {
-    return m_sEndpointReference;
+    return m_aAccessPoint.getEndpointReference ();
   }
 
+  /**
+   * Change the endpoint reference URL of this endpoint. Because Access Points are immutable and
+   * shared between endpoints, this results in a new detached Access Point that is de-duplicated by
+   * the backend upon saving.
+   *
+   * @param sEndpointReference
+   *        The new endpoint reference URL. May be <code>null</code>.
+   */
   public final void setEndpointReference (@Nullable final String sEndpointReference)
   {
-    m_sEndpointReference = sEndpointReference;
+    m_aAccessPoint = m_aAccessPoint.withEndpointReference (sEndpointReference);
   }
 
   public boolean isRequireBusinessLevelSignature ()
@@ -157,12 +286,20 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   @Nullable
   public String getCertificate ()
   {
-    return m_sCertificate;
+    return m_aAccessPoint.getCertificate ();
   }
 
+  /**
+   * Change the certificate of this endpoint. Because Access Points are immutable and shared between
+   * endpoints, this results in a new detached Access Point that is de-duplicated by the backend upon
+   * saving.
+   *
+   * @param sCertificate
+   *        The new certificate. May be <code>null</code>.
+   */
   public final void setCertificate (@Nullable final String sCertificate)
   {
-    m_sCertificate = sCertificate;
+    m_aAccessPoint = m_aAccessPoint.withCertificate (sCertificate);
   }
 
   @Nullable
@@ -200,17 +337,20 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 
   public com.helger.xsds.peppol.smp1.@NonNull EndpointType getAsJAXBObjectPeppol ()
   {
+    final String sEndpointReference = getEndpointReference ();
+    final String sCertificate = getCertificate ();
     final com.helger.xsds.peppol.smp1.EndpointType ret = new com.helger.xsds.peppol.smp1.EndpointType ();
     // EndpointReference element is mandatory
-    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (m_sEndpointReference != null ? m_sEndpointReference
-                                                                                                               : ""));
+    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (sEndpointReference != null
+                                                                                                             ? sEndpointReference
+                                                                                                             : ""));
     ret.setRequireBusinessLevelSignature (m_bRequireBusinessLevelSignature);
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);
     // For compatibility, don't add BEGIN_CERTIFCATE and END_CERTIFICATE
     // For .NET compatibility only use "\n" as line separator
-    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (m_sCertificate, false, "\n"));
+    ret.setCertificate (CertificateHelper.getRFC1421CompliantString (sCertificate, false, "\n"));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     if (StringHelper.isNotEmpty (m_sTechnicalInformationUrl))
@@ -224,12 +364,12 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   {
     final com.helger.xsds.bdxr.smp1.EndpointType ret = new com.helger.xsds.bdxr.smp1.EndpointType ();
     // Ensure an empty element is emitted if no endpoint reference is present
-    ret.setEndpointURI (StringHelper.getNotNull (m_sEndpointReference));
+    ret.setEndpointURI (StringHelper.getNotNull (getEndpointReference ()));
     ret.setRequireBusinessLevelSignature (Boolean.valueOf (m_bRequireBusinessLevelSignature));
     ret.setMinimumAuthenticationLevel (m_sMinimumAuthenticationLevel);
     ret.setServiceActivationDate (m_aServiceActivationDT);
     ret.setServiceExpirationDate (m_aServiceExpirationDT);
-    ret.setCertificate (CertificateHelper.convertCertificateStringToByteArray (m_sCertificate));
+    ret.setCertificate (CertificateHelper.convertCertificateStringToByteArray (getCertificate ()));
     ret.setServiceDescription (m_sServiceDescription);
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
@@ -247,13 +387,13 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
       ret.setDescription (m_sServiceDescription);
     if (StringHelper.isNotEmpty (m_sTechnicalContactUrl))
       ret.setContact (m_sTechnicalContactUrl);
-    if (StringHelper.isNotEmpty (m_sEndpointReference))
-      ret.setAddressURI (m_sEndpointReference);
+    if (StringHelper.isNotEmpty (getEndpointReference ()))
+      ret.setAddressURI (getEndpointReference ());
     if (m_aServiceActivationDT != null)
       ret.setActivationDate (m_aServiceActivationDT.toLocalDate ());
     if (m_aServiceExpirationDT != null)
       ret.setExpirationDate (m_aServiceExpirationDT.toLocalDate ());
-    final X509Certificate aX509Cert = new CertificateDecodeHelper ().source (m_sCertificate)
+    final X509Certificate aX509Cert = new CertificateDecodeHelper ().source (getCertificate ())
                                                                     .pemEncoded (true)
                                                                     .getDecodedOrNull ();
     if (aX509Cert != null)
@@ -296,12 +436,11 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     return ToStringGenerator.getDerived (super.toString ())
                             .append ("ID", m_sID)
                             .append ("TransportProfile", m_sTransportProfile)
-                            .append ("EndpointReference", m_sEndpointReference)
+                            .append ("AccessPoint", m_aAccessPoint)
                             .append ("RequireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
                             .append ("MinimumAuthenticationLevel", m_sMinimumAuthenticationLevel)
                             .append ("ServiceActivationDate", m_aServiceActivationDT)
                             .append ("ServiceExpirationDate", m_aServiceExpirationDT)
-                            .append ("Certificate", m_sCertificate)
                             .append ("ServiceDescription", m_sServiceDescription)
                             .append ("TechnicalContactUrl", m_sTechnicalContactUrl)
                             .append ("TechnicalInformationUrl", m_sTechnicalInformationUrl)

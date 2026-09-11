@@ -21,6 +21,7 @@ import com.helger.base.compare.IComparator;
 import com.helger.base.id.IHasID;
 import com.helger.base.string.StringHelper;
 import com.helger.datetime.xml.XMLOffsetDateTime;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 
 /**
@@ -49,11 +50,34 @@ public interface ISMPEndpoint extends ISMPHasExtension, IHasID <String>
   String getTransportProfile ();
 
   /**
+   * @return The Access Point referenced by this endpoint, containing the endpoint reference URL and
+   *         the AP certificate. Never <code>null</code>.
+   * @since 8.4.4
+   */
+  @NonNull
+  ISMPAccessPoint getAccessPoint ();
+
+  /**
+   * @return The ID of the Access Point referenced by this endpoint. Never <code>null</code> nor
+   *         empty.
+   * @since 8.4.4
+   */
+  @NonNull
+  @Nonempty
+  default String getAccessPointID ()
+  {
+    return getAccessPoint ().getID ();
+  }
+
+  /**
    * @return The address of an endpoint, as an WS-Addressing Endpoint Reference (EPR). This is just
    *         a URL.
    */
   @Nullable
-  String getEndpointReference ();
+  default String getEndpointReference ()
+  {
+    return getAccessPoint ().getEndpointReference ();
+  }
 
   /**
    * @return <code>true</code> if this endpoint has an endpoint reference URL, <code>false</code>
@@ -155,7 +179,10 @@ public interface ISMPEndpoint extends ISMPHasExtension, IHasID <String>
    *         formatted value.
    */
   @Nullable
-  String getCertificate ();
+  default String getCertificate ()
+  {
+    return getAccessPoint ().getCertificate ();
+  }
 
   default boolean hasCertificate ()
   {

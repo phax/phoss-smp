@@ -37,13 +37,16 @@ import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
@@ -53,6 +56,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
@@ -74,10 +78,14 @@ public final class SMPServiceInformationManagerXML extends
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
 
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
+  private final ISMPAccessPointManager m_aAccessPointMgr;
 
-  public SMPServiceInformationManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
+  public SMPServiceInformationManagerXML (@NonNull @Nonempty final String sFilename,
+                                          @NonNull final ISMPAccessPointManager aAccessPointMgr) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
+    ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
+    m_aAccessPointMgr = aAccessPointMgr;
   }
 
   @NonNull
@@ -116,6 +124,9 @@ public final class SMPServiceInformationManagerXML extends
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
+
+    // Resolve and de-duplicate the Access Points of all endpoints
+    SMPEndpointHelper.resolveAccessPoints (m_aAccessPointMgr, aSMPServiceInformation);
 
     // Check for an update
     boolean bChangeExisting = false;
@@ -247,6 +258,8 @@ public final class SMPServiceInformationManagerXML extends
     EChange eChange = EChange.UNCHANGED;
     for (final ISMPServiceInformation aSMPServiceInformation : getAllSMPServiceInformationOfServiceGroup (aParticipantID))
       eChange = eChange.or (deleteSMPServiceInformation (aSMPServiceInformation));
+    if (eChange.isChanged ())
+      _deleteAllUnusedAccessPoints ();
     return eChange;
   }
 
@@ -469,6 +482,8 @@ public final class SMPServiceInformationManagerXML extends
             if (sOldURL.equals (aEndpoint.getEndpointReference ()))
             {
               ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
+              // Re-resolve the Access Point, because the URL changed
+              SMPEndpointHelper.resolveAccessPoint (m_aAccessPointMgr, aEndpoint);
               bSIChanged = true;
               aEndpointsChanged.inc ();
             }
@@ -476,6 +491,8 @@ public final class SMPServiceInformationManagerXML extends
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
       }
     });
+    if (aEndpointsChanged.isNot0 ())
+      _deleteAllUnusedAccessPoints ();
     return aEndpointsChanged.longValue ();
   }
 
@@ -503,6 +520,8 @@ public final class SMPServiceInformationManagerXML extends
               if (sOldCertNormalized.equals (sStoredCertNormalized))
               {
                 ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
+                // Re-resolve the Access Point, because the certificate changed
+                SMPEndpointHelper.resolveAccessPoint (m_aAccessPointMgr, aEndpoint);
                 bSIChanged = true;
                 aEndpointsChanged.inc ();
               }
@@ -512,6 +531,22 @@ public final class SMPServiceInformationManagerXML extends
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
       }
     });
+    if (aEndpointsChanged.isNot0 ())
+      _deleteAllUnusedAccessPoints ();
     return aEndpointsChanged.longValue ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsSet <String> getAllUsedAccessPointIDs ()
+  {
+    final ICommonsSet <String> ret = new CommonsHashSet <> ();
+    forEachValue (aSI -> SMPEndpointHelper.collectAccessPointIDs (aSI, ret));
+    return ret;
+  }
+
+  private void _deleteAllUnusedAccessPoints ()
+  {
+    m_aAccessPointMgr.deleteAllUnusedAccessPoints (getAllUsedAccessPointIDs ());
   }
 }

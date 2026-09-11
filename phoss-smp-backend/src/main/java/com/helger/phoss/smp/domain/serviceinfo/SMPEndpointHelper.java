@@ -19,10 +19,14 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.format.PDTToString;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.period.LocalDatePeriod;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 
 /**
  * Helper class to deal with specific
@@ -81,5 +85,74 @@ public final class SMPEndpointHelper
   public static String createUniqueEndpointID ()
   {
     return GlobalIDFactory.getNewPersistentStringID ();
+  }
+
+  /**
+   * Resolve the Access Points of all endpoints contained in the provided service information. Every
+   * endpoint gets the managed - and therefore de-duplicated - Access Point matching its endpoint
+   * reference URL and certificate assigned. This must be called by every backend before persisting
+   * a service information object.
+   *
+   * @param aAccessPointMgr
+   *        The Access Point manager to use. May not be <code>null</code>.
+   * @param aServiceInformation
+   *        The service information to handle. May be <code>null</code>.
+   */
+  public static void resolveAccessPoints (@NonNull final ISMPAccessPointManager aAccessPointMgr,
+                                          @Nullable final ISMPServiceInformation aServiceInformation)
+  {
+    ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
+    if (aServiceInformation == null)
+      return;
+
+    for (final ISMPProcess aProcess : aServiceInformation.getAllProcesses ())
+      for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        resolveAccessPoint (aAccessPointMgr, aEndpoint);
+  }
+
+  /**
+   * Resolve the Access Point of a single endpoint.
+   *
+   * @param aAccessPointMgr
+   *        The Access Point manager to use. May not be <code>null</code>.
+   * @param aEndpoint
+   *        The endpoint to handle. May be <code>null</code>.
+   * @return The resolved Access Point or <code>null</code> if the endpoint was <code>null</code> or
+   *         of an unsupported type.
+   */
+  @Nullable
+  public static ISMPAccessPoint resolveAccessPoint (@NonNull final ISMPAccessPointManager aAccessPointMgr,
+                                                    @Nullable final ISMPEndpoint aEndpoint)
+  {
+    ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
+    if (!(aEndpoint instanceof SMPEndpoint))
+      return aEndpoint == null ? null : aEndpoint.getAccessPoint ();
+
+    final SMPEndpoint aRealEndpoint = (SMPEndpoint) aEndpoint;
+    final ISMPAccessPoint aAccessPoint = aAccessPointMgr.getOrCreateAccessPoint (aRealEndpoint.getEndpointReference (),
+                                                                                 aRealEndpoint.getCertificate ());
+    aRealEndpoint.setAccessPoint (aAccessPoint);
+    return aAccessPoint;
+  }
+
+  /**
+   * Collect the IDs of all Access Points referenced by the endpoints of the provided service
+   * information.
+   *
+   * @param aServiceInformation
+   *        The service information to scan. May be <code>null</code>.
+   * @param aTarget
+   *        The target set to fill. May not be <code>null</code>.
+   */
+  public static void collectAccessPointIDs (@Nullable final ISMPServiceInformation aServiceInformation,
+                                            @NonNull final ICommonsSet <String> aTarget)
+  {
+    ValueEnforcer.notNull (aTarget, "Target");
+    if (aServiceInformation == null)
+      return;
+
+    for (final ISMPProcess aProcess : aServiceInformation.getAllProcesses ())
+      for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        aTarget.add (aEndpoint.getAccessPointID ());
   }
 }
