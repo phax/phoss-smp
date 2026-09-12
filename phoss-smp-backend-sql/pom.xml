@@ -30,7 +30,7 @@
   <description>SMP SQL backend</description>
   <url>https://github.com/phax/phoss-smp/phoss-smp-backend-sql</url>
   <inceptionYear>2015</inceptionYear>
-  
+
   <licenses>
     <license>
       <name>MPL 2.0</name>
@@ -38,12 +38,12 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
+
   <organization>
     <name>Philip Helger</name>
     <url>https://www.helger.com</url>
   </organization>
-  
+
   <developers>
     <developer>
       <id>philip</id>
@@ -52,7 +52,7 @@
       <url>https://www.helger.com</url>
     </developer>
   </developers>
-  
+
   <dependencies>
     <dependency>
       <groupId>com.helger</groupId>
@@ -106,25 +106,13 @@
       <artifactId>flyway-sqlserver</artifactId>
       <version>${flyway.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.7.13</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>9.3.0</version>
-      <scope>runtime</scope>
-    </dependency>
-    
+
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
