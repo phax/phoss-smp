@@ -115,6 +115,7 @@ public final class MenuSecure
       aMenuTree.createItem (aServiceGroups,
                             new PageSecureServiceGroupMigrationInbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_INBOUND));
     }
+    aMenuTree.createRootItem (new PageSecureAccessPoints (CMenuSecure.MENU_ACCESS_POINTS));
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_ENDPOINTS,
                                                                                               "Endpoints",
@@ -124,7 +125,6 @@ public final class MenuSecure
       aMenuTree.createItem (aEndpoints, new PageSecureEndpointChangeURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_URL));
       aMenuTree.createItem (aEndpoints,
                             new PageSecureEndpointChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
-      aMenuTree.createItem (aEndpoints, new PageSecureAccessPoints (CMenuSecure.MENU_ACCESS_POINTS));
     }
     aMenuTree.createRootItem (new PageSecureRedirect (CMenuSecure.MENU_REDIRECTS));
     aMenuTree.createRootItem (new PageSecureBusinessCard (CMenuSecure.MENU_BUSINESS_CARDS))

@@ -82,22 +82,24 @@ public class HCSMPAccessPointSelect extends HCSelect2
   protected JSAssocArray getSelect2InvocationOptions ()
   {
     final JSAssocArray ret = super.getSelect2InvocationOptions ();
+    final JSAssocArray aOptions = ret != null ? ret : new JSAssocArray ();
 
     // function (params) { return { q: params.term, page: params.page }; }
     final JSAnonymousFunction aDataFunc = new JSAnonymousFunction ();
     final JSParam aParams = aDataFunc.param ("params");
     aDataFunc.body ()
              ._return (new JSAssocArray ().add (AjaxExecutorSecureAccessPointSelect.PARAM_SEARCH_TEXT,
-                                                aParams.ref ("term"))
-                                          .add (AjaxExecutorSecureAccessPointSelect.PARAM_PAGE,
-                                                aParams.ref ("page")));
+                                               aParams.ref ("term"))
+                                         .add (AjaxExecutorSecureAccessPointSelect.PARAM_PAGE,
+                                               aParams.ref ("page")));
 
-    ret.add ("ajax",
-             new JSAssocArray ().add ("url", m_sAjaxURL)
-                                .add ("dataType", "json")
-                                .add ("delay", 250)
-                                .add ("cache", true)
-                                .add ("data", aDataFunc));
-    return ret;
+    aOptions.add ("ajax",
+                 new JSAssocArray ().add ("url", m_sAjaxURL)
+                                    .add ("dataType", "json")
+                                    .add ("delay", 250)
+                                    .add ("cache", false)
+                                    .add ("global", false)
+                                    .add ("data", aDataFunc));
+    return aOptions;
   }
 }
