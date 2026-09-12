@@ -189,12 +189,12 @@ smp.keystore.password = ...
 smp.keystore.key.alias = ...
 smp.keystore.key.password = ...
 
-# SQL backend
-jdbc.driver = com.mysql.cj.jdbc.Driver
-jdbc.url = jdbc:mysql://localhost:3306/smp?...
-jdbc.user = smp
-jdbc.password = smp
-target-database = MySQL        # MySQL, PostgreSQL, Oracle, DB2
+# SQL backend (default local CI setup uses PostgreSQL via docker compose)
+jdbc.driver = org.postgresql.Driver
+jdbc.url = jdbc:postgresql://localhost:5432/postgres
+jdbc.user = peppol
+jdbc.password = peppol
+target-database = PostgreSQL   # MySQL, PostgreSQL, Oracle, DB2
 
 # Data directory (use absolute path in production)
 webapp.datapath = /var/smp
