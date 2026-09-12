@@ -30,6 +30,7 @@ import com.helger.xml.microdom.util.MicroHelper;
 public final class SMPAccessPointMicroTypeConverter implements IMicroTypeConverter <SMPAccessPoint>
 {
   public static final MicroQName ATTR_ID = new MicroQName ("id");
+  public static final MicroQName ATTR_NAME = new MicroQName ("name");
   public static final MicroQName ATTR_ENDPOINT_REFERENCE = new MicroQName ("endpointref");
   public static final String ELEMENT_CERTIFICATE = "certificate";
 
@@ -40,6 +41,7 @@ public final class SMPAccessPointMicroTypeConverter implements IMicroTypeConvert
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_ID, aValue.getID ());
+    aElement.setAttribute (ATTR_NAME, aValue.getName ());
     if (aValue.hasEndpointReference ())
       aElement.setAttribute (ATTR_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
     if (aValue.hasCertificate ())
@@ -53,8 +55,11 @@ public final class SMPAccessPointMicroTypeConverter implements IMicroTypeConvert
     String sID = aElement.getAttributeValue (ATTR_ID);
     if (StringHelper.isEmpty (sID))
       sID = SMPAccessPointHelper.createUniqueAccessPointID ();
+    String sName = aElement.getAttributeValue (ATTR_NAME);
+    if (StringHelper.isEmpty (sName))
+      sName = sID;
     final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
     final String sCertificate = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE);
-    return new SMPAccessPoint (sID, sEndpointReference, sCertificate);
+    return new SMPAccessPoint (sID, sName, sEndpointReference, sCertificate);
   }
 }

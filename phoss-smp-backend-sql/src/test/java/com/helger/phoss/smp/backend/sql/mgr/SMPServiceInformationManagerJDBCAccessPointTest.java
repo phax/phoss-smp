@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.mgr;
+package com.helger.phoss.smp.backend.sql.mgr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -53,14 +53,15 @@ import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
+import com.helger.web.scope.mgr.WebScoped;
 
 /**
- * Test class for the Access Point related bulk operations of
- * {@link SMPServiceInformationManagerXML}.
+ * Test class for the Access Point related operations of {@link SMPServiceInformationManagerJDBC}.
+ * Requires a running PostgreSQL instance as started by "unittest-db-docker-compose.yml".
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerXMLAccessPointTest
+public final class SMPServiceInformationManagerJDBCAccessPointTest
 {
   private static final String URL1 = "http://localhost/ap1";
   private static final String URL2 = "http://localhost/ap2";
@@ -73,6 +74,7 @@ public final class SMPServiceInformationManagerXMLAccessPointTest
   @Rule
   public final TestRule m_aTestRule = new SMPServerTestRule ();
 
+  private WebScoped m_aWebScoped;
   private IIdentifierFactory m_aIF;
   private ISMPServiceGroupManager m_aSGMgr;
   private ISMPServiceInformationManager m_aSIMgr;
@@ -86,6 +88,9 @@ public final class SMPServiceInformationManagerXMLAccessPointTest
   @Before
   public void before () throws SMPServerException
   {
+    // The SQL backend needs a request scope, e.g. for the settings
+    m_aWebScoped = new WebScoped ();
+
     final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
     assertNotNull (aTestUser);
 
@@ -104,7 +109,7 @@ public final class SMPServiceInformationManagerXMLAccessPointTest
 
     m_aSGMgr.deleteSMPServiceGroupNoEx (m_aPI1, true);
     m_aSGMgr.deleteSMPServiceGroupNoEx (m_aPI2, true);
-    // The XML backend data survives between the tests
+    // The database content survives between the tests
     for (final ISMPAccessPoint aAP : m_aAPMgr.getAllAccessPoints ())
       m_aAPMgr.deleteAccessPoint (aAP.getID ());
     m_aSGMgr.createSMPServiceGroup (aTestUser.getID (), m_aPI1, null, null, true);
@@ -129,6 +134,8 @@ public final class SMPServiceInformationManagerXMLAccessPointTest
     m_aSGMgr.deleteSMPServiceGroupNoEx (m_aPI2, true);
     for (final ISMPAccessPoint aAP : m_aAPMgr.getAllAccessPoints ())
       m_aAPMgr.deleteAccessPoint (aAP.getID ());
+
+    m_aWebScoped.close ();
   }
 
   private void _createSI (final IParticipantIdentifier aPI,

@@ -50,34 +50,56 @@ public interface ISMPEndpoint extends ISMPHasExtension, IHasID <String>
   String getTransportProfile ();
 
   /**
-   * @return The Access Point referenced by this endpoint, containing the endpoint reference URL and
-   *         the AP certificate. Never <code>null</code>.
+   * @return The Access Point referenced by this endpoint or <code>null</code> if this endpoint
+   *         contains the endpoint reference URL and the certificate directly. Referencing an
+   *         Access Point is an opt-in feature - an endpoint either uses an Access Point or it
+   *         contains the data directly, but never both.
    * @since 8.4.4
    */
-  @NonNull
+  @Nullable
   ISMPAccessPoint getAccessPoint ();
 
   /**
-   * @return The ID of the Access Point referenced by this endpoint. Never <code>null</code> nor
-   *         empty.
+   * @return <code>true</code> if this endpoint references an Access Point, <code>false</code> if it
+   *         contains the endpoint reference URL and the certificate directly.
    * @since 8.4.4
    */
-  @NonNull
-  @Nonempty
+  default boolean hasAccessPoint ()
+  {
+    return getAccessPoint () != null;
+  }
+
+  /**
+   * @return The ID of the Access Point referenced by this endpoint or <code>null</code> if no
+   *         Access Point is referenced.
+   * @since 8.4.4
+   */
+  @Nullable
   default String getAccessPointID ()
   {
-    return getAccessPoint ().getID ();
+    final ISMPAccessPoint aAP = getAccessPoint ();
+    return aAP == null ? null : aAP.getID ();
+  }
+
+  /**
+   * @return The name of the Access Point referenced by this endpoint or <code>null</code> if no
+   *         Access Point is referenced.
+   * @since 8.4.4
+   */
+  @Nullable
+  default String getAccessPointName ()
+  {
+    final ISMPAccessPoint aAP = getAccessPoint ();
+    return aAP == null ? null : aAP.getName ();
   }
 
   /**
    * @return The address of an endpoint, as an WS-Addressing Endpoint Reference (EPR). This is just
-   *         a URL.
+   *         a URL. If this endpoint references an Access Point, the URL of that Access Point is
+   *         returned.
    */
   @Nullable
-  default String getEndpointReference ()
-  {
-    return getAccessPoint ().getEndpointReference ();
-  }
+  String getEndpointReference ();
 
   /**
    * @return <code>true</code> if this endpoint has an endpoint reference URL, <code>false</code>
@@ -176,13 +198,11 @@ public interface ISMPEndpoint extends ISMPHasExtension, IHasID <String>
 
   /**
    * @return the complete signing certificate of the recipient AP, as a PEM base 64 encoded X509 DER
-   *         formatted value.
+   *         formatted value. If this endpoint references an Access Point, the certificate of that
+   *         Access Point is returned.
    */
   @Nullable
-  default String getCertificate ()
-  {
-    return getAccessPoint ().getCertificate ();
-  }
+  String getCertificate ();
 
   default boolean hasCertificate ()
   {

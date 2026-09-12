@@ -24,15 +24,10 @@ import com.helger.base.type.ObjectType;
 /**
  * Default implementation of the {@link ISMPAccessPoint} interface.
  * <p>
- * An Access Point is identified by its endpoint reference URL. The certificate is a mutable
- * attribute that may only be changed via the {@link ISMPAccessPointManager} - because a single
- * Access Point object is shared by all endpoints referencing it, such a change is immediately
- * effective for all of them, which is exactly the desired behaviour.
- * <p>
- * Changing the URL or the certificate of a single <em>endpoint</em> on the other hand must never
- * modify a shared Access Point. Therefore {@link #withEndpointReference(String)} and
- * {@link #withCertificate(String)} create new detached Access Points that are de-duplicated by the
- * backend upon saving.
+ * An Access Point is identified by its unique name. All attributes may only be changed via the
+ * {@link ISMPAccessPointManager} - because a single Access Point object is shared by all endpoints
+ * referencing it, such a change is immediately effective for all of them, which is exactly the
+ * purpose of the Access Point relation.
  *
  * @author Philip Helger
  * @since 8.4.4
@@ -43,24 +38,28 @@ public class SMPAccessPoint implements ISMPAccessPoint
   public static final ObjectType OT = new ObjectType ("smpaccesspoint");
 
   private final String m_sID;
+  private String m_sName;
   private String m_sEndpointReference;
   private String m_sCertificate;
 
   public SMPAccessPoint (@NonNull @Nonempty final String sID,
+                         @NonNull @Nonempty final String sName,
                          @Nullable final String sEndpointReference,
                          @Nullable final String sCertificate)
   {
     ValueEnforcer.notEmpty (sID, "ID");
+    ValueEnforcer.notEmpty (sName, "Name");
     m_sID = sID;
+    m_sName = sName;
     m_sEndpointReference = sEndpointReference;
     m_sCertificate = sCertificate;
   }
 
   /**
-   * Create a new Access Point with a newly created unique ID. Such an object is "detached", meaning
-   * it is not necessarily contained in the {@link ISMPAccessPointManager}. It is the responsibility
-   * of the respective backend to resolve it to a managed Access Point upon saving.
+   * Create a new Access Point with a newly created unique ID.
    *
+   * @param sName
+   *        The unique name of the Access Point. May neither be <code>null</code> nor empty.
    * @param sEndpointReference
    *        The endpoint reference URL. May be <code>null</code>.
    * @param sCertificate
@@ -68,10 +67,14 @@ public class SMPAccessPoint implements ISMPAccessPoint
    * @return Never <code>null</code>.
    */
   @NonNull
-  public static SMPAccessPoint createDetached (@Nullable final String sEndpointReference,
-                                               @Nullable final String sCertificate)
+  public static SMPAccessPoint createWithNewID (@NonNull @Nonempty final String sName,
+                                                @Nullable final String sEndpointReference,
+                                                @Nullable final String sCertificate)
   {
-    return new SMPAccessPoint (SMPAccessPointHelper.createUniqueAccessPointID (), sEndpointReference, sCertificate);
+    return new SMPAccessPoint (SMPAccessPointHelper.createUniqueAccessPointID (),
+                               sName,
+                               sEndpointReference,
+                               sCertificate);
   }
 
   @NonNull
@@ -79,6 +82,31 @@ public class SMPAccessPoint implements ISMPAccessPoint
   public String getID ()
   {
     return m_sID;
+  }
+
+  @NonNull
+  @Nonempty
+  public String getName ()
+  {
+    return m_sName;
+  }
+
+  /**
+   * Set the name of this Access Point. The caller must ensure that no other Access Point with that
+   * name exists, so this method may only be called by an {@link ISMPAccessPointManager}.
+   *
+   * @param sName
+   *        The new name. May neither be <code>null</code> nor empty.
+   * @return {@link EChange#CHANGED} if the value was changed.
+   */
+  @NonNull
+  public EChange setName (@NonNull @Nonempty final String sName)
+  {
+    ValueEnforcer.notEmpty (sName, "Name");
+    if (sName.equals (m_sName))
+      return EChange.UNCHANGED;
+    m_sName = sName;
+    return EChange.CHANGED;
   }
 
   @Nullable
@@ -94,8 +122,9 @@ public class SMPAccessPoint implements ISMPAccessPoint
   }
 
   /**
-   * Set the endpoint reference URL of this Access Point. This changes the identity of the Access
-   * Point, so this method may only be called by an {@link ISMPAccessPointManager}.
+   * Set the endpoint reference URL of this Access Point. Because a single Access Point object is
+   * shared by all endpoints referencing it, this change is immediately effective for all of them.
+   * This method may only be called by an {@link ISMPAccessPointManager}.
    *
    * @param sEndpointReference
    *        The new endpoint reference URL. May be <code>null</code>.
@@ -128,34 +157,6 @@ public class SMPAccessPoint implements ISMPAccessPoint
     return EChange.CHANGED;
   }
 
-  /**
-   * @param sEndpointReference
-   *        The new endpoint reference URL. May be <code>null</code>.
-   * @return A new detached Access Point with the provided endpoint reference and the certificate of
-   *         this object. Never <code>null</code>.
-   */
-  @NonNull
-  public SMPAccessPoint withEndpointReference (@Nullable final String sEndpointReference)
-  {
-    if (hasSameEndpointReference (sEndpointReference))
-      return this;
-    return createDetached (sEndpointReference, m_sCertificate);
-  }
-
-  /**
-   * @param sCertificate
-   *        The new certificate. May be <code>null</code>.
-   * @return A new detached Access Point with the provided certificate and the endpoint reference of
-   *         this object. Never <code>null</code>.
-   */
-  @NonNull
-  public SMPAccessPoint withCertificate (@Nullable final String sCertificate)
-  {
-    if (hasSameCertificate (sCertificate))
-      return this;
-    return createDetached (m_sEndpointReference, sCertificate);
-  }
-
   @Override
   public boolean equals (final Object o)
   {
@@ -177,6 +178,7 @@ public class SMPAccessPoint implements ISMPAccessPoint
   public String toString ()
   {
     return new ToStringGenerator (this).append ("ID", m_sID)
+                                       .append ("Name", m_sName)
                                        .append ("EndpointReference", m_sEndpointReference)
                                        .append ("Certificate", m_sCertificate)
                                        .getToString ();

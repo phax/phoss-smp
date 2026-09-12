@@ -18,33 +18,42 @@ import com.helger.base.compare.CompareHelper;
 import com.helger.base.compare.IComparator;
 import com.helger.base.equals.EqualsHelper;
 import com.helger.base.id.IHasID;
+import com.helger.base.name.IHasName;
 import com.helger.base.string.StringHelper;
 
 /**
- * Represents a single physical Access Point - meaning the endpoint reference URL and the public
+ * Represents a single named Access Point - meaning the endpoint reference URL and the public
  * certificate of that Access Point.
  * <p>
- * Because multiple SMP endpoints (of different participants, document types and processes)
- * regularly point to the very same physical Access Point, this data is stored only once and is
- * referenced from all the {@link com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint} objects using
- * it.
+ * Access Points are an <b>optional</b> feature: an {@link com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint}
+ * either contains the endpoint reference URL and the certificate directly (the classic way) or it
+ * references an Access Point - but never both. Referencing an Access Point is beneficial if many
+ * endpoints share the same physical Access Point, because in that case the - potentially large -
+ * data is stored only once and a change of e.g. the certificate is a single write that is
+ * immediately effective for all endpoints referencing the Access Point.
  * <p>
- * An Access Point is <b>identified by its endpoint reference URL</b>. A physical Access Point can
- * technically only have one single public certificate, so the certificate is a mutable attribute of
- * the Access Point and not part of its identity. As a consequence, changing the certificate of an
- * Access Point is a single write that is immediately effective for all endpoints referencing it.
+ * An Access Point is <b>identified by its unique name</b>. The name is also the identifier that is
+ * used to reference an Access Point in the REST API.
  *
  * @author Philip Helger
  * @since 8.4.4
  */
-public interface ISMPAccessPoint extends IHasID <String>
+public interface ISMPAccessPoint extends IHasID <String>, IHasName
 {
   /**
-   * @return The unique ID of this Access Point. Never <code>null</code> nor empty.
+   * @return The unique internal ID of this Access Point. Never <code>null</code> nor empty.
    */
   @NonNull
   @Nonempty
   String getID ();
+
+  /**
+   * @return The unique name of this Access Point. This is the identifier that is used in the REST
+   *         API. Never <code>null</code> nor empty.
+   */
+  @NonNull
+  @Nonempty
+  String getName ();
 
   /**
    * @return The address of the Access Point, as a WS-Addressing Endpoint Reference (EPR). This is
@@ -80,16 +89,21 @@ public interface ISMPAccessPoint extends IHasID <String>
   }
 
   /**
-   * @return <code>true</code> if neither an endpoint reference nor a certificate is present.
+   * Check if this Access Point has exactly the provided name. Names are compared case insensitive,
+   * because the name is the unique business key of an Access Point.
+   *
+   * @param sName
+   *        The name to compare to. May be <code>null</code>.
+   * @return <code>true</code> if the name matches.
    */
-  default boolean hasNoContent ()
+  default boolean hasSameName (@Nullable final String sName)
   {
-    return !hasEndpointReference () && !hasCertificate ();
+    return SMPAccessPointHelper.createNameLookupKey (getName ())
+                               .equals (SMPAccessPointHelper.createNameLookupKey (sName));
   }
 
   /**
-   * Check if this Access Point uses exactly the provided endpoint reference URL. This is the
-   * identity check of an Access Point.
+   * Check if this Access Point uses exactly the provided endpoint reference URL.
    *
    * @param sEndpointReference
    *        The endpoint reference to compare to. May be <code>null</code>.
@@ -97,8 +111,8 @@ public interface ISMPAccessPoint extends IHasID <String>
    */
   default boolean hasSameEndpointReference (@Nullable final String sEndpointReference)
   {
-    return SMPAccessPointHelper.createLookupKey (getEndpointReference ())
-                               .equals (SMPAccessPointHelper.createLookupKey (sEndpointReference));
+    return EqualsHelper.equals (StringHelper.getNotNull (getEndpointReference (), ""),
+                                StringHelper.getNotNull (sEndpointReference, ""));
   }
 
   /**
@@ -116,8 +130,6 @@ public interface ISMPAccessPoint extends IHasID <String>
   @NonNull
   static IComparator <ISMPAccessPoint> comparator ()
   {
-    return (aElement1, aElement2) -> CompareHelper.compare (aElement1.getEndpointReference (),
-                                                            aElement2.getEndpointReference (),
-                                                            true);
+    return (aElement1, aElement2) -> CompareHelper.compare (aElement1.getName (), aElement2.getName (), true);
   }
 }

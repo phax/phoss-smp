@@ -156,10 +156,14 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return 0;
   }
 
-  @NonNull
-  @ReturnsMutableCopy
-  public ICommonsSet <String> getAllUsedAccessPointIDs ()
+  public long getEndpointCountUsingAccessPoint (@Nullable final String sAccessPointID)
   {
-    return new CommonsHashSet <> ();
+    return 0;
+  }
+
+  public long useAccessPointForMatchingEndpoints (@NonNull final String sAccessPointID,
+                                                  final boolean bRequireSameEndpointReference)
+  {
+    return 0;
   }
 }

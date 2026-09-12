@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.helger.phoss.smp.backend.xml.mgr;
+package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,18 +49,19 @@ import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.exception.SMPServerException;
-import com.helger.phoss.smp.mock.SMPServerTestRule;
+import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.photon.security.CSecurity;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
 
 /**
- * Test class for the Access Point related bulk operations of
- * {@link SMPServiceInformationManagerXML}.
+ * Test class for the Access Point related operations of
+ * {@link SMPServiceInformationManagerMongoDB}. Requires a running MongoDB instance as started by
+ * "unittest-db-docker-compose.yml".
  *
  * @author Philip Helger
  */
-public final class SMPServiceInformationManagerXMLAccessPointTest
+public final class SMPServiceInformationManagerMongoDBAccessPointTest
 {
   private static final String URL1 = "http://localhost/ap1";
   private static final String URL2 = "http://localhost/ap2";
@@ -71,7 +72,7 @@ public final class SMPServiceInformationManagerXMLAccessPointTest
   private static final String CERT3 = "cert3";
 
   @Rule
-  public final TestRule m_aTestRule = new SMPServerTestRule ();
+  public final TestRule m_aTestRule = new SMPServerMongoDBTestRule ();
 
   private IIdentifierFactory m_aIF;
   private ISMPServiceGroupManager m_aSGMgr;
@@ -104,7 +105,7 @@ public final class SMPServiceInformationManagerXMLAccessPointTest
 
     m_aSGMgr.deleteSMPServiceGroupNoEx (m_aPI1, true);
     m_aSGMgr.deleteSMPServiceGroupNoEx (m_aPI2, true);
-    // The XML backend data survives between the tests
+    // The database content survives between the tests
     for (final ISMPAccessPoint aAP : m_aAPMgr.getAllAccessPoints ())
       m_aAPMgr.deleteAccessPoint (aAP.getID ());
     m_aSGMgr.createSMPServiceGroup (aTestUser.getID (), m_aPI1, null, null, true);

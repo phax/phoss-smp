@@ -11,9 +11,11 @@
 package com.helger.phoss.smp.domain.serviceinfo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,9 +33,9 @@ import com.helger.xml.microdom.MicroElement;
  *
  * @author Philip Helger
  */
-@SuppressWarnings ("deprecation")
 public final class SMPEndpointMicroTypeConverterTest
 {
+  private static final String NAME1 = "ap1";
   private static final String URL1 = "http://localhost/ap1";
   private static final String URL2 = "http://localhost/ap2";
   private static final String CERT1 = "cert1";
@@ -47,58 +49,89 @@ public final class SMPEndpointMicroTypeConverterTest
     m_aAPMgr = new MockSMPAccessPointManager ();
   }
 
-  private SMPEndpoint _createEndpoint (final String sURL, final String sCert)
+  private static SMPEndpoint _createDirectEndpoint (final String sURL, final String sCert)
   {
     final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
-    final SMPEndpoint ret = new SMPEndpoint ("epid",
-                                             "tp",
-                                             sURL,
-                                             true,
-                                             "minauth",
-                                             aStartDT,
-                                             aStartDT.plusYears (1),
-                                             sCert,
-                                             "sd",
-                                             "tc",
-                                             "ti",
-                                             null);
-    // Resolve against the manager, as every backend does before saving
-    SMPEndpointHelper.resolveAccessPoint (m_aAPMgr, ret);
-    return ret;
+    return new SMPEndpoint ("epid",
+                            "tp",
+                            sURL,
+                            true,
+                            "minauth",
+                            aStartDT,
+                            aStartDT.plusYears (1),
+                            sCert,
+                            "sd",
+                            "tc",
+                            "ti",
+                            null);
+  }
+
+  private static SMPEndpoint _createAPEndpoint (final ISMPAccessPoint aAP)
+  {
+    final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
+    return new SMPEndpoint ("epid", "tp", aAP, true, "minauth", aStartDT, aStartDT.plusYears (1), "sd", "tc", "ti", null);
   }
 
   @Test
-  public void testRoundTrip ()
+  public void testRoundTripDirectData ()
   {
-    final SMPEndpoint aEP = _createEndpoint (URL1, CERT1);
+    // The "classic" Endpoint that contains all data directly
+    final SMPEndpoint aEP = _createDirectEndpoint (URL1, CERT1);
+    assertFalse (aEP.hasAccessPoint ());
 
     final IMicroElement aElement = new SMPEndpointMicroTypeConverter ().convertToMicroElement (aEP, null, "endpoint");
     assertNotNull (aElement);
-
-    // The URL and the certificate are no longer stored on the endpoint itself
-    assertEquals (aEP.getAccessPointID (), aElement.getAttributeValue (SMPEndpointMicroTypeConverter.ATTR_ACCESS_POINT_ID));
-    assertNull (aElement.getAttributeValue (SMPEndpointMicroTypeConverter.ATTR_ENDPOINT_REFERENCE));
-    assertNull (aElement.getFirstChildElement (SMPEndpointMicroTypeConverter.ELEMENT_CERTIFICATE));
+    assertNull (aElement.getAttributeValue (SMPEndpointMicroTypeConverter.ATTR_ACCESS_POINT_ID));
+    assertEquals (URL1, aElement.getAttributeValue (SMPEndpointMicroTypeConverter.ATTR_ENDPOINT_REFERENCE));
+    assertEquals (CERT1,
+                  aElement.getFirstChildElement (SMPEndpointMicroTypeConverter.ELEMENT_CERTIFICATE).getTextContent ());
 
     final SMPEndpoint aReadEP = SMPEndpointMicroTypeConverter.convertToNative (aElement, m_aAPMgr);
     assertEquals (aEP.getID (), aReadEP.getID ());
     assertEquals (aEP.getTransportProfile (), aReadEP.getTransportProfile ());
     assertEquals (URL1, aReadEP.getEndpointReference ());
     assertEquals (CERT1, aReadEP.getCertificate ());
+    assertFalse (aReadEP.hasAccessPoint ());
     assertEquals (aEP.isRequireBusinessLevelSignature (), aReadEP.isRequireBusinessLevelSignature ());
     assertEquals (aEP.getMinimumAuthenticationLevel (), aReadEP.getMinimumAuthenticationLevel ());
     assertEquals (aEP.getServiceDescription (), aReadEP.getServiceDescription ());
     assertEquals (aEP.getTechnicalContactUrl (), aReadEP.getTechnicalContactUrl ());
     assertEquals (aEP.getTechnicalInformationUrl (), aReadEP.getTechnicalInformationUrl ());
 
-    // No additional Access Point was created while reading
+    // No Access Point is ever created implicitly
+    assertEquals (0, m_aAPMgr.getAccessPointCount ());
+  }
+
+  @Test
+  public void testRoundTripAccessPoint ()
+  {
+    final ISMPAccessPoint aAP = m_aAPMgr.createAccessPoint (NAME1, URL1, CERT1);
+    assertNotNull (aAP);
+    final SMPEndpoint aEP = _createAPEndpoint (aAP);
+    assertTrue (aEP.hasAccessPoint ());
+
+    final IMicroElement aElement = new SMPEndpointMicroTypeConverter ().convertToMicroElement (aEP, null, "endpoint");
+    assertNotNull (aElement);
+
+    // If an Access Point is referenced, the data is not duplicated
+    assertEquals (aAP.getID (), aElement.getAttributeValue (SMPEndpointMicroTypeConverter.ATTR_ACCESS_POINT_ID));
+    assertNull (aElement.getAttributeValue (SMPEndpointMicroTypeConverter.ATTR_ENDPOINT_REFERENCE));
+    assertNull (aElement.getFirstChildElement (SMPEndpointMicroTypeConverter.ELEMENT_CERTIFICATE));
+
+    final SMPEndpoint aReadEP = SMPEndpointMicroTypeConverter.convertToNative (aElement, m_aAPMgr);
+    assertEquals (URL1, aReadEP.getEndpointReference ());
+    assertEquals (CERT1, aReadEP.getCertificate ());
+    assertEquals (aAP.getID (), aReadEP.getAccessPointID ());
+    assertEquals (NAME1, aReadEP.getAccessPointName ());
     assertEquals (1, m_aAPMgr.getAccessPointCount ());
   }
 
   @Test
   public void testReadUsesSharedAccessPointInstance ()
   {
-    final SMPEndpoint aEP = _createEndpoint (URL1, CERT1);
+    final ISMPAccessPoint aAP = m_aAPMgr.createAccessPoint (NAME1, URL1, CERT1);
+    assertNotNull (aAP);
+    final SMPEndpoint aEP = _createAPEndpoint (aAP);
     final IMicroElement aElement = new SMPEndpointMicroTypeConverter ().convertToMicroElement (aEP, null, "endpoint");
 
     final SMPEndpoint aReadEP1 = SMPEndpointMicroTypeConverter.convertToNative (aElement, m_aAPMgr);
@@ -106,7 +139,7 @@ public final class SMPEndpointMicroTypeConverterTest
 
     // All deserialized endpoints must reference the very same managed object,
     // otherwise an Access Point wide certificate change would not be visible
-    final ISMPAccessPoint aManaged = m_aAPMgr.getAccessPointOfID (aEP.getAccessPointID ());
+    final ISMPAccessPoint aManaged = m_aAPMgr.getAccessPointOfID (aAP.getID ());
     assertSame (aManaged, aReadEP1.getAccessPoint ());
     assertSame (aManaged, aReadEP2.getAccessPoint ());
 
@@ -115,51 +148,38 @@ public final class SMPEndpointMicroTypeConverterTest
     assertEquals (CERT2, aReadEP1.getCertificate ());
     assertEquals (CERT2, aReadEP2.getCertificate ());
 
-    m_aAPMgr.updateAccessPointEndpointReference (aManaged.getID (), URL2);
+    m_aAPMgr.updateAccessPoint (aManaged.getID (), NAME1, URL2, CERT2);
     assertEquals (URL2, aReadEP1.getEndpointReference ());
     assertEquals (URL2, aReadEP2.getEndpointReference ());
   }
 
   @Test
-  public void testSoftMigrationOfLegacyInlineData ()
+  public void testReadUnresolvableAccessPointReference ()
   {
-    // Data written before v8.4.4 had the URL and the certificate inline and no
-    // Access Point reference at all
     final IMicroElement aElement = new MicroElement ("endpoint");
     aElement.setAttribute (SMPEndpointMicroTypeConverter.ATTR_ID, "epid");
     aElement.setAttribute (SMPEndpointMicroTypeConverter.ATTR_TRANSPORT_PROFILE, "tp");
+    aElement.setAttribute (SMPEndpointMicroTypeConverter.ATTR_ACCESS_POINT_ID, "does-not-exist");
     aElement.setAttribute (SMPEndpointMicroTypeConverter.ATTR_ENDPOINT_REFERENCE, URL1);
     aElement.addElement (SMPEndpointMicroTypeConverter.ELEMENT_CERTIFICATE).addText (CERT1);
 
+    // Falls back to the contained direct data - and creates no Access Point
     final SMPEndpoint aReadEP = SMPEndpointMicroTypeConverter.convertToNative (aElement, m_aAPMgr);
     assertNotNull (aReadEP);
-    assertEquals ("epid", aReadEP.getID ());
+    assertFalse (aReadEP.hasAccessPoint ());
     assertEquals (URL1, aReadEP.getEndpointReference ());
     assertEquals (CERT1, aReadEP.getCertificate ());
-
-    // The Access Point was created on the fly
-    assertEquals (1, m_aAPMgr.getAccessPointCount ());
-    assertEquals (aReadEP.getAccessPointID (), m_aAPMgr.findAccessPoint (URL1).getID ());
-
-    // A second legacy endpoint with the same URL must reuse it
-    final IMicroElement aElement2 = new MicroElement ("endpoint");
-    aElement2.setAttribute (SMPEndpointMicroTypeConverter.ATTR_ID, "epid2");
-    aElement2.setAttribute (SMPEndpointMicroTypeConverter.ATTR_TRANSPORT_PROFILE, "tp2");
-    aElement2.setAttribute (SMPEndpointMicroTypeConverter.ATTR_ENDPOINT_REFERENCE, URL1);
-    aElement2.addElement (SMPEndpointMicroTypeConverter.ELEMENT_CERTIFICATE).addText (CERT1);
-
-    final SMPEndpoint aReadEP2 = SMPEndpointMicroTypeConverter.convertToNative (aElement2, m_aAPMgr);
-    assertEquals (1, m_aAPMgr.getAccessPointCount ());
-    assertEquals (aReadEP.getAccessPointID (), aReadEP2.getAccessPointID ());
-    assertSame (aReadEP.getAccessPoint (), aReadEP2.getAccessPoint ());
+    assertEquals (0, m_aAPMgr.getAccessPointCount ());
   }
 
   @Test
   public void testMakeSelfContained ()
   {
-    // The export format must remain backwards compatible, so the URL and the
-    // certificate have to be inlined again
-    final SMPEndpoint aEP = _createEndpoint (URL1, CERT1);
+    // The export format must be readable by SMPs that do not know Access
+    // Points, so the URL and the certificate have to be inlined
+    final ISMPAccessPoint aAP = m_aAPMgr.createAccessPoint (NAME1, URL1, CERT1);
+    assertNotNull (aAP);
+    final SMPEndpoint aEP = _createAPEndpoint (aAP);
     final IMicroElement aElement = new SMPEndpointMicroTypeConverter ().convertToMicroElement (aEP, null, "endpoint");
 
     SMPEndpointMicroTypeConverter.makeSelfContained (aElement, m_aAPMgr);
@@ -170,9 +190,8 @@ public final class SMPEndpointMicroTypeConverterTest
     assertEquals (CERT1,
                   aElement.getFirstChildElement (SMPEndpointMicroTypeConverter.ELEMENT_CERTIFICATE).getTextContent ());
 
-    // Such an element must be readable by an SMP that does not know Access
-    // Points at all, and by this one too
     final SMPEndpoint aReadEP = SMPEndpointMicroTypeConverter.convertToNative (aElement, m_aAPMgr);
+    assertFalse (aReadEP.hasAccessPoint ());
     assertEquals (URL1, aReadEP.getEndpointReference ());
     assertEquals (CERT1, aReadEP.getCertificate ());
   }

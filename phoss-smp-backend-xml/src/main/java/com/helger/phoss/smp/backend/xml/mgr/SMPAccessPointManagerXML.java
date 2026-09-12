@@ -10,26 +10,29 @@
  */
 package com.helger.phoss.smp.backend.xml.mgr;
 
+import java.util.function.Predicate;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
-import com.helger.base.numeric.mutable.MutableBoolean;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
-import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
+import com.helger.phoss.smp.domain.accesspoint.ESMPAccessPointColumn;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
 import com.helger.phoss.smp.domain.accesspoint.SMPAccessPointHelper;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.photon.core.paging.TableColumnHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 
 /**
@@ -42,8 +45,10 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
                                             implements
                                             ISMPAccessPointManager
 {
-  /** Lookup key to ID. Only to be accessed inside the RW lock. */
-  private final ICommonsMap <String, String> m_aLookupIndex = new CommonsHashMap <> ();
+  private static final ESMPAccessPointColumn [] COLUMNS = ESMPAccessPointColumn.values ();
+
+  /** Name lookup key to ID. Only to be accessed inside the RW lock. */
+  private final ICommonsMap <String, String> m_aNameIndex = new CommonsHashMap <> ();
 
   public SMPAccessPointManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
@@ -51,70 +56,106 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
   }
 
   /**
-   * Rebuild the lookup index if it is out of sync with the contained items. This is necessary,
+   * Rebuild the name index if it is out of sync with the contained items. This is necessary,
    * because items are also added while reading the persisted data, bypassing this manager.
    * <p>
    * Must be called inside the write lock.
    */
   private void _ensureIndexIsValid ()
   {
-    if (m_aLookupIndex.size () != size ())
+    if (m_aNameIndex.size () != size ())
     {
-      m_aLookupIndex.clear ();
-      internalForEachValue (x -> m_aLookupIndex.put (SMPAccessPointHelper.createLookupKey (x), x.getID ()));
+      m_aNameIndex.clear ();
+      internalForEachValue (x -> m_aNameIndex.put (SMPAccessPointHelper.createNameLookupKey (x), x.getID ()));
     }
   }
 
   @Nullable
-  public ISMPAccessPoint findAccessPoint (@Nullable final String sEndpointReference)
+  private SMPAccessPoint _getOfName (@Nullable final String sName)
   {
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference);
+    final String sLookupKey = SMPAccessPointHelper.createNameLookupKey (sName);
+    if (sLookupKey.isEmpty ())
+      return null;
+
     return m_aRWLock.writeLockedGet ( () -> {
       _ensureIndexIsValid ();
-      final String sID = m_aLookupIndex.get (sLookupKey);
+      final String sID = m_aNameIndex.get (sLookupKey);
       return sID == null ? null : getOfID (sID);
     });
   }
 
-  @NonNull
-  public ISMPAccessPoint getOrCreateAccessPoint (@Nullable final String sEndpointReference,
-                                                 @Nullable final String sCertificate)
+  @Nullable
+  public ISMPAccessPoint createAccessPoint (@NonNull @Nonempty final String sName,
+                                            @Nullable final String sEndpointReference,
+                                            @Nullable final String sCertificate)
   {
-    final String sLookupKey = SMPAccessPointHelper.createLookupKey (sEndpointReference);
+    ValueEnforcer.notEmpty (sName, "Name");
 
-    // Try to find an existing one and create it if it is not yet present. This must happen
-    // atomically to avoid creating duplicates.
-    final MutableBoolean aCertChanged = new MutableBoolean (false);
-    final SMPAccessPoint aResolved = m_aRWLock.writeLockedGet ( () -> {
+    final String sLookupKey = SMPAccessPointHelper.createNameLookupKey (sName);
+    final SMPAccessPoint aCreated = m_aRWLock.writeLockedGet ( () -> {
       _ensureIndexIsValid ();
+      if (m_aNameIndex.containsKey (sLookupKey))
+        return null;
 
-      final String sExistingID = m_aLookupIndex.get (sLookupKey);
-      if (sExistingID != null)
-      {
-        final SMPAccessPoint aExisting = getOfID (sExistingID);
-        if (aExisting != null)
-        {
-          // An Access Point can only have one certificate - the latest one wins
-          if (aExisting.setCertificate (sCertificate).isChanged ())
-          {
-            internalUpdateItem (aExisting);
-            aCertChanged.set (true);
-          }
-          return aExisting;
-        }
-        // Stale index entry
-        m_aLookupIndex.remove (sLookupKey);
-      }
-
-      final SMPAccessPoint aNew = SMPAccessPoint.createDetached (sEndpointReference, sCertificate);
+      final SMPAccessPoint aNew = SMPAccessPoint.createWithNewID (sName, sEndpointReference, sCertificate);
       internalCreateItem (aNew);
-      m_aLookupIndex.put (sLookupKey, aNew.getID ());
+      m_aNameIndex.put (sLookupKey, aNew.getID ());
       return aNew;
     });
 
-    if (aCertChanged.booleanValue ())
-      AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-certificate", aResolved.getID ());
-    return aResolved;
+    if (aCreated == null)
+    {
+      AuditHelper.onAuditCreateFailure (SMPAccessPoint.OT, "name-already-in-use", sName);
+      return null;
+    }
+
+    AuditHelper.onAuditCreateSuccess (SMPAccessPoint.OT, aCreated.getID (), sName, sEndpointReference);
+    return aCreated;
+  }
+
+  @NonNull
+  public EChange updateAccessPoint (@Nullable final String sID,
+                                    @NonNull @Nonempty final String sName,
+                                    @Nullable final String sEndpointReference,
+                                    @Nullable final String sCertificate)
+  {
+    ValueEnforcer.notEmpty (sName, "Name");
+
+    if (StringHelper.isEmpty (sID))
+      return EChange.UNCHANGED;
+
+    final String sNewLookupKey = SMPAccessPointHelper.createNameLookupKey (sName);
+    final EChange eChange = m_aRWLock.writeLockedGet ( () -> {
+      _ensureIndexIsValid ();
+
+      final SMPAccessPoint aAP = getOfID (sID);
+      if (aAP == null)
+        return EChange.UNCHANGED;
+
+      // The name must stay unique
+      final String sExistingID = m_aNameIndex.get (sNewLookupKey);
+      if (sExistingID != null && !sExistingID.equals (sID))
+        return EChange.UNCHANGED;
+
+      final String sOldLookupKey = SMPAccessPointHelper.createNameLookupKey (aAP);
+      EChange eRealChange = EChange.UNCHANGED;
+      eRealChange = eRealChange.or (aAP.setName (sName));
+      eRealChange = eRealChange.or (aAP.setEndpointReference (sEndpointReference));
+      eRealChange = eRealChange.or (aAP.setCertificate (sCertificate));
+      if (eRealChange.isUnchanged ())
+        return EChange.UNCHANGED;
+
+      m_aNameIndex.remove (sOldLookupKey);
+      m_aNameIndex.put (sNewLookupKey, sID);
+      internalUpdateItem (aAP);
+      return EChange.CHANGED;
+    });
+
+    if (eChange.isUnchanged ())
+      return EChange.UNCHANGED;
+
+    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-all", sID, sName, sEndpointReference);
+    return EChange.CHANGED;
   }
 
   @NonNull
@@ -140,43 +181,18 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
     return EChange.CHANGED;
   }
 
-  @NonNull
-  public EChange updateAccessPointEndpointReference (@Nullable final String sID,
-                                                     @Nullable final String sNewEndpointReference)
-  {
-    if (StringHelper.isEmpty (sID))
-      return EChange.UNCHANGED;
-
-    final EChange eChange = m_aRWLock.writeLockedGet ( () -> {
-      _ensureIndexIsValid ();
-
-      final SMPAccessPoint aAP = getOfID (sID);
-      if (aAP == null)
-        return EChange.UNCHANGED;
-
-      final String sOldLookupKey = SMPAccessPointHelper.createLookupKey (aAP);
-      if (aAP.setEndpointReference (sNewEndpointReference).isUnchanged ())
-        return EChange.UNCHANGED;
-
-      m_aLookupIndex.remove (sOldLookupKey);
-      m_aLookupIndex.put (SMPAccessPointHelper.createLookupKey (aAP), sID);
-      internalUpdateItem (aAP);
-      return EChange.CHANGED;
-    });
-
-    if (eChange.isUnchanged ())
-      return EChange.UNCHANGED;
-
-    AuditHelper.onAuditModifySuccess (SMPAccessPoint.OT, "set-endpoint-reference", sID, sNewEndpointReference);
-    return EChange.CHANGED;
-  }
-
   @Nullable
   public ISMPAccessPoint getAccessPointOfID (@Nullable final String sID)
   {
     if (StringHelper.isEmpty (sID))
       return null;
     return getOfID (sID);
+  }
+
+  @Nullable
+  public ISMPAccessPoint getAccessPointOfName (@Nullable final String sName)
+  {
+    return _getOfName (sName);
   }
 
   @NonNull
@@ -186,10 +202,28 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
     return getAll ();
   }
 
+  @Override
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <ISMPAccessPoint> getAllAccessPoints (@NonNull final IPagingSpec aPagingSpec,
+                                                            @Nullable final String sSearchText)
+  {
+    return getAllPaged (TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+                        aPagingSpec,
+                        TableColumnHelper.getComparator (COLUMNS, aPagingSpec));
+  }
+
   @Nonnegative
   public long getAccessPointCount ()
   {
     return size ();
+  }
+
+  @Override
+  public long getAccessPointCount (@Nullable final String sSearchText)
+  {
+    final Predicate <ISMPAccessPoint> aFilter = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    return aFilter == null ? getAccessPointCount () : getCount (aFilter);
   }
 
   @NonNull
@@ -202,7 +236,7 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
       final SMPAccessPoint aDeleted = internalDeleteItem (sID);
       if (aDeleted == null)
         return EChange.UNCHANGED;
-      m_aLookupIndex.remove (SMPAccessPointHelper.createLookupKey (aDeleted));
+      m_aNameIndex.remove (SMPAccessPointHelper.createNameLookupKey (aDeleted));
       return EChange.CHANGED;
     });
 
@@ -214,18 +248,5 @@ public final class SMPAccessPointManagerXML extends AbstractPhotonMapBasedWALDAO
 
     AuditHelper.onAuditDeleteSuccess (SMPAccessPoint.OT, sID);
     return EChange.CHANGED;
-  }
-
-  @Nonnegative
-  public long deleteAllUnusedAccessPoints (@NonNull final ICommonsSet <String> aUsedIDs)
-  {
-    final ICommonsList <String> aUnusedIDs = new CommonsArrayList <> ();
-    forEachKey (x -> !aUsedIDs.contains (x), aUnusedIDs::add);
-
-    long nDeleted = 0;
-    for (final String sID : aUnusedIDs)
-      if (deleteAccessPoint (sID).isChanged ())
-        nDeleted++;
-    return nDeleted;
   }
 }

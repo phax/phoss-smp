@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -42,10 +41,8 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
-import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
@@ -161,30 +158,52 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     return m_aCBs;
   }
 
-  /**
-   * Create the Access Point object of an endpoint DB row.
-   *
-   * @param sAccessPointID
-   *        The value of the <code>accessPointID</code> column. May be <code>null</code> for
-   *        inconsistent data.
-   * @param sEndpointReference
-   *        The joined endpoint reference URL. May be <code>null</code>.
-   * @param sCertificate
-   *        The joined certificate. May be <code>null</code>.
-   * @return Never <code>null</code>.
-   */
   @NonNull
-  private static SMPAccessPoint _toAccessPoint (@Nullable final String sAccessPointID,
-                                                @Nullable final String sEndpointReference,
-                                                @Nullable final String sCertificate)
+  private static SMPEndpoint _createEndpoint (@NonNull final DBResultRow aDBRow, final int nOffset)
   {
-    if (StringHelper.isEmpty (sAccessPointID))
+    final String sAccessPointID = aDBRow.getAsString (nOffset + 12);
+    if (StringHelper.isNotEmpty (sAccessPointID))
     {
-      // Should never happen - fallback to a detached Access Point
-      LOGGER.warn ("Found an endpoint without a resolvable Access Point");
-      return SMPAccessPoint.createDetached (sEndpointReference, sCertificate);
+      final String sAccessPointName = aDBRow.getAsString (nOffset + 13);
+      if (StringHelper.isNotEmpty (sAccessPointName))
+      {
+        final ISMPAccessPoint aAP = new SMPAccessPoint (sAccessPointID,
+                                                        sAccessPointName,
+                                                        aDBRow.getAsString (nOffset + 14),
+                                                        aDBRow.getAsString (nOffset + 15));
+        return new SMPEndpoint (aDBRow.getAsString (nOffset),
+                                aDBRow.getAsString (nOffset + 1),
+                                aAP,
+                                aDBRow.getAsBoolean (nOffset + 3,
+                                                     SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
+                                aDBRow.getAsString (nOffset + 4),
+                                aDBRow.getAsXMLOffsetDateTime (nOffset + 5),
+                                aDBRow.getAsXMLOffsetDateTime (nOffset + 6),
+                                aDBRow.getAsString (nOffset + 8),
+                                aDBRow.getAsString (nOffset + 9),
+                                aDBRow.getAsString (nOffset + 10),
+                                aDBRow.getAsString (nOffset + 11));
+      }
+
+      LOGGER.warn ("Found endpoint '" +
+                   aDBRow.getAsString (nOffset) +
+                   "' with an unresolved Access Point ID '" +
+                   sAccessPointID +
+                   "'");
     }
-    return new SMPAccessPoint (sAccessPointID, sEndpointReference, sCertificate);
+
+    return new SMPEndpoint (aDBRow.getAsString (nOffset),
+                            aDBRow.getAsString (nOffset + 1),
+                            aDBRow.getAsString (nOffset + 2),
+                            aDBRow.getAsBoolean (nOffset + 3, SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
+                            aDBRow.getAsString (nOffset + 4),
+                            aDBRow.getAsXMLOffsetDateTime (nOffset + 5),
+                            aDBRow.getAsXMLOffsetDateTime (nOffset + 6),
+                            aDBRow.getAsString (nOffset + 7),
+                            aDBRow.getAsString (nOffset + 8),
+                            aDBRow.getAsString (nOffset + 9),
+                            aDBRow.getAsString (nOffset + 10),
+                            aDBRow.getAsString (nOffset + 11));
   }
 
   @NonNull
@@ -192,7 +211,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   {
     ValueEnforcer.notNull (aSMPServiceInformation, "ServiceInformation");
 
-    // Resolve and de-duplicate the Access Points of all endpoints
+    // Resolve the Access Point references of all endpoints
     SMPEndpointHelper.resolveAccessPoints (m_aAccessPointMgr, aSMPServiceInformation);
 
     final MutableBoolean aUpdated = new MutableBoolean (false);
@@ -234,11 +253,12 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         // Insert new endpoints
         for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
         {
+          final boolean bHasAccessPoint = aEndpoint.hasAccessPoint ();
           aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                             m_sTableNameE +
                                             " (id, businessIdentifierScheme, businessIdentifier, documentIdentifierScheme, documentIdentifier, processIdentifierType, processIdentifier," +
-                                            " accessPointID, minimumAuthenticationLevel, requireBusinessLevelSignature, serviceActivationDate, serviceDescription, serviceExpirationDate, technicalContactUrl, technicalInformationUrl, transportProfile," +
-                                            " extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            " endpointReference, certificate, accessPointID, minimumAuthenticationLevel, requireBusinessLevelSignature, serviceActivationDate, serviceDescription, serviceExpirationDate, technicalContactUrl, technicalInformationUrl, transportProfile," +
+                                            " extension) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aEndpoint.getID (),
                                                                                        aPID.getScheme (),
                                                                                        aPID.getValue (),
@@ -246,7 +266,11 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                        aDocTypeID.getValue (),
                                                                                        aProcessID.getScheme (),
                                                                                        aProcessID.getValue (),
-                                                                                       aEndpoint.getAccessPointID (),
+                                                                                       bHasAccessPoint ? null
+                                                                                                       : DBValueHelper.getTrimmedToLength (aEndpoint.getEndpointReference (),
+                                                                                                                                          ISMPAccessPointManager.ENDPOINT_REFERENCE_MAX_LENGTH),
+                                                                                       bHasAccessPoint ? null : aEndpoint.getCertificate (),
+                                                                                       bHasAccessPoint ? aEndpoint.getAccessPointID () : null,
                                                                                        aEndpoint.getMinimumAuthenticationLevel (),
                                                                                        Boolean.valueOf (aEndpoint.isRequireBusinessLevelSignature ()),
                                                                                        DBValueHelper.toTimestamp (aEndpoint.getServiceActivationDateTime ()),
@@ -516,9 +540,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                           ")";
     final String sSQL = "SELECT sm.businessIdentifierScheme, sm.businessIdentifier, sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                         "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                        "   se.id, se.transportProfile, ap.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
-                        "     se.serviceActivationDate, se.serviceExpirationDate, ap.certificate, se.serviceDescription," +
-                        "     se.technicalContactUrl, se.technicalInformationUrl, se.extension, se.accessPointID" +
+                        "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                        "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                        "     se.technicalContactUrl, se.technicalInformationUrl, se.extension, se.accessPointID," +
+                        "     ap.name, ap.endpointReference, ap.certificate" +
                         " FROM " +
                         sServiceMetadataTable +
                         " sm" +
@@ -558,20 +583,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                     aDBRow.getAsString (7));
         // Don't add endpoint to process, because that impacts
         // SMPProcess.equals/hashcode
-        final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (8),
-                                                       aDBRow.getAsString (9),
-                                                       _toAccessPoint (aDBRow.getAsString (20),
-                                                                       aDBRow.getAsString (10),
-                                                                       aDBRow.getAsString (15)),
-                                                       aDBRow.getAsBoolean (11,
-                                                                            SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                       aDBRow.getAsString (12),
-                                                       aDBRow.getAsXMLOffsetDateTime (13),
-                                                       aDBRow.getAsXMLOffsetDateTime (14),
-                                                       aDBRow.getAsString (16),
-                                                       aDBRow.getAsString (17),
-                                                       aDBRow.getAsString (18),
-                                                       aDBRow.getAsString (19));
+        final SMPEndpoint aEndpoint = _createEndpoint (aDBRow, 8);
         aGrouping.computeIfAbsent (aParticipantID, k -> new CommonsHashMap <> ())
                  .computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
                                    k -> new CommonsHashMap <> ())
@@ -619,9 +631,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       final ICommonsList <DBResultRow> aDBResult = aExecutor.queryAll ("SELECT sm.documentIdentifierScheme, sm.documentIdentifier, sm.extension," +
                                                                        "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                       "   se.id, se.transportProfile, ap.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
-                                                                       "     se.serviceActivationDate, se.serviceExpirationDate, ap.certificate, se.serviceDescription," +
-                                                                       "     se.technicalContactUrl, se.technicalInformationUrl, se.extension, se.accessPointID" +
+                                                                       "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                       "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                                                                       "     se.technicalContactUrl, se.technicalInformationUrl, se.extension, se.accessPointID," +
+                                                                       "     ap.name, ap.endpointReference, ap.certificate" +
                                                                        " FROM " +
                                                                        m_sTableNameSM +
                                                                        " sm" +
@@ -658,20 +671,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                       aDBRow.getAsString (5));
           // Don't add endpoint to process, because that impacts
           // SMPProcess.equals/hashcode
-          final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (6),
-                                                         aDBRow.getAsString (7),
-                                                         _toAccessPoint (aDBRow.getAsString (18),
-                                                                         aDBRow.getAsString (8),
-                                                                         aDBRow.getAsString (13)),
-                                                         aDBRow.getAsBoolean (9,
-                                                                              SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                         aDBRow.getAsString (10),
-                                                         aDBRow.getAsXMLOffsetDateTime (11),
-                                                         aDBRow.getAsXMLOffsetDateTime (12),
-                                                         aDBRow.getAsString (14),
-                                                         aDBRow.getAsString (15),
-                                                         aDBRow.getAsString (16),
-                                                         aDBRow.getAsString (17));
+          final SMPEndpoint aEndpoint = _createEndpoint (aDBRow, 6);
           aGrouping.computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
                                      k -> new CommonsHashMap <> ())
                    .computeIfAbsent (aProcess, k -> new CommonsArrayList <> ())
@@ -736,9 +736,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sm.extension," +
                                                                           "   sp.processIdentifierType, sp.processIdentifier, sp.extension," +
-                                                                          "   se.id, se.transportProfile, ap.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
-                                                                          "     se.serviceActivationDate, se.serviceExpirationDate, ap.certificate, se.serviceDescription," +
-                                                                          "     se.technicalContactUrl, se.technicalInformationUrl, se.extension, se.accessPointID" +
+                                                                          "   se.id, se.transportProfile, se.endpointReference, se.requireBusinessLevelSignature, se.minimumAuthenticationLevel," +
+                                                                          "     se.serviceActivationDate, se.serviceExpirationDate, se.certificate, se.serviceDescription," +
+                                                                          "     se.technicalContactUrl, se.technicalInformationUrl, se.extension, se.accessPointID," +
+                                                                          "     ap.name, ap.endpointReference, ap.certificate" +
                                                                           " FROM " +
                                                                           m_sTableNameSM +
                                                                           " sm" +
@@ -773,20 +774,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                  aDBRow.getAsString (2)),
                                                     null,
                                                     aDBRow.getAsString (3));
-        final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (4),
-                                                       aDBRow.getAsString (5),
-                                                       _toAccessPoint (aDBRow.getAsString (16),
-                                                                       aDBRow.getAsString (6),
-                                                                       aDBRow.getAsString (11)),
-                                                       aDBRow.getAsBoolean (7,
-                                                                            SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                       aDBRow.getAsString (8),
-                                                       aDBRow.getAsXMLOffsetDateTime (9),
-                                                       aDBRow.getAsXMLOffsetDateTime (10),
-                                                       aDBRow.getAsString (12),
-                                                       aDBRow.getAsString (13),
-                                                       aDBRow.getAsString (14),
-                                                       aDBRow.getAsString (15));
+        final SMPEndpoint aEndpoint = _createEndpoint (aDBRow, 4);
         aEndpoints.computeIfAbsent (aProcess, k -> new CommonsArrayList <> ()).add (aEndpoint);
       }
 
@@ -826,19 +814,19 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
   {
     final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT ap.endpointReference, se.businessIdentifierScheme, se.businessIdentifier FROM " +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT se.endpointReference, ap.endpointReference, se.businessIdentifierScheme, se.businessIdentifier FROM " +
                                                                           m_sTableNameE +
-                                                                          " se INNER JOIN " +
+                                                                          " se LEFT OUTER JOIN " +
                                                                           m_sTableNameAP +
-                                                                          " ap ON se.accessPointID=ap.id" +
-                                                                          " WHERE ap.endpointReference IS NOT NULL");
+                                                                          " ap ON se.accessPointID=ap.id");
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
       {
-        final String sURL = aRow.getAsString (0);
+        final String sAPURL = aRow.getAsString (1);
+        final String sURL = sAPURL != null ? sAPURL : aRow.getAsString (0);
         if (StringHelper.isNotEmpty (sURL))
         {
-          final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (1), aRow.getAsString (2));
+          final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (2), aRow.getAsString (3));
 
           final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
           ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
@@ -852,65 +840,21 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
   {
     final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT ap.certificate, se.businessIdentifierScheme, se.businessIdentifier FROM " +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT se.certificate, ap.certificate, se.businessIdentifierScheme, se.businessIdentifier FROM " +
                                                                           m_sTableNameE +
-                                                                          " se INNER JOIN " +
+                                                                          " se LEFT OUTER JOIN " +
                                                                           m_sTableNameAP +
                                                                           " ap ON se.accessPointID=ap.id");
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
       {
-        final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aRow.getAsString (0));
-        final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (1), aRow.getAsString (2));
+        final String sAPCert = aRow.getAsString (1);
+        final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (sAPCert != null ? sAPCert : aRow.getAsString (0));
+        final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (2), aRow.getAsString (3));
 
         final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sNormalizedCert, k -> new EndpointUsageInfo ());
         ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
       }
-    return ret;
-  }
-
-  /** Maximum number of elements in a single SQL "IN" clause (Oracle limit is 1000) */
-  private static final int MAX_IN_CLAUSE_ELEMENTS = 500;
-
-  /**
-   * Count the endpoints referencing one of the provided Access Point IDs.
-   *
-   * @param aAccessPointIDs
-   *        The Access Point IDs to look for. May not be <code>null</code>.
-   * @param aServiceGroupID
-   *        Optional service group filter. May be <code>null</code>.
-   * @return The number of matching endpoints.
-   */
-  @Nonnegative
-  private long _countEndpointsUsingAccessPoints (@NonNull final ICommonsSet <String> aAccessPointIDs,
-                                                 @Nullable final IParticipantIdentifier aServiceGroupID)
-  {
-    if (aAccessPointIDs.isEmpty ())
-      return 0;
-
-    // Chunk the IDs, because some databases (e.g. Oracle) limit the number of elements of a single
-    // "IN" clause
-    final ICommonsList <String> aAllIDs = new CommonsArrayList <> (aAccessPointIDs);
-    long ret = 0;
-    for (int nStart = 0; nStart < aAllIDs.size (); nStart += MAX_IN_CLAUSE_ELEMENTS)
-    {
-      final List <String> aChunk = aAllIDs.subList (nStart,
-                                                    Math.min (nStart + MAX_IN_CLAUSE_ELEMENTS, aAllIDs.size ()));
-      final ICommonsList <Object> aParams = new CommonsArrayList <> (aChunk);
-      final StringBuilder aSQL = new StringBuilder ("SELECT COUNT(*) FROM ").append (m_sTableNameE)
-                                                                            .append (" WHERE accessPointID IN (")
-                                                                            .append (StringHelper.getRepeated ("?,",
-                                                                                                               aChunk.size () -
-                                                                                                                     1))
-                                                                            .append ("?)");
-      if (aServiceGroupID != null)
-      {
-        aSQL.append (" AND businessIdentifierScheme=? AND businessIdentifier=?");
-        aParams.add (aServiceGroupID.getScheme ());
-        aParams.add (aServiceGroupID.getValue ());
-      }
-      ret += newExecutor ().queryCount (aSQL.toString (), new ConstantPreparedStatementDataProvider (aParams));
-    }
     return ret;
   }
 
@@ -925,58 +869,43 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (sOldURL.equals (sNewURL))
       return 0;
 
-    final ISMPAccessPoint aOldAP = m_aAccessPointMgr.findAccessPoint (sOldURL);
-    if (aOldAP == null)
-      return 0;
-
-    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (new CommonsHashSet <> (aOldAP.getID ()),
-                                                                     aServiceGroupID);
-    if (nEndpointsChanged == 0)
-      return 0;
-
-    final ISMPAccessPoint aTargetAP = m_aAccessPointMgr.findAccessPoint (sNewURL);
-    if (aServiceGroupID == null && aTargetAP == null)
-    {
-      // Fast path: all endpoints of this Access Point are affected and the new URL is not yet in
-      // use, so simply rename the Access Point. No endpoint row needs to be touched at all.
-      m_aAccessPointMgr.updateAccessPointEndpointReference (aOldAP.getID (), sNewURL);
-      return nEndpointsChanged;
-    }
-
-    // Only a part of the endpoints is affected and/or the new URL already exists, so the affected
-    // endpoints must be re-pointed to the Access Point of the new URL
-    final ISMPAccessPoint aNewAP;
-    if (aTargetAP != null)
-    {
-      if (!aTargetAP.hasSameCertificate (aOldAP.getCertificate ()))
-        LOGGER.warn ("The Access Point '" +
-                     sNewURL +
-                     "' already exists with a different certificate. The affected endpoints now use the certificate of '" +
-                     sNewURL +
-                     "'.");
-      aNewAP = aTargetAP;
-    }
-    else
-      aNewAP = m_aAccessPointMgr.getOrCreateAccessPoint (sNewURL, aOldAP.getCertificate ());
-
-    final long nChanged;
+    final StringBuilder aSQL = new StringBuilder ("UPDATE ").append (m_sTableNameE)
+                                                            .append (" SET endpointReference=? WHERE accessPointID IS NULL AND endpointReference=?");
+    final ICommonsList <Object> aParams = new CommonsArrayList <> ();
+    aParams.add (DBValueHelper.getTrimmedToLength (sNewURL, ISMPAccessPointManager.ENDPOINT_REFERENCE_MAX_LENGTH));
+    aParams.add (sOldURL);
     if (aServiceGroupID != null)
-      nChanged = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                        m_sTableNameE +
-                                                        " SET accessPointID=? WHERE accessPointID=? AND businessIdentifierScheme=? AND businessIdentifier=?",
-                                                        new ConstantPreparedStatementDataProvider (aNewAP.getID (),
-                                                                                                   aOldAP.getID (),
-                                                                                                   aServiceGroupID.getScheme (),
-                                                                                                   aServiceGroupID.getValue ()));
-    else
-      nChanged = newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                        m_sTableNameE +
-                                                        " SET accessPointID=? WHERE accessPointID=?",
-                                                        new ConstantPreparedStatementDataProvider (aNewAP.getID (),
-                                                                                                   aOldAP.getID ()));
-    if (nChanged > 0)
-      _deleteAllUnusedAccessPoints ();
-    return Math.max (nChanged, 0);
+    {
+      aSQL.append (" AND businessIdentifierScheme=? AND businessIdentifier=?");
+      aParams.add (aServiceGroupID.getScheme ());
+      aParams.add (aServiceGroupID.getValue ());
+    }
+
+    long nChanged = Math.max (newExecutor ().insertOrUpdateOrDelete (aSQL.toString (),
+                                                                     new ConstantPreparedStatementDataProvider (aParams)),
+                              0);
+
+    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
+      if (aAP.hasSameEndpointReference (sOldURL))
+      {
+        final long nUsingAP = getEndpointCountUsingAccessPoint (aAP.getID ());
+        if (nUsingAP == 0)
+          continue;
+
+        if (aServiceGroupID != null)
+        {
+          LOGGER.warn ("The endpoints referencing the Access Point '" +
+                       aAP.getName () +
+                       "' are not changed, because an Access Point is shared across Service Groups");
+          continue;
+        }
+
+        if (m_aAccessPointMgr.updateAccessPoint (aAP.getID (), aAP.getName (), sNewURL, aAP.getCertificate ())
+                             .isChanged ())
+          nChanged += nUsingAP;
+      }
+
+    return nChanged;
   }
 
   @Nonnegative
@@ -987,34 +916,65 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    // The certificate is an attribute of the Access Point, so only the (few) Access Point rows need
-    // to be updated - no endpoint row is touched at all
-    final ICommonsSet <String> aAPIDs = m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized);
-    if (aAPIDs.isEmpty ())
-      return 0;
-
-    // Determine the number of affected endpoints for the caller, before the change is applied
-    final long nEndpointsChanged = _countEndpointsUsingAccessPoints (aAPIDs, null);
-    m_aAccessPointMgr.updateAllAccessPointCertificates (sOldCertNormalized, sNewCert);
-    return nEndpointsChanged;
-  }
-
-  @NonNull
-  @ReturnsMutableCopy
-  public ICommonsSet <String> getAllUsedAccessPointIDs ()
-  {
-    final ICommonsSet <String> ret = new CommonsHashSet <> ();
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT DISTINCT accessPointID FROM " +
+    long nChanged = 0;
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, certificate FROM " +
                                                                           m_sTableNameE +
-                                                                          " WHERE accessPointID IS NOT NULL");
+                                                                          " WHERE accessPointID IS NULL");
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
-        ret.add (aRow.getAsString (0));
-    return ret;
+        if (sOldCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (aRow.getAsString (1))))
+          nChanged += Math.max (newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                       m_sTableNameE +
+                                                                       " SET certificate=? WHERE id=?",
+                                                                       new ConstantPreparedStatementDataProvider (sNewCert,
+                                                                                                                  aRow.getAsString (0))),
+                                0);
+
+    for (final String sAPID : m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized))
+    {
+      final long nUsingAP = getEndpointCountUsingAccessPoint (sAPID);
+      if (m_aAccessPointMgr.updateAccessPointCertificate (sAPID, sNewCert).isChanged ())
+        nChanged += nUsingAP;
+    }
+
+    return nChanged;
   }
 
-  private void _deleteAllUnusedAccessPoints ()
+  @Nonnegative
+  public long getEndpointCountUsingAccessPoint (@Nullable final String sAccessPointID)
   {
-    m_aAccessPointMgr.deleteAllUnusedAccessPoints (getAllUsedAccessPointIDs ());
+    if (StringHelper.isEmpty (sAccessPointID))
+      return 0;
+
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " + m_sTableNameE + " WHERE accessPointID=?",
+                                      new ConstantPreparedStatementDataProvider (sAccessPointID));
+  }
+
+  @Nonnegative
+  public long useAccessPointForMatchingEndpoints (@NonNull final String sAccessPointID,
+                                                  final boolean bRequireSameEndpointReference)
+  {
+    ValueEnforcer.notNull (sAccessPointID, "AccessPointID");
+
+    final ISMPAccessPoint aAP = m_aAccessPointMgr.getAccessPointOfID (sAccessPointID);
+    if (aAP == null || !aAP.hasCertificate ())
+      return 0;
+
+    final String sAPCertNormalized = SMPCertificateHelper.getNormalizedCert (aAP.getCertificate ());
+    long nChanged = 0;
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, endpointReference, certificate FROM " +
+                                                                          m_sTableNameE +
+                                                                          " WHERE accessPointID IS NULL");
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+        if (sAPCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (aRow.getAsString (2))) &&
+            (!bRequireSameEndpointReference || aAP.hasSameEndpointReference (aRow.getAsString (1))))
+          nChanged += Math.max (newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                                       m_sTableNameE +
+                                                                       " SET accessPointID=?, endpointReference=NULL, certificate=NULL WHERE id=?",
+                                                                       new ConstantPreparedStatementDataProvider (sAccessPointID,
+                                                                                                                  aRow.getAsString (0))),
+                                0);
+    return nChanged;
   }
 }

@@ -17,11 +17,14 @@ import java.util.Locale;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.factory.GlobalIDFactory;
-import com.helger.collection.commons.ICommonsSet;
+import com.helger.base.state.ESuccess;
 import com.helger.datetime.format.PDTToString;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.period.LocalDatePeriod;
@@ -36,6 +39,7 @@ import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 @Immutable
 public final class SMPEndpointHelper
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (SMPEndpointHelper.class);
   private static final LocalDate DATE_MIN = PDTFactory.createLocalDate (0, Month.JANUARY, 1);
   private static final LocalDate DATE_MAX = PDTFactory.createLocalDate (9999, Month.DECEMBER, 31);
 
@@ -88,75 +92,74 @@ public final class SMPEndpointHelper
   }
 
   /**
-   * Resolve the Access Points of all endpoints contained in the provided service information. Every
-   * endpoint gets the managed - and therefore de-duplicated - Access Point matching its endpoint
-   * reference URL assigned. This must be called by every backend before persisting a service
-   * information object.
-   * <p>
-   * Note: if an endpoint carries a certificate that differs from the one of the already existing
-   * Access Point with the same URL, the certificate of that Access Point is updated - and therefore
-   * changed for all endpoints referencing it. A physical Access Point can only have one certificate.
+   * Resolve the Access Point references of all endpoints contained in the provided service
+   * information against the provided manager. Every endpoint that references an Access Point gets
+   * the managed instance assigned, so that later changes of the Access Point are immediately
+   * effective. Endpoints that contain the endpoint reference URL and the certificate directly are
+   * not touched.
    *
    * @param aAccessPointMgr
    *        The Access Point manager to use. May not be <code>null</code>.
    * @param aServiceInformation
    *        The service information to handle. May be <code>null</code>.
+   * @return <code>true</code> if all contained Access Point references could be resolved.
    */
-  public static void resolveAccessPoints (@NonNull final ISMPAccessPointManager aAccessPointMgr,
-                                          @Nullable final ISMPServiceInformation aServiceInformation)
+  public static boolean resolveAccessPoints (@NonNull final ISMPAccessPointManager aAccessPointMgr,
+                                             @Nullable final ISMPServiceInformation aServiceInformation)
   {
     ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
     if (aServiceInformation == null)
-      return;
+      return true;
 
+    boolean bAllResolved = true;
     for (final ISMPProcess aProcess : aServiceInformation.getAllProcesses ())
       for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-        resolveAccessPoint (aAccessPointMgr, aEndpoint);
+        if (resolveAccessPoint (aAccessPointMgr, aEndpoint).isFailure ())
+          bAllResolved = false;
+    return bAllResolved;
   }
 
   /**
-   * Resolve the Access Point of a single endpoint.
+   * Resolve the Access Point reference of a single endpoint. If the endpoint does not reference an
+   * Access Point, nothing happens.
    *
    * @param aAccessPointMgr
    *        The Access Point manager to use. May not be <code>null</code>.
    * @param aEndpoint
    *        The endpoint to handle. May be <code>null</code>.
-   * @return The resolved Access Point or <code>null</code> if the endpoint was <code>null</code> or
-   *         of an unsupported type.
+   * @return {@link ESuccess#FAILURE} if the referenced Access Point could not be resolved.
    */
-  @Nullable
-  public static ISMPAccessPoint resolveAccessPoint (@NonNull final ISMPAccessPointManager aAccessPointMgr,
-                                                    @Nullable final ISMPEndpoint aEndpoint)
+  @NonNull
+  public static ESuccess resolveAccessPoint (@NonNull final ISMPAccessPointManager aAccessPointMgr,
+                                             @Nullable final ISMPEndpoint aEndpoint)
   {
     ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
     if (!(aEndpoint instanceof SMPEndpoint))
-      return aEndpoint == null ? null : aEndpoint.getAccessPoint ();
+      return ESuccess.SUCCESS;
 
     final SMPEndpoint aRealEndpoint = (SMPEndpoint) aEndpoint;
-    final ISMPAccessPoint aAccessPoint = aAccessPointMgr.getOrCreateAccessPoint (aRealEndpoint.getEndpointReference (),
-                                                                                 aRealEndpoint.getCertificate ());
-    aRealEndpoint.setAccessPoint (aAccessPoint);
-    return aAccessPoint;
-  }
+    final ISMPAccessPoint aReferenced = aRealEndpoint.getAccessPoint ();
+    if (aReferenced == null)
+    {
+      // Endpoint contains URL and certificate directly
+      return ESuccess.SUCCESS;
+    }
 
-  /**
-   * Collect the IDs of all Access Points referenced by the endpoints of the provided service
-   * information.
-   *
-   * @param aServiceInformation
-   *        The service information to scan. May be <code>null</code>.
-   * @param aTarget
-   *        The target set to fill. May not be <code>null</code>.
-   */
-  public static void collectAccessPointIDs (@Nullable final ISMPServiceInformation aServiceInformation,
-                                            @NonNull final ICommonsSet <String> aTarget)
-  {
-    ValueEnforcer.notNull (aTarget, "Target");
-    if (aServiceInformation == null)
-      return;
+    final ISMPAccessPoint aResolved = aAccessPointMgr.getAccessPointOfID (aReferenced.getID ());
+    if (aResolved == null)
+    {
+      LOGGER.warn ("Failed to resolve the SMP Access Point with ID '" +
+                   aReferenced.getID () +
+                   "' referenced from endpoint '" +
+                   aRealEndpoint.getID () +
+                   "'");
+      return ESuccess.FAILURE;
+    }
 
-    for (final ISMPProcess aProcess : aServiceInformation.getAllProcesses ())
-      for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-        aTarget.add (aEndpoint.getAccessPointID ());
+    // Important: use the managed object as-is and do not create a copy of it. Access Points are
+    // shared between all endpoints referencing them, so that changing e.g. the certificate of an
+    // Access Point is immediately effective for all of them.
+    aRealEndpoint.setAccessPoint (aResolved);
+    return ESuccess.SUCCESS;
   }
 }

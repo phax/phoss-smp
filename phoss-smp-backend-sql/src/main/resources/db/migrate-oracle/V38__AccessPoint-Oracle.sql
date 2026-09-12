@@ -15,65 +15,20 @@
 -- limitations under the License.
 --
 
--- Step 1: Create the new Access Point table.
--- An Access Point is identified by its endpoint reference URL, because a physical
--- Access Point can technically only have one single public certificate.
--- Note: the UNIQUE index on endpointReference is created after the initial data
--- load (step 4), because bulk loading into an unindexed table is significantly
--- faster.
 CREATE TABLE smp_access_point (
   id                VARCHAR2(45)  NOT NULL,
+  name              VARCHAR2(64)  NOT NULL,
   endpointReference VARCHAR2(256),
   certificate       CLOB,
   CONSTRAINT pk_smp_access_point PRIMARY KEY (id)
 );
 
--- Step 2: Add the reference column to the endpoint table
+CREATE UNIQUE INDEX UX_smp_access_point_name ON smp_access_point (name);
+
+ALTER TABLE smp_endpoint MODIFY (endpointReference NULL, certificate NULL);
+
 ALTER TABLE smp_endpoint ADD accessPointID VARCHAR2(45);
-
--- Step 3: Temporary index on the column to be de-duplicated.
--- Without it, the grouping in step 4 and the join in step 5 degrade into
--- (repeated) full table scans, which is prohibitively slow for large endpoint
--- tables. It is dropped again in step 6.
-CREATE INDEX IX_smp_endpoint_epr_tmp ON smp_endpoint (endpointReference);
-
--- Step 4: Create one Access Point per distinct endpointReference.
--- The ID of the first endpoint of each group is reused as the Access Point ID,
--- because it is unique by definition. The certificate of that very same endpoint
--- is used as the certificate of the Access Point.
--- The distinct URLs are determined with a single grouped pass over the index of
--- step 3 and are then joined back via the primary key, so that the certificate
--- (a potentially large value) is only read for the rows that are inserted.
-INSERT INTO smp_access_point (id, endpointReference, certificate)
-  SELECT e.id, e.endpointReference, e.certificate
-  FROM smp_endpoint e
-  INNER JOIN (SELECT MIN(id) AS id
-              FROM smp_endpoint
-              GROUP BY endpointReference) g ON g.id = e.id;
-
-CREATE UNIQUE INDEX UX_smp_access_point_epr ON smp_access_point (endpointReference);
-
--- Step 5: Point all endpoints to their Access Point.
--- A MERGE is used instead of a correlated subquery update, so that the optimizer
--- can use a single hash join instead of one index lookup per endpoint row.
-MERGE INTO smp_endpoint e
-  USING smp_access_point ap
-  ON (e.endpointReference = ap.endpointReference)
-  WHEN MATCHED THEN UPDATE SET accessPointID = ap.id;
-
--- Step 6: Drop the now redundant columns in a single statement, so that the
--- table is processed only once. CHECKPOINT limits the amount of undo that is
--- generated for large tables.
-DROP INDEX IX_smp_endpoint_epr_tmp;
-ALTER TABLE smp_endpoint DROP (endpointReference, certificate) CHECKPOINT 10000;
-
--- Step 7: Index for the join. Created last, because maintaining it during the
--- mass update of step 5 would be pure overhead.
 CREATE INDEX IX_smp_endpoint_apid ON smp_endpoint (accessPointID);
 
 -- Note: no explicit statistics gathering is done here, because Oracle refreshes
 -- the statistics of both tables with its automatic optimizer statistics task.
--- On a very large endpoint table it may be worthwhile to run
---   DBMS_STATS.GATHER_TABLE_STATS(USER, 'SMP_ENDPOINT');
---   DBMS_STATS.GATHER_TABLE_STATS(USER, 'SMP_ACCESS_POINT');
--- manually right after the migration.

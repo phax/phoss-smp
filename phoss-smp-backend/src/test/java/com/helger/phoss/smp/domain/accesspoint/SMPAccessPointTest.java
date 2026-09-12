@@ -14,9 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -30,119 +28,103 @@ import com.helger.base.state.EChange;
  */
 public final class SMPAccessPointTest
 {
+  private static final String NAME1 = "ap1";
+  private static final String NAME2 = "ap2";
   private static final String URL1 = "http://localhost/ap1";
   private static final String URL2 = "http://localhost/ap2";
   private static final String CERT1 = "cert1";
   private static final String CERT2 = "cert2";
 
   @Test
-  public void testCreateDetached ()
+  public void testCreateWithNewID ()
   {
-    final SMPAccessPoint aAP = SMPAccessPoint.createDetached (URL1, CERT1);
+    final SMPAccessPoint aAP = SMPAccessPoint.createWithNewID (NAME1, URL1, CERT1);
     assertNotNull (aAP);
     assertNotNull (aAP.getID ());
+    assertEquals (NAME1, aAP.getName ());
     assertEquals (URL1, aAP.getEndpointReference ());
     assertEquals (CERT1, aAP.getCertificate ());
     assertTrue (aAP.hasEndpointReference ());
     assertTrue (aAP.hasCertificate ());
-    assertFalse (aAP.hasNoContent ());
 
-    // Every detached Access Point gets its own ID
-    assertNotEquals (aAP.getID (), SMPAccessPoint.createDetached (URL1, CERT1).getID ());
+    // Every new Access Point gets its own ID
+    assertNotEquals (aAP.getID (), SMPAccessPoint.createWithNewID (NAME1, URL1, CERT1).getID ());
   }
 
   @Test
   public void testEmptyContent ()
   {
-    final SMPAccessPoint aAP = SMPAccessPoint.createDetached (null, null);
+    final SMPAccessPoint aAP = SMPAccessPoint.createWithNewID (NAME1, null, null);
+    assertEquals (NAME1, aAP.getName ());
     assertNull (aAP.getEndpointReference ());
     assertNull (aAP.getCertificate ());
     assertFalse (aAP.hasEndpointReference ());
     assertFalse (aAP.hasCertificate ());
-    assertTrue (aAP.hasNoContent ());
   }
 
   @Test
-  public void testIdentityIsUrlOnly ()
+  public void testSetName ()
   {
-    final SMPAccessPoint aAP = SMPAccessPoint.createDetached (URL1, CERT1);
-    assertTrue (aAP.hasSameEndpointReference (URL1));
-    assertFalse (aAP.hasSameEndpointReference (URL2));
-
-    // null and empty are treated identically, because that is how the backends
-    // store "no value"
-    final SMPAccessPoint aEmpty = SMPAccessPoint.createDetached (null, null);
-    assertTrue (aEmpty.hasSameEndpointReference (null));
-    assertTrue (aEmpty.hasSameEndpointReference (""));
-    assertEquals (SMPAccessPointHelper.createLookupKey ((String) null), SMPAccessPointHelper.createLookupKey (""));
-    assertEquals (URL1, SMPAccessPointHelper.createLookupKey (URL1));
-    assertEquals (SMPAccessPointHelper.createLookupKey (URL1), SMPAccessPointHelper.createLookupKey (aAP));
-
-    // The certificate is NOT part of the identity
-    assertEquals (SMPAccessPointHelper.createLookupKey (aAP),
-                  SMPAccessPointHelper.createLookupKey (SMPAccessPoint.createDetached (URL1, CERT2)));
+    final SMPAccessPoint aAP = SMPAccessPoint.createWithNewID (NAME1, URL1, CERT1);
+    assertEquals (EChange.UNCHANGED, aAP.setName (NAME1));
+    assertEquals (EChange.CHANGED, aAP.setName (NAME2));
+    assertEquals (NAME2, aAP.getName ());
   }
 
   @Test
-  public void testSettersMutateInPlace ()
+  public void testSetEndpointReference ()
   {
-    // Setters are for the manager only - they mutate the shared object, so that
-    // the change is immediately visible for all endpoints referencing it
-    final SMPAccessPoint aAP = SMPAccessPoint.createDetached (URL1, CERT1);
-    final String sID = aAP.getID ();
-
-    assertEquals (EChange.UNCHANGED, aAP.setCertificate (CERT1));
-    assertEquals (EChange.CHANGED, aAP.setCertificate (CERT2));
-    assertEquals (CERT2, aAP.getCertificate ());
-    assertEquals (EChange.UNCHANGED, aAP.setCertificate (CERT2));
-
+    final SMPAccessPoint aAP = SMPAccessPoint.createWithNewID (NAME1, URL1, CERT1);
     assertEquals (EChange.UNCHANGED, aAP.setEndpointReference (URL1));
     assertEquals (EChange.CHANGED, aAP.setEndpointReference (URL2));
     assertEquals (URL2, aAP.getEndpointReference ());
-
-    // The ID never changes
-    assertEquals (sID, aAP.getID ());
+    assertEquals (EChange.CHANGED, aAP.setEndpointReference (null));
+    assertNull (aAP.getEndpointReference ());
+    // null and empty are equivalent
+    assertEquals (EChange.UNCHANGED, aAP.setEndpointReference (""));
   }
 
   @Test
-  public void testWithCreatesDetachedCopy ()
+  public void testSetCertificate ()
   {
-    // "with" is for entity level edits - it must never modify the shared object
-    final SMPAccessPoint aAP = SMPAccessPoint.createDetached (URL1, CERT1);
-
-    final SMPAccessPoint aNewCert = aAP.withCertificate (CERT2);
-    assertNotSame (aAP, aNewCert);
-    assertNotEquals (aAP.getID (), aNewCert.getID ());
-    assertEquals (URL1, aNewCert.getEndpointReference ());
-    assertEquals (CERT2, aNewCert.getCertificate ());
-    // Original is untouched
-    assertEquals (CERT1, aAP.getCertificate ());
-
-    final SMPAccessPoint aNewURL = aAP.withEndpointReference (URL2);
-    assertNotSame (aAP, aNewURL);
-    assertNotEquals (aAP.getID (), aNewURL.getID ());
-    assertEquals (URL2, aNewURL.getEndpointReference ());
-    assertEquals (CERT1, aNewURL.getCertificate ());
-    // Original is untouched
-    assertEquals (URL1, aAP.getEndpointReference ());
-
-    // No change means no new object, so that unrelated saves do not create
-    // garbage Access Points
-    assertSame (aAP, aAP.withCertificate (CERT1));
-    assertSame (aAP, aAP.withEndpointReference (URL1));
+    final SMPAccessPoint aAP = SMPAccessPoint.createWithNewID (NAME1, URL1, CERT1);
+    assertEquals (EChange.UNCHANGED, aAP.setCertificate (CERT1));
+    assertEquals (EChange.CHANGED, aAP.setCertificate (CERT2));
+    assertEquals (CERT2, aAP.getCertificate ());
   }
 
   @Test
-  public void testEqualsHashCodeByID ()
+  public void testHasSameName ()
   {
-    final SMPAccessPoint aAP = SMPAccessPoint.createDetached (URL1, CERT1);
+    final SMPAccessPoint aAP = SMPAccessPoint.createWithNewID (NAME1, URL1, CERT1);
+    assertTrue (aAP.hasSameName (NAME1));
+    // Name comparison is case insensitive
+    assertTrue (aAP.hasSameName (NAME1.toUpperCase (java.util.Locale.ROOT)));
+    assertFalse (aAP.hasSameName (NAME2));
+    assertFalse (aAP.hasSameName (null));
+  }
 
-    // Same ID, different content -> equal, because the ID identifies the object
-    final SMPAccessPoint aSameID = new SMPAccessPoint (aAP.getID (), URL2, CERT2);
-    assertEquals (aAP, aSameID);
-    assertEquals (aAP.hashCode (), aSameID.hashCode ());
+  @Test
+  public void testHelperNames ()
+  {
+    assertTrue (SMPAccessPointHelper.isValidName ("ap1"));
+    assertTrue (SMPAccessPointHelper.isValidName ("AP-1_test.x"));
+    assertFalse (SMPAccessPointHelper.isValidName (null));
+    assertFalse (SMPAccessPointHelper.isValidName (""));
+    assertFalse (SMPAccessPointHelper.isValidName ("-ap"));
+    assertFalse (SMPAccessPointHelper.isValidName ("a b"));
+    assertFalse (SMPAccessPointHelper.isValidName ("x".repeat (SMPAccessPointHelper.NAME_MAX_LENGTH + 1)));
 
-    // Different ID, same content -> not equal
-    assertNotEquals (aAP, SMPAccessPoint.createDetached (URL1, CERT1));
+    assertEquals (SMPAccessPointHelper.createNameLookupKey ("AP1"), SMPAccessPointHelper.createNameLookupKey (" ap1 "));
+  }
+
+  @Test
+  public void testRESTReference ()
+  {
+    final String sRef = SMPAccessPointHelper.createRESTReference (NAME1);
+    assertEquals (SMPAccessPointHelper.REST_ACCESS_POINT_PREFIX + NAME1, sRef);
+    assertEquals (NAME1, SMPAccessPointHelper.getAccessPointNameFromRESTReference (sRef));
+    assertNull (SMPAccessPointHelper.getAccessPointNameFromRESTReference (URL1));
+    assertNull (SMPAccessPointHelper.getAccessPointNameFromRESTReference (null));
   }
 }

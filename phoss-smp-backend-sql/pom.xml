@@ -118,5 +118,12 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Needed for the unit tests that run against the PostgreSQL instance of "unittest-db-docker-compose.yml" -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.13</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

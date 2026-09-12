@@ -20,7 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -45,6 +50,8 @@ import com.helger.xml.microdom.IMicroElement;
  */
 public final class SMPAccessPointManagerXMLTest
 {
+  private static final String NAME1 = "ap1";
+  private static final String NAME2 = "ap2";
   private static final String URL1 = "http://localhost/ap1";
   private static final String URL2 = "http://localhost/ap2";
   private static final String CERT1 = "cert1";
@@ -71,41 +78,73 @@ public final class SMPAccessPointManagerXMLTest
                             null);
   }
 
+  @Before
+  public void before ()
+  {
+    // The XML backend data survives between the tests
+    final ISMPAccessPointManager aAPMgr = SMPMetaManager.getAccessPointMgr ();
+    for (final ISMPAccessPoint aAP : aAPMgr.getAllAccessPoints ())
+      aAPMgr.deleteAccessPoint (aAP.getID ());
+  }
+
+  @After
+  public void after ()
+  {
+    before ();
+  }
+
   @Test
-  public void testOneCertificatePerURL ()
+  public void testCreateAndUniqueName ()
   {
     final ISMPAccessPointManager aAPMgr = SMPMetaManager.getAccessPointMgr ();
 
-    final ISMPAccessPoint aAP1 = aAPMgr.getOrCreateAccessPoint (URL1, CERT1);
+    final ISMPAccessPoint aAP1 = aAPMgr.createAccessPoint (NAME1, URL1, CERT1);
     assertNotNull (aAP1);
+    assertEquals (NAME1, aAP1.getName ());
     assertEquals (URL1, aAP1.getEndpointReference ());
     assertEquals (CERT1, aAP1.getCertificate ());
 
-    // Same URL, same certificate -> same Access Point
-    assertSame (aAP1, aAPMgr.getOrCreateAccessPoint (URL1, CERT1));
+    // The name must be unique - case insensitive
+    assertNull (aAPMgr.createAccessPoint (NAME1, URL2, CERT2));
+    assertNull (aAPMgr.createAccessPoint (NAME1.toUpperCase (Locale.ROOT), URL2, CERT2));
+    assertEquals (1, aAPMgr.getAccessPointCount ());
 
-    // Same URL, different certificate -> same Access Point, but updated
-    // certificate, because an Access Point can only have one certificate
-    final ISMPAccessPoint aAP1b = aAPMgr.getOrCreateAccessPoint (URL1, CERT2);
-    assertEquals (aAP1.getID (), aAP1b.getID ());
-    assertEquals (CERT2, aAPMgr.getAccessPointOfID (aAP1.getID ()).getCertificate ());
-
-    // Different URL -> different Access Point
-    final ISMPAccessPoint aAP2 = aAPMgr.getOrCreateAccessPoint (URL2, CERT2);
+    // Different name with the same content is allowed
+    final ISMPAccessPoint aAP2 = aAPMgr.createAccessPoint (NAME2, URL1, CERT1);
     assertNotNull (aAP2);
-    assertEquals (URL2, aAP2.getEndpointReference ());
+    assertEquals (2, aAPMgr.getAccessPointCount ());
 
-    // Lookup by URL only
-    assertEquals (aAP1.getID (), aAPMgr.findAccessPoint (URL1).getID ());
-    assertEquals (aAP2.getID (), aAPMgr.findAccessPoint (URL2).getID ());
-    assertNull (aAPMgr.findAccessPoint ("http://localhost/does-not-exist"));
+    // Lookup by name
+    assertEquals (aAP1.getID (), aAPMgr.getAccessPointOfName (NAME1).getID ());
+    assertEquals (aAP2.getID (), aAPMgr.getAccessPointOfName (NAME2.toUpperCase (Locale.ROOT)).getID ());
+    assertNull (aAPMgr.getAccessPointOfName ("does-not-exist"));
+  }
+
+  @Test
+  public void testUpdateAndDelete ()
+  {
+    final ISMPAccessPointManager aAPMgr = SMPMetaManager.getAccessPointMgr ();
+    final ISMPAccessPoint aAP = aAPMgr.createAccessPoint (NAME1, URL1, CERT1);
+    assertNotNull (aAP);
+
+    assertTrue (aAPMgr.updateAccessPoint (aAP.getID (), NAME2, URL2, CERT2).isChanged ());
+    assertNull (aAPMgr.getAccessPointOfName (NAME1));
+    assertNotNull (aAPMgr.getAccessPointOfName (NAME2));
+    assertEquals (URL2, aAPMgr.getAccessPointOfID (aAP.getID ()).getEndpointReference ());
+
+    assertTrue (aAPMgr.deleteAccessPoint (aAP.getID ()).isChanged ());
+    assertEquals (0, aAPMgr.getAccessPointCount ());
+    assertNull (aAPMgr.getAccessPointOfName (NAME2));
+
+    // The name is free again
+    assertNotNull (aAPMgr.createAccessPoint (NAME2, URL2, CERT2));
   }
 
   @Test
   public void testDeserializedEndpointUsesManagedAccessPoint ()
   {
     final ISMPAccessPointManager aAPMgr = SMPMetaManager.getAccessPointMgr ();
-    final ISMPAccessPoint aAP = aAPMgr.getOrCreateAccessPoint (URL1, CERT1);
+    final ISMPAccessPoint aAP = aAPMgr.createAccessPoint (NAME1, URL1, CERT1);
     assertNotNull (aAP);
 
     final SMPEndpoint aEP = _createEndpoint ("epid", URL1, CERT1);

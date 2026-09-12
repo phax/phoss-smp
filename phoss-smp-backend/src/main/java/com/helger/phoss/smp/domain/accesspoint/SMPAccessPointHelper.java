@@ -10,7 +10,9 @@
  */
 package com.helger.phoss.smp.domain.accesspoint;
 
+import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -28,15 +30,22 @@ import com.helger.base.string.StringHelper;
 @Immutable
 public final class SMPAccessPointHelper
 {
+  /** Maximum length of the Access Point name as stored in the DB backends */
+  public static final int NAME_MAX_LENGTH = 64;
+
+  /**
+   * The prefix that is used in the REST API to reference an Access Point by name instead of
+   * providing the endpoint reference URL and the certificate directly.
+   */
+  public static final String REST_ACCESS_POINT_PREFIX = "accesspoint:";
+
+  private static final Pattern VALID_NAME = Pattern.compile ("[a-zA-Z0-9][a-zA-Z0-9._\\-]*");
+
   private SMPAccessPointHelper ()
   {}
 
   /**
    * @return A new unique ID for an Access Point. Neither <code>null</code> nor empty.
-   *         <p>
-   *         Note: a random UUID is used instead of the {@code GlobalIDFactory}, because Access
-   *         Points are implicitly created whenever an {@code SMPEndpoint} is instantiated - and
-   *         that may happen outside of an initialized scope.
    */
   @NonNull
   @Nonempty
@@ -46,32 +55,83 @@ public final class SMPAccessPointHelper
   }
 
   /**
-   * Create the key that is used to identify identical Access Points. Two Access Points are
-   * considered identical if they have the same endpoint reference URL - a physical Access Point can
-   * technically only have one single public certificate, so the certificate is not part of the
-   * identity. <code>null</code> and empty values are treated identically, because that is how the
-   * different backends store "no value".
+   * Create the key that is used to check the uniqueness of Access Point names. Names are treated
+   * case insensitive, so that Access Points cannot be confused with each other.
    *
-   * @param sEndpointReference
-   *        The endpoint reference URL. May be <code>null</code>.
+   * @param sName
+   *        The Access Point name. May be <code>null</code>.
    * @return The non-<code>null</code> lookup key.
    */
   @NonNull
-  public static String createLookupKey (@Nullable final String sEndpointReference)
+  public static String createNameLookupKey (@Nullable final String sName)
   {
-    return StringHelper.getNotNull (sEndpointReference, "");
+    return StringHelper.getNotNull (sName, "").trim ().toLowerCase (Locale.ROOT);
   }
 
   /**
-   * Create the lookup key of an existing Access Point.
+   * Create the name lookup key of an existing Access Point.
    *
    * @param aAccessPoint
    *        The Access Point to create the key for. May not be <code>null</code>.
    * @return The non-<code>null</code> lookup key.
    */
   @NonNull
-  public static String createLookupKey (@NonNull final ISMPAccessPoint aAccessPoint)
+  public static String createNameLookupKey (@NonNull final ISMPAccessPoint aAccessPoint)
   {
-    return createLookupKey (aAccessPoint.getEndpointReference ());
+    return createNameLookupKey (aAccessPoint.getName ());
+  }
+
+  /**
+   * Check if the provided Access Point name is syntactically valid. A valid name starts with a
+   * letter or a digit and may additionally contain dots, underscores and hyphens. The length is
+   * limited to {@link #NAME_MAX_LENGTH} characters, because the name is stored in an indexed
+   * database column.
+   *
+   * @param sName
+   *        The name to check. May be <code>null</code>.
+   * @return <code>true</code> if the name is valid.
+   */
+  public static boolean isValidName (@Nullable final String sName)
+  {
+    if (StringHelper.isEmpty (sName) || sName.length () > NAME_MAX_LENGTH)
+      return false;
+    return VALID_NAME.matcher (sName).matches ();
+  }
+
+  /**
+   * Create the value that is used in the REST API to reference the provided Access Point by name.
+   *
+   * @param sName
+   *        The Access Point name. May neither be <code>null</code> nor empty.
+   * @return The reference value. Neither <code>null</code> nor empty.
+   * @see #getAccessPointNameFromRESTReference(String)
+   */
+  @NonNull
+  @Nonempty
+  public static String createRESTReference (@NonNull @Nonempty final String sName)
+  {
+    return REST_ACCESS_POINT_PREFIX + sName;
+  }
+
+  /**
+   * Extract the Access Point name from a REST API endpoint reference value.
+   *
+   * @param sEndpointReference
+   *        The endpoint reference value as provided via the REST API. May be <code>null</code>.
+   * @return <code>null</code> if the provided value does not reference an Access Point.
+   * @see #createRESTReference(String)
+   */
+  @Nullable
+  public static String getAccessPointNameFromRESTReference (@Nullable final String sEndpointReference)
+  {
+    if (sEndpointReference == null)
+      return null;
+
+    final String sTrimmed = sEndpointReference.trim ();
+    if (!StringHelper.startsWithIgnoreCase (sTrimmed, REST_ACCESS_POINT_PREFIX))
+      return null;
+
+    final String sName = sTrimmed.substring (REST_ACCESS_POINT_PREFIX.length ()).trim ();
+    return StringHelper.isEmpty (sName) ? null : sName;
   }
 }

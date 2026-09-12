@@ -25,7 +25,6 @@ import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
-import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 import com.helger.xml.microdom.MicroQName;
@@ -43,15 +42,11 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
   public static final MicroQName ATTR_ID = new MicroQName ("id");
   public static final MicroQName ATTR_TRANSPORT_PROFILE = new MicroQName ("transportprofile");
   public static final MicroQName ATTR_ACCESS_POINT_ID = new MicroQName ("apid");
-  /** @deprecated Only used for reading data written before v8.4.4 */
-  @Deprecated
   public static final MicroQName ATTR_ENDPOINT_REFERENCE = new MicroQName ("endpointref");
   public static final MicroQName ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE = new MicroQName ("reqblsig");
   public static final MicroQName ATTR_MINIMUM_AUTHENTICATION_LEVEL = new MicroQName ("minauthlevel");
   public static final MicroQName ATTR_SERVICE_ACTIVATION_DATE = new MicroQName ("activation");
   public static final MicroQName ATTR_SERVICE_EXPIRATION_DATE = new MicroQName ("expiration");
-  /** @deprecated Only used for reading data written before v8.4.4 */
-  @Deprecated
   public static final String ELEMENT_CERTIFICATE = "certificate";
   public static final String ELEMENT_SERVICE_DESCRIPTION = "svcdescription";
   public static final MicroQName ATTR_TECHNICAL_CONTACT_URL = new MicroQName ("techcontacturl");
@@ -66,9 +61,20 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_ID, aValue.getID ());
     aElement.setAttribute (ATTR_TRANSPORT_PROFILE, aValue.getTransportProfile ());
-    // The endpoint reference URL and the certificate are stored in the
-    // referenced Access Point only
-    aElement.setAttribute (ATTR_ACCESS_POINT_ID, aValue.getAccessPointID ());
+    if (aValue.hasAccessPoint ())
+    {
+      // The endpoint reference URL and the certificate are stored in the referenced Access Point
+      // only
+      aElement.setAttribute (ATTR_ACCESS_POINT_ID, aValue.getAccessPointID ());
+    }
+    else
+    {
+      // The endpoint reference URL and the certificate are stored in the endpoint itself
+      if (aValue.hasEndpointReference ())
+        aElement.setAttribute (ATTR_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
+      if (aValue.hasCertificate ())
+        aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE).addText (aValue.getCertificate ());
+    }
     aElement.setAttribute (ATTR_REQUIRE_BUSINESS_LEVEL_SIGNATURE, aValue.isRequireBusinessLevelSignature ());
     if (aValue.hasMinimumAuthenticationLevel ())
       aElement.setAttribute (ATTR_MINIMUM_AUTHENTICATION_LEVEL, aValue.getMinimumAuthenticationLevel ());
@@ -133,47 +139,42 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
     final String sTechnicalInformationUrl = aElement.getAttributeValue (ATTR_TECHNICAL_INFORMATION_URL);
     final String sExtension = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_EXTENSION);
 
-    // Resolve the Access Point
-    SMPAccessPoint aAccessPoint = null;
+    // An endpoint either references an Access Point or it contains the endpoint reference URL and
+    // the certificate directly
     final String sAccessPointID = aElement.getAttributeValue (ATTR_ACCESS_POINT_ID);
     if (StringHelper.isNotEmpty (sAccessPointID))
     {
       // Important: use the managed object as-is and do not create a copy of it. Access Points are
-      // shared between all endpoints using the same URL, so that changing the certificate of an
+      // shared between all endpoints referencing them, so that changing the certificate of an
       // Access Point is immediately effective for all of them.
-      final ISMPAccessPoint aResolved = aAccessPointMgr.getAccessPointOfID (sAccessPointID);
-      if (aResolved instanceof SMPAccessPoint)
-        aAccessPoint = (SMPAccessPoint) aResolved;
-      else
-        if (aResolved != null)
-          aAccessPoint = new SMPAccessPoint (aResolved.getID (),
-                                             aResolved.getEndpointReference (),
-                                             aResolved.getCertificate ());
-        else
-          LOGGER.warn ("Failed to resolve SMP Access Point with ID '" + sAccessPointID + "'");
+      final ISMPAccessPoint aAccessPoint = aAccessPointMgr.getAccessPointOfID (sAccessPointID);
+      if (aAccessPoint != null)
+        return new SMPEndpoint (sID,
+                                sTransportProfile,
+                                aAccessPoint,
+                                bRequireBusinessLevelSignature,
+                                sMinimumAuthenticationLevel,
+                                aServiceActivationDate,
+                                aServiceExpirationDate,
+                                sServiceDescription,
+                                sTechnicalContactUrl,
+                                sTechnicalInformationUrl,
+                                sExtension);
+
+      LOGGER.warn ("Failed to resolve SMP Access Point with ID '" + sAccessPointID + "'");
     }
-    if (aAccessPoint == null)
-    {
-      // Migration: data written before v8.4.4 contained the endpoint reference
-      // and the certificate inline
-      final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
-      final String sCertificate = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE);
-      final ISMPAccessPoint aCreated = aAccessPointMgr.getOrCreateAccessPoint (sEndpointReference, sCertificate);
-      if (aCreated instanceof SMPAccessPoint)
-        aAccessPoint = (SMPAccessPoint) aCreated;
-      else
-        aAccessPoint = new SMPAccessPoint (aCreated.getID (),
-                                           aCreated.getEndpointReference (),
-                                           aCreated.getCertificate ());
-    }
+
+    final String sEndpointReference = aElement.getAttributeValue (ATTR_ENDPOINT_REFERENCE);
+    final String sCertificate = MicroHelper.getChildTextContentTrimmed (aElement, ELEMENT_CERTIFICATE);
 
     return new SMPEndpoint (sID,
                             sTransportProfile,
-                            aAccessPoint,
+                            sEndpointReference,
                             bRequireBusinessLevelSignature,
                             sMinimumAuthenticationLevel,
                             aServiceActivationDate,
                             aServiceExpirationDate,
+                            sCertificate,
                             sServiceDescription,
                             sTechnicalContactUrl,
                             sTechnicalInformationUrl,
@@ -184,8 +185,8 @@ public final class SMPEndpointMicroTypeConverter implements IMicroTypeConverter 
    * Make an exported endpoint element self-contained by inlining the endpoint reference URL and the
    * certificate of the referenced Access Point and removing the Access Point reference. This is
    * required because Access Point IDs cannot be guaranteed to be unique across multiple
-   * installations. The resulting XML uses the format of SMP versions before v8.4.4 and is read back
-   * by the soft migration in {@link #convertToNative(IMicroElement, ISMPAccessPointManager)}.
+   * installations. The resulting XML contains the endpoint reference and the certificate directly,
+   * so that it can be imported into any SMP instance.
    *
    * @param aEndpointElement
    *        The endpoint element to modify. May not be <code>null</code>.

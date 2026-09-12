@@ -25,7 +25,6 @@ import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
-import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
@@ -44,7 +43,9 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
 
   private final String m_sID;
   private String m_sTransportProfile;
-  private SMPAccessPoint m_aAccessPoint;
+  private ISMPAccessPoint m_aAccessPoint;
+  private String m_sEndpointReference;
+  private String m_sCertificate;
   private boolean m_bRequireBusinessLevelSignature;
   private String m_sMinimumAuthenticationLevel;
   private XMLOffsetDateTime m_aServiceActivationDT;
@@ -54,9 +55,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   private String m_sTechnicalInformationUrl;
 
   /**
-   * Constructor using an explicit endpoint reference URL and certificate. A new detached Access
-   * Point is created for them. The backends de-duplicate the Access Point when the endpoint is
-   * saved.
+   * Constructor using an explicit endpoint reference URL and certificate. The endpoint does not
+   * reference an Access Point.
    *
    * @param sID
    *        Endpoint ID. May neither be <code>null</code> nor empty.
@@ -96,21 +96,24 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sTechnicalInformationUrl,
                       @Nullable final String sExtension)
   {
-    this (sID,
-          sTransportProfile,
-          SMPAccessPoint.createDetached (sEndpointReference, sCertificate),
-          bRequireBusinessLevelSignature,
-          sMinimumAuthenticationLevel,
-          aServiceActivationDT,
-          aServiceExpirationDT,
-          sServiceDescription,
-          sTechnicalContactUrl,
-          sTechnicalInformationUrl,
-          sExtension);
+    ValueEnforcer.notEmpty (sID, "ID");
+    m_sID = sID;
+    setTransportProfile (sTransportProfile);
+    setEndpointReference (sEndpointReference);
+    setCertificate (sCertificate);
+    setRequireBusinessLevelSignature (bRequireBusinessLevelSignature);
+    setMinimumAuthenticationLevel (sMinimumAuthenticationLevel);
+    setServiceActivationDateTime (aServiceActivationDT);
+    setServiceExpirationDateTime (aServiceExpirationDT);
+    setServiceDescription (sServiceDescription);
+    setTechnicalContactUrl (sTechnicalContactUrl);
+    setTechnicalInformationUrl (sTechnicalInformationUrl);
+    getExtensions ().setExtensionAsString (sExtension);
   }
 
   /**
-   * Constructor using an already resolved Access Point.
+   * Constructor referencing an Access Point. The endpoint reference URL and the certificate are
+   * taken from the Access Point.
    *
    * @param sID
    *        Endpoint ID. May neither be <code>null</code> nor empty.
@@ -150,6 +153,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                       @Nullable final String sExtension)
   {
     ValueEnforcer.notEmpty (sID, "ID");
+    ValueEnforcer.notNull (aAccessPoint, "AccessPoint");
     m_sID = sID;
     setTransportProfile (sTransportProfile);
     setAccessPoint (aAccessPoint);
@@ -184,29 +188,20 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   }
 
   /**
-   * @return The Access Point (endpoint reference URL + certificate) referenced by this endpoint.
-   *         Never <code>null</code>.
+   * @return The Access Point referenced by this endpoint or <code>null</code> if the endpoint
+   *         reference URL and the certificate are contained directly.
    * @since 8.4.4
    */
-  @NonNull
-  public SMPAccessPoint getAccessPoint ()
+  @Nullable
+  public ISMPAccessPoint getAccessPoint ()
   {
     return m_aAccessPoint;
   }
 
   /**
-   * @return The ID of the referenced Access Point. Never <code>null</code> nor empty.
-   * @since 8.4.4
-   */
-  @NonNull
-  @Nonempty
-  public String getAccessPointID ()
-  {
-    return m_aAccessPoint.getID ();
-  }
-
-  /**
-   * Set the Access Point to be referenced by this endpoint.
+   * Let this endpoint reference the provided Access Point. The endpoint reference URL and the
+   * certificate that may be contained directly are removed, because an endpoint either references
+   * an Access Point or contains the data directly - but never both.
    *
    * @param aAccessPoint
    *        The new Access Point. May not be <code>null</code>.
@@ -215,30 +210,51 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   public final void setAccessPoint (@NonNull final ISMPAccessPoint aAccessPoint)
   {
     ValueEnforcer.notNull (aAccessPoint, "AccessPoint");
-    m_aAccessPoint = aAccessPoint instanceof SMPAccessPoint ? (SMPAccessPoint) aAccessPoint
-                                                            : new SMPAccessPoint (aAccessPoint.getID (),
-                                                                                  aAccessPoint.getEndpointReference (),
-                                                                                  aAccessPoint.getCertificate ());
+    m_aAccessPoint = aAccessPoint;
+    m_sEndpointReference = null;
+    m_sCertificate = null;
+  }
+
+  /**
+   * Remove the reference to an Access Point and use the provided endpoint reference URL and
+   * certificate directly instead.
+   *
+   * @param sEndpointReference
+   *        The endpoint reference URL to be used directly. May be <code>null</code>.
+   * @param sCertificate
+   *        The certificate to be used directly. May be <code>null</code>.
+   * @since 8.4.4
+   */
+  public final void setDirectData (@Nullable final String sEndpointReference, @Nullable final String sCertificate)
+  {
+    m_aAccessPoint = null;
+    m_sEndpointReference = sEndpointReference;
+    m_sCertificate = sCertificate;
   }
 
   @Nullable
   public String getEndpointReference ()
   {
-    return m_aAccessPoint.getEndpointReference ();
+    return m_aAccessPoint != null ? m_aAccessPoint.getEndpointReference () : m_sEndpointReference;
   }
 
   /**
-   * Change the endpoint reference URL of this endpoint. Because an Access Point is identified by
-   * its URL and shared between endpoints, this results in a new detached Access Point that is
-   * de-duplicated by the backend upon saving. The Access Point previously referenced by this
-   * endpoint is not modified.
+   * Change the endpoint reference URL that is contained in this endpoint directly. A reference to
+   * an Access Point - if present - is removed, because an endpoint either references an Access
+   * Point or contains the data directly.
    *
    * @param sEndpointReference
    *        The new endpoint reference URL. May be <code>null</code>.
    */
   public final void setEndpointReference (@Nullable final String sEndpointReference)
   {
-    m_aAccessPoint = m_aAccessPoint.withEndpointReference (sEndpointReference);
+    if (m_aAccessPoint != null)
+    {
+      // Take over the certificate of the Access Point, so that only the URL changes
+      m_sCertificate = m_aAccessPoint.getCertificate ();
+      m_aAccessPoint = null;
+    }
+    m_sEndpointReference = sEndpointReference;
   }
 
   public boolean isRequireBusinessLevelSignature ()
@@ -287,21 +303,26 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
   @Nullable
   public String getCertificate ()
   {
-    return m_aAccessPoint.getCertificate ();
+    return m_aAccessPoint != null ? m_aAccessPoint.getCertificate () : m_sCertificate;
   }
 
   /**
-   * Change the certificate of this endpoint. This results in a new detached Access Point that is
-   * de-duplicated by the backend upon saving. Note that saving then updates the certificate of the
-   * Access Point with this endpoint's URL - and therefore of all endpoints using that very same URL
-   * - because a physical Access Point can only have one certificate.
+   * Change the certificate that is contained in this endpoint directly. A reference to an Access
+   * Point - if present - is removed, because an endpoint either references an Access Point or
+   * contains the data directly.
    *
    * @param sCertificate
    *        The new certificate. May be <code>null</code>.
    */
   public final void setCertificate (@Nullable final String sCertificate)
   {
-    m_aAccessPoint = m_aAccessPoint.withCertificate (sCertificate);
+    if (m_aAccessPoint != null)
+    {
+      // Take over the URL of the Access Point, so that only the certificate changes
+      m_sEndpointReference = m_aAccessPoint.getEndpointReference ();
+      m_aAccessPoint = null;
+    }
+    m_sCertificate = sCertificate;
   }
 
   @Nullable
@@ -439,6 +460,8 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
                             .append ("ID", m_sID)
                             .append ("TransportProfile", m_sTransportProfile)
                             .append ("AccessPoint", m_aAccessPoint)
+                            .append ("EndpointReference", m_sEndpointReference)
+                            .append ("Certificate", m_sCertificate)
                             .append ("RequireBusinessLevelSignature", m_bRequireBusinessLevelSignature)
                             .append ("MinimumAuthenticationLevel", m_sMinimumAuthenticationLevel)
                             .append ("ServiceActivationDate", m_aServiceActivationDT)
