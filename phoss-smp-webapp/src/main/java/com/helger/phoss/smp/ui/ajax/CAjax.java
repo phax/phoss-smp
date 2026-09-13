@@ -61,6 +61,11 @@ public final class CAjax
                                                                                                           .filter (FILTER_IS_USER_LOGGED_IN)
                                                                                                           .build ();
 
+  public static final IAjaxFunctionDeclaration FUNCTION_ACCESS_POINT_SELECT = AjaxFunctionDeclaration.builder ("accessPointSelect")
+                                                                                                     .executor (AjaxExecutorSecureAccessPointSelect.class)
+                                                                                                     .filter (FILTER_IS_USER_LOGGED_IN)
+                                                                                                     .build ();
+
   private static final Logger LOGGER = LoggerFactory.getLogger (CAjax.class);
 
   private CAjax ()
@@ -71,6 +76,7 @@ public final class CAjax
     aAjaxRegistry.registerFunction (DATATABLES);
     aAjaxRegistry.registerFunction (DATATABLES_I18N);
     aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);
+    aAjaxRegistry.registerFunction (FUNCTION_ACCESS_POINT_SELECT);
     LOGGER.info ("Successfully registered the Ajax functions");
   }
 

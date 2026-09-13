@@ -42,9 +42,13 @@ import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
 import com.helger.html.hc.html.forms.HCEdit;
 import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.forms.HCRadioButton;
 import com.helger.html.hc.html.forms.HCTextArea;
+import com.helger.html.hc.html.script.HCScriptInlineOnDocumentReady;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
+import com.helger.html.js.IHasJSCode;
+import com.helger.html.request.IHCRequestFieldBooleanMultiValue;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.ui.CertificateUI;
@@ -60,6 +64,7 @@ import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifierParts;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -75,6 +80,7 @@ import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.nicename.SMPNiceNameUI;
 import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
+import com.helger.phoss.smp.ui.secure.hc.HCSMPAccessPointSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCSMPTransportProfileSelect;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -121,7 +127,11 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   private static final String FIELD_PROCESS_ID_VALUE = "processidvalue";
   private static final String FIELD_TRANSPORT_PROFILE = "transportprofile";
   private static final String FIELD_ENDPOINT_ID = "endpointid";
+  private static final String FIELD_ACCESS_POINT = "accesspoint";
+  private static final String FIELD_ACCESS_POINT_MODE = "accesspointmode";
   private static final String FIELD_ENDPOINT_REFERENCE = "endpointreference";
+  private static final String VALUE_ACCESS_POINT_MODE_ACCESS_POINT = "accesspoint";
+  private static final String VALUE_ACCESS_POINT_MODE_DIRECT = "direct";
   private static final String FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE = "requiresbusinesslevelsignature";
   private static final String FIELD_MINIMUM_AUTHENTICATION_LEVEL = "minimumauthenticationlevel";
   private static final String FIELD_NOT_BEFORE = "notbefore";
@@ -137,6 +147,45 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
   protected static final String ACTION_DELETE_DOCUMENT_TYPE = "del.doctype";
   protected static final String ACTION_DELETE_PROCESS = "del.process";
+
+  @NonNull
+  private static IHCRequestFieldBooleanMultiValue _createRadioButtonField (@NonNull final String sFieldName,
+                                                                          @NonNull final String sValue,
+                                                                          final boolean bChecked)
+  {
+    return new IHCRequestFieldBooleanMultiValue ()
+    {
+      @Override
+      public String getFieldName ()
+      {
+        return sFieldName;
+      }
+
+      @Override
+      public String getDefaultValue ()
+      {
+        return sValue;
+      }
+
+      @Override
+      public String getRequestValue ()
+      {
+        return sValue;
+      }
+
+      @Override
+      public boolean isChecked ()
+      {
+        return bChecked;
+      }
+
+      @Override
+      public String getValue ()
+      {
+        return sValue;
+      }
+    };
+  }
 
   public AbstractPageSecureEndpoint (@NonNull @Nonempty final String sID, @NonNull final String sName)
   {
@@ -456,6 +505,15 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                                                    aSelectedEndpoint.getTransportProfile ())).addChild (SMPNiceNameUI.getTransportProfile (aSelectedEndpoint.getTransportProfile (),
                                                                                                                                                                            true))));
 
+    {
+      final ISMPAccessPoint aAccessPoint = aSelectedEndpoint.getAccessPoint ();
+      aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Access Point")
+                                                   .setCtrl (aAccessPoint == null ? em ("none - the data is contained in the Endpoint directly")
+                                                                                  : new HCA (createViewURL (aWPEC,
+                                                                                                            CMenuSecure.MENU_ACCESS_POINTS,
+                                                                                                            aAccessPoint.getID ())).addChild (aAccessPoint.getName ())));
+    }
+
     aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Endpoint reference")
                                                  .setCtrl (StringHelper.isNotEmpty (aSelectedEndpoint.getEndpointReference ()) ? HCA.createLinkedWebsite (aSelectedEndpoint.getEndpointReference (),
                                                                                                                                                           HC_Target.BLANK)
@@ -558,6 +616,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final String sTransportProfileID = bEdit ? aSelectedEndpoint.getTransportProfile ()
                                              : aWPEC.params ().getAsStringTrimmed (FIELD_TRANSPORT_PROFILE);
     final ISMPTransportProfile aTransportProfile = aTransportProfileMgr.getSMPTransportProfileOfID (sTransportProfileID);
+    final String sAccessPointMode = aWPEC.params ().getAsStringTrimmed (FIELD_ACCESS_POINT_MODE);
+    String sAccessPointID = aWPEC.params ().getAsStringTrimmed (FIELD_ACCESS_POINT);
+    if (VALUE_ACCESS_POINT_MODE_DIRECT.equals (sAccessPointMode))
+      sAccessPointID = "";
+    final ISMPAccessPoint aAccessPoint = SMPMetaManager.getAccessPointMgr ().getAccessPointOfID (sAccessPointID);
+    final boolean bUseAccessPoint = VALUE_ACCESS_POINT_MODE_ACCESS_POINT.equals (sAccessPointMode) ||
+                                   (StringHelper.isEmpty (sAccessPointMode) && StringHelper.isNotEmpty (sAccessPointID));
     final String sEndpointReference = aWPEC.params ().getAsStringTrimmed (FIELD_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aWPEC.params ()
                                                         .getAsBoolean (FIELD_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
@@ -675,29 +740,50 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       }
     }
 
-    if (StringHelper.isEmpty (sEndpointReference))
+    if (bUseAccessPoint)
     {
-      if (bIsPeppolMode)
-        aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
+      // An Endpoint either references an Access Point or it contains the endpoint reference URL
+      // and the certificate directly - but never both
+      if (aAccessPoint == null)
+        aFormErrors.addFieldError (FIELD_ACCESS_POINT, "The selected Access Point does not exist!");
+      else
+      {
+        if (bIsPeppolMode && !aAccessPoint.hasEndpointReference ())
+          aFormErrors.addFieldError (FIELD_ACCESS_POINT,
+                                     "The selected Access Point has no Endpoint Reference, but it is mandatory!");
+        if (!aAccessPoint.hasCertificate ())
+          aFormErrors.addFieldError (FIELD_ACCESS_POINT, "The selected Access Point has no certificate!");
+      }
     }
     else
-      if (URLHelper.getAsURL (sEndpointReference) == null)
-        aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "The Endpoint Reference is not a valid URL!");
+    {
+      if (StringHelper.isEmpty (sEndpointReference))
+      {
+        if (bIsPeppolMode)
+          aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "Endpoint Reference must not be empty!");
+      }
+      else
+        if (URLHelper.getAsURL (sEndpointReference) == null)
+          aFormErrors.addFieldError (FIELD_ENDPOINT_REFERENCE, "The Endpoint Reference is not a valid URL!");
+    }
 
     if (aNotBeforeDate != null && aNotAfterDate != null)
       if (aNotBeforeDate.isAfter (aNotAfterDate))
         aFormErrors.addFieldError (FIELD_NOT_BEFORE, "Not Before Date must not be after Not After Date!");
 
-    if (StringHelper.isEmpty (sCertificate))
-      aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
-    else
+    if (!bUseAccessPoint)
     {
-      final X509Certificate aCert = new CertificateDecodeHelper ().source (sCertificate)
-                                                                  .pemEncoded (true)
-                                                                  .getDecodedOrNull ();
-      if (aCert == null)
-        aFormErrors.addFieldError (FIELD_CERTIFICATE,
-                                   "The provided certificate string is not a valid X509 certificate!");
+      if (StringHelper.isEmpty (sCertificate))
+        aFormErrors.addFieldError (FIELD_CERTIFICATE, "Certificate must not be empty!");
+      else
+      {
+        final X509Certificate aCert = new CertificateDecodeHelper ().source (sCertificate)
+                                                                    .pemEncoded (true)
+                                                                    .getDecodedOrNull ();
+        if (aCert == null)
+          aFormErrors.addFieldError (FIELD_CERTIFICATE,
+                                     "The provided certificate string is not a valid X509 certificate!");
+      }
     }
 
     if (StringHelper.isEmpty (sServiceDescription))
@@ -738,18 +824,32 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       // For edit, preserve existing endpoint ID; for create/copy, generate a new one
       final String sEndpointID = bEdit && aSelectedEndpoint != null ? aSelectedEndpoint.getID ()
                                                                     : SMPEndpointHelper.createUniqueEndpointID ();
-      final SMPEndpoint aNewEndpoint = new SMPEndpoint (sEndpointID,
-                                                        sTransportProfileID,
-                                                        sEndpointReference,
-                                                        bRequireBusinessLevelSignature,
-                                                        sMinimumAuthenticationLevel,
-                                                        PDTFactory.createXMLOffsetDateTime (aNotBeforeDate),
-                                                        PDTFactory.createXMLOffsetDateTime (aNotAfterDate),
-                                                        sCertificate,
-                                                        sServiceDescription,
-                                                        sTechnicalContact,
-                                                        sTechnicalInformation,
-                                                        sExtension);
+      final SMPEndpoint aNewEndpoint;
+      if (bUseAccessPoint)
+        aNewEndpoint = new SMPEndpoint (sEndpointID,
+                                        sTransportProfileID,
+                                        aAccessPoint,
+                                        bRequireBusinessLevelSignature,
+                                        sMinimumAuthenticationLevel,
+                                        PDTFactory.createXMLOffsetDateTime (aNotBeforeDate),
+                                        PDTFactory.createXMLOffsetDateTime (aNotAfterDate),
+                                        sServiceDescription,
+                                        sTechnicalContact,
+                                        sTechnicalInformation,
+                                        sExtension);
+      else
+        aNewEndpoint = new SMPEndpoint (sEndpointID,
+                                        sTransportProfileID,
+                                        sEndpointReference,
+                                        bRequireBusinessLevelSignature,
+                                        sMinimumAuthenticationLevel,
+                                        PDTFactory.createXMLOffsetDateTime (aNotBeforeDate),
+                                        PDTFactory.createXMLOffsetDateTime (aNotAfterDate),
+                                        sCertificate,
+                                        sServiceDescription,
+                                        sTechnicalContact,
+                                        sTechnicalInformation,
+                                        sExtension);
       aProcess.createOrUpdateEndpoint (aNewEndpoint);
 
       if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo).isSuccess ())
@@ -865,16 +965,68 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
 
     }
 
+    final String sAccessPointControlID = "smp-endpoint-access-point";
+    final String sEndpointReferenceGroupID = "smp-endpoint-reference-group";
+    final String sCertificateGroupID = "smp-endpoint-certificate-group";
+    final boolean bUseAccessPointByDefault = aSelectedEndpoint != null && StringHelper.isNotEmpty (aSelectedEndpoint.getAccessPointID ());
+    final HCSMPAccessPointSelect aAccessPointSelect = new HCSMPAccessPointSelect (new RequestField (FIELD_ACCESS_POINT,
+                                                                                                    aSelectedEndpoint != null ? aSelectedEndpoint.getAccessPointID ()
+                                                                                                                          : null),
+                                                                                  aWPEC.getRequestScope ());
+    aAccessPointSelect.setID (sAccessPointControlID);
+    final HCNodeList aAccessPointMode = new HCNodeList ().addChild (new HCRadioButton (_createRadioButtonField (FIELD_ACCESS_POINT_MODE,
+                                                                                                                           VALUE_ACCESS_POINT_MODE_ACCESS_POINT,
+                                                                                                                           bUseAccessPointByDefault)))
+                                                       .addChild (" Use Access Point ")
+                                                       .addChild (new HCRadioButton (_createRadioButtonField (FIELD_ACCESS_POINT_MODE,
+                                                                                                                VALUE_ACCESS_POINT_MODE_DIRECT,
+                                                                                                                !bUseAccessPointByDefault)))
+                                                       .addChild (" Use URL + certificate ");
+    aForm.addFormGroup (new BootstrapFormGroup ().setID ("smp-endpoint-access-point-mode")
+                                                  .setLabel ("Endpoint data source")
+                                                  .setCtrl (aAccessPointMode)
+                                                  .setHelpText ("Choose whether the endpoint uses a reusable Access Point or direct URL + certificate data. The two modes are mutually exclusive.")
+                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ACCESS_POINT)));
     {
-      aForm.addFormGroup (new BootstrapFormGroup ().setLabel (new HCFormLabel ("Endpoint Reference",
-                                                                               bIsPeppolMode ? ELabelType.MANDATORY
-                                                                                             : ELabelType.OPTIONAL))
-                                                   .setCtrl (new HCEdit (new RequestField (FIELD_ENDPOINT_REFERENCE,
-                                                                                           aSelectedEndpoint != null ? aSelectedEndpoint.getEndpointReference ()
-                                                                                                                     : null)))
-                                                   .setHelpText ("The URL where messsages of this type should be targeted to.")
-                                                   .setErrorList (aFormErrors.getListOfField (FIELD_ENDPOINT_REFERENCE)));
+      aForm.addFormGroup (new BootstrapFormGroup ().setID ("smp-endpoint-access-point-group")
+                                                   .setLabel ("Access Point")
+                                                   .setCtrl (aAccessPointSelect)
+                                                   .setHelpText ("Optionally reference an existing Access Point instead of providing " +
+                                                                 "the Endpoint Reference and the certificate below. An Endpoint either " +
+                                                                 "references an Access Point or it contains the data directly - but never both.")
+                                                   .setErrorList (aFormErrors.getListOfField (FIELD_ACCESS_POINT)));
     }
+
+    aForm.addFormGroup (new BootstrapFormGroup ().setID (sEndpointReferenceGroupID)
+                                                  .setLabel (new HCFormLabel ("Endpoint Reference",
+                                                                              bIsPeppolMode ? ELabelType.MANDATORY
+                                                                                            : ELabelType.OPTIONAL))
+                                                  .setCtrl (new HCEdit (new RequestField (FIELD_ENDPOINT_REFERENCE,
+                                                                                         aSelectedEndpoint != null ? aSelectedEndpoint.getEndpointReference ()
+                                                                                                                   : null)))
+                                                  .setHelpText ("The URL where messsages of this type should be targeted to.")
+                                                  .setErrorList (aFormErrors.getListOfField (FIELD_ENDPOINT_REFERENCE)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setID (sCertificateGroupID)
+                                                  .setLabelMandatory ("Certificate")
+                                                  .setCtrl (new HCTextArea (new RequestField (FIELD_CERTIFICATE,
+                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getCertificate ()
+                                                                                                                       : null)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
+                                                  .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
+                                                               "PEM encoded X509 DER formatted value.")
+                                                  .setErrorList (aFormErrors.getListOfField (FIELD_CERTIFICATE)));
+
+    aForm.addChild (new HCScriptInlineOnDocumentReady (new IHasJSCode ()
+    {
+      @Override
+      public String getJSCode ()
+      {
+        return "var $smptoggleMode = $('input[name=\"" + FIELD_ACCESS_POINT_MODE + "\"]');" +
+               "var $smptoggleApGroup = $('#smp-endpoint-access-point-group');" +
+               "var $smptoggleDirect = $('#" + sEndpointReferenceGroupID + ", #" + sCertificateGroupID + "');" +
+               "function smpToggleEndpointMode(){var bUseAP = $('input[name=\"" + FIELD_ACCESS_POINT_MODE + "\"]:checked').val() === '" + VALUE_ACCESS_POINT_MODE_ACCESS_POINT + "'; $smptoggleApGroup.toggle(bUseAP); $smptoggleDirect.toggle(!bUseAP);}" +
+               "smpToggleEndpointMode(); $smptoggleMode.on('change', smpToggleEndpointMode);";
+      }
+    }));
 
     if (!bIsPeppolMode)
     {
@@ -927,14 +1079,6 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
                                                  .setHelpText ("Expiration date of the service. Senders should ignore services that " +
                                                                "are expired.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_NOT_AFTER)));
-
-    aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Certificate")
-                                                 .setCtrl (new HCTextArea (new RequestField (FIELD_CERTIFICATE,
-                                                                                             aSelectedEndpoint != null ? aSelectedEndpoint.getCertificate ()
-                                                                                                                       : null)).setRows (CSMP.TEXT_AREA_CERT_ROWS))
-                                                 .setHelpText ("Holds the complete signing certificate of the recipient AP, as a " +
-                                                               "PEM encoded X509 DER formatted value.")
-                                                 .setErrorList (aFormErrors.getListOfField (FIELD_CERTIFICATE)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Description")
                                                  .setCtrl (new HCEdit (new RequestField (FIELD_SERVICE_DESCRIPTION,

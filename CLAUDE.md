@@ -92,6 +92,9 @@ To implement a **custom backend**, follow the pattern of `phoss-smp-backend-xml`
 - **Redirect**: Pointer to another SMP for a specific document type.
 - **BusinessCard**: Extended participant info for the Peppol Directory.
 - **TransportProfile**: Supported transport protocols (e.g., `peppol-transport-as4-v2_0`).
+- **AccessPoint**: Optional, reusable combination of endpoint reference URL and certificate with a unique name. Using an Access Point is **opt-in per endpoint**: an endpoint either references an Access Point *or* carries URL and certificate directly — never both. There is no automatic migration of existing data; endpoints can be re-pointed to an Access Point on demand via "Use for matching endpoints" in the Access Point administration page (Service data > Endpoints > Access Points).
+
+In the REST API an endpoint references an Access Point by setting the endpoint reference to `accesspoint:<AccessPointName>` and omitting the certificate. Responses always contain the resolved URL and certificate, so REST clients are unaffected.
 
 Manager interfaces for all entities are in `phoss-smp-backend` under `com.helger.phoss.smp.domain.*`. Implementations live in the respective backend modules.
 
@@ -117,6 +120,11 @@ Three API variants are implemented in `phoss-smp-backend/src/main/java/com/helge
 | GET | `/businesscard/{ServiceGroupId}` | No | Get business card |
 | PUT | `/businesscard/{ServiceGroupId}` | Yes | Create/update business card |
 | DELETE | `/businesscard/{ServiceGroupId}` | Yes | Delete business card |
+| GET | `/accesspoint/list` | Yes (admin) | List all Access Points |
+| GET | `/accesspoint/name/{AccessPointName}` | Yes (admin) | Get a single Access Point |
+| PUT | `/accesspoint/name/{AccessPointName}` | Yes (admin) | Create/update an Access Point |
+| DELETE | `/accesspoint/name/{AccessPointName}` | Yes (admin) | Delete an Access Point (fails if still referenced) |
+| POST | `/accesspoint/name/{AccessPointName}/use-for-matching-endpoints` | Yes (admin) | Let all endpoints with matching data reference the Access Point |
 | GET | `/smp-status/` | No | Health/status JSON (disabled by default) |
 | GET | `/smp-ready` | No | Backend-aware readiness: HTTP 200 `{"ready":true}` / HTTP 503 `{"ready":false}` |
 
@@ -181,12 +189,12 @@ smp.keystore.password = ...
 smp.keystore.key.alias = ...
 smp.keystore.key.password = ...
 
-# SQL backend
-jdbc.driver = com.mysql.cj.jdbc.Driver
-jdbc.url = jdbc:mysql://localhost:3306/smp?...
-jdbc.user = smp
-jdbc.password = smp
-target-database = MySQL        # MySQL, PostgreSQL, Oracle, DB2
+# SQL backend (default local CI setup uses PostgreSQL via docker compose)
+jdbc.driver = org.postgresql.Driver
+jdbc.url = jdbc:postgresql://localhost:5432/postgres
+jdbc.user = peppol
+jdbc.password = peppol
+target-database = PostgreSQL   # MySQL, PostgreSQL, Oracle, DB2
 
 # Data directory (use absolute path in production)
 webapp.datapath = /var/smp
