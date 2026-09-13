@@ -25,7 +25,6 @@ import com.helger.html.jscode.JSAssocArray;
 import com.helger.html.jscode.JSParam;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
-import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.ajax.AjaxExecutorSecureAccessPointSelect;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.photon.core.form.RequestField;
@@ -35,8 +34,9 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 /**
  * Select for all existing Access Points. The first entry is always the "no Access Point" entry,
  * because referencing an Access Point is an opt-in feature per endpoint.<br>
- * The Access Points are loaded on demand via Ajax in chunks of {@link SMPCommonUI#PAGE_SIZE}
- * elements, so that the select also works with a large number of Access Points.
+ * The Access Points are loaded on demand via Ajax in chunks of
+ * {@link SMPAccessPointSelectHelper#PAGE_SIZE} elements (infinite scrolling), so that the select
+ * also works with a large number of Access Points.
  *
  * @author Philip Helger
  * @since 8.4.4
@@ -88,7 +88,7 @@ public class HCSMPAccessPointSelect extends HCSelect2
     final JSAnonymousFunction aDataFunc = new JSAnonymousFunction ();
     final JSParam aParams = aDataFunc.param ("params");
     aDataFunc.body ()
-             ._return (new JSAssocArray ().add (AjaxExecutorSecureAccessPointSelect.PARAM_SEARCH_TEXT,
+             ._return (new JSAssocArray ().add (AjaxExecutorSecureAccessPointSelect.PARAM_SEARCH_TERM,
                                                aParams.ref ("term"))
                                          .add (AjaxExecutorSecureAccessPointSelect.PARAM_PAGE,
                                                aParams.ref ("page")));
