@@ -441,7 +441,7 @@ public final class SMPServerConfiguration
    *         (<code>GET /{ServiceGroupId}</code> and
    *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code>) should be cached,
    *         <code>false</code> if not. By default caching is disabled.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   public static boolean isRestCacheEnabled ()
   {
@@ -451,7 +451,7 @@ public final class SMPServerConfiguration
   /**
    * @return The maximum time a single REST API response is cached. The value is limited to
    *         {@link #MAX_SMP_REST_CACHE_TTL}. Never <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @NonNull
   public static Duration getRestCacheTTL ()
@@ -479,7 +479,7 @@ public final class SMPServerConfiguration
   /**
    * @return The maximum number of entries a single REST API response cache may hold. The value is
    *         limited to {@link #MAX_SMP_REST_CACHE_MAX_ITEMS}. Always &gt; 0.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   public static int getRestCacheMaxItems ()
   {
@@ -502,7 +502,7 @@ public final class SMPServerConfiguration
   /**
    * @return The prefix to be used for all Redis keys of the REST API response cache. Never
    *         <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @NonNull
   @Nonempty
@@ -515,7 +515,7 @@ public final class SMPServerConfiguration
   /**
    * @return The name of the Redis Pub/Sub channel that is used to invalidate the in-memory caches of
    *         all other SMP instances. Never <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @NonNull
   @Nonempty
@@ -528,7 +528,7 @@ public final class SMPServerConfiguration
   /**
    * @return The full Redis connection URI (e.g. <code>redis://localhost:6379/0</code>). If this is
    *         empty, the single connection settings are used instead. May be <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @Nullable
   public static String getRestCacheRedisUri ()
@@ -539,7 +539,7 @@ public final class SMPServerConfiguration
   /**
    * @return The Redis host name. If this is empty and no Redis URI is provided, the REST API
    *         response cache only works in-memory. May be <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @Nullable
   public static String getRestCacheRedisHost ()
@@ -549,7 +549,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return The Redis port. Defaults to {@value #DEFAULT_SMP_REST_CACHE_REDIS_PORT}.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   public static int getRestCacheRedisPort ()
   {
@@ -558,7 +558,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return The Redis user name for ACL based authentication. May be <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @Nullable
   public static String getRestCacheRedisUser ()
@@ -568,7 +568,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return The Redis password. May be <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   public static char @Nullable [] getRestCacheRedisPassword ()
   {
@@ -578,7 +578,7 @@ public final class SMPServerConfiguration
   /**
    * @return The Redis database index to be used. Defaults to
    *         {@value #DEFAULT_SMP_REST_CACHE_REDIS_DATABASE}.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   public static int getRestCacheRedisDatabase ()
   {
@@ -588,7 +588,7 @@ public final class SMPServerConfiguration
   /**
    * @return <code>true</code> if the Redis connection should use SSL/TLS, <code>false</code> if not.
    *         Defaults to <code>false</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   public static boolean isRestCacheRedisSSL ()
   {
@@ -597,7 +597,7 @@ public final class SMPServerConfiguration
 
   /**
    * @return The maximum duration a single Redis command may take. Never <code>null</code>.
-   * @since 80.4.3-stormware
+   * @since 8.4.4
    */
   @NonNull
   public static Duration getRestCacheRedisTimeout ()

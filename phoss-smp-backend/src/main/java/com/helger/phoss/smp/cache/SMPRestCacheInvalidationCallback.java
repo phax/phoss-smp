@@ -27,7 +27,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
  *
  * @author Philip Helger
  * @see SMPRestCache
- * @since 80.4.3-stormware
+ * @since 8.4.4
  */
 public class SMPRestCacheInvalidationCallback implements
                                              ISMPServiceGroupCallback,

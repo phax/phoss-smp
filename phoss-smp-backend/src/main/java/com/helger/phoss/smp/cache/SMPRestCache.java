@@ -62,7 +62,7 @@ import io.lettuce.core.codec.ByteArrayCodec;
  * {@link #invalidateParticipant(IParticipantIdentifier)}.
  *
  * @author Philip Helger
- * @since 80.4.3-stormware
+ * @since 8.4.4
  */
 @ThreadSafe
 public final class SMPRestCache extends AbstractGlobalSingleton
