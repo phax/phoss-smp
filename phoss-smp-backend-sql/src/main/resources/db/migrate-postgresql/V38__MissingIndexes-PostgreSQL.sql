@@ -22,8 +22,8 @@
 CREATE INDEX IF NOT EXISTS IX_smp_ownership_username ON smp_ownership (username);
 
 -- smp_bce: the PK is "id" only, but Business Cards are always accessed by "pid"
--- DB2, MySQL and SQL Server have this index since V1
-CREATE INDEX IF NOT EXISTS idx_smp_bce ON smp_bce (pid);
+-- DB2, MySQL and SQL Server have this index since V1, under their own names
+CREATE INDEX IF NOT EXISTS IX_smp_bce_pid ON smp_bce (pid);
 
 -- smp_service_metadata_red: the PK starts with "documentIdentifierScheme", so lookups by service group alone cannot use it
 CREATE INDEX IF NOT EXISTS IX_smp_smr_participant ON smp_service_metadata_red (businessIdentifierScheme, businessIdentifier);
@@ -40,8 +40,8 @@ CREATE INDEX IF NOT EXISTS IX_smp_audit_dt ON smp_audit (dt);
 CREATE INDEX IF NOT EXISTS IX_smp_audit_userid ON smp_audit (userid);
 
 -- smp_secuser: the login path resolves users by login name and by email
--- DB2 and SQL Server have the login name index since V8
-CREATE INDEX IF NOT EXISTS idx_smp_secuser_loginname ON smp_secuser (loginname);
+-- DB2 and SQL Server have the login name index since V8, under their own name
+CREATE INDEX IF NOT EXISTS IX_smp_secuser_loginname ON smp_secuser (loginname);
 CREATE INDEX IF NOT EXISTS IX_smp_secuser_email ON smp_secuser (email);
 
 -- smp_secusertoken: token to user resolution
