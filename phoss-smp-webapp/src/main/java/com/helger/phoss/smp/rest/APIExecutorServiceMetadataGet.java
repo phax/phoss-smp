@@ -33,8 +33,13 @@ import com.helger.base.debug.GlobalDebug;
 import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.base.string.StringHelper;
 import com.helger.mime.CMimeType;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.cache.SMPRestCache;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
@@ -68,6 +73,23 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final String sPathDocumentTypeID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+
+    // Check if a previously created and signed response can be reused
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final IParticipantIdentifier aCacheParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+    final IDocumentTypeIdentifier aCacheDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
+    final boolean bCacheable = aCacheParticipantID != null && aCacheDocTypeID != null;
+    if (bCacheable)
+    {
+      final byte [] aCachedBytes = SMPRestCache.getServiceMetadataPayload (aCacheParticipantID, aCacheDocTypeID);
+      if (aCachedBytes != null)
+      {
+        aUnifiedResponse.setContent (aCachedBytes)
+                        .setMimeType (CMimeType.TEXT_XML)
+                        .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+        return;
+      }
+    }
 
     // Create the unsigned response document
     final Document aDoc;
@@ -182,7 +204,12 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         }
       }
 
-      aUnifiedResponse.setContent (aBAOS.toByteArray ())
+      final byte [] aResponseBytes = aBAOS.toByteArray ();
+
+      if (bCacheable)
+        SMPRestCache.setServiceMetadataPayload (aCacheParticipantID, aCacheDocTypeID, aResponseBytes);
+
+      aUnifiedResponse.setContent (aResponseBytes)
                       .setMimeType (CMimeType.TEXT_XML)
                       .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
     }

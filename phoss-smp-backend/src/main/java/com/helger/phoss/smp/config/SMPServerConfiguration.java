@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.misc.ChangeNextMajorRelease;
+import com.helger.base.string.StringHelper;
 import com.helger.config.IConfig;
 import com.helger.mime.EMimeContentType;
 import com.helger.peppolid.factory.ESMPIdentifierType;
@@ -67,6 +68,20 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
   public static final String KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK = "smp.rest.delete.notfound.as.ok";
   public static final String KEY_SMP_REST_AUTH_ERRORDETAILS = "smp.rest.auth.errordetails";
+
+  public static final String KEY_SMP_REST_CACHE_ENABLED = "smp.rest.cache.enabled";
+  public static final String KEY_SMP_REST_CACHE_TTL = "smp.rest.cache.ttl";
+  public static final String KEY_SMP_REST_CACHE_MAX_ITEMS = "smp.rest.cache.maxitems";
+  public static final String KEY_SMP_REST_CACHE_KEY_PREFIX = "smp.rest.cache.keyprefix";
+  public static final String KEY_SMP_REST_CACHE_BROADCAST_CHANNEL = "smp.rest.cache.broadcast.channel";
+  public static final String KEY_SMP_REST_CACHE_REDIS_URI = "smp.rest.cache.redis.uri";
+  public static final String KEY_SMP_REST_CACHE_REDIS_HOST = "smp.rest.cache.redis.host";
+  public static final String KEY_SMP_REST_CACHE_REDIS_PORT = "smp.rest.cache.redis.port";
+  public static final String KEY_SMP_REST_CACHE_REDIS_USER = "smp.rest.cache.redis.user";
+  public static final String KEY_SMP_REST_CACHE_REDIS_PASSWORD = "smp.rest.cache.redis.password";
+  public static final String KEY_SMP_REST_CACHE_REDIS_DATABASE = "smp.rest.cache.redis.database";
+  public static final String KEY_SMP_REST_CACHE_REDIS_SSL = "smp.rest.cache.redis.ssl";
+  public static final String KEY_SMP_REST_CACHE_REDIS_TIMEOUT = "smp.rest.cache.redis.timeout";
 
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
@@ -113,6 +128,23 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK = false;
   @ChangeNextMajorRelease ("Change default to false")
   public static final boolean DEFAULT_SMP_REST_AUTH_ERRORDETAILS = true;
+
+  /** The REST API response cache is opt-in and therefore disabled by default. */
+  public static final boolean DEFAULT_SMP_REST_CACHE_ENABLED = false;
+  /** The maximum time a REST API response may be cached - one hour */
+  public static final Duration MAX_SMP_REST_CACHE_TTL = Duration.ofHours (1);
+  /** The default time a REST API response is cached */
+  public static final Duration DEFAULT_SMP_REST_CACHE_TTL = MAX_SMP_REST_CACHE_TTL;
+  /** The maximum number of entries a single REST API response cache may hold */
+  public static final int MAX_SMP_REST_CACHE_MAX_ITEMS = 1_000;
+  /** The default number of entries a single REST API response cache holds */
+  public static final int DEFAULT_SMP_REST_CACHE_MAX_ITEMS = MAX_SMP_REST_CACHE_MAX_ITEMS;
+  public static final String DEFAULT_SMP_REST_CACHE_KEY_PREFIX = "SMP:RestCache:";
+  public static final String DEFAULT_SMP_REST_CACHE_BROADCAST_CHANNEL = "SMP_RestCache_invalidate";
+  public static final int DEFAULT_SMP_REST_CACHE_REDIS_PORT = 6379;
+  public static final int DEFAULT_SMP_REST_CACHE_REDIS_DATABASE = 0;
+  public static final boolean DEFAULT_SMP_REST_CACHE_REDIS_SSL = false;
+  public static final Duration DEFAULT_SMP_REST_CACHE_REDIS_TIMEOUT = Duration.ofSeconds (5);
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
@@ -402,6 +434,180 @@ public final class SMPServerConfiguration
   public static boolean isRestAuthErrorDetails ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_AUTH_ERRORDETAILS, DEFAULT_SMP_REST_AUTH_ERRORDETAILS);
+  }
+
+  /**
+   * @return <code>true</code> if the responses of the read-only REST API endpoints
+   *         (<code>GET /{ServiceGroupId}</code> and
+   *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code>) should be cached,
+   *         <code>false</code> if not. By default caching is disabled.
+   * @since 80.4.3-stormware
+   */
+  public static boolean isRestCacheEnabled ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_CACHE_ENABLED, DEFAULT_SMP_REST_CACHE_ENABLED);
+  }
+
+  /**
+   * @return The maximum time a single REST API response is cached. The value is limited to
+   *         {@link #MAX_SMP_REST_CACHE_TTL}. Never <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @NonNull
+  public static Duration getRestCacheTTL ()
+  {
+    final Duration aConfigured = _getConfig ().getAsConfigDuration (KEY_SMP_REST_CACHE_TTL,
+                                                                    sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                                         KEY_SMP_REST_CACHE_TTL +
+                                                                                         "' as duration: " +
+                                                                                         sMsg));
+    if (aConfigured == null || aConfigured.isZero () || aConfigured.isNegative ())
+      return DEFAULT_SMP_REST_CACHE_TTL;
+
+    if (aConfigured.compareTo (MAX_SMP_REST_CACHE_TTL) > 0)
+    {
+      LOGGER.warn ("The configuration key '" +
+                   KEY_SMP_REST_CACHE_TTL +
+                   "' exceeds the maximum of " +
+                   MAX_SMP_REST_CACHE_TTL +
+                   " and is therefore limited to it");
+      return MAX_SMP_REST_CACHE_TTL;
+    }
+    return aConfigured;
+  }
+
+  /**
+   * @return The maximum number of entries a single REST API response cache may hold. The value is
+   *         limited to {@link #MAX_SMP_REST_CACHE_MAX_ITEMS}. Always &gt; 0.
+   * @since 80.4.3-stormware
+   */
+  public static int getRestCacheMaxItems ()
+  {
+    final int nConfigured = _getConfig ().getAsInt (KEY_SMP_REST_CACHE_MAX_ITEMS, DEFAULT_SMP_REST_CACHE_MAX_ITEMS);
+    if (nConfigured <= 0)
+      return DEFAULT_SMP_REST_CACHE_MAX_ITEMS;
+
+    if (nConfigured > MAX_SMP_REST_CACHE_MAX_ITEMS)
+    {
+      LOGGER.warn ("The configuration key '" +
+                   KEY_SMP_REST_CACHE_MAX_ITEMS +
+                   "' exceeds the maximum of " +
+                   MAX_SMP_REST_CACHE_MAX_ITEMS +
+                   " and is therefore limited to it");
+      return MAX_SMP_REST_CACHE_MAX_ITEMS;
+    }
+    return nConfigured;
+  }
+
+  /**
+   * @return The prefix to be used for all Redis keys of the REST API response cache. Never
+   *         <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @NonNull
+  @Nonempty
+  public static String getRestCacheKeyPrefix ()
+  {
+    final String ret = _getConfig ().getAsString (KEY_SMP_REST_CACHE_KEY_PREFIX);
+    return StringHelper.isNotEmpty (ret) ? ret : DEFAULT_SMP_REST_CACHE_KEY_PREFIX;
+  }
+
+  /**
+   * @return The name of the Redis Pub/Sub channel that is used to invalidate the in-memory caches of
+   *         all other SMP instances. Never <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @NonNull
+  @Nonempty
+  public static String getRestCacheBroadcastChannel ()
+  {
+    final String ret = _getConfig ().getAsString (KEY_SMP_REST_CACHE_BROADCAST_CHANNEL);
+    return StringHelper.isNotEmpty (ret) ? ret : DEFAULT_SMP_REST_CACHE_BROADCAST_CHANNEL;
+  }
+
+  /**
+   * @return The full Redis connection URI (e.g. <code>redis://localhost:6379/0</code>). If this is
+   *         empty, the single connection settings are used instead. May be <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @Nullable
+  public static String getRestCacheRedisUri ()
+  {
+    return _getConfig ().getAsString (KEY_SMP_REST_CACHE_REDIS_URI);
+  }
+
+  /**
+   * @return The Redis host name. If this is empty and no Redis URI is provided, the REST API
+   *         response cache only works in-memory. May be <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @Nullable
+  public static String getRestCacheRedisHost ()
+  {
+    return _getConfig ().getAsString (KEY_SMP_REST_CACHE_REDIS_HOST);
+  }
+
+  /**
+   * @return The Redis port. Defaults to {@value #DEFAULT_SMP_REST_CACHE_REDIS_PORT}.
+   * @since 80.4.3-stormware
+   */
+  public static int getRestCacheRedisPort ()
+  {
+    return _getConfig ().getAsInt (KEY_SMP_REST_CACHE_REDIS_PORT, DEFAULT_SMP_REST_CACHE_REDIS_PORT);
+  }
+
+  /**
+   * @return The Redis user name for ACL based authentication. May be <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @Nullable
+  public static String getRestCacheRedisUser ()
+  {
+    return _getConfig ().getAsString (KEY_SMP_REST_CACHE_REDIS_USER);
+  }
+
+  /**
+   * @return The Redis password. May be <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  public static char @Nullable [] getRestCacheRedisPassword ()
+  {
+    return _getConfig ().getAsCharArray (KEY_SMP_REST_CACHE_REDIS_PASSWORD);
+  }
+
+  /**
+   * @return The Redis database index to be used. Defaults to
+   *         {@value #DEFAULT_SMP_REST_CACHE_REDIS_DATABASE}.
+   * @since 80.4.3-stormware
+   */
+  public static int getRestCacheRedisDatabase ()
+  {
+    return _getConfig ().getAsInt (KEY_SMP_REST_CACHE_REDIS_DATABASE, DEFAULT_SMP_REST_CACHE_REDIS_DATABASE);
+  }
+
+  /**
+   * @return <code>true</code> if the Redis connection should use SSL/TLS, <code>false</code> if not.
+   *         Defaults to <code>false</code>.
+   * @since 80.4.3-stormware
+   */
+  public static boolean isRestCacheRedisSSL ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_CACHE_REDIS_SSL, DEFAULT_SMP_REST_CACHE_REDIS_SSL);
+  }
+
+  /**
+   * @return The maximum duration a single Redis command may take. Never <code>null</code>.
+   * @since 80.4.3-stormware
+   */
+  @NonNull
+  public static Duration getRestCacheRedisTimeout ()
+  {
+    final Duration ret = _getConfig ().getAsConfigDuration (KEY_SMP_REST_CACHE_REDIS_TIMEOUT,
+                                                            sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                                 KEY_SMP_REST_CACHE_REDIS_TIMEOUT +
+                                                                                 "' as duration: " +
+                                                                                 sMsg));
+    return ret != null && !ret.isZero () && !ret.isNegative () ? ret : DEFAULT_SMP_REST_CACHE_REDIS_TIMEOUT;
   }
 
   /**
