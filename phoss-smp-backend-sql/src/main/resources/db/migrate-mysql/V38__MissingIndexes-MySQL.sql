@@ -51,7 +51,7 @@ CALL smp_create_index ('smp_audit', 'IX_smp_audit_userid', '`userid`');
 
 -- smp_secuser: the login path resolves users by login name and by email
 -- Both columns are TEXT here, so they are indexed by prefix
--- DB2 and SQL Server have the login name index since V8, under their own name
+-- DB2 and SQL Server have the login name index since V8
 CALL smp_create_index ('smp_secuser', 'IX_smp_secuser_loginname', '`loginname`(191)');
 CALL smp_create_index ('smp_secuser', 'IX_smp_secuser_email', '`email`(191)');
 
