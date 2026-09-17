@@ -68,6 +68,7 @@
 
   <properties>
     <flyway.version>13.5.0</flyway.version>
+    <jetcache.version>2.7.9</jetcache.version>
     <log4j.version>2.26.1</log4j.version>
     <mongodb.version>5.11.0</mongodb.version>
     <protobuf.version>4.36.1</protobuf.version>
@@ -165,6 +166,18 @@
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
         <version>7.1.1</version>
+      </dependency>
+
+      <!-- Caching of the read-only SMP REST API responses -->
+      <dependency>
+        <groupId>com.alicp.jetcache</groupId>
+        <artifactId>jetcache-core</artifactId>
+        <version>${jetcache.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alicp.jetcache</groupId>
+        <artifactId>jetcache-redis-lettuce</artifactId>
+        <version>${jetcache.version}</version>
       </dependency>
       <!-- Used by Flyway -->
       <dependency>
