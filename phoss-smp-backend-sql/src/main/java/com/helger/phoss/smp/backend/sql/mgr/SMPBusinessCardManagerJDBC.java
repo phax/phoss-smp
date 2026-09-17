@@ -526,6 +526,6 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   @Nonnegative
   public long getSMPBusinessCardCount ()
   {
-    return newExecutor ().queryCount ("SELECT COUNT (DISTINCT pid) FROM " + m_sTableName);
+    return newExecutor ().queryCount ("SELECT COUNT(DISTINCT pid) FROM " + m_sTableName);
   }
 }
