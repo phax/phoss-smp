@@ -526,6 +526,7 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
   @Nonnegative
   public long getSMPBusinessCardCount ()
   {
+    //MySql is sensitive to spaces in query, so no space between count and ( is allowed
     return newExecutor ().queryCount ("SELECT COUNT(DISTINCT pid) FROM " + m_sTableName);
   }
 }
