@@ -97,13 +97,13 @@
     <dependency>
       <groupId>com.ibm.db2</groupId>
       <artifactId>jcc</artifactId>
-      <version>12.1.5.0</version>
+      <version>12.1.5.0_special_89304</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>13.4.0.jre11</version>
+      <version>13.6.0.jre11</version>
       <scope>runtime</scope>
     </dependency>
  
