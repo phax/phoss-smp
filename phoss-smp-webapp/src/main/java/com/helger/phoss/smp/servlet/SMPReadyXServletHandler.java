@@ -36,7 +36,7 @@ import com.helger.xservlet.handler.simple.IXServletSimpleHandler;
  * Create the backend-aware readiness response as a small JSON object.
  *
  * @author vinit-thummar
- * @since 8.3.1
+ * @since 8.4.0
  */
 public class SMPReadyXServletHandler implements IXServletSimpleHandler
 {

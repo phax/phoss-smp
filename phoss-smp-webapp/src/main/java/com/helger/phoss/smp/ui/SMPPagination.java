@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.ui;
 
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
@@ -45,8 +46,8 @@ import com.helger.html.hc.html.textlevel.HCSpan;
 import com.helger.photon.bootstrap5.CBootstrapCSS;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.uicore.page.IWebPageExecutionContext;
-import com.helger.url.param.URLParameter;
 import com.helger.url.SimpleURL;
+import com.helger.url.param.URLParameter;
 
 /**
  * Represents the state of the server side pagination of a single page. The current page index, the
@@ -55,7 +56,7 @@ import com.helger.url.SimpleURL;
  * brings its own pagination UI.
  *
  * @author Philip Helger
- * @since 8.3.1
+ * @since 8.4.0
  */
 public class SMPPagination
 {
@@ -305,7 +306,7 @@ public class SMPPagination
       if (!aPageSizes.contains (Integer.valueOf (m_nPageSize)))
       {
         aPageSizes.add (Integer.valueOf (m_nPageSize));
-        aPageSizes.sort (null);
+        Collections.sort (aPageSizes);
       }
 
       final HCSelect aPageSizeSelect = new HCSelect (new RequestField (PARAM_PAGE_SIZE, m_nPageSize));

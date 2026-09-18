@@ -40,7 +40,7 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
  * Evaluates all backend-specific readiness checks.
  *
  * @author vinit-thummar
- * @since 8.3.1
+ * @since 8.4.0
  */
 @ThreadSafe
 public final class SMPReadyProvider

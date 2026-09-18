@@ -27,7 +27,7 @@ import com.helger.annotation.style.IsSPIInterface;
  * block indefinitely.
  *
  * @author vinit-thummar
- * @since 8.3.1
+ * @since 8.4.0
  */
 @IsSPIInterface
 public interface ISMPReadyProviderExtensionSPI
