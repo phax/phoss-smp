@@ -50,18 +50,18 @@
 	font-weight: bold;
 }
 
-#menu li li a {
+#menu li li a.nav-link {
 	font-size: 90%;
 	padding-bottom: 3px;
 	padding-left: 15px;
 	padding-top: 3px;
 }
 
-#menu li li li a {
+#menu li li li a.nav-link {
 	padding-left: 25px;
 }
 
-#menu li li li li a {
+#menu li li li li a.nav-link {
 	padding-left: 35px;
 }
 
