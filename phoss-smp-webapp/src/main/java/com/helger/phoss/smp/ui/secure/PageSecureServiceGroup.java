@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+// This file was modified using AI tooling (pi coding agent).
+
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.Locale;
@@ -1169,8 +1171,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
                                                      @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
-    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
-                                                                       this);
+    final WebPageExecutionContext aWPEC = createSecureWPECForAjax (aRequestScope);
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();

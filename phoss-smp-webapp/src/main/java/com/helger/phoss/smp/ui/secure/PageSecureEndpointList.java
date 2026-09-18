@@ -16,6 +16,8 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
+// This file was modified using AI tooling (pi coding agent).
+
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
@@ -47,7 +49,6 @@ import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
-import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
@@ -108,8 +109,7 @@ public final class PageSecureEndpointList extends AbstractPageSecureEndpoint
   private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
                                                      @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
-    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
-                                                                       this);
+    final WebPageExecutionContext aWPEC = createSecureWPECForAjax (aRequestScope);
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final String sSearchText = aRequest.getSearchText ();
