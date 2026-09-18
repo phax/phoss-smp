@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-/* This file was modified using AI tooling (pi coding agent). */
-
 #viewport table {
 	margin-bottom: 0 !important;
 }
@@ -52,16 +50,6 @@
 	font-weight: bold;
 }
 
-/*
- * Indentation of nested submenu items.
- *
- * Deliberately keyed off <li> nesting depth instead of counting ".nav" ancestor classes: the
- * previous "#menu .nav .nav>li>a" / "#menu .nav .nav .nav>li>a" selectors silently stopped
- * working for the 3rd nesting level (e.g. Administration > Security > Users) after the
- * Bootstrap 4 -> 5 migration, since they implicitly assumed a specific number of nested ".nav"
- * wrapper elements per level. Using <li> depth is robust regardless of such markup changes and
- * also covers a 4th level, should one ever be added.
- */
 #menu li li a {
 	font-size: 90%;
 	padding-bottom: 3px;
