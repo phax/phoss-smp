@@ -1169,8 +1169,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
                                                      @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
-    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
-                                                                       this);
+    final WebPageExecutionContext aWPEC = createSecureWPECForAjax (aRequestScope);
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();

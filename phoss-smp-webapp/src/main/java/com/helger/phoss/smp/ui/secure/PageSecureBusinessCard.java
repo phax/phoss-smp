@@ -1299,8 +1299,7 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
   private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
                                                      @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
-    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
-                                                                       this);
+    final WebPageExecutionContext aWPEC = createSecureWPECForAjax (aRequestScope);
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
     final String sSearchText = aRequest.getSearchText ();

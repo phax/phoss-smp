@@ -70,7 +70,6 @@ import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
 import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
-import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandHelper;
@@ -510,8 +509,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   private DataTablesOnDemandResult _getOnDemandData (@NonNull final DataTablesOnDemandRequest aRequest,
                                                      @NonNull final IRequestWebScopeWithoutResponse aRequestScope)
   {
-    final WebPageExecutionContext aWPEC = new WebPageExecutionContext (LayoutExecutionContext.createForAjaxOrAction (aRequestScope),
-                                                                       this);
+    final WebPageExecutionContext aWPEC = createSecureWPECForAjax (aRequestScope);
     final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
     final String sSearchText = aRequest.getSearchText ();
 
