@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.ui;
 
-// This file was modified using AI tooling (pi coding agent).
-
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
@@ -70,7 +68,7 @@ public abstract class AbstractSMPWebPageForm <DATATYPE extends IHasID <String>> 
    * Create a {@link WebPageExecutionContext} for this page to be used from within on-demand AJAX
    * callbacks (e.g. the DataTables server side processing callback). This explicitly pins the
    * request to the "secure" application before resolving the {@link LayoutExecutionContext}.
-   * <br>
+   * 
    * This is necessary because the on-demand AJAX function is registered application-agnostically
    * (it is not covered by the {@code /secure/*} servlet path and therefore not handled by the
    * usual application-ID determination filter). Without this, the application ID would be

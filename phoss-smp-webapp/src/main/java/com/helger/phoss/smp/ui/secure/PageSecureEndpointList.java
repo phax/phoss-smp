@@ -16,8 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-// This file was modified using AI tooling (pi coding agent).
-
 import java.util.Locale;
 
 import org.jspecify.annotations.NonNull;
