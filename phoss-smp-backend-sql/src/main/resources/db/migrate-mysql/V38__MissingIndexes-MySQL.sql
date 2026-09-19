@@ -18,44 +18,22 @@
 -- smp_ownership (username), smp_bce (pid) and smp_service_metadata_red (businessIdentifierScheme, businessIdentifier)
 -- are already indexed since V1 as the FK indexes InnoDB requires
 
--- All indexes are created conditionally, so that installations that already
--- added them manually are not broken by this migration.
--- MySQL has no "CREATE INDEX IF NOT EXISTS", so a temporary helper procedure
--- checks INFORMATION_SCHEMA before creating each index
-DROP PROCEDURE IF EXISTS smp_create_index;
-
-CREATE PROCEDURE smp_create_index (IN p_table VARCHAR(64), IN p_index VARCHAR(64), IN p_columns VARCHAR(512))
-BEGIN
-  DECLARE n_existing INT;
-  SELECT COUNT(*) INTO n_existing
-    FROM information_schema.statistics
-    WHERE table_schema = DATABASE() AND table_name = p_table AND index_name = p_index;
-  IF n_existing = 0 THEN
-    SET @smp_create_index_sql = CONCAT ('CREATE INDEX `', p_index, '` ON `', p_table, '` (', p_columns, ')');
-    PREPARE smp_create_index_stmt FROM @smp_create_index_sql;
-    EXECUTE smp_create_index_stmt;
-    DEALLOCATE PREPARE smp_create_index_stmt;
-  END IF;
-END;
-
 -- smp_endpoint: the transport profile usage check counts rows by "transportProfile"
-CALL smp_create_index ('smp_endpoint', 'IX_smp_endpoint_tprofile', '`transportProfile`');
+CREATE INDEX `IX_smp_endpoint_tprofile` ON `smp_endpoint` (`transportProfile`);
 
 -- smp_pmigration: listed by direction [and state], deleted by "pid"
-CALL smp_create_index ('smp_pmigration', 'IX_smp_pmigration_dir_state', '`direction`, `state`');
-CALL smp_create_index ('smp_pmigration', 'IX_smp_pmigration_pid', '`pid`');
+CREATE INDEX `IX_smp_pmigration_dir_state` ON `smp_pmigration` (`direction`, `state`);
+CREATE INDEX `IX_smp_pmigration_pid` ON `smp_pmigration` (`pid`);
 
 -- smp_audit: grows unbounded, is listed ordered by "dt" and filtered by "userid"
-CALL smp_create_index ('smp_audit', 'IX_smp_audit_dt', '`dt`');
-CALL smp_create_index ('smp_audit', 'IX_smp_audit_userid', '`userid`');
+CREATE INDEX `IX_smp_audit_dt` ON `smp_audit` (`dt`);
+CREATE INDEX `IX_smp_audit_userid` ON `smp_audit` (`userid`);
 
 -- smp_secuser: the login path resolves users by login name and by email
 -- Both columns are TEXT here, so they are indexed by prefix
 -- DB2 and SQL Server have the login name index since V8
-CALL smp_create_index ('smp_secuser', 'IX_smp_secuser_loginname', '`loginname`(191)');
-CALL smp_create_index ('smp_secuser', 'IX_smp_secuser_email', '`email`(191)');
+CREATE INDEX `IX_smp_secuser_loginname` ON `smp_secuser` (`loginname`(191));
+CREATE INDEX `IX_smp_secuser_email` ON `smp_secuser` (`email`(191));
 
 -- smp_secusertoken: token to user resolution
-CALL smp_create_index ('smp_secusertoken', 'IX_smp_secusertoken_userid', '`userid`');
-
-DROP PROCEDURE smp_create_index;
+CREATE INDEX `IX_smp_secusertoken_userid` ON `smp_secusertoken` (`userid`);
