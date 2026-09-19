@@ -51,8 +51,18 @@ public abstract class AbstractManagerMongoDB
 
   private static final Logger LOGGER = LoggerFactory.getLogger (AbstractManagerMongoDB.class);
 
-  private static final String BSON_SCHEME = "scheme";
-  private static final String BSON_VALUE = "value";
+  /**
+   * The name of the field containing the scheme of an identifier.
+   *
+   * @since 8.4.3
+   */
+  protected static final String BSON_SCHEME = "scheme";
+  /**
+   * The name of the field containing the value of an identifier.
+   *
+   * @since 8.4.3
+   */
+  protected static final String BSON_VALUE = "value";
 
   private final String m_sCollectionName;
   private final MongoCollection <Document> m_aCollection;

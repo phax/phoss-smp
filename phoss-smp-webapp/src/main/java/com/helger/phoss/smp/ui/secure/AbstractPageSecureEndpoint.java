@@ -61,6 +61,7 @@ import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
@@ -806,12 +807,13 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
       aForm.addChild (new HCHiddenField (FIELD_ENDPOINT_ID, aSelectedEndpoint.getID ()));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                          aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                  : null),
-                                                                                        aDisplayLocale,
-                                                                                        null,
-                                                                                        bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.createAjax (aWPEC.getRequestScope (),
+                                                                                            new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                              aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                      : null),
+                                                                                            aDisplayLocale,
+                                                                                            ESMPServiceGroupFilter.ALL,
+                                                                                            bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
     {
       final BootstrapRow aRow = new BootstrapRow ();
