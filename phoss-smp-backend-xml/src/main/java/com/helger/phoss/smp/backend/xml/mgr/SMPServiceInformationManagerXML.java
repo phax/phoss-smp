@@ -37,13 +37,17 @@ import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
@@ -53,6 +57,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
+import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.photon.audit.AuditHelper;
@@ -74,10 +79,14 @@ public final class SMPServiceInformationManagerXML extends
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPServiceInformationManagerXML.class);
 
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
+  private final ISMPAccessPointManager m_aAccessPointMgr;
 
-  public SMPServiceInformationManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
+  public SMPServiceInformationManagerXML (@NonNull @Nonempty final String sFilename,
+                                          @NonNull final ISMPAccessPointManager aAccessPointMgr) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
+    ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
+    m_aAccessPointMgr = aAccessPointMgr;
   }
 
   @NonNull
@@ -116,6 +125,9 @@ public final class SMPServiceInformationManagerXML extends
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
+
+    // Resolve the Access Point references of all endpoints to the managed objects
+    SMPEndpointHelper.resolveAccessPoints (m_aAccessPointMgr, aSMPServiceInformation);
 
     // Check for an update
     boolean bChangeExisting = false;
@@ -447,6 +459,68 @@ public final class SMPServiceInformationManagerXML extends
     return ret;
   }
 
+  /**
+   * Count the endpoints referencing the Access Point with the provided ID.
+   *
+   * @param sAccessPointID
+   *        The Access Point ID to look for. May be <code>null</code>.
+   * @return The number of matching endpoints.
+   */
+  @Nonnegative
+  public long getEndpointCountUsingAccessPoint (@Nullable final String sAccessPointID)
+  {
+    if (StringHelper.isEmpty (sAccessPointID))
+      return 0;
+
+    final MutableLong ret = new MutableLong (0);
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          if (sAccessPointID.equals (aEndpoint.getAccessPointID ()))
+            ret.inc ();
+    });
+    return ret.longValue ();
+  }
+
+  /**
+   * Modify all endpoints matching the provided filter with the provided modifier.
+   *
+   * @param aServiceGroupID
+   *        Optional service group filter. May be <code>null</code>.
+   * @param aFilter
+   *        The filter to select the endpoints to be changed. May not be <code>null</code>.
+   * @param aModifier
+   *        The modifier to be invoked on all matching endpoints. May not be <code>null</code>.
+   * @return The number of changed endpoints.
+   */
+  @Nonnegative
+  private long _updateEndpoints (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                 @NonNull final Predicate <ISMPEndpoint> aFilter,
+                                 @NonNull final Consumer <SMPEndpoint> aModifier)
+  {
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave ( () -> {
+      for (final ISMPServiceInformation aSI : getAllSMPServiceInformation ())
+      {
+        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+          continue;
+
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+            if (aEndpoint instanceof SMPEndpoint && aFilter.test (aEndpoint))
+            {
+              aModifier.accept ((SMPEndpoint) aEndpoint);
+              bSIChanged = true;
+              aEndpointsChanged.inc ();
+            }
+        if (bSIChanged)
+          m_aRWLock.writeLocked ( () -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
+  }
+
   @Nonnegative
   public long updateAllEndpointURLs (@Nullable final IParticipantIdentifier aServiceGroupID,
                                      @NonNull final String sOldURL,
@@ -455,28 +529,37 @@ public final class SMPServiceInformationManagerXML extends
     ValueEnforcer.notNull (sOldURL, "OldURL");
     ValueEnforcer.notNull (sNewURL, "NewURL");
 
-    final MutableLong aEndpointsChanged = new MutableLong (0);
-    performWithoutAutoSave (() -> {
-      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
-      for (final ISMPServiceInformation aSI : aAllSIs)
+    if (sOldURL.equals (sNewURL))
+      return 0;
+
+    // Endpoints containing the URL directly
+    long nChanged = _updateEndpoints (aServiceGroupID,
+                                      x -> !x.hasAccessPoint () && sOldURL.equals (x.getEndpointReference ()),
+                                      x -> x.setEndpointReference (sNewURL));
+
+    // Endpoints referencing an Access Point with that URL - changing the Access Point affects all
+    // of them at once, so this is only possible if no service group filter is present
+    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
+      if (aAP.hasSameEndpointReference (sOldURL))
       {
-        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+        final long nUsingAP = getEndpointCountUsingAccessPoint (aAP.getID ());
+        if (nUsingAP == 0)
           continue;
 
-        boolean bSIChanged = false;
-        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-            if (sOldURL.equals (aEndpoint.getEndpointReference ()))
-            {
-              ((SMPEndpoint) aEndpoint).setEndpointReference (sNewURL);
-              bSIChanged = true;
-              aEndpointsChanged.inc ();
-            }
-        if (bSIChanged)
-          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+        if (aServiceGroupID != null)
+        {
+          LOGGER.warn ("The endpoints referencing the Access Point '" +
+                       aAP.getName () +
+                       "' are not changed, because an Access Point is shared across Service Groups");
+          continue;
+        }
+
+        if (m_aAccessPointMgr.updateAccessPoint (aAP.getID (), aAP.getName (), sNewURL, aAP.getCertificate ())
+                             .isChanged ())
+          nChanged += nUsingAP;
       }
-    });
-    return aEndpointsChanged.longValue ();
+
+    return nChanged;
   }
 
   @Nonnegative
@@ -487,31 +570,39 @@ public final class SMPServiceInformationManagerXML extends
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    final MutableLong aEndpointsChanged = new MutableLong (0);
-    performWithoutAutoSave (() -> {
-      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
-      for (final ISMPServiceInformation aSI : aAllSIs)
-      {
-        boolean bSIChanged = false;
-        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
-          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
-          {
-            final String sCert = aEndpoint.getCertificate ();
-            if (sCert != null)
-            {
-              final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sCert);
-              if (sOldCertNormalized.equals (sStoredCertNormalized))
-              {
-                ((SMPEndpoint) aEndpoint).setCertificate (sNewCert);
-                bSIChanged = true;
-                aEndpointsChanged.inc ();
-              }
-            }
-          }
-        if (bSIChanged)
-          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
-      }
-    });
-    return aEndpointsChanged.longValue ();
+    // Endpoints containing the certificate directly
+    long nChanged = _updateEndpoints (null,
+                                      x -> !x.hasAccessPoint () &&
+                                           sOldCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (x.getCertificate ())),
+                                      x -> x.setCertificate (sNewCert));
+
+    // Endpoints referencing an Access Point with that certificate - no endpoint is touched at all,
+    // because the certificate is an attribute of the Access Point
+    for (final String sAPID : m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized))
+    {
+      final long nUsingAP = getEndpointCountUsingAccessPoint (sAPID);
+      if (m_aAccessPointMgr.updateAccessPointCertificate (sAPID, sNewCert).isChanged ())
+        nChanged += nUsingAP;
+    }
+
+    return nChanged;
+  }
+
+  @Nonnegative
+  public long useAccessPointForMatchingEndpoints (@NonNull final String sAccessPointID,
+                                                  final boolean bRequireSameEndpointReference)
+  {
+    ValueEnforcer.notNull (sAccessPointID, "AccessPointID");
+
+    final ISMPAccessPoint aAP = m_aAccessPointMgr.getAccessPointOfID (sAccessPointID);
+    if (aAP == null || !aAP.hasCertificate ())
+      return 0;
+
+    final String sAPCertNormalized = SMPCertificateHelper.getNormalizedCert (aAP.getCertificate ());
+    return _updateEndpoints (null,
+                             x -> !x.hasAccessPoint () &&
+                                  sAPCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (x.getCertificate ())) &&
+                                  (!bRequireSameEndpointReference || aAP.hasSameEndpointReference (x.getEndpointReference ())),
+                             x -> x.setAccessPoint (aAP));
   }
 }

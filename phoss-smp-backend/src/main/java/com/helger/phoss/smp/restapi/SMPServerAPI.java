@@ -644,6 +644,10 @@ public final class SMPServerAPI
                                                              aJAXBEndpoint.getTechnicalInformationUrl (),
                                                              SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
 
+              // An endpoint may reference an Access Point by name instead of containing the
+              // endpoint reference URL and the certificate directly
+              SMPAccessPointRESTHelper.applyAccessPointReference (aEndpoint, m_aAPIDataProvider.getCurrentURI ());
+
               final LocalDatePeriod aEndpointPeriod = SMPEndpointHelper.createSafePeriod (aEndpoint.getServiceActivationDate (),
                                                                                           aEndpoint.getServiceExpirationDate ());
 

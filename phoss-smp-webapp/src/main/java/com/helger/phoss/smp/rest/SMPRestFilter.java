@@ -70,6 +70,9 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PATH_COMPLETE = "/complete";
   public static final String PATH_CUSTOM_PROPERTIES = "/customproperties";
   public static final String PATH_LIST = "/list";
+  public static final String PATH_ACCESS_POINT = "/accesspoint";
+  public static final String PATH_ACCESS_POINT_NAME = PATH_ACCESS_POINT + "/name";
+  public static final String PATH_USE_FOR_MATCHING_ENDPOINTS = "/use-for-matching-endpoints";
   public static final String PATH_SERVICE_GROUP_IDS = "/servicegroupids";
   public static final String PATH_SERVICES = "/services";
 
@@ -82,6 +85,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PARAM_MIGRATION_KEY = "MigrationKey";
   public static final String PARAM_CUSTOM_PROPERTY_NAME = "PropertyName";
   public static final String PARAM_CUSTOM_PROPERTY_TYPE = "PropertyType";
+  public static final String PARAM_ACCESS_POINT_NAME = "AccessPointName";
 
   static final String LOG_PREFIX = "[REST API] ";
 
@@ -312,6 +316,51 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                      new APIExecutorCustomPropertyDelete ());
       aDeleteCustomProperty.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteCustomProperty);
+    }
+
+    // Access Point management API since 8.4.4
+    {
+      final APIDescriptor aGetAccessPointList = new APIDescriptor (APIPath.get (PATH_ACCESS_POINT + PATH_LIST),
+                                                                   new APIExecutorAccessPointListGet ());
+      aGetAccessPointList.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aGetAccessPointList);
+    }
+    {
+      final APIDescriptor aGetAccessPoint = new APIDescriptor (APIPath.get (PATH_ACCESS_POINT_NAME +
+                                                                            "/{" +
+                                                                            PARAM_ACCESS_POINT_NAME +
+                                                                            "}"), new APIExecutorAccessPointGet ());
+      aGetAccessPoint.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aGetAccessPoint);
+    }
+    {
+      final APIDescriptor aPutAccessPoint = new APIDescriptor (APIPath.put (PATH_ACCESS_POINT_NAME +
+                                                                            "/{" +
+                                                                            PARAM_ACCESS_POINT_NAME +
+                                                                            "}"), new APIExecutorAccessPointPut ());
+      aPutAccessPoint.allowedMimeTypes ()
+                     .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+      aPutAccessPoint.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aPutAccessPoint);
+    }
+    {
+      final APIDescriptor aDeleteAccessPoint = new APIDescriptor (APIPath.delete (PATH_ACCESS_POINT_NAME +
+                                                                                  "/{" +
+                                                                                  PARAM_ACCESS_POINT_NAME +
+                                                                                  "}"),
+                                                                  new APIExecutorAccessPointDelete ());
+      aDeleteAccessPoint.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aDeleteAccessPoint);
+    }
+    {
+      final APIDescriptor aUseAccessPoint = new APIDescriptor (APIPath.post (PATH_ACCESS_POINT_NAME +
+                                                                             "/{" +
+                                                                             PARAM_ACCESS_POINT_NAME +
+                                                                             "}" +
+                                                                             PATH_USE_FOR_MATCHING_ENDPOINTS),
+                                                               new APIExecutorAccessPointUseForMatchingEndpointsPost ());
+      aUseAccessPoint.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aUseAccessPoint);
     }
 
     // Extended Query APIs since 5.3.0

@@ -19,6 +19,7 @@ package com.helger.phoss.smp.backend.mongodb.mgr;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -59,6 +60,9 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpointHelper;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPoint;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
@@ -92,6 +96,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   private static final String BSON_ENDPOINT_ID = "endpointid";
   private static final String BSON_TRANSPORT_PROFILE = "transportprofile";
   private static final String BSON_ENDPOINT_REFERENCE = "endpointreference";
+  private static final String BSON_ACCESS_POINT_ID = "apid";
   private static final String BSON_BUSINESSLEVELSIG = "businesslevelsig";
   private static final String BSON_MINIMUM_AUTHENTICATION_LEVEL = "minauth";
   private static final String BSON_SERVICEACTIVATION = "serviceactivation";
@@ -104,18 +109,24 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   private static final String BSON_ENDPOINTS_PATH = BSON_PROCESSES + "." + BSON_ENDPOINTS;
   private static final String BSON_ENDPOINT_REFERENCE_PATH = BSON_ENDPOINTS_PATH + "." + BSON_ENDPOINT_REFERENCE;
+  private static final String BSON_ACCESS_POINT_ID_PATH = BSON_ENDPOINTS_PATH + "." + BSON_ACCESS_POINT_ID;
   private static final String BSON_TRANSPORT_PROFILE_PATH = BSON_ENDPOINTS_PATH + "." + BSON_TRANSPORT_PROFILE;
 
   private final IIdentifierFactory m_aIdentifierFactory;
+  private final ISMPAccessPointManager m_aAccessPointMgr;
   private final CallbackList <ISMPServiceInformationCallback> m_aCBs = new CallbackList <> ();
 
-  public SMPServiceInformationManagerMongoDB (@NonNull final IIdentifierFactory aIdentifierFactory)
+  public SMPServiceInformationManagerMongoDB (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                              @NonNull final ISMPAccessPointManager aAccessPointMgr)
   {
     super ("smp-serviceinfo");
+    ValueEnforcer.notNull (aAccessPointMgr, "AccessPointMgr");
     m_aIdentifierFactory = aIdentifierFactory;
+    m_aAccessPointMgr = aAccessPointMgr;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
     getCollection ().createIndex (Indexes.ascending (BSON_SERVICE_GROUP_ID));
     getCollection ().createIndex (Indexes.ascending (BSON_ENDPOINT_REFERENCE_PATH));
+    getCollection ().createIndex (Indexes.ascending (BSON_ACCESS_POINT_ID_PATH));
     getCollection ().createIndex (Indexes.ascending (BSON_TRANSPORT_PROFILE_PATH));
   }
 
@@ -132,8 +143,15 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   {
     final Document ret = new Document ().append (BSON_ENDPOINT_ID, aValue.getID ())
                                         .append (BSON_TRANSPORT_PROFILE, aValue.getTransportProfile ());
-    if (aValue.hasEndpointReference ())
-      ret.append (BSON_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
+    if (aValue.hasAccessPoint ())
+      ret.append (BSON_ACCESS_POINT_ID, aValue.getAccessPointID ());
+    else
+    {
+      if (aValue.hasEndpointReference ())
+        ret.append (BSON_ENDPOINT_REFERENCE, aValue.getEndpointReference ());
+      if (aValue.hasCertificate ())
+        ret.append (BSON_CERTIFICATE, aValue.getCertificate ());
+    }
     ret.append (BSON_BUSINESSLEVELSIG, Boolean.valueOf (aValue.isRequireBusinessLevelSignature ()));
     if (aValue.hasMinimumAuthenticationLevel ())
       ret.append (BSON_MINIMUM_AUTHENTICATION_LEVEL, aValue.getMinimumAuthenticationLevel ());
@@ -141,8 +159,6 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       ret.append (BSON_SERVICEACTIVATION, TypeConverter.convert (aValue.getServiceActivationDateTime (), Date.class));
     if (aValue.hasServiceExpirationDateTime ())
       ret.append (BSON_SERVICEEXPIRATION, TypeConverter.convert (aValue.getServiceExpirationDateTime (), Date.class));
-    if (aValue.hasCertificate ())
-      ret.append (BSON_CERTIFICATE, aValue.getCertificate ());
     if (aValue.hasServiceDescription ())
       ret.append (BSON_SERVICE_DESCRIPTION, aValue.getServiceDescription ());
     if (aValue.hasTechnicalContactUrl ())
@@ -167,7 +183,6 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       aChange.set (true);
     }
     final String sTransportProfile = aDoc.getString (BSON_TRANSPORT_PROFILE);
-    final String sEndpointReference = aDoc.getString (BSON_ENDPOINT_REFERENCE);
     final boolean bRequireBusinessLevelSignature = aDoc.getBoolean (BSON_BUSINESSLEVELSIG,
                                                                     SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE);
     final String sMinimumAuthenticationLevel = aDoc.getString (BSON_MINIMUM_AUTHENTICATION_LEVEL);
@@ -175,19 +190,42 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                                                                           XMLOffsetDateTime.class);
     final XMLOffsetDateTime aServiceExpirationDT = TypeConverter.convert (aDoc.getDate (BSON_SERVICEEXPIRATION),
                                                                           XMLOffsetDateTime.class);
-    final String sCertificate = aDoc.getString (BSON_CERTIFICATE);
     final String sServiceDescription = aDoc.getString (BSON_SERVICE_DESCRIPTION);
     final String sTechnicalContactUrl = aDoc.getString (BSON_TECHCONTACTURL);
     final String sTechnicalInformationUrl = aDoc.getString (BSON_TECHINFOURL);
     final String sExtension = aDoc.getString (BSON_EXTENSIONS);
+
+    // An endpoint either references an Access Point or it contains the endpoint reference URL and
+    // the certificate directly
+    final ISMPAccessPointManager aAccessPointMgr = SMPMetaManager.getAccessPointMgr ();
+    final String sAccessPointID = aDoc.getString (BSON_ACCESS_POINT_ID);
+    if (StringHelper.isNotEmpty (sAccessPointID))
+    {
+      final ISMPAccessPoint aAccessPoint = aAccessPointMgr.getAccessPointOfID (sAccessPointID);
+      if (aAccessPoint != null)
+        return new SMPEndpoint (sEndpointID,
+                                sTransportProfile,
+                                aAccessPoint,
+                                bRequireBusinessLevelSignature,
+                                sMinimumAuthenticationLevel,
+                                aServiceActivationDT,
+                                aServiceExpirationDT,
+                                sServiceDescription,
+                                sTechnicalContactUrl,
+                                sTechnicalInformationUrl,
+                                sExtension);
+      else
+        LOGGER.warn ("Failed to resolve Access Point with ID '" + sAccessPointID + "' of endpoint '" + sEndpointID + "'");
+    }
+
     return new SMPEndpoint (sEndpointID,
                             sTransportProfile,
-                            sEndpointReference,
+                            aDoc.getString (BSON_ENDPOINT_REFERENCE),
                             bRequireBusinessLevelSignature,
                             sMinimumAuthenticationLevel,
                             aServiceActivationDT,
                             aServiceExpirationDT,
-                            sCertificate,
+                            aDoc.getString (BSON_CERTIFICATE),
                             sServiceDescription,
                             sTechnicalContactUrl,
                             sTechnicalInformationUrl,
@@ -299,6 +337,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("mergeSMPServiceInformation (" + aSMPServiceInformationObj + ")");
+
+    // Resolve and de-duplicate the Access Points of all endpoints
+    SMPEndpointHelper.resolveAccessPoints (m_aAccessPointMgr, aSMPServiceInformation);
 
     // Check for an update
     boolean bChangedExisting = false;
@@ -615,22 +656,16 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   public ICommonsMap <String, IEndpointUsageInfo> getEndpointURLUsageMap ()
   {
     final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
-    final Document aGroupID = new Document (BSON_ENDPOINT_REFERENCE, "$" + BSON_ENDPOINT_REFERENCE_PATH).append (
-                                                                                                                 BSON_SERVICE_GROUP_ID,
-                                                                                                                 "$" +
-                                                                                                                                        BSON_SERVICE_GROUP_ID);
-    for (final Document aDoc : getCollection ().aggregate (_createEndpointGroupPipeline (aGroupID))
-                                               .allowDiskUse (Boolean.TRUE))
-    {
-      final Document aID = aDoc.get (BSON_MONGO_ID, Document.class);
-      final String sURL = aID.getString (BSON_ENDPOINT_REFERENCE);
-      if (StringHelper.isNotEmpty (sURL))
-      {
-        final String sServiceGroupID = aID.getString (BSON_SERVICE_GROUP_ID);
-        final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
-        aInfo.addForServiceGroupID (sServiceGroupID, ((Number) aDoc.get (BSON_COUNT)).intValue ());
-      }
-    }
+    forEachSMPServiceInformation (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          if (aEndpoint.hasEndpointReference ())
+          {
+            final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (aEndpoint.getEndpointReference (),
+                                                                                     k -> new EndpointUsageInfo ());
+            aInfo.incrementForServiceGroupID (aSI.getServiceGroupID ());
+          }
+    });
     return ret;
   }
 
@@ -639,19 +674,89 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
   public ICommonsMap <String, IEndpointUsageInfo> getEndpointCertificateUsageMap ()
   {
     final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
-    final String sCertificatePath = BSON_ENDPOINTS_PATH + "." + BSON_CERTIFICATE;
-    final Document aGroupID = new Document (BSON_CERTIFICATE, "$" + sCertificatePath).append (BSON_SERVICE_GROUP_ID,
-                                                                                              "$" +
-                                                                                                                     BSON_SERVICE_GROUP_ID);
-    for (final Document aDoc : getCollection ().aggregate (_createEndpointGroupPipeline (aGroupID))
-                                               .allowDiskUse (Boolean.TRUE))
+    forEachSMPServiceInformation (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+        {
+          final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aEndpoint.getCertificate ());
+          final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sNormalizedCert,
+                                                                                   k -> new EndpointUsageInfo ());
+          aInfo.incrementForServiceGroupID (aSI.getServiceGroupID ());
+        }
+    });
+    return ret;
+  }
+
+  /**
+   * Modify all endpoints matching the provided filter with the provided modifier.
+   *
+   * @param aServiceGroupID
+   *        Optional service group filter. May be <code>null</code>.
+   * @param aEndpointFilter
+   *        The endpoint filter. May not be <code>null</code>.
+   * @param aEndpointModifier
+   *        The endpoint modifier. May not be <code>null</code>.
+   * @return The number of changed endpoints.
+   */
+  @Nonnegative
+  private long _updateEndpointDocs (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                    @NonNull final Predicate <Document> aEndpointFilter,
+                                    @NonNull final Consumer <Document> aEndpointModifier)
+  {
+    long nEndpointsChanged = 0;
+
+    final FindIterable <Document> aCursor = aServiceGroupID == null ? getCollection ().find ()
+                                                                    : getCollection ().find (Filters.eq (BSON_SERVICE_GROUP_ID,
+                                                                                                         aServiceGroupID.getURIEncoded ()));
+    for (final Document aDoc : aCursor)
     {
-      final Document aID = aDoc.get (BSON_MONGO_ID, Document.class);
-      final String sNormalizedCert = SMPCertificateHelper.getNormalizedCert (aID.getString (BSON_CERTIFICATE));
-      final String sServiceGroupID = aID.getString (BSON_SERVICE_GROUP_ID);
-      final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sNormalizedCert,
-                                                                               k -> new EndpointUsageInfo ());
-      aInfo.addForServiceGroupID (sServiceGroupID, ((Number) aDoc.get (BSON_COUNT)).intValue ());
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+              if (aEndpointFilter.test (aEndpoint))
+              {
+                aEndpointModifier.accept (aEndpoint);
+                bDocChanged = true;
+                nEndpointsChanged++;
+              }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (Filters.eq (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
+  }
+
+  /**
+   * Count the endpoints referencing the Access Point with the provided ID.
+   *
+   * @param sAccessPointID
+   *        The Access Point ID to look for. May be <code>null</code>.
+   * @return The number of matching endpoints.
+   */
+  @Nonnegative
+  public long getEndpointCountUsingAccessPoint (@Nullable final String sAccessPointID)
+  {
+    if (StringHelper.isEmpty (sAccessPointID))
+      return 0;
+
+    long ret = 0;
+    for (final Document aDoc : getCollection ().find (Filters.eq (BSON_ACCESS_POINT_ID_PATH, sAccessPointID)))
+    {
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+              if (sAccessPointID.equals (aEndpoint.getString (BSON_ACCESS_POINT_ID)))
+                ret++;
+        }
     }
     return ret;
   }
@@ -664,35 +769,34 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     ValueEnforcer.notNull (sOldURL, "OldURL");
     ValueEnforcer.notNull (sNewURL, "NewURL");
 
-    long nEndpointsChanged = 0;
+    if (sOldURL.equals (sNewURL))
+      return 0;
 
-    // Find all documents that have matching endpoints
-    Bson aFilter = Filters.eq (BSON_ENDPOINT_REFERENCE_PATH, sOldURL);
-    if (aServiceGroupID != null)
-      aFilter = Filters.and (aFilter, Filters.eq (BSON_SERVICE_GROUP_ID, aServiceGroupID.getURIEncoded ()));
+    long nChanged = _updateEndpointDocs (aServiceGroupID,
+                                         x -> StringHelper.isEmpty (x.getString (BSON_ACCESS_POINT_ID)) &&
+                                              sOldURL.equals (x.getString (BSON_ENDPOINT_REFERENCE)),
+                                         x -> x.put (BSON_ENDPOINT_REFERENCE, sNewURL));
 
-    // Iterate each matching document, update endpoints in Java, and replace
-    for (final Document aDoc : getCollection ().find (aFilter))
-    {
-      boolean bDocChanged = false;
-      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
-      if (aProcesses != null)
-        for (final Document aProcess : aProcesses)
+    for (final ISMPAccessPoint aAP : m_aAccessPointMgr.getAllAccessPoints ())
+      if (aAP.hasSameEndpointReference (sOldURL))
+      {
+        final long nUsingAP = getEndpointCountUsingAccessPoint (aAP.getID ());
+        if (nUsingAP == 0)
+          continue;
+
+        if (aServiceGroupID != null)
         {
-          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
-          if (aEndpoints != null)
-            for (final Document aEndpoint : aEndpoints)
-              if (sOldURL.equals (aEndpoint.getString (BSON_ENDPOINT_REFERENCE)))
-              {
-                aEndpoint.put (BSON_ENDPOINT_REFERENCE, sNewURL);
-                bDocChanged = true;
-                nEndpointsChanged++;
-              }
+          LOGGER.warn ("The endpoints referencing the Access Point '" +
+                       aAP.getName () +
+                       "' are not changed, because an Access Point is shared across Service Groups");
+          continue;
         }
-      if (bDocChanged)
-        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
-    }
-    return nEndpointsChanged;
+
+        if (m_aAccessPointMgr.updateAccessPoint (aAP.getID (), aAP.getName (), sNewURL, aAP.getCertificate ())
+                             .isChanged ())
+          nChanged += nUsingAP;
+      }
+    return nChanged;
   }
 
   @Nonnegative
@@ -702,37 +806,43 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     ValueEnforcer.notNull (sNewCert, "NewCert");
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
-    long nEndpointsChanged = 0;
 
-    // Find all documents that have endpoints with certificates
-    for (final Document aDoc : getCollection ().find ())
+    long nChanged = _updateEndpointDocs (null,
+                                         x -> StringHelper.isEmpty (x.getString (BSON_ACCESS_POINT_ID)) &&
+                                              sOldCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (x.getString (BSON_CERTIFICATE))),
+                                         x -> x.put (BSON_CERTIFICATE, sNewCert));
+
+    for (final String sAPID : m_aAccessPointMgr.getAllAccessPointIDsWithCertificate (sOldCertNormalized))
     {
-      boolean bDocChanged = false;
-      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
-      if (aProcesses != null)
-        for (final Document aProcess : aProcesses)
-        {
-          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
-          if (aEndpoints != null)
-            for (final Document aEndpoint : aEndpoints)
-            {
-              final String sStoredCert = aEndpoint.getString (BSON_CERTIFICATE);
-              if (sStoredCert != null)
-              {
-                final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
-                if (sOldCertNormalized.equals (sStoredCertNormalized))
-                {
-                  aEndpoint.put (BSON_CERTIFICATE, sNewCert);
-                  bDocChanged = true;
-                  nEndpointsChanged++;
-                }
-              }
-            }
-        }
-      if (bDocChanged)
-        getCollection ().replaceOne (Filters.eq (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+      final long nUsingAP = getEndpointCountUsingAccessPoint (sAPID);
+      if (m_aAccessPointMgr.updateAccessPointCertificate (sAPID, sNewCert).isChanged ())
+        nChanged += nUsingAP;
     }
-    return nEndpointsChanged;
+
+    return nChanged;
+  }
+
+  @Nonnegative
+  public long useAccessPointForMatchingEndpoints (@NonNull final String sAccessPointID,
+                                                  final boolean bRequireSameEndpointReference)
+  {
+    ValueEnforcer.notNull (sAccessPointID, "AccessPointID");
+
+    final ISMPAccessPoint aAP = m_aAccessPointMgr.getAccessPointOfID (sAccessPointID);
+    if (aAP == null || !aAP.hasCertificate ())
+      return 0;
+
+    final String sAPCertNormalized = SMPCertificateHelper.getNormalizedCert (aAP.getCertificate ());
+    return _updateEndpointDocs (null,
+                                x -> StringHelper.isEmpty (x.getString (BSON_ACCESS_POINT_ID)) &&
+                                     sAPCertNormalized.equals (SMPCertificateHelper.getNormalizedCert (x.getString (BSON_CERTIFICATE))) &&
+                                     (!bRequireSameEndpointReference ||
+                                      aAP.hasSameEndpointReference (x.getString (BSON_ENDPOINT_REFERENCE))),
+                                x -> {
+                                  x.put (BSON_ACCESS_POINT_ID, sAccessPointID);
+                                  x.remove (BSON_ENDPOINT_REFERENCE);
+                                  x.remove (BSON_CERTIFICATE);
+                                });
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
