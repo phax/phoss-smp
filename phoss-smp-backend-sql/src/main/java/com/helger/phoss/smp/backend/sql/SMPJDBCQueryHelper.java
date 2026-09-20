@@ -2,11 +2,17 @@
  * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.phoss.smp.backend.sql;
 
@@ -15,6 +21,7 @@ import java.util.Locale;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.enforce.ValueEnforcer;
@@ -114,6 +121,53 @@ public final class SMPJDBCQueryHelper
                                                      aPagingSpec,
                                                      createColumnNameResolver (aColumns),
                                                      TableColumnHelper.getAllDefaultSortFields (aColumns));
+  }
+
+  /**
+   * Create the database specific SQL expression that concatenates the provided SQL expressions to a
+   * single string.
+   *
+   * @param aExpressions
+   *        The SQL expressions to be concatenated. May neither be <code>null</code> nor empty.
+   * @return The SQL expression. Never <code>null</code>.
+   * @since 8.4.4
+   */
+  @NonNull
+  public static String getStringConcat (@NonNull @Nonempty final String... aExpressions)
+  {
+    return getStringConcat (SMPDataSourceSingleton.getDatabaseType (), aExpressions);
+  }
+
+  /**
+   * Create the database specific SQL expression that concatenates the provided SQL expressions to a
+   * single string. MySQL cannot use the <code>||</code> operator, because it is the logical OR by
+   * default, and SQL Server does not support it at all.
+   *
+   * @param eDBType
+   *        The database system to create the expression for. May not be <code>null</code>.
+   * @param aExpressions
+   *        The SQL expressions to be concatenated. May neither be <code>null</code> nor empty.
+   * @return The SQL expression. Never <code>null</code>.
+   * @since 8.4.4
+   */
+  @NonNull
+  public static String getStringConcat (@NonNull final EDatabaseSystemType eDBType,
+                                        @NonNull @Nonempty final String... aExpressions)
+  {
+    ValueEnforcer.notNull (eDBType, "DBType");
+    ValueEnforcer.notEmptyNoNullValue (aExpressions, "Expressions");
+
+    if (aExpressions.length == 1)
+      return aExpressions[0];
+
+    switch (eDBType)
+    {
+      case MYSQL:
+      case SQLSERVER:
+        return "CONCAT(" + String.join (", ", aExpressions) + ")";
+      default:
+        return "(" + String.join (" || ", aExpressions) + ")";
+    }
   }
 
   /**

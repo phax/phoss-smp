@@ -50,7 +50,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
   /**
    * The default number of seconds a single database connection validation may take.
    *
-   * @since 8.3.1
+   * @since 8.4.0
    */
   public static final int DEFAULT_CONNECTION_VALIDATION_TIMEOUT_SECONDS = 1;
 
@@ -146,7 +146,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
    *        The maximum number of seconds the validation of the connection may take. Must be &ge; 0,
    *        where 0 means "no timeout".
    * @return <code>true</code> if a usable connection was established, <code>false</code> otherwise.
-   * @since 8.3.1
+   * @since 8.4.0
    */
   public static boolean isDBConnectionPossible (@Nonnegative final int nValidationTimeoutSeconds)
   {
@@ -184,7 +184,7 @@ public final class SMPDataSourceSingleton extends AbstractGlobalSingleton
    *
    * @return <code>true</code> if a usable connection was established, <code>false</code> otherwise.
    * @see #isDBConnectionPossible(int)
-   * @since 8.3.1
+   * @since 8.4.0
    */
   public static boolean isDBConnectionPossible ()
   {

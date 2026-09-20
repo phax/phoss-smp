@@ -22,7 +22,9 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.factory.AbstractPersistingLongIDFactory;
+import com.helger.base.numeric.mutable.MutableBoolean;
 import com.helger.base.numeric.mutable.MutableLong;
+import com.helger.base.state.ESuccess;
 import com.helger.base.string.StringParser;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
@@ -39,6 +41,9 @@ public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
 
   /** The ID of the key column in the "smp-settings" table */
   public static final String SETTINGS_KEY_LATEST_ID = "latest-id";
+
+  /** The maximum number of attempts to reserve a new block of IDs */
+  public static final int MAX_RESERVATION_ATTEMPTS = 10;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPIDFactoryJDBC.class);
 
@@ -61,24 +66,54 @@ public class SMPIDFactoryJDBC extends AbstractPersistingLongIDFactory
   @Override
   protected long readAndUpdateIDCounter (@Nonnegative final int nReserveCount)
   {
-    final MutableLong aReadValue = new MutableLong (0);
-
     final DBExecutor aExecutor = new SMPDBExecutor ();
-    aExecutor.performInTransaction (() -> {
-      // Read existing value
-      final String sExistingValue = SMPSettingsManagerJDBC.getSettingsValueFromDB (aExecutor, SETTINGS_KEY_LATEST_ID);
-      final long nRead = StringParser.parseLong (sExistingValue, m_nInitialCount);
-      aReadValue.set (nRead);
 
-      // Write new value
-      final long nNewValue = nRead + nReserveCount;
-      SMPSettingsManagerJDBC.setSettingsValueInDB (aExecutor, SETTINGS_KEY_LATEST_ID, Long.toString (nNewValue));
+    // Every attempt uses a transaction of its own, because a retry inside the same transaction
+    // would read the same stale value again on a database defaulting to REPEATABLE READ
+    for (int nAttempt = 1; nAttempt <= MAX_RESERVATION_ATTEMPTS; ++nAttempt)
+    {
+      final MutableLong aReadValue = new MutableLong (0);
+      final MutableBoolean aReserved = new MutableBoolean (false);
 
-      if (LOGGER.isDebugEnabled ())
-        LOGGER.debug ("Updated SQL ID from " + sExistingValue + " to " + nNewValue);
-    });
+      final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
+        // Read existing value
+        final String sExistingValue = SMPSettingsManagerJDBC.getSettingsValueFromDB (aExecutor, SETTINGS_KEY_LATEST_ID);
+        final long nRead = StringParser.parseLong (sExistingValue, m_nInitialCount);
+        final long nNewValue = nRead + nReserveCount;
 
-    return aReadValue.longValue ();
+        // Write new value, but only if no other SMP instance reserved a block in the meantime.
+        // An unconditional update would hand out the same block of IDs twice, because the lock
+        // of this factory is limited to the current JVM.
+        if (SMPSettingsManagerJDBC.compareAndSetSettingsValueInDB (aExecutor,
+                                                                   SETTINGS_KEY_LATEST_ID,
+                                                                   sExistingValue,
+                                                                   Long.toString (nNewValue)).isChanged ())
+        {
+          aReadValue.set (nRead);
+          aReserved.set (true);
+
+          if (LOGGER.isDebugEnabled ())
+            LOGGER.debug ("Updated SQL ID from " + sExistingValue + " to " + nNewValue);
+        }
+      });
+
+      if (eSuccess.isSuccess () && aReserved.booleanValue ())
+        return aReadValue.longValue ();
+
+      LOGGER.warn ("Failed to reserve a block of " +
+                   nReserveCount +
+                   " IDs in attempt " +
+                   nAttempt +
+                   " of " +
+                   MAX_RESERVATION_ATTEMPTS);
+    }
+
+    // Returning a value anyway would hand out IDs of a block that was never persisted
+    throw new IllegalStateException ("Failed to reserve a block of " +
+                                     nReserveCount +
+                                     " IDs in " +
+                                     MAX_RESERVATION_ATTEMPTS +
+                                     " attempts");
   }
 
   @Override

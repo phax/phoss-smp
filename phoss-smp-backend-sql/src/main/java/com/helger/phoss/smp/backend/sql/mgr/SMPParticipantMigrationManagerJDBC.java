@@ -31,19 +31,20 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppolid.IParticipantIdentifier;
-import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.collection.paging.IPagingSpec;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
-import com.helger.phoss.smp.domain.pmigration.ESMPParticipantMigrationColumn;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
+import com.helger.phoss.smp.domain.pmigration.ESMPParticipantMigrationColumn;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
@@ -280,6 +281,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
   private ICommonsList <ISMPParticipantMigration> _getAllParticipantMigrations (@NonNull final EParticipantMigrationDirection eDirection,
                                                                                 @Nullable final EParticipantMigrationState eState)
   {
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
     final ICommonsList <ISMPParticipantMigration> ret = new CommonsArrayList <> ();
     final ICommonsList <DBResultRow> aDBResult;
     if (eState == null)
@@ -293,8 +296,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
         for (final DBResultRow aRow : aDBResult)
         {
           final EParticipantMigrationState eRealState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
-          final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
-                                                           .parseParticipantIdentifier (aRow.getAsString (2));
+          final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (aRow.getAsString (2));
           ret.add (new SMPParticipantMigration (aRow.getAsString (0),
                                                 eDirection,
                                                 eRealState,
@@ -314,8 +316,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
       if (aDBResult != null)
         for (final DBResultRow aRow : aDBResult)
         {
-          final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
-                                                           .parseParticipantIdentifier (aRow.getAsString (1));
+          final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (aRow.getAsString (1));
           ret.add (new SMPParticipantMigration (aRow.getAsString (0),
                                                 eDirection,
                                                 eState,
@@ -355,6 +356,8 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
     if (aPagingSpec.isEmptyPage ())
       return ret;
 
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
     final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
     final ICommonsList <Object> aParams = new CommonsArrayList <> ();
     final StringBuilder aWhere = new StringBuilder (" WHERE direction=?");
@@ -380,8 +383,7 @@ public class SMPParticipantMigrationManagerJDBC extends AbstractJDBCEnabledManag
       for (final DBResultRow aRow : aDBResult)
       {
         final EParticipantMigrationState eRealState = EParticipantMigrationState.getFromIDOrNull (aRow.getAsString (1));
-        final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
-                                                         .parseParticipantIdentifier (aRow.getAsString (2));
+        final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (aRow.getAsString (2));
         ret.add (new SMPParticipantMigration (aRow.getAsString (0),
                                               eDirection,
                                               eRealState,

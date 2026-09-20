@@ -68,9 +68,21 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPBusinessCardManagerMongoDB.class);
 
+  /**
+   * The name of the MongoDB collection used by this manager.
+   *
+   * @since 8.4.4
+   */
+  public static final String COLLECTION_NAME = "smp-businesscard";
+  /**
+   * The name of the field containing the ID of the Service Group of a Business Card.
+   *
+   * @since 8.4.4
+   */
+  public static final String BSON_SERVICE_GROUP_ID = "sgid";
+
   private static final String BSON_ID = "id";
   private static final ESMPBusinessCardColumn [] COLUMNS = ESMPBusinessCardColumn.values ();
-  private static final String BSON_SERVICE_GROUP_ID = "sgid";
   private static final String BSON_ENTITIES = "entities";
   private static final String BSON_NAMES = "names";
   private static final String BSON_COUNTRYCODE = "countrycode";
@@ -93,9 +105,11 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
 
   public SMPBusinessCardManagerMongoDB (@NonNull final IIdentifierFactory aIdentifierFactory)
   {
-    super ("smp-businesscard");
+    super (COLLECTION_NAME);
     m_aIdentifierFactory = aIdentifierFactory;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    // Needed for the $lookup of ESMPServiceGroupFilter.NO_BUSINESS_CARD
+    getCollection ().createIndex (Indexes.ascending (BSON_SERVICE_GROUP_ID));
   }
 
   @NonNull

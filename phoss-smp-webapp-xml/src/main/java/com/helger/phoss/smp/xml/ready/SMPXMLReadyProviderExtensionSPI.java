@@ -25,7 +25,7 @@ import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
  * that ships no readiness check at all can be detected as a configuration error.
  *
  * @author vinit-thummar
- * @since 8.3.1
+ * @since 8.4.0
  */
 @IsSPIImplementation
 public class SMPXMLReadyProviderExtensionSPI implements ISMPReadyProviderExtensionSPI

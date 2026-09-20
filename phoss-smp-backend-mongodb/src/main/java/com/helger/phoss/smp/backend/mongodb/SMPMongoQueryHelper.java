@@ -2,11 +2,17 @@
  * Copyright (C) 2019-2026 Philip Helger and contributors
  * philip[at]helger[dot]com
  *
- * The Original Code is Copyright The Peppol project (http://www.peppol.eu)
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.helger.phoss.smp.backend.mongodb;
 
@@ -18,7 +24,9 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.reflection.GenericReflection;
 import com.helger.base.string.StringHelper;
+import com.helger.cache.regex.RegExCache;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
@@ -60,7 +68,8 @@ public final class SMPMongoQueryHelper
     ValueEnforcer.notNull (aPagingSpec, "PagingSpec");
 
     final ICommonsList <Bson> aSorts = new CommonsArrayList <> ();
-    for (final SortColumn <?> aSortColumn : TableColumnHelper.getAllSortColumns (_cast (aColumns), aPagingSpec))
+    for (final SortColumn <?> aSortColumn : TableColumnHelper.getAllSortColumns (GenericReflection.uncheckedCast (aColumns),
+                                                                                 aPagingSpec))
     {
       final ISMPTableColumn <?> aColumn = (ISMPTableColumn <?>) aSortColumn.getColumn ();
       final ICommonsList <String> aFieldNames = aColumn.getAllMongoFieldNames ();
@@ -94,7 +103,8 @@ public final class SMPMongoQueryHelper
       return null;
 
     // Quote, so that the search text can never be interpreted as a regular expression
-    final Pattern aPattern = Pattern.compile (Pattern.quote (sSearchText), Pattern.CASE_INSENSITIVE);
+    final Pattern aPattern = RegExCache.getPattern (Pattern.quote (sSearchText), Pattern.CASE_INSENSITIVE);
+
     final ICommonsList <Bson> aFilters = new CommonsArrayList <> ();
     for (final ISMPTableColumn <?> aColumn : aColumns)
       if (aColumn.isSearchable ())
@@ -105,12 +115,5 @@ public final class SMPMongoQueryHelper
             aFilters.add (Filters.regex (sFieldName, aPattern));
       }
     return aFilters.isEmpty () ? null : Filters.or (aFilters);
-  }
-
-  @SuppressWarnings ("unchecked")
-  @NonNull
-  private static <T> ISMPTableColumn <T> [] _cast (@NonNull final ISMPTableColumn <?> [] aColumns)
-  {
-    return (ISMPTableColumn <T> []) aColumns;
   }
 }

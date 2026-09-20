@@ -115,6 +115,9 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     m_aIdentifierFactory = aIdentifierFactory;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
     getCollection ().createIndex (Indexes.ascending (BSON_SERVICE_GROUP_ID));
+    // Needed for the Service Metadata lookup of the REST API, which is the most frequent query of
+    // an SMP at all
+    getCollection ().createIndex (Indexes.ascending (BSON_SERVICE_GROUP_ID, BSON_DOCTYPE_ID));
     getCollection ().createIndex (Indexes.ascending (BSON_ENDPOINT_REFERENCE_PATH));
     getCollection ().createIndex (Indexes.ascending (BSON_TRANSPORT_PROFILE_PATH));
   }
