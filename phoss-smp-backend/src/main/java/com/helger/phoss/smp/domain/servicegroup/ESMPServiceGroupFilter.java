@@ -31,7 +31,7 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
  * read.
  *
  * @author Philip Helger
- * @since 8.4.3
+ * @since 8.4.4
  */
 public enum ESMPServiceGroupFilter implements IHasID <String>
 {
@@ -77,32 +77,33 @@ public enum ESMPServiceGroupFilter implements IHasID <String>
   {
     switch (this)
     {
-      case NO_BUSINESS_CARD:
+      case ALL ->
+      {
+        // Nothing to filter - see below
+      }
+      case NO_BUSINESS_CARD ->
       {
         final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-        if (aBusinessCardMgr == null)
-        {
-          // Business Cards are disabled - so none exists
-          return x -> true;
-        }
-        return x -> !aBusinessCardMgr.containsSMPBusinessCardOfID (x.getParticipantIdentifier ());
+        if (aBusinessCardMgr != null)
+          return x -> !aBusinessCardMgr.containsSMPBusinessCardOfID (x.getParticipantIdentifier ());
+        // Business Cards are disabled - so none exists
       }
-      case NO_BLOCKING_MIGRATION:
+      case NO_BLOCKING_MIGRATION ->
       {
         final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
-        if (aParticipantMigrationMgr == null)
-          return x -> true;
-
-        // Determine all participants for which no new migration can be started, once per query
-        final ICommonsSet <String> aBlockedPIDs = new CommonsHashSet <> ();
-        for (final ISMPParticipantMigration aMigration : aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null))
-          if (aMigration.getState ().preventsNewMigration ())
-            aBlockedPIDs.add (aMigration.getParticipantIdentifier ().getURIEncoded ());
-        return x -> !aBlockedPIDs.contains (x.getParticipantIdentifier ().getURIEncoded ());
+        if (aParticipantMigrationMgr != null)
+        {
+          // Determine all participants for which no new migration can be started, once per query
+          final ICommonsSet <String> aBlockedPIDs = new CommonsHashSet <> ();
+          for (final ISMPParticipantMigration aMigration : aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null))
+            if (aMigration.getState ().preventsNewMigration ())
+              aBlockedPIDs.add (aMigration.getParticipantIdentifier ().getURIEncoded ());
+          return x -> !aBlockedPIDs.contains (x.getParticipantIdentifier ().getURIEncoded ());
+        }
+        // Participant Migrations are disabled - so none exists
       }
-      default:
-        return x -> true;
     }
+    return x -> true;
   }
 
   @Nullable

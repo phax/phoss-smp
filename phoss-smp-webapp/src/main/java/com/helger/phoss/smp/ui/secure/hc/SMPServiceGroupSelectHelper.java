@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.annotation.style.ReturnsMutableCopy;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.PagingSpec;
 import com.helger.collection.paging.SortField;
@@ -36,7 +37,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  * read.
  *
  * @author Philip Helger
- * @since 8.4.3
+ * @since 8.4.4
  */
 @Immutable
 public final class SMPServiceGroupSelectHelper
@@ -66,10 +67,14 @@ public final class SMPServiceGroupSelectHelper
   @ReturnsMutableCopy
   public static ICommonsList <ISMPServiceGroup> getPagePlusOne (@NonNull final ESMPServiceGroupFilter eFilter,
                                                                 @Nullable final String sSearchText,
-                                                                @Nonnegative final int nPage)
+                                                                @Nonnegative final long nPage)
   {
+    ValueEnforcer.isGE0 (nPage, "Page");
+
     final SortField aSortField = SortField.ascending (ESMPServiceGroupColumn.PARTICIPANT_ID.getID ());
-    final long nSkip = (long) (nPage - 1) * PAGE_SIZE;
+    // The page number comes from a client, so the multiplication is saturated instead of
+    // overflowing into a negative skip count
+    final long nSkip = nPage <= 1 ? 0 : Math.min (nPage - 1, Long.MAX_VALUE / PAGE_SIZE) * PAGE_SIZE;
     return SMPMetaManager.getServiceGroupMgr ()
                          .getAllSMPServiceGroups (eFilter,
                                                   new PagingSpec (nSkip, PAGE_SIZE + 1L, aSortField),
@@ -85,6 +90,6 @@ public final class SMPServiceGroupSelectHelper
    */
   public static boolean containsAnyServiceGroup (@NonNull final ESMPServiceGroupFilter eFilter)
   {
-    return SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupCount (eFilter, null) > 0;
+    return SMPMetaManager.getServiceGroupMgr ().containsAnySMPServiceGroup (eFilter);
   }
 }

@@ -18,6 +18,7 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -148,6 +149,10 @@ public final class SMPServiceGroupPagingFuncTest
         aCreated.add (aPI);
       }
 
+      // No Business Card exists yet, so all of them match
+      assertEquals (VALUES.length, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BUSINESS_CARD, null));
+      assertTrue (aMgr.containsAnySMPServiceGroup (ESMPServiceGroupFilter.NO_BUSINESS_CARD));
+
       // The first one gets a Business Card
       final IParticipantIdentifier aPIWithBC = aCreated.getFirstOrNull ();
       assertNotNull (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aPIWithBC, new CommonsArrayList <> (), false));
@@ -158,12 +163,16 @@ public final class SMPServiceGroupPagingFuncTest
                                                                                  new PagingSpec (0, 10),
                                                                                  null);
       assertEquals (VALUES.length - 1, aNoBC.size ());
-      assertTrue ("The Service Group with a Business Card must not be contained",
-                  aNoBC.findFirst (x -> x.getParticipantIdentifier ().hasSameContent (aPIWithBC)) == null);
+      assertNull ("The Service Group with a Business Card must not be contained",
+                  aNoBC.findFirst (x -> x.getParticipantIdentifier ().hasSameContent (aPIWithBC)));
 
       // The search text must be applied on top of the filter - "0088:paging1"
       // has a Business Card, so only 2 of the 3 remain
       assertEquals (2, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BUSINESS_CARD, "paging"));
+
+      // No Participant Migration exists yet, so all of them match
+      assertEquals (VALUES.length, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION, null));
+      assertTrue (aMgr.containsAnySMPServiceGroup (ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION));
 
       // The last one gets an outbound migration
       final IParticipantIdentifier aPIMigrating = aCreated.getLastOrNull ();
@@ -176,8 +185,8 @@ public final class SMPServiceGroupPagingFuncTest
                                                                                   new PagingSpec (0, 10),
                                                                                   null);
       assertEquals (VALUES.length - 1, aNoMig.size ());
-      assertTrue ("The Service Group with a migration in progress must not be contained",
-                  aNoMig.findFirst (x -> x.getParticipantIdentifier ().hasSameContent (aPIMigrating)) == null);
+      assertNull ("The Service Group with a migration in progress must not be contained",
+                  aNoMig.findFirst (x -> x.getParticipantIdentifier ().hasSameContent (aPIMigrating)));
     }
     finally
     {

@@ -24,7 +24,9 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.reflection.GenericReflection;
 import com.helger.base.string.StringHelper;
+import com.helger.cache.regex.RegExCache;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.paging.IPagingSpec;
@@ -66,7 +68,8 @@ public final class SMPMongoQueryHelper
     ValueEnforcer.notNull (aPagingSpec, "PagingSpec");
 
     final ICommonsList <Bson> aSorts = new CommonsArrayList <> ();
-    for (final SortColumn <?> aSortColumn : TableColumnHelper.getAllSortColumns (_cast (aColumns), aPagingSpec))
+    for (final SortColumn <?> aSortColumn : TableColumnHelper.getAllSortColumns (GenericReflection.uncheckedCast (aColumns),
+                                                                                 aPagingSpec))
     {
       final ISMPTableColumn <?> aColumn = (ISMPTableColumn <?>) aSortColumn.getColumn ();
       final ICommonsList <String> aFieldNames = aColumn.getAllMongoFieldNames ();
@@ -100,7 +103,8 @@ public final class SMPMongoQueryHelper
       return null;
 
     // Quote, so that the search text can never be interpreted as a regular expression
-    final Pattern aPattern = Pattern.compile (Pattern.quote (sSearchText), Pattern.CASE_INSENSITIVE);
+    final Pattern aPattern = RegExCache.getPattern (Pattern.quote (sSearchText), Pattern.CASE_INSENSITIVE);
+
     final ICommonsList <Bson> aFilters = new CommonsArrayList <> ();
     for (final ISMPTableColumn <?> aColumn : aColumns)
       if (aColumn.isSearchable ())
@@ -111,12 +115,5 @@ public final class SMPMongoQueryHelper
             aFilters.add (Filters.regex (sFieldName, aPattern));
       }
     return aFilters.isEmpty () ? null : Filters.or (aFilters);
-  }
-
-  @SuppressWarnings ("unchecked")
-  @NonNull
-  private static <T> ISMPTableColumn <T> [] _cast (@NonNull final ISMPTableColumn <?> [] aColumns)
-  {
-    return (ISMPTableColumn <T> []) aColumns;
   }
 }

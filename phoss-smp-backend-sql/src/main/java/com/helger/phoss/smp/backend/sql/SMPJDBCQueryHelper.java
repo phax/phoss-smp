@@ -130,7 +130,7 @@ public final class SMPJDBCQueryHelper
    * @param aExpressions
    *        The SQL expressions to be concatenated. May neither be <code>null</code> nor empty.
    * @return The SQL expression. Never <code>null</code>.
-   * @since 8.4.3
+   * @since 8.4.4
    */
   @NonNull
   public static String getStringConcat (@NonNull @Nonempty final String... aExpressions)
@@ -148,13 +148,14 @@ public final class SMPJDBCQueryHelper
    * @param aExpressions
    *        The SQL expressions to be concatenated. May neither be <code>null</code> nor empty.
    * @return The SQL expression. Never <code>null</code>.
-   * @since 8.4.3
+   * @since 8.4.4
    */
   @NonNull
   public static String getStringConcat (@NonNull final EDatabaseSystemType eDBType,
                                         @NonNull @Nonempty final String... aExpressions)
   {
-    ValueEnforcer.notEmpty (aExpressions, "Expressions");
+    ValueEnforcer.notNull (eDBType, "DBType");
+    ValueEnforcer.notEmptyNoNullValue (aExpressions, "Expressions");
 
     if (aExpressions.length == 1)
       return aExpressions[0];

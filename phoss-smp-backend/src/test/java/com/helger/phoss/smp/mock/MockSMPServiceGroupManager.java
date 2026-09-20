@@ -17,7 +17,9 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.collection.paging.IPagingSpec;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -79,6 +81,28 @@ final class MockSMPServiceGroupManager implements ISMPServiceGroupManager
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups ()
   {
     throw new UnsupportedOperationException ();
+  }
+
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (final ESMPServiceGroupFilter eFilter,
+                                                                 final IPagingSpec aPagingSpec,
+                                                                 final String sSearchText)
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  public long getSMPServiceGroupCount (final ESMPServiceGroupFilter eFilter, final String sSearchText)
+  {
+    return 0;
+  }
+
+  public boolean containsAnySMPServiceGroup ()
+  {
+    return false;
+  }
+
+  public boolean containsAnySMPServiceGroup (final ESMPServiceGroupFilter eFilter)
+  {
+    return false;
   }
 
   public ICommonsSet <String> getAllSMPServiceGroupIDs ()

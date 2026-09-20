@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.ui.ajax;
 
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
@@ -40,10 +42,12 @@ import com.helger.photon.core.execcontext.LayoutExecutionContext;
  * </pre>
  *
  * @author Philip Helger
- * @since 8.4.3
+ * @since 8.4.4
  */
 public final class AjaxExecutorSecureServiceGroupSelect extends AbstractSMPAjaxExecutor
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (AjaxExecutorSecureServiceGroupSelect.class);
+
   /** Name of the request parameter containing the search term */
   public static final String PARAM_SEARCH_TERM = "q";
   /** Name of the request parameter containing the 1-based page number */
@@ -62,13 +66,18 @@ public final class AjaxExecutorSecureServiceGroupSelect extends AbstractSMPAjaxE
                                     @NonNull final PhotonUnifiedResponse aAjaxResponse) throws Exception
   {
     final String sSearchText = aLEC.params ().getAsStringTrimmed (PARAM_SEARCH_TERM);
-    int nPage = aLEC.params ().getAsInt (PARAM_PAGE, 1);
-    if (nPage < 1)
-      nPage = 1;
-    // Unknown filter IDs are provided by a client, so they are simply ignored
-    final ESMPServiceGroupFilter eFilter = ESMPServiceGroupFilter.getFromIDOrDefault (aLEC.params ()
-                                                                                          .getAsStringTrimmed (PARAM_FILTER),
-                                                                                      ESMPServiceGroupFilter.ALL);
+    // select2 uses 1-based page numbers
+    final long nPage = Math.max (aLEC.params ().getAsLong (PARAM_PAGE, 1), 1);
+
+    // The filter is provided by a client, so an unknown one must not silently widen the result set
+    final String sFilterID = aLEC.params ().getAsStringTrimmed (PARAM_FILTER);
+    final ESMPServiceGroupFilter eFilter = ESMPServiceGroupFilter.getFromIDOrNull (sFilterID);
+    if (eFilter == null)
+    {
+      LOGGER.warn ("The provided Service Group filter '" + sFilterID + "' is unknown");
+      aAjaxResponse.createBadRequest ();
+      return;
+    }
 
     final ICommonsList <ISMPServiceGroup> aList = SMPServiceGroupSelectHelper.getPagePlusOne (eFilter,
                                                                                              StringHelper.isEmpty (sSearchText) ? null
