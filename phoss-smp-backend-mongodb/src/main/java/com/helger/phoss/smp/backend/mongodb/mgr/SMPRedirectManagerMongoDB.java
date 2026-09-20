@@ -81,6 +81,10 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     super ("smp-redirect");
     m_aIdentifierFactory = aIdentifierFactory;
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    // Needed for the Redirect lookup of the REST API, and for the deletion of all Redirects of a
+    // Service Group. The Document Type is part of it, so that the lookup by Service Group alone can
+    // use it as well
+    getCollection ().createIndex (Indexes.ascending (BSON_SERVICE_GROUP_ID, BSON_DOCTYPE_ID));
   }
 
   @NonNull

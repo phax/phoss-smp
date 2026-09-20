@@ -47,6 +47,7 @@ import com.helger.security.authentication.subject.user.CUserID;
 import com.helger.security.authentication.subject.user.ICurrentUserIDProvider;
 import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
 
 /**
  * A special implementation of {@link IAuditor} writing data to a MongoDB collection
@@ -93,6 +94,9 @@ public class AuditorMongoDB implements IAuditor
   {
     ValueEnforcer.notEmpty (sCollectionName, "CollectionName");
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
+    // The audit collection grows unbounded and is only ever read sorted by date, so without this
+    // index every read is a collection scan with an in-memory sort
+    m_aCollection.createIndex (Indexes.ascending (BSON_DT));
     m_aCurrentUserIDProvider = ValueEnforcer.notNull (aCurrentUserIDProvider, "UserIDProvider");
   }
 

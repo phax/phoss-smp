@@ -93,6 +93,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     super ("smp-servicegroup");
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    // Needed for the listing and the counting of the Service Groups of a single owner
+    getCollection ().createIndex (Indexes.ascending (BSON_OWNER_ID));
   }
 
   @NonNull

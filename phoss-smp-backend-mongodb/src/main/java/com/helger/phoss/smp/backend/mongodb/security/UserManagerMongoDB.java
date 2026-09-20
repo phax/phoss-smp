@@ -78,6 +78,8 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
     super (USER_COLLECTION_NAME);
     getCollection ().createIndex (Indexes.ascending (BSON_ID));
     getCollection ().createIndex (Indexes.ascending (BSON_USER_LOGIN_NAME));
+    // Needed for the login, which resolves a user by its email address
+    getCollection ().createIndex (Indexes.ascending (BSON_USER_EMAIL));
   }
 
   @NonNull
