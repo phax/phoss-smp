@@ -267,13 +267,13 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     if (eFormAction.isCreating ())
     {
       final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-      if (aSettings.getSMLInfo () == null)
+      if (!aSettings.hasSMLInfo ())
         return false;
       if (!aSettings.isSMLEnabled ())
         return false;
 
       final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-      if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
+      if (!aServiceGroupManager.containsAnySMPServiceGroup ())
         return false;
     }
 
@@ -329,10 +329,10 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     // Filter out all Service Groups for which a new migration makes no sense (because a migration
     // is currently in progress)
     final IHCServiceGroupSelect aSGSelect = HCServiceGroupSelect.createAjax (aWPEC.getRequestScope (),
-                                                                            new RequestField (FIELD_PARTICIPANT_ID),
-                                                                            aDisplayLocale,
-                                                                            ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION,
-                                                                            false);
+                                                                             new RequestField (FIELD_PARTICIPANT_ID),
+                                                                             aDisplayLocale,
+                                                                             ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION,
+                                                                             false);
     if (!aSGSelect.containsAnyServiceGroup ())
     {
       aForm.addChild (warn ("No Service Group on this SMP can currently be migrated."));
@@ -528,7 +528,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       }
       else
       {
-        if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
+        if (!aServiceGroupManager.containsAnySMPServiceGroup ())
         {
           aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to migrate it."));
           // Note: makes no to allow to create a new Service Group here and than

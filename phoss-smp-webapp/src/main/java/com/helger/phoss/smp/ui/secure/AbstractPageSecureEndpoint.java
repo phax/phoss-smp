@@ -269,7 +269,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupMgr.getSMPServiceGroupCount () <= 0)
+    if (!aServiceGroupMgr.containsAnySMPServiceGroup ())
     {
       aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to create an Endpoint for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new service group")
