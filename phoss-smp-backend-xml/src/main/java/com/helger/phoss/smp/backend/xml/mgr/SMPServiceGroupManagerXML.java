@@ -40,6 +40,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -351,13 +352,47 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
     return getAll ();
   }
 
+  /**
+   * Create the combined predicate of the provided filter and the provided search text, so that the
+   * internal data structures only need to be iterated once.
+   *
+   * @param eFilter
+   *        The filter to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code>.
+   * @return <code>null</code> if neither the filter nor the search text filters anything.
+   */
+  @Nullable
+  private static Predicate <ISMPServiceGroup> _getPredicate (@NonNull final ESMPServiceGroupFilter eFilter,
+                                                             @Nullable final String sSearchText)
+  {
+    final Predicate <ISMPServiceGroup> aSearchPredicate = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
+    if (eFilter.isAll ())
+      return aSearchPredicate;
+
+    final Predicate <ISMPServiceGroup> aFilterPredicate = eFilter.getFilterPredicate ();
+    return aSearchPredicate == null ? aFilterPredicate : aFilterPredicate.and (aSearchPredicate);
+  }
+
   @NonNull
   @ReturnsMutableCopy
   @Override
   public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final IPagingSpec aPagingSpec,
                                                                  @Nullable final String sSearchText)
   {
-    return getAllPaged (TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText),
+    return getAllSMPServiceGroups (ESMPServiceGroupFilter.ALL, aPagingSpec, sSearchText);
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final ESMPServiceGroupFilter eFilter,
+                                                                 @NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    ValueEnforcer.notNull (eFilter, "Filter");
+    ValueEnforcer.notNull (aPagingSpec, "PagingSpec");
+
+    return getAllPaged (_getPredicate (eFilter, sSearchText),
                         aPagingSpec,
                         TableColumnHelper.getComparator (COLUMNS, aPagingSpec));
   }
@@ -365,8 +400,31 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
   @Override
   public long getSMPServiceGroupCount (@Nullable final String sSearchText)
   {
-    final Predicate <ISMPServiceGroup> aFilter = TableColumnHelper.getSearchPredicate (COLUMNS, sSearchText);
-    return aFilter == null ? getSMPServiceGroupCount () : getCount (aFilter);
+    return getSMPServiceGroupCount (ESMPServiceGroupFilter.ALL, sSearchText);
+  }
+
+  public long getSMPServiceGroupCount (@NonNull final ESMPServiceGroupFilter eFilter,
+                                       @Nullable final String sSearchText)
+  {
+    ValueEnforcer.notNull (eFilter, "Filter");
+
+    final Predicate <ISMPServiceGroup> aPredicate = _getPredicate (eFilter, sSearchText);
+    return aPredicate == null ? getSMPServiceGroupCount () : getCount (aPredicate);
+  }
+
+  public boolean containsAnySMPServiceGroup ()
+  {
+    return isNotEmpty ();
+  }
+
+  public boolean containsAnySMPServiceGroup (@NonNull final ESMPServiceGroupFilter eFilter)
+  {
+    ValueEnforcer.notNull (eFilter, "Filter");
+
+    if (eFilter.isAll ())
+      return containsAnySMPServiceGroup ();
+
+    return containsAny (eFilter.getFilterPredicate ());
   }
 
   @NonNull

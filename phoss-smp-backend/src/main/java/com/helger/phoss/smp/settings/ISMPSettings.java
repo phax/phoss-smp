@@ -84,6 +84,11 @@ public interface ISMPSettings extends ITypedObject <String>
   @Nullable
   ISMLInfo getSMLInfo ();
 
+  default boolean hasSMLInfo ()
+  {
+    return getSMLInfo () != null;
+  }
+
   /**
    * @return The ID of SML information object to be used. May be <code>null</code>. Only relevant
    *         when {@link #isSMLEnabled()} is <code>true</code>.

@@ -60,7 +60,12 @@ public final class CAjax
                                                                                                           .executor (AjaxExecutorSecureBackendConnectionReset.class)
                                                                                                           .filter (FILTER_IS_USER_LOGGED_IN)
                                                                                                           .build ();
-
+  
+  public static final IAjaxFunctionDeclaration FUNCTION_SERVICE_GROUP_SELECT = AjaxFunctionDeclaration.builder ("serviceGroupSelect")
+                                                                                                      .executor (AjaxExecutorSecureServiceGroupSelect.class)
+                                                                                                      .filter (FILTER_IS_USER_LOGGED_IN)
+                                                                                                      .build ();
+  
   public static final IAjaxFunctionDeclaration FUNCTION_ACCESS_POINT_SELECT = AjaxFunctionDeclaration.builder ("accessPointSelect")
                                                                                                      .executor (AjaxExecutorSecureAccessPointSelect.class)
                                                                                                      .filter (FILTER_IS_USER_LOGGED_IN)
@@ -75,7 +80,8 @@ public final class CAjax
   {
     aAjaxRegistry.registerFunction (DATATABLES);
     aAjaxRegistry.registerFunction (DATATABLES_I18N);
-    aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);
+    aAjaxRegistry.registerFunction (FUNCTION_BACKEND_CONNECTION_RESET);    
+    aAjaxRegistry.registerFunction (FUNCTION_SERVICE_GROUP_SELECT);
     aAjaxRegistry.registerFunction (FUNCTION_ACCESS_POINT_SELECT);
     LOGGER.info ("Successfully registered the Ajax functions");
   }

@@ -196,6 +196,29 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
   }
 
   /**
+   * Get a single "page" of all entries matching the provided search text and the provided filter.
+   * This method is meant to be used for server side pagination in combination with
+   * {@link #getSMPServiceGroupCount(ESMPServiceGroupFilter, String)}.<br>
+   * Implementations must resolve the filter as part of their query, so that never more Service
+   * Groups than necessary are read.
+   *
+   * @param eFilter
+   *        The predefined filter to be applied. May not be <code>null</code>.
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case no
+   *        filtering by text takes place.
+   * @return A non-<code>null</code> but maybe empty list.
+   * @since 8.4.4
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull ESMPServiceGroupFilter eFilter,
+                                                          @NonNull IPagingSpec aPagingSpec,
+                                                          @Nullable String sSearchText);
+
+  /**
    * @return A non-<code>null</code> but maybe empty set of all contained service group IDs.
    * @since 5.6.0
    */
@@ -259,4 +282,41 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
 
     return TableColumnHelper.getCount (ESMPServiceGroupColumn.values (), getAllSMPServiceGroups (), sSearchText);
   }
+
+  /**
+   * Get the number of entries matching the provided search text and the provided filter.
+   *
+   * @param eFilter
+   *        The predefined filter to be applied. May not be <code>null</code>.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code> or empty in which case all
+   *        matching entries are counted.
+   * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
+   *         because of a missing SQL backend).
+   * @since 8.4.4
+   */
+  @CheckForSigned
+  long getSMPServiceGroupCount (@NonNull ESMPServiceGroupFilter eFilter, @Nullable String sSearchText);
+
+  /**
+   * Check if at least one Service Group is contained. This is more efficient than counting all
+   * entries, because the query can stop at the first match.
+   *
+   * @return <code>true</code> if at least one Service Group is contained, <code>false</code>
+   *         otherwise.
+   * @since 8.4.4
+   */
+  boolean containsAnySMPServiceGroup ();
+
+  /**
+   * Check if at least one Service Group matching the provided filter is contained. This is more
+   * efficient than counting all matching entries, because the query can stop at the first match.
+   *
+   * @param eFilter
+   *        The predefined filter to be applied. May not be <code>null</code>.
+   * @return <code>true</code> if at least one matching Service Group is contained,
+   *         <code>false</code> otherwise.
+   * @since 8.4.4
+   */
+  boolean containsAnySMPServiceGroup (@NonNull ESMPServiceGroupFilter eFilter);
 }

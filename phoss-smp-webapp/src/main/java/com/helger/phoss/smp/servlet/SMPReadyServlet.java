@@ -24,7 +24,7 @@ import com.helger.xservlet.AbstractXServlet;
  * Servlet providing the backend-aware application readiness state.
  *
  * @author vinit-thummar
- * @since 8.3.1
+ * @since 8.4.0
  */
 public class SMPReadyServlet extends AbstractXServlet
 {

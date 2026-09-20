@@ -121,6 +121,60 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
     }
   }
 
+  /**
+   * Set a settings value in the DB, but only if the currently stored value is the expected one.
+   * Contrary to {@link #setSettingsValueInDB(DBExecutor, String, String)} this detects a lost
+   * update, so that a value may safely be modified by more than one SMP instance at the same time.
+   *
+   * @param aExecutor
+   *        The executor to be used. Should be running inside a transaction. May not be
+   *        <code>null</code>.
+   * @param sKey
+   *        The key of the entry to be changed. May neither be <code>null</code> nor empty.
+   * @param sExpectedValue
+   *        The value that is expected to be currently stored, as it was read from the DB. Pass
+   *        <code>null</code> if the entry is expected to not exist at all.
+   * @param sNewValue
+   *        The new value to be set. May be <code>null</code>.
+   * @return {@link EChange#CHANGED} if the value was written, {@link EChange#UNCHANGED} if another
+   *         party changed the value in the meantime. If the entry was expected to not exist, but
+   *         was created by another party in the meantime, the surrounding transaction fails with a
+   *         primary key violation.
+   * @since 8.4.4
+   */
+  @NonNull
+  public static EChange compareAndSetSettingsValueInDB (@NonNull final DBExecutor aExecutor,
+                                                        @NonNull @Nonempty final String sKey,
+                                                        @Nullable final String sExpectedValue,
+                                                        @Nullable final String sNewValue)
+  {
+    ValueEnforcer.notNull (aExecutor, "Executor");
+    ValueEnforcer.notEmpty (sKey, "Key");
+
+    final String sRealKey = DBValueHelper.getTrimmedToLength (sKey, CSMPServer.MAX_LEN_ID);
+    final String sRealNewValue = DBValueHelper.getTrimmedToLength (sNewValue, ISMPSettingsManager.MAX_LEN_VALUE);
+
+    if (sExpectedValue == null)
+    {
+      // Create - a concurrent creation runs into a primary key violation
+      final long nCreated = aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
+                                                              SMPDBExecutor.TABLE_NAME_PREFIX +
+                                                              "smp_settings (id, value) VALUES (?, ?)",
+                                                              new ConstantPreparedStatementDataProvider (sRealKey,
+                                                                                                         sRealNewValue));
+      return EChange.valueOf (nCreated == 1);
+    }
+
+    // Update, but only if nobody else changed the value in the meantime
+    final long nUpdated = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                            SMPDBExecutor.TABLE_NAME_PREFIX +
+                                                            "smp_settings SET value=? WHERE id=? AND value=?",
+                                                            new ConstantPreparedStatementDataProvider (sRealNewValue,
+                                                                                                       sRealKey,
+                                                                                                       sExpectedValue));
+    return EChange.valueOf (nUpdated == 1);
+  }
+
   @NonNull
   public ESuccess setSettingsValuesInDB (@NonNull @Nonempty final Map <String, String> aEntries)
   {

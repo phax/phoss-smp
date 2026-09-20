@@ -28,7 +28,7 @@ import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
  * that a database that went down after the connection was pooled is detected as well.
  *
  * @author vinit-thummar
- * @since 8.3.1
+ * @since 8.4.0
  */
 @IsSPIImplementation
 public class SMPSQLReadyProviderExtensionSPI implements ISMPReadyProviderExtensionSPI

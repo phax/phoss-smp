@@ -47,6 +47,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -55,6 +56,7 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPExtensionUI;
 import com.helger.phoss.smp.ui.ajax.CAjax;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
+import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -64,23 +66,22 @@ import com.helger.photon.bootstrap5.form.BootstrapViewForm;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
+import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.EWebPageFormAction;
-import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
-import com.helger.photon.core.execcontext.LayoutExecutionContext;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandHelper;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandRequest;
 import com.helger.photon.uictrls.datatables.ajax.DataTablesOnDemandResult;
 import com.helger.photon.uictrls.datatables.column.DTCol;
-import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
+import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 
@@ -144,7 +145,7 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final ISMPServiceGroupManager aServiceGroupManager = SMPMetaManager.getServiceGroupMgr ();
-    if (aServiceGroupManager.getSMPServiceGroupCount () <= 0)
+    if (!aServiceGroupManager.containsAnySMPServiceGroup ())
     {
       aNodeList.addChild (warn ("No Service Group is present! At least one Service Group must be present to create a Redirect for it."));
       aNodeList.addChild (new BootstrapButton ().addChild ("Create new Service Group")
@@ -382,12 +383,13 @@ public final class PageSecureRedirect extends AbstractSMPWebPageForm <ISMPRedire
     aForm.addChild (getUIHandler ().createActionHeader (bEdit ? "Edit Redirect" : "Create new Redirect"));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Service Group")
-                                                 .setCtrl (HCServiceGroupSelect.create (new RequestField (FIELD_SERVICE_GROUP_ID,
-                                                                                                          aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
-                                                                                                                                  : null),
-                                                                                        aDisplayLocale,
-                                                                                        null,
-                                                                                        bEdit))
+                                                 .setCtrl (HCServiceGroupSelect.createAjax (aWPEC.getRequestScope (),
+                                                                                            new RequestField (FIELD_SERVICE_GROUP_ID,
+                                                                                                              aSelectedObject != null ? aSelectedObject.getServiceGroupID ()
+                                                                                                                                      : null),
+                                                                                            aDisplayLocale,
+                                                                                            ESMPServiceGroupFilter.ALL,
+                                                                                            bEdit))
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_SERVICE_GROUP_ID)));
 
     aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Document Type ID")

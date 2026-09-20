@@ -377,7 +377,7 @@ public final class SMPServerConfiguration
    *         unbounded amount of time, e.g. because the database connection pool is exhausted. If
    *         the value is &le; 0, the readiness checks are executed without a time limit. The
    *         default value is 2 seconds.
-   * @since 8.3.1
+   * @since 8.4.0
    */
   @NonNull
   public static Duration getReadyTimeout ()
