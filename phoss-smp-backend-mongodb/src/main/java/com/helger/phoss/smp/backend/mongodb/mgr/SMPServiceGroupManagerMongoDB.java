@@ -41,8 +41,11 @@ import com.helger.json.serialize.JsonReader;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.backend.mongodb.SMPMongoQueryHelper;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
+import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -57,8 +60,11 @@ import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.Variable;
 import com.mongodb.client.result.DeleteResult;
 
 /**
@@ -75,6 +81,13 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   private static final String BSON_PARTICIPANT_ID = "participantid";
   private static final String BSON_EXTENSION = "extension";
   private static final String BSON_CUSTOM_PROPERTIES = "customproperties";
+
+  /** The temporary field name used for the <code>$lookup</code> results of the filtered queries */
+  private static final String BSON_JOINED = "__joined";
+  /** The temporary field name used for the <code>$count</code> results of the filtered queries */
+  private static final String BSON_COUNT = "__count";
+  /** The name of the aggregation variable holding the participant ID of the Service Group */
+  private static final String VAR_SG_PID = "sgpid";
 
   private final CallbackList <ISMPServiceGroupCallback> m_aCBs = new CallbackList <> ();
 
@@ -351,6 +364,140 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   {
     final Bson aFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
     return aFilter == null ? getSMPServiceGroupCount () : getCollection ().countDocuments (aFilter);
+  }
+
+  /**
+   * Create the aggregation expression that compares the two provided values for equality.
+   *
+   * @param sValue1
+   *        The first value. May not be <code>null</code>.
+   * @param sValue2
+   *        The second value. May not be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  private static Document _eq (@NonNull final String sValue1, @NonNull final String sValue2)
+  {
+    return new Document ("$eq", new CommonsArrayList <> (sValue1, sValue2));
+  }
+
+  /**
+   * Create the first part of the aggregation pipeline, that applies the search text and the
+   * provided filter. The filter is resolved with a <code>$lookup</code> on the respective other
+   * collection, so that no additional query is necessary.
+   *
+   * @param eFilter
+   *        The filter to be applied. May not be <code>null</code> and may not be
+   *        {@link ESMPServiceGroupFilter#ALL}.
+   * @param sSearchText
+   *        The global search text to filter by. May be <code>null</code>.
+   * @return Never <code>null</code>.
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  private static ICommonsList <Bson> _createFilterPipeline (@NonNull final ESMPServiceGroupFilter eFilter,
+                                                            @Nullable final String sSearchText)
+  {
+    final ICommonsList <Bson> ret = new CommonsArrayList <> ();
+
+    final Bson aSearchFilter = SMPMongoQueryHelper.createSearchFilter (COLUMNS, sSearchText);
+    if (aSearchFilter != null)
+      ret.add (Aggregates.match (aSearchFilter));
+
+    switch (eFilter)
+    {
+      case NO_BUSINESS_CARD:
+      {
+        ret.add (Aggregates.lookup (SMPBusinessCardManagerMongoDB.COLLECTION_NAME,
+                                    BSON_ID,
+                                    SMPBusinessCardManagerMongoDB.BSON_SERVICE_GROUP_ID,
+                                    BSON_JOINED));
+        break;
+      }
+      case NO_BLOCKING_MIGRATION:
+      {
+        // All states that prevent a new migration
+        final ICommonsList <String> aStateIDs = new CommonsArrayList <> ();
+        for (final EParticipantMigrationState eState : EParticipantMigrationState.values ())
+          if (eState.preventsNewMigration ())
+            aStateIDs.add (eState.getID ());
+        if (aStateIDs.isEmpty ())
+          return ret;
+
+        // The participant identifier is a sub document, so it is compared field by field
+        final String sPMField = "$" + SMPParticipantMigrationManagerMongoDB.BSON_PARTICIPANT_ID;
+        final String sSGVar = "$$" + VAR_SG_PID;
+        final ICommonsList <Bson> aConditions = new CommonsArrayList <> ();
+        aConditions.add (_eq (sPMField + "." + BSON_SCHEME, sSGVar + "." + BSON_SCHEME));
+        aConditions.add (_eq (sPMField + "." + BSON_VALUE, sSGVar + "." + BSON_VALUE));
+        aConditions.add (_eq ("$" + SMPParticipantMigrationManagerMongoDB.BSON_DIRECTION,
+                              EParticipantMigrationDirection.OUTBOUND.getID ()));
+        aConditions.add (new Document ("$in",
+                                       new CommonsArrayList <> ("$" +
+                                                                SMPParticipantMigrationManagerMongoDB.BSON_STATE,
+                                                                aStateIDs)));
+
+        final ICommonsList <Bson> aSubPipeline = new CommonsArrayList <> ();
+        aSubPipeline.add (Aggregates.match (Filters.expr (new Document ("$and", aConditions))));
+
+        ret.add (Aggregates.lookup (SMPParticipantMigrationManagerMongoDB.COLLECTION_NAME,
+                                    new CommonsArrayList <> (new Variable <> (VAR_SG_PID, "$" + BSON_PARTICIPANT_ID)),
+                                    aSubPipeline,
+                                    BSON_JOINED));
+        break;
+      }
+      default:
+        throw new IllegalStateException ("Unsupported filter " + eFilter);
+    }
+
+    // Keep only the Service Groups that have no match in the other collection
+    ret.add (Aggregates.match (Filters.size (BSON_JOINED, 0)));
+    return ret;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  @Override
+  public ICommonsList <ISMPServiceGroup> getAllSMPServiceGroups (@NonNull final ESMPServiceGroupFilter eFilter,
+                                                                 @NonNull final IPagingSpec aPagingSpec,
+                                                                 @Nullable final String sSearchText)
+  {
+    if (eFilter.isAll ())
+      return getAllSMPServiceGroups (aPagingSpec, sSearchText);
+
+    final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
+    if (aPagingSpec.isEmptyPage ())
+      return ret;
+
+    final ICommonsList <Bson> aPipeline = _createFilterPipeline (eFilter, sSearchText);
+    final Bson aSort = SMPMongoQueryHelper.createSort (COLUMNS, aPagingSpec);
+    if (aSort != null)
+      aPipeline.add (Aggregates.sort (aSort));
+    if (aPagingSpec.getStartIndex () > 0)
+      aPipeline.add (Aggregates.skip ((int) Math.min (aPagingSpec.getStartIndex (), Integer.MAX_VALUE)));
+    if (!aPagingSpec.isUnlimited ())
+      aPipeline.add (Aggregates.limit ((int) Math.min (aPagingSpec.getMaxCount (), Integer.MAX_VALUE)));
+
+    getCollection ().aggregate (aPipeline).forEach (x -> ret.add (toDomain (x)));
+    return ret;
+  }
+
+  @Override
+  public long getSMPServiceGroupCount (@NonNull final ESMPServiceGroupFilter eFilter,
+                                       @Nullable final String sSearchText)
+  {
+    if (eFilter.isAll ())
+      return getSMPServiceGroupCount (sSearchText);
+
+    final ICommonsList <Bson> aPipeline = _createFilterPipeline (eFilter, sSearchText);
+    aPipeline.add (Aggregates.count (BSON_COUNT));
+
+    final Document aDoc = getCollection ().aggregate (aPipeline).first ();
+    if (aDoc == null)
+      return 0;
+
+    final Object aCount = aDoc.get (BSON_COUNT);
+    return aCount instanceof Number ? ((Number) aCount).longValue () : 0;
   }
 
   @NonNull
