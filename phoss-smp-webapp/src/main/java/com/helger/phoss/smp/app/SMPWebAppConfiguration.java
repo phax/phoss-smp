@@ -44,6 +44,12 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static final String WEBAPP_KEY_GLOBAL_DEBUG = "global.debug";
   public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
   public static final String WEBAPP_KEY_SESSION_COOKIE_SECURE = "webapp.session.cookie.secure";
+  public static final String WEBAPP_KEY_SESSION_COOKIE_SAMESITE = "webapp.session.cookie.samesite";
+
+  public static final String SESSION_COOKIE_SAMESITE_STRICT = "Strict";
+  public static final String SESSION_COOKIE_SAMESITE_LAX = "Lax";
+  public static final String SESSION_COOKIE_SAMESITE_NONE = "None";
+  public static final String DEFAULT_SESSION_COOKIE_SAMESITE = SESSION_COOKIE_SAMESITE_STRICT;
 
   /**
    * @deprecated Only called via reflection
@@ -390,6 +396,19 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static ETriState getSessionCookieSecure ()
   {
     final String sValue = _getConfig ().getAsString (WEBAPP_KEY_SESSION_COOKIE_SECURE);
-    return ETriState.valueOf (StringParser.parseBoolObjExact (StringHelper.trim (sValue)));
+    return ETriState.valueOf (StringParser.parseBoolObjExact (sValue));
+  }
+
+  /**
+   * @return The value of the "SameSite" attribute of the session cookie. May be <code>null</code>
+   *         or empty, in which case the attribute should not be touched at all. The default value
+   *         is {@link #DEFAULT_SESSION_COOKIE_SAMESITE}. The comparison of the value is case
+   *         insensitive.
+   * @since 8.4.4
+   */
+  @Nullable
+  public static String getSessionCookieSameSite ()
+  {
+    return _getConfig ().getAsString (WEBAPP_KEY_SESSION_COOKIE_SAMESITE, DEFAULT_SESSION_COOKIE_SAMESITE);
   }
 }

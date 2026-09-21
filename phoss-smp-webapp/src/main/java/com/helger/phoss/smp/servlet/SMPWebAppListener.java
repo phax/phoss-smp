@@ -200,6 +200,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     }
   }
 
+  private static final String COOKIE_ATTR_SAMESITE = "SameSite";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPWebAppListener.class);
   private static OffsetDateTime s_aStartupDateTime;
 
@@ -351,13 +353,95 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     }
   }
 
+  /**
+   * Get the canonical spelling of the provided "SameSite" value.
+   *
+   * @param sValue
+   *        The configured value. May be <code>null</code>.
+   * @return <code>null</code> if the provided value is not a valid "SameSite" value.
+   */
+  @Nullable
+  private static String _getCanonicalSameSite (@Nullable final String sValue)
+  {
+    if (SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_STRICT.equalsIgnoreCase (sValue))
+      return SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_STRICT;
+    if (SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_LAX.equalsIgnoreCase (sValue))
+      return SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_LAX;
+    if (SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_NONE.equalsIgnoreCase (sValue))
+      return SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_NONE;
+    return null;
+  }
+
+  /**
+   * Set the "SameSite" attribute of the session cookie, based on the configuration. This must
+   * happen before the {@link ServletContext} is initialized, because afterwards the session cookie
+   * configuration is immutable. See issue #565.
+   *
+   * @param aSC
+   *        ServletContext. Never <code>null</code>.
+   */
+  private static void _initSessionCookieSameSite (@NonNull final ServletContext aSC)
+  {
+    final String sConfiguredSameSite = SMPWebAppConfiguration.getSessionCookieSameSite ();
+    if (StringHelper.isEmpty (sConfiguredSameSite))
+    {
+      LOGGER.info ("Not touching the 'SameSite' attribute of the session cookie, as configured");
+      return;
+    }
+
+    String sSameSite = _getCanonicalSameSite (sConfiguredSameSite);
+    if (sSameSite == null)
+    {
+      sSameSite = SMPWebAppConfiguration.DEFAULT_SESSION_COOKIE_SAMESITE;
+      LOGGER.warn ("The value '" +
+                   sConfiguredSameSite +
+                   "' of the configuration property '" +
+                   SMPWebAppConfiguration.WEBAPP_KEY_SESSION_COOKIE_SAMESITE +
+                   "' is invalid. Only '" +
+                   SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_STRICT +
+                   "', '" +
+                   SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_LAX +
+                   "' and '" +
+                   SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_NONE +
+                   "' are allowed. Using '" +
+                   sSameSite +
+                   "' instead.");
+    }
+
+    try
+    {
+      aSC.getSessionCookieConfig ().setAttribute (COOKIE_ATTR_SAMESITE, sSameSite);
+      LOGGER.info ("Set the 'SameSite' attribute of the session cookie to '" + sSameSite + "'");
+
+      // Browsers reject a "SameSite=None" cookie that is not "Secure"
+      if (SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_NONE.equals (sSameSite) &&
+          !aSC.getSessionCookieConfig ().isSecure ())
+      {
+        LOGGER.warn ("The session cookie uses 'SameSite=" +
+                     SMPWebAppConfiguration.SESSION_COOKIE_SAMESITE_NONE +
+                     "' but it is not marked as 'Secure' - browsers will reject such a cookie. Set the configuration property '" +
+                     SMPWebAppConfiguration.WEBAPP_KEY_SESSION_COOKIE_SECURE +
+                     "' to 'true' to fix this.");
+      }
+    }
+    catch (final IllegalStateException | UnsupportedOperationException ex)
+    {
+      LOGGER.warn ("Failed to set the 'SameSite' attribute of the session cookie to '" +
+                   sSameSite +
+                   "': " +
+                   ex.getMessage ());
+    }
+  }
+
   @Override
   @OverridingMethodsMustInvokeSuper
   protected void beforeContextInitialized (@NonNull final ServletContext aSC)
   {
     super.beforeContextInitialized (aSC);
 
+    // Must be first, because the "SameSite" handling checks the "Secure" flag
     _initSessionCookieSecure (aSC);
+    _initSessionCookieSameSite (aSC);
   }
 
   protected void showLogo ()
