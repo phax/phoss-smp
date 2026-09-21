@@ -22,7 +22,9 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.style.UsedViaReflection;
 import com.helger.base.debug.GlobalDebug;
+import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
+import com.helger.base.string.StringParser;
 import com.helger.base.url.URLHelper;
 import com.helger.config.IConfig;
 import com.helger.phoss.smp.config.SMPConfigProvider;
@@ -41,6 +43,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 {
   public static final String WEBAPP_KEY_GLOBAL_DEBUG = "global.debug";
   public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
+  public static final String WEBAPP_KEY_SESSION_COOKIE_SECURE = "webapp.session.cookie.secure";
 
   /**
    * @deprecated Only called via reflection
@@ -373,5 +376,20 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static boolean isCSPReportingEnabled ()
   {
     return _getConfig ().getAsBoolean ("csp.reporting.enabled", false);
+  }
+
+  /**
+   * @return {@link ETriState#TRUE} if the "Secure" flag of the session cookie should be enabled,
+   *         {@link ETriState#FALSE} if it should be disabled and {@link ETriState#UNDEFINED} if it
+   *         should be determined automatically (also the default). Any value other than
+   *         <code>true</code> and <code>false</code> - like the default value <code>auto</code> -
+   *         leads to {@link ETriState#UNDEFINED}.
+   * @since 8.4.4
+   */
+  @NonNull
+  public static ETriState getSessionCookieSecure ()
+  {
+    final String sValue = _getConfig ().getAsString (WEBAPP_KEY_SESSION_COOKIE_SECURE);
+    return ETriState.valueOf (StringParser.parseBoolObjExact (StringHelper.trim (sValue)));
   }
 }

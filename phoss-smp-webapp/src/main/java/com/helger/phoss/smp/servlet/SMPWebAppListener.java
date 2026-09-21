@@ -29,6 +29,7 @@ import com.helger.annotation.OverridingMethodsMustInvokeSuper;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.exception.InitializationException;
+import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
 import com.helger.cache.regex.RegExHelper;
@@ -308,6 +309,55 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     super.onTheVeryBeginning (aSC);
 
     _initTimeZone ();
+  }
+
+  /**
+   * Set the "Secure" flag of the session cookie, based on the configuration. This must happen
+   * before the {@link ServletContext} is initialized, because afterwards the session cookie
+   * configuration is immutable. See issue #563.
+   *
+   * @param aSC
+   *        ServletContext. Never <code>null</code>.
+   */
+  private static void _initSessionCookieSecure (@NonNull final ServletContext aSC)
+  {
+    final ETriState eSecure = SMPWebAppConfiguration.getSessionCookieSecure ();
+    final boolean bSecure;
+    if (eSecure.isDefined ())
+    {
+      // Explicitly configured
+      bSecure = eSecure.getAsBooleanValue ();
+    }
+    else
+    {
+      // Automatic mode - only enable it, if the public URL is an https URL, so that an existing
+      // setting from the "web.xml" or from the application server is never disabled
+      if (!StringHelper.startsWith (SMPServerConfiguration.getPublicServerURL (), "https://"))
+      {
+        LOGGER.info ("Not touching the 'Secure' flag of the session cookie, because no https public URL is configured");
+        return;
+      }
+      bSecure = true;
+    }
+
+    try
+    {
+      aSC.getSessionCookieConfig ().setSecure (bSecure);
+      LOGGER.info ("Set the 'Secure' flag of the session cookie to " + bSecure);
+    }
+    catch (final IllegalStateException | UnsupportedOperationException ex)
+    {
+      LOGGER.warn ("Failed to set the 'Secure' flag of the session cookie to " + bSecure + ": " + ex.getMessage ());
+    }
+  }
+
+  @Override
+  @OverridingMethodsMustInvokeSuper
+  protected void beforeContextInitialized (@NonNull final ServletContext aSC)
+  {
+    super.beforeContextInitialized (aSC);
+
+    _initSessionCookieSecure (aSC);
   }
 
   protected void showLogo ()
