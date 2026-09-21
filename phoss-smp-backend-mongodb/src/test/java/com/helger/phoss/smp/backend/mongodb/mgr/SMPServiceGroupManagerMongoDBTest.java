@@ -135,8 +135,7 @@ public final class SMPServiceGroupManagerMongoDBTest
       assertEquals (1,
                     aMgr.getAllSMPServiceGroups (ESMPServiceGroupFilter.NO_BUSINESS_CARD,
                                                  new PagingSpec (1, 100),
-                                                 "mongofilter")
-                        .size ());
+                                                 "mongofilter").size ());
     }
     finally
     {

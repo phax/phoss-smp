@@ -80,9 +80,9 @@ public final class AjaxExecutorSecureServiceGroupSelect extends AbstractSMPAjaxE
     }
 
     final ICommonsList <ISMPServiceGroup> aList = SMPServiceGroupSelectHelper.getPagePlusOne (eFilter,
-                                                                                             StringHelper.isEmpty (sSearchText) ? null
-                                                                                                                                : sSearchText,
-                                                                                             nPage);
+                                                                                              StringHelper.isEmpty (sSearchText) ? null
+                                                                                                                                 : sSearchText,
+                                                                                              nPage);
     final boolean bHasMore = aList.size () > SMPServiceGroupSelectHelper.PAGE_SIZE;
 
     // Use an owner name cache, so that each owner is only resolved once

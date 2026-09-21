@@ -85,7 +85,8 @@ public final class ServiceGroupFilterTest extends AbstractSMPWebAppSQLTest
 
         // Other Service Groups may exist in the database, so all queries are limited to the ones
         // created here by the search text
-        assertEquals (VALUES.length, aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BUSINESS_CARD, "sgfilter"));
+        assertEquals (VALUES.length,
+                      aMgr.getSMPServiceGroupCount (ESMPServiceGroupFilter.NO_BUSINESS_CARD, "sgfilter"));
 
         // The first one gets a Business Card - it needs at least one entity, because the SQL
         // backend stores one row per entity
@@ -115,8 +116,7 @@ public final class ServiceGroupFilterTest extends AbstractSMPWebAppSQLTest
         assertEquals (1,
                       aMgr.getAllSMPServiceGroups (ESMPServiceGroupFilter.NO_BUSINESS_CARD,
                                                    new PagingSpec (1, 100),
-                                                   "sgfilter")
-                          .size ());
+                                                   "sgfilter").size ());
 
         // The last one gets an outbound migration
         final IParticipantIdentifier aPIMigrating = aCreated.getLastOrNull ();

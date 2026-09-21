@@ -163,8 +163,7 @@ public final class HCServiceGroupSelect
                                                          .add ("global", false)
                                                          .add ("data", aDataFunc)
                                                          .add ("processResults", aProcessFunc)
-                                                         .add ("error", aErrorFunc))
-                                .add ("minimumInputLength", 0);
+                                                         .add ("error", aErrorFunc)).add ("minimumInputLength", 0);
     }
 
     public boolean containsAnyServiceGroup ()
@@ -228,8 +227,8 @@ public final class HCServiceGroupSelect
     }
 
     final HCAjaxServiceGroupSelect2 aSelect2 = new HCAjaxServiceGroupSelect2 (aRF,
-                                                                             CAjax.FUNCTION_SERVICE_GROUP_SELECT.getInvocationURI (aRequestScope),
-                                                                             eFilter);
+                                                                              CAjax.FUNCTION_SERVICE_GROUP_SELECT.getInvocationURI (aRequestScope),
+                                                                              eFilter);
     // Only add the currently selected option - all others are loaded on demand
     if (aSelectedServiceGroup != null)
       aSelect2.addOption (aSelectedServiceGroup.getID (), getDisplayName (aSelectedServiceGroup));
