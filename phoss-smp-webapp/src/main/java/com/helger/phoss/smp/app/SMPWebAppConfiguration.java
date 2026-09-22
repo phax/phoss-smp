@@ -45,11 +45,13 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
   public static final String WEBAPP_KEY_GLOBAL_PRODUCTION = "global.production";
   public static final String WEBAPP_KEY_SESSION_COOKIE_SECURE = "webapp.session.cookie.secure";
   public static final String WEBAPP_KEY_SESSION_COOKIE_SAMESITE = "webapp.session.cookie.samesite";
+  public static final String WEBAPP_KEY_SECURITY_LOGIN_ERRORDETAILS = "webapp.security.login.errordetails";
 
   public static final String SESSION_COOKIE_SAMESITE_STRICT = "Strict";
   public static final String SESSION_COOKIE_SAMESITE_LAX = "Lax";
   public static final String SESSION_COOKIE_SAMESITE_NONE = "None";
   public static final String DEFAULT_SESSION_COOKIE_SAMESITE = SESSION_COOKIE_SAMESITE_STRICT;
+  public static final boolean DEFAULT_SECURITY_LOGIN_ERRORDETAILS = false;
 
   /**
    * @deprecated Only called via reflection
@@ -152,12 +154,14 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
 
   /**
    * @return <code>true</code> if the details of login failures (like "User not existing" or
-   *         "Invalid password") should be shown or not.
+   *         "Invalid password") should be shown or not. Default is
+   *         {@link #DEFAULT_SECURITY_LOGIN_ERRORDETAILS}.
    * @since 6.0.0
    */
   public static boolean isSecurityLoginShowErrorDetails ()
   {
-    return _getConfig ().getAsBoolean ("webapp.security.login.errordetails", true);
+    return _getConfig ().getAsBoolean (WEBAPP_KEY_SECURITY_LOGIN_ERRORDETAILS,
+                                       DEFAULT_SECURITY_LOGIN_ERRORDETAILS);
   }
 
   /**
