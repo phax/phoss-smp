@@ -92,7 +92,7 @@
       <dependency>
         <groupId>com.helger.schedule</groupId>
         <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>6.1.1</version>
+        <version>6.2.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -127,7 +127,7 @@
       <dependency>
         <groupId>com.helger.photon</groupId>
         <artifactId>ph-oton-bootstrap5-parent-pom</artifactId>
-        <version>0.9.4</version>
+        <version>0.9.5</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -141,7 +141,7 @@
       <dependency>
         <groupId>com.helger.peppol.ui</groupId>
         <artifactId>peppol-shared-ui-parent-pom</artifactId>
-        <version>0.10.2</version>
+        <version>0.10.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -170,7 +170,7 @@
       <dependency>
         <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
