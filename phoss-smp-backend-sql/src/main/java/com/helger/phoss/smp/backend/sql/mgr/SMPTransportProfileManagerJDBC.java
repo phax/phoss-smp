@@ -37,9 +37,9 @@ import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
-import com.helger.peppol.smp.ESMPTransportProfileState;
-import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smp.SMPTransportProfile;
+import com.helger.edelivery.smp.ESMPTransportProfileState;
+import com.helger.edelivery.smp.ISMPTransportProfile;
+import com.helger.edelivery.smp.SMPTransportProfile;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.audit.AuditHelper;
 

@@ -31,6 +31,7 @@ import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
+import com.helger.smpclient.peppol.utils.PeppolSMPExtensionHelper;
 
 /**
  * This class represents a single service group.
@@ -162,7 +163,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
       // This is set by the REST server
       ret.setServiceMetadataReferenceCollection (null);
     }
-    ret.setExtension (getExtensions ().getAsPeppolExtension ());
+    ret.setExtension (PeppolSMPExtensionHelper.getAsPeppolExtension (getExtensions ()));
     return ret;
   }
 

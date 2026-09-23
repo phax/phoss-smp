@@ -33,6 +33,7 @@ import com.helger.peppolid.bdxr.smp1.process.BDXR1ProcessIdentifier;
 import com.helger.peppolid.bdxr.smp2.process.BDXR2ProcessIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
+import com.helger.smpclient.peppol.utils.PeppolSMPExtensionHelper;
 
 /**
  * Default implementation of the {@link ISMPProcess} interface.
@@ -204,7 +205,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
       for (final var aEndpoint : aEndpoints)
         aEndpointList.addEndpoint (aEndpoint.getAsJAXBObjectPeppol ());
     ret.setServiceEndpointList (aEndpointList);
-    ret.setExtension (getExtensions ().getAsPeppolExtension ());
+    ret.setExtension (PeppolSMPExtensionHelper.getAsPeppolExtension (getExtensions ()));
     return ret;
   }
 
@@ -270,7 +271,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 
     final SMPProcess rhs = (SMPProcess) o;
     return EqualsHelper.equals (m_aProcessIdentifier, rhs.m_aProcessIdentifier) &&
-           EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
+      EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
   }
 
   @Override

@@ -142,10 +142,9 @@ import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.servlet.request.IRequestParamMap;
 import com.helger.servlet.request.RequestParamMap;
 import com.helger.smpclient.extension.SMPExtensionList;
-import com.helger.smpclient.url.IBDXLURLProvider;
-import com.helger.smpclient.url.IPeppolURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
+import com.helger.smpclient.url.dns.IBDXLURLProvider;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
 import com.helger.url.SimpleURL;
@@ -227,21 +226,15 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         String sURI = null;
         try
         {
-          if (aURLProvider instanceof final IPeppolURLProvider aRealProvider)
-            sDNSName = aRealProvider.getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (), sSMLZoneName);
-          else
-            if (aURLProvider instanceof final IBDXLURLProvider aRealProvider)
-            {
-              // Fallback by not resolving the NAPTR
-              sDNSName = aRealProvider.getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (),
-                                                                sSMLZoneName);
-            }
-            else
-            {
-              // Of course this should never happen
-              LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
-              continue;
-            }
+          if (!(aURLProvider instanceof final IBDXLURLProvider aRealProvider))
+          {
+            // Of course this should never happen
+            LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
+            continue;
+          }
+
+          // Fallback by not resolving the NAPTR
+          sDNSName = aRealProvider.getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (), sSMLZoneName);
 
           if (bTookTooLong)
           {
@@ -281,7 +274,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                                                        .add (CPageParam.PARAM_OBJECT,
                                                                                                                              aServiceGroup.getID ()))
                                                                                                      .setDisabled (bOffline ||
-                                                                                                                   !aSettings.isSMLEnabled ()));
+                                                                                                       !aSettings.isSMLEnabled ()));
         }
         else
         {
@@ -300,7 +293,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                                                                             .add (CPageParam.PARAM_OBJECT,
                                                                                                   aServiceGroup.getID ()))
                                                                           .setDisabled (bOffline ||
-                                                                                        !aSettings.isSMLEnabled ()));
+                                                                            !aSettings.isSMLEnabled ()));
           }
         }
       }
@@ -1297,9 +1290,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (aSettings.getSMLDNSZone () == null ||
-                            nTotalServiceGroupCount <= 0 ||
-                            bTooMany ||
-                            !aSettings.isSMLEnabled ());
+                nTotalServiceGroupCount <= 0 ||
+                bTooMany ||
+                !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 

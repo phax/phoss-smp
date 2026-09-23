@@ -113,7 +113,7 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-parent-pom</artifactId>
-        <version>11.4.5</version>
+        <version>11.4.6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -134,21 +134,21 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>12.10.0</version>
+        <version>13.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol.ui</groupId>
         <artifactId>peppol-shared-ui-parent-pom</artifactId>
-        <version>0.10.3</version>
+        <version>0.11.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>phoss-directory-parent-pom</artifactId>
-        <version>0.18.2</version>
+        <version>0.18.3-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

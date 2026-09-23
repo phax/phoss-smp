@@ -28,10 +28,10 @@ import org.junit.rules.TestRule;
 
 import com.helger.base.type.ObjectType;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.edelivery.smp.ESMPTransportProfileState;
+import com.helger.edelivery.smp.ISMPTransportProfile;
+import com.helger.edelivery.smp.SMPTransportProfile;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smp.ESMPTransportProfileState;
-import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.phoss.smp.backend.mongodb.SMPServerMongoDBTestRule;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;

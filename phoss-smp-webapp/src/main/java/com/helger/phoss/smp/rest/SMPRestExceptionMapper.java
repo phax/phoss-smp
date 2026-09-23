@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.state.EHandled;
-import com.helger.http.EHttpMethod;
 import com.helger.base.string.StringHelper;
 import com.helger.http.CHttp;
 import com.helger.http.CHttpHeader;
+import com.helger.http.EHttpMethod;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;

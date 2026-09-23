@@ -20,10 +20,10 @@ import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.dao.DAOException;
+import com.helger.edelivery.smp.ESMPTransportProfileState;
+import com.helger.edelivery.smp.ISMPTransportProfile;
+import com.helger.edelivery.smp.SMPTransportProfile;
 import com.helger.peppol.smp.ESMPTransportProfile;
-import com.helger.peppol.smp.ESMPTransportProfileState;
-import com.helger.peppol.smp.ISMPTransportProfile;
-import com.helger.peppol.smp.SMPTransportProfile;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.dao.AbstractPhotonMapBasedWALDAO;
 

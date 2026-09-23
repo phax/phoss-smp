@@ -27,6 +27,7 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
+import com.helger.smpclient.peppol.utils.PeppolSMPExtensionHelper;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.xsds.bdxr.smp2.bc.ContentBinaryObjectType;
 
@@ -215,7 +216,7 @@ public class SMPEndpoint extends AbstractSMPHasExtension implements ISMPEndpoint
     ret.setTechnicalContactUrl (m_sTechnicalContactUrl);
     if (StringHelper.isNotEmpty (m_sTechnicalInformationUrl))
       ret.setTechnicalInformationUrl (m_sTechnicalInformationUrl);
-    ret.setExtension (getExtensions ().getAsPeppolExtension ());
+    ret.setExtension (PeppolSMPExtensionHelper.getAsPeppolExtension (getExtensions ()));
     ret.setTransportProfile (m_sTransportProfile);
     return ret;
   }

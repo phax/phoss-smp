@@ -25,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.collection.commons.ICommonsList;
-import com.helger.peppol.smp.ESMPTransportProfileState;
-import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.edelivery.smp.ESMPTransportProfileState;
+import com.helger.edelivery.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.mgr.SMPTransportProfileManagerJDBC;
 import com.helger.phoss.smp.domain.transportprofile.SMPTransportProfileManagerXML;

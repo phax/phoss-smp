@@ -23,8 +23,8 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.name.IHasName;
+import com.helger.edelivery.smp.ISMPTransportProfile;
 import com.helger.html.hc.html.forms.HCSelect;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.core.form.RequestField;
 

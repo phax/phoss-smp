@@ -17,7 +17,7 @@ import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.ReturnsMutableCopy;
 import com.helger.base.state.EChange;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.edelivery.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 
 /**

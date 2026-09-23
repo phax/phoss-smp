@@ -32,6 +32,7 @@ import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.security.certificate.CertificateHelper;
+import com.helger.smpclient.peppol.utils.PeppolSMPExtensionHelper;
 import com.helger.url.codec.URLCoder;
 import com.helger.url.protocol.IURLProtocol;
 import com.helger.url.protocol.URLProtocolRegistry;
@@ -202,7 +203,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     final com.helger.xsds.peppol.smp1.RedirectType aRedirect = new com.helger.xsds.peppol.smp1.RedirectType ();
     aRedirect.setHref (getPercentEncodedURL (m_sTargetHref));
     aRedirect.setCertificateUID (m_sSubjectUniqueIdentifier);
-    aRedirect.setExtension (getExtensions ().getAsPeppolExtension ());
+    aRedirect.setExtension (PeppolSMPExtensionHelper.getAsPeppolExtension (getExtensions ()));
     // Certificate is not used here
 
     final com.helger.xsds.peppol.smp1.ServiceMetadataType ret = new com.helger.xsds.peppol.smp1.ServiceMetadataType ();

@@ -18,7 +18,7 @@ import com.helger.annotation.misc.Since;
 import com.helger.base.id.IHasID;
 import com.helger.base.lang.EnumHelper;
 import com.helger.base.name.IHasDisplayName;
-import com.helger.peppol.sml.ESMPAPIType;
+import com.helger.edelivery.smp.ESMPAPIType;
 
 /**
  * Defines the type of REST responses to be returned. Either Peppol (using objects in namespace

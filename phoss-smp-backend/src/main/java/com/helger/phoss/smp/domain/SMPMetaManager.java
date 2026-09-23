@@ -49,9 +49,9 @@ import com.helger.phoss.smp.settings.ISMPSettingsManager;
 import com.helger.photon.mgrs.PhotonBasicManager;
 import com.helger.scope.IScope;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
-import com.helger.smpclient.url.BDXLURLProvider;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.PeppolNaptrURLProvider;
+import com.helger.smpclient.url.dns.BDXLURLProvider;
+import com.helger.smpclient.url.dns.PeppolNaptrURLProvider;
 import com.helger.web.scope.mgr.WebScoped;
 
 /**

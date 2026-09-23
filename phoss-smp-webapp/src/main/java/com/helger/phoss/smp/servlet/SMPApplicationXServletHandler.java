@@ -20,20 +20,19 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
-
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsLinkedHashMap;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.http.CHttpHeader;
 import com.helger.http.csp.CSPDirective;
 import com.helger.http.csp.CSPPolicy;
 import com.helger.http.csp.CSPSourceList;
-import com.helger.base.string.StringHelper;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.photon.app.csrf.CSRFSessionManager;
+import com.helger.photon.core.appid.RequestSettings;
 import com.helger.photon.core.csp.CSPReportingEndpoint;
 import com.helger.photon.core.csp.ICSPReportingParameterProvider;
-import com.helger.photon.core.appid.RequestSettings;
 import com.helger.photon.core.servlet.AbstractApplicationXServletHandler;
 import com.helger.servlet.response.UnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;

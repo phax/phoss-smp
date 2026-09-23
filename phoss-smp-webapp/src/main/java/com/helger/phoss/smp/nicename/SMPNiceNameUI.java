@@ -19,10 +19,10 @@ package com.helger.phoss.smp.nicename;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.concurrent.Immutable;
+import com.helger.edelivery.smp.ISMPTransportProfile;
 import com.helger.html.hc.IHCNode;
-import com.helger.peppol.smp.ISMPTransportProfile;
 import com.helger.peppol.ui.nicename.NiceNameUI;
-import com.helger.peppolid.peppol.EPeppolCodeListItemState;
+import com.helger.peppolid.codelist.ECodeListItemState;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
@@ -59,11 +59,11 @@ public final class SMPNiceNameUI
       return NiceNameUI.createFormattedID (sTransportProfile, null, null, null, bInDetails);
 
     // Transform from TP state to code list item state
-    final EPeppolCodeListItemState eState = switch (aTP.getState ())
+    final ECodeListItemState eState = switch (aTP.getState ())
     {
-      case ACTIVE -> EPeppolCodeListItemState.ACTIVE;
-      case DEPRECATED -> EPeppolCodeListItemState.DEPRECATED;
-      case DELETED -> EPeppolCodeListItemState.REMOVED;
+      case ACTIVE -> ECodeListItemState.ACTIVE;
+      case DEPRECATED -> ECodeListItemState.DEPRECATED;
+      case DELETED -> ECodeListItemState.REMOVED;
     };
     return NiceNameUI.createFormattedID (sTransportProfile,
                                          aTP.getName (),

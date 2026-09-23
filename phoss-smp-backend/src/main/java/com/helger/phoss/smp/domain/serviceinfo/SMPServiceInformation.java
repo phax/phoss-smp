@@ -40,6 +40,7 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.AbstractSMPHasExtension;
 import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.smpclient.peppol.utils.PeppolSMPExtensionHelper;
 
 /**
  * Default implementation of the {@link ISMPServiceInformation} interface.
@@ -216,7 +217,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
       return null;
     }
     aSI.setProcessList (aProcesses);
-    aSI.setExtension (getExtensions ().getAsPeppolExtension ());
+    aSI.setExtension (PeppolSMPExtensionHelper.getAsPeppolExtension (getExtensions ()));
 
     final com.helger.xsds.peppol.smp1.ServiceMetadataType ret = new com.helger.xsds.peppol.smp1.ServiceMetadataType ();
     ret.setServiceInformation (aSI);

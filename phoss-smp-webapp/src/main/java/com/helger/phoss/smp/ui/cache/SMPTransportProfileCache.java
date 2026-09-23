@@ -17,7 +17,7 @@
 package com.helger.phoss.smp.ui.cache;
 
 import com.helger.cache.impl.ProviderCache;
-import com.helger.peppol.smp.ISMPTransportProfile;
+import com.helger.edelivery.smp.ISMPTransportProfile;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
