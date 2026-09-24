@@ -91,7 +91,6 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
 
     final boolean bIsPeppol = SMPServerConfiguration.getRESTType () == ESMPRESTType.PEPPOL;
     final boolean bIsOldSml = bIsPeppol && CSMP.isOldPeppolSml (aSmlInfo);
-    final boolean bIsNewSml = bIsPeppol && CSMP.isNewPeppolSml (aSmlInfo);
 
     {
       final BootstrapCard aCard = aNodeList.addAndReturnChild (new BootstrapCard ());
@@ -122,9 +121,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                                : HCSMLSelect.getDisplayNameNode (aSmlInfo))
                                                     .setHelpText (bIsOldSml ? div (badgeDanger ("You are still using an old Peppol SML based on the European Comission SMK/SML offering. Please modify it."))
                                                                             : null,
-                                                                  bIsNewSml ? div (badgeSuccess ("You are using the new OpenPeppol SML. Great!"))
-                                                                            : null,
-                                                                  bIsPeppol ? div ("Details on the Peppol SML Insourcing 2026 can be found in ").addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp/discussions/445"))
+                                                                  bIsOldSml ? div ("Details on the Peppol SML Insourcing 2026 can be found in ").addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp/discussions/445"))
                                                                                                                                                                .setTargetBlank ()
                                                                                                                                                                .addChild ("GitHub Discussions"))
                                                                             : null));
@@ -228,17 +225,14 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
     final boolean bIsPeppol = SMPServerConfiguration.getRESTType () == ESMPRESTType.PEPPOL;
     final boolean bIsOldSml;
-    final boolean bIsNewSml;
     if (bIsPeppol)
     {
       final ISMLInfo aSmlInfo = aObject.getSMLInfo ();
       bIsOldSml = CSMP.isOldPeppolSml (aSmlInfo);
-      bIsNewSml = CSMP.isNewPeppolSml (aSmlInfo);
     }
     else
     {
       bIsOldSml = false;
-      bIsNewSml = false;
     }
 
     aForm.addChild (getUIHandler ().createDataGroupHeader ("REST API"));
@@ -269,9 +263,7 @@ public final class PageSecureSMPSettings extends AbstractSMPWebPageSimpleForm <I
                                                                      .addChild ("."),
                                                                bIsOldSml ? div (badgeDanger ("You are still using an old Peppol SML based on the European Comission SMK/SML offering. Please modify it."))
                                                                          : null,
-                                                               bIsNewSml ? div (badgeSuccess ("You are using the new OpenPeppol SML. Great!"))
-                                                                         : null,
-                                                               bIsPeppol ? div ("Details on the Peppol SML Insourcing 2026 can be found in ").addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp/discussions/445"))
+                                                               bIsOldSml ? div ("Details on the Peppol SML Insourcing 2026 can be found in ").addChild (a ().setHref (new SimpleURL ("https://github.com/phax/phoss-smp/discussions/445"))
                                                                                                                                                             .setTargetBlank ()
                                                                                                                                                             .addChild ("GitHub Discussions"))
                                                                          : null)

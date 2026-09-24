@@ -166,14 +166,4 @@ public final class CSMP
     // Old European Commission URLs - works for Prod and Test
     return aSmlInfo != null && aSmlInfo.getDNSZone ().toLowerCase (Locale.US).contains ("edelivery.tech.ec.europa.eu");
   }
-
-  public static boolean isNewPeppolSml (@Nullable final ISMLInfo aSmlInfo)
-  {
-    if (aSmlInfo == null)
-      return false;
-    // New OpenPeppol SML - Prod and Test
-    final String sDnsZone = StringHelper.trimEnd (aSmlInfo.getDNSZone ().toLowerCase (Locale.US), '.');
-    return sDnsZone.equals ("participant.sml.prod.tech.peppol.org") ||
-           sDnsZone.equals ("participant.sml.test.tech.peppol.org");
-  }
 }

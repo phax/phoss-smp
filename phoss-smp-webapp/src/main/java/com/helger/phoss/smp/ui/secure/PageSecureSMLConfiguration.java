@@ -355,12 +355,10 @@ public class PageSecureSMLConfiguration extends AbstractSMPWebPageForm <ISMLInfo
     {
       final ISimpleURL aViewLink = createViewURL (aWPEC, aCurObject);
       final boolean bIsOldSml = bIsPeppol && CSMP.isOldPeppolSml (aCurObject);
-      final boolean bIsNewSml = bIsPeppol && CSMP.isNewPeppolSml (aCurObject);
 
       final HCRow aRow = aTable.addBodyRow ();
       aRow.addCell (div (new HCA (aViewLink).addChild (aCurObject.getDisplayName ())),
-                    bIsOldSml ? div (badgeDanger ("Deprecated. Use the OpenPeppol SML instead.")) : null,
-                    bIsNewSml ? div (badgeSuccess ("This is the new OpenPeppol SML. Great!")) : null);
+                    bIsOldSml ? div (badgeDanger ("Deprecated. Use the OpenPeppol SML instead.")) : null);
       aRow.addCell (aCurObject.getDNSZone ());
       aRow.addCell (aCurObject.getManagementServiceURL ());
       aRow.addCell (EPhotonCoreText.getYesOrNo (aCurObject.isClientCertificateRequired (), aDisplayLocale));
