@@ -42,7 +42,7 @@ public interface ISMPEndpoint extends ISMPHasExtension, IHasID <String>
    * @return the type of BUSDOX transport that is being used between access points, e.g. the BUSDOX
    *         START profile ("busdox-transport-start"). The list of valid transport protocols is
    *         found in ICT-Transport-Policy_for_using_Identifiers.
-   * @see com.helger.peppol.smp.ISMPTransportProfile
+   * @see com.helger.edelivery.smp.ISMPTransportProfile
    */
   @NonNull
   @Nonempty
