@@ -12,6 +12,8 @@ package com.helger.phoss.smp.exception;
 
 import org.jspecify.annotations.NonNull;
 
+import com.helger.base.string.StringHelper;
+
 /**
  * This exception is thrown if an error occurred communicating with the SML
  *
@@ -20,8 +22,26 @@ import org.jspecify.annotations.NonNull;
  */
 public class SMPSMLException extends SMPServerException
 {
+  /**
+   * Append the message of the causing exception, so that the SML fault details survive into the
+   * REST error payload - only the message of the top-level exception is serialized there (see
+   * <code>SMPRestExceptionMapper</code>). This mirrors what
+   * <code>RegistrationHookException</code> does with the SOAP fault message.
+   *
+   * @param sMsg
+   *        The message of this exception. May not be <code>null</code>.
+   * @param aCause
+   *        The causing exception. May not be <code>null</code>.
+   * @return The message to be used, never <code>null</code>.
+   */
+  @NonNull
+  private static String _getRealMessage (@NonNull final String sMsg, @NonNull final Exception aCause)
+  {
+    return StringHelper.getConcatenatedOnDemand (sMsg, " - ", aCause.getMessage ());
+  }
+
   public SMPSMLException (@NonNull final String sMsg, @NonNull final Exception aCause)
   {
-    super (sMsg, aCause);
+    super (_getRealMessage (sMsg, aCause), aCause);
   }
 }
