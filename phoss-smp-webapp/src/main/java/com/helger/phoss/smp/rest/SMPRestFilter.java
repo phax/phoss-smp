@@ -231,6 +231,23 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aDeleteAllServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteAllServiceMetadata);
     }
+    // Add a single Endpoint to a ServiceMetadata since 8.4.4
+    {
+      final APIDescriptor aPutServiceMetadataEndpoint = new APIDescriptor (APIPath.put ("/{" +
+                                                                                        PARAM_SERVICE_GROUP_ID +
+                                                                                        "}" +
+                                                                                        PATH_SERVICES +
+                                                                                        "/{" +
+                                                                                        PARAM_DOCUMENT_TYPE_ID +
+                                                                                        "}/{" +
+                                                                                        PARAM_PROCESS_ID +
+                                                                                        "}"),
+                                                                           new APIExecutorServiceMetadataEndpointPut ());
+      aPutServiceMetadataEndpoint.allowedMimeTypes ()
+                                 .addAll (CMimeType.TEXT_XML.getAsString (), CMimeType.APPLICATION_XML.getAsString ());
+      aPutServiceMetadataEndpoint.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aPutServiceMetadataEndpoint);
+    }
     // Delete a single process of a ServiceMetadata since 8.1.8
     {
       final APIDescriptor aDeleteServiceMetadataProcess = new APIDescriptor (APIPath.delete ("/{" +

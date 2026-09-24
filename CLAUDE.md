@@ -113,6 +113,7 @@ Three API variants are implemented in `phoss-smp-backend/src/main/java/com/helge
 | DELETE | `/{ServiceGroupId}` | Yes | Delete service group |
 | GET | `/{ServiceGroupId}/services/{DocumentTypeId}` | No | Get endpoints |
 | PUT | `/{ServiceGroupId}/services/{DocumentTypeId}` | Yes | Define AP endpoints |
+| PUT | `/{ServiceGroupId}/services/{DocumentTypeId}/{ProcessId}` | Yes | Add a single endpoint (keeps existing ones) |
 | DELETE | `/{ServiceGroupId}/services/{DocumentTypeId}` | Yes | Delete metadata |
 | GET | `/businesscard/{ServiceGroupId}` | No | Get business card |
 | PUT | `/businesscard/{ServiceGroupId}` | Yes | Create/update business card |

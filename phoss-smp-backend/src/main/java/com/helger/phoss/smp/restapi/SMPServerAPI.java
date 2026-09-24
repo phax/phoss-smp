@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
+import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsList;
@@ -34,6 +35,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -695,6 +697,165 @@ public final class SMPServerAPI
 
       if (false)
         LOGGER.info (sLog + " SUCCESS");
+      STATS_COUNTER_SUCCESS.increment (sAction);
+      return ESuccess.SUCCESS;
+    }
+    catch (final SMPServerException ex)
+    {
+      LOGGER.warn (sLog + " ERROR - " + ex.getMessage ());
+      STATS_COUNTER_ERROR.increment (sAction);
+      throw ex;
+    }
+  }
+
+  /**
+   * Add a single Endpoint to an existing Process of an existing Service Information. Contrary to
+   * {@link #saveServiceRegistration(String, String, ServiceMetadataType, SMPAPICredentials)} this
+   * method does not overwrite existing Processes and Endpoints. If the Service Information or the
+   * Process does not exist, they are created on the fly.
+   *
+   * @param sPathServiceGroupID
+   *        Service Group ID from the URL path. May not be <code>null</code>.
+   * @param sPathDocumentTypeID
+   *        Document Type ID from the URL path. May not be <code>null</code>.
+   * @param sPathProcessID
+   *        Process ID from the URL path. May not be <code>null</code>.
+   * @param aJAXBEndpoint
+   *        The Endpoint to be added. May not be <code>null</code>.
+   * @param aCredentials
+   *        The credentials to be used. May not be <code>null</code>.
+   * @return {@link ESuccess}
+   * @throws SMPServerException
+   *         In case of error
+   * @since 8.4.4
+   */
+  @NonNull
+  public ESuccess saveServiceRegistrationEndpoint (@NonNull final String sPathServiceGroupID,
+                                                   @NonNull final String sPathDocumentTypeID,
+                                                   @NonNull final String sPathProcessID,
+                                                   @NonNull final EndpointType aJAXBEndpoint,
+                                                   @NonNull final SMPAPICredentials aCredentials) throws SMPServerException
+  {
+    final String sLog = LOG_PREFIX +
+                        "PUT /" +
+                        sPathServiceGroupID +
+                        "/services/" +
+                        sPathDocumentTypeID +
+                        "/" +
+                        sPathProcessID;
+    final String sAction = "saveServiceRegistrationEndpoint";
+
+    LOGGER.info (sLog + " ==> " + aJAXBEndpoint);
+    STATS_COUNTER_INVOCATION.increment (sAction);
+    try
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+      // Parse provided identifiers
+      final IParticipantIdentifier aPathServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      if (aPathServiceGroupID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final IDocumentTypeIdentifier aPathDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
+      if (aPathDocTypeID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseDocType (sPathDocumentTypeID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final IProcessIdentifier aPathProcessID = aIdentifierFactory.parseProcessIdentifier (sPathProcessID);
+      if (aPathProcessID == null)
+      {
+        // Invalid identifier
+        throw SMPBadRequestException.failedToParseProcess (sPathProcessID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      if (StringHelper.isEmpty (aJAXBEndpoint.getTransportProfile ()))
+      {
+        throw new SMPBadRequestException ("Save Endpoint was called without a Transport Profile",
+                                          m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      // Main save
+      final IUser aDataUser = SMPUserManagerPhoton.validateUserCredentials (aCredentials);
+      SMPUserManagerPhoton.verifyOwnership (aPathServiceGroupID, aDataUser);
+
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      final ISMPServiceGroup aPathServiceGroup = aServiceGroupMgr.getSMPServiceGroupOfID (aPathServiceGroupID);
+      if (aPathServiceGroup == null)
+      {
+        // Service group not found
+        throw SMPNotFoundException.unknownSG (sPathServiceGroupID, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+      ISMPServiceInformation aServiceInfo = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPathServiceGroupID,
+                                                                                                                   aPathDocTypeID);
+      if (aServiceInfo == null)
+      {
+        // Create a new Service Information on the fly
+        aServiceInfo = new SMPServiceInformation (aPathServiceGroup.getParticipantIdentifier (),
+                                                  aPathDocTypeID,
+                                                  null,
+                                                  null);
+      }
+
+      ISMPProcess aProcess = aServiceInfo.getProcessOfID (aPathProcessID);
+      if (aProcess == null)
+      {
+        // Create a new Process on the fly
+        aProcess = new SMPProcess (aPathProcessID, null, null);
+        aServiceInfo.addProcess ((SMPProcess) aProcess);
+      }
+
+      // Always assign a new unique ID, as the JAXB data model has no ID
+      final SMPEndpoint aEndpoint = new SMPEndpoint (SMPEndpointHelper.createUniqueEndpointID (),
+                                                     aJAXBEndpoint.getTransportProfile (),
+                                                     W3CEndpointReferenceHelper.getAddress (aJAXBEndpoint.getEndpointReference ()),
+                                                     aJAXBEndpoint.isRequireBusinessLevelSignature (),
+                                                     aJAXBEndpoint.getMinimumAuthenticationLevel (),
+                                                     aJAXBEndpoint.getServiceActivationDate (),
+                                                     aJAXBEndpoint.getServiceExpirationDate (),
+                                                     aJAXBEndpoint.getCertificate (),
+                                                     aJAXBEndpoint.getServiceDescription (),
+                                                     aJAXBEndpoint.getTechnicalContactUrl (),
+                                                     aJAXBEndpoint.getTechnicalInformationUrl (),
+                                                     SMPExtensionConverter.convertToString (aJAXBEndpoint.getExtension ()));
+
+      // Period must not be overlapping with an already existing Endpoint of the
+      // same Transport Profile
+      final LocalDatePeriod aEndpointPeriod = SMPEndpointHelper.createSafePeriod (aEndpoint.getServiceActivationDate (),
+                                                                                  aEndpoint.getServiceExpirationDate ());
+      final ICommonsList <ISMPEndpoint> aExistingEndpoints = aProcess.getAllEndpointsOfTransportProfile (aEndpoint.getTransportProfile ());
+      final boolean bPeriodAlreadyCovered = aExistingEndpoints.containsAny (x -> aEndpointPeriod.isOverlappingWithIncl (SMPEndpointHelper.createSafePeriod (x.getServiceActivationDate (),
+                                                                                                                                                            x.getServiceExpirationDate ())));
+      if (bPeriodAlreadyCovered)
+      {
+        final String sErrorMsg = "Save Endpoint was called for the provided service group, document type, process ('" +
+                                 aPathProcessID.getURIEncoded () +
+                                 "') and transport profile ('" +
+                                 aEndpoint.getTransportProfile () +
+                                 "'): another Endpoint has a validity overlapping this Endpoints validity: " +
+                                 SMPEndpointHelper.getAsValidityString (aEndpoint.getServiceActivationDate (),
+                                                                        aEndpoint.getServiceExpirationDate (),
+                                                                        CSMPServer.DEFAULT_LOCALE) +
+                                 ".";
+        throw new SMPBadRequestException (sErrorMsg, m_aAPIDataProvider.getCurrentURI ());
+      }
+
+      aProcess.createOrUpdateEndpoint (aEndpoint);
+
+      if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfo).isFailure ())
+      {
+        LOGGER.error (sLog + " - ERROR - Endpoint");
+        STATS_COUNTER_ERROR.increment (sAction);
+        return ESuccess.FAILURE;
+      }
+
+      LOGGER.info (sLog + " SUCCESS - Endpoint");
       STATS_COUNTER_SUCCESS.increment (sAction);
       return ESuccess.SUCCESS;
     }

@@ -51,7 +51,9 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.jaxb.SmpEndpointMarshaller;
 import com.helger.phoss.smp.mock.MockSMPClient;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
@@ -97,6 +99,27 @@ public final class ServiceMetadataInterfaceTest
   {
     // Use default credentials for XML backend
     return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
+  }
+
+  @NonNull
+  private static EndpointType _createEndpoint (@NonNull final String sTransportProfile, @NonNull final String sURL)
+  {
+    final EndpointType ret = new EndpointType ();
+    ret.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference (sURL));
+    ret.setRequireBusinessLevelSignature (false);
+    ret.setCertificate ("blacert");
+    ret.setServiceDescription ("Unit test service");
+    ret.setTechnicalContactUrl ("https://github.com/phax/phoss-smp");
+    ret.setTransportProfile (sTransportProfile);
+    return ret;
+  }
+
+  @NonNull
+  private static String _createEndpointXML (@NonNull final String sTransportProfile, @NonNull final String sURL)
+  {
+    final String ret = new SmpEndpointMarshaller ().getAsString (_createEndpoint (sTransportProfile, sURL));
+    assertNotNull (ret);
+    return ret;
   }
 
   @NonNull
@@ -674,6 +697,104 @@ public final class ServiceMetadataInterfaceTest
       _testResponseJerseyClient (aResponseMsg, 200, 404);
 
       _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
+      assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
+    }
+  }
+
+  @Test
+  public void testAddSingleEndpointJerseyClient ()
+  {
+    final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
+    final String sPI_LC = aPI_LC.getURIEncoded ();
+
+    final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
+    final String sDT = aDT.getURIEncoded ();
+
+    final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+    final String sProcID = aProcID.getURIEncoded ();
+
+    final ServiceGroupType aSG = new ServiceGroupType ();
+    aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
+    aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
+
+    final ISMPServiceGroupManager aSGMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aSIMgr = SMPMetaManager.getServiceInformationMgr ();
+    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
+    Response aResponseMsg;
+
+    try
+    {
+      // PUT ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
+                                                                                                      .createServiceGroup (aSG)));
+      _testResponseJerseyClient (aResponseMsg, 200);
+
+      try
+      {
+        // PUT Endpoint 1 - creates Service Information and Process on the fly
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .path (sProcID)
+                                               .request ()).put (Entity.xml (_createEndpointXML (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID (),
+                                                                                                "http://test.smpserver/as4")));
+        _testResponseJerseyClient (aResponseMsg, 200);
+
+        ISMPServiceInformation aSI = aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT);
+        assertNotNull (aSI);
+        assertEquals (1, aSI.getProcessCount ());
+        assertEquals (1, aSI.getProcessOfID (aProcID).getEndpointCount ());
+
+        // PUT Endpoint 2 - different Transport Profile, must be added to the
+        // existing Endpoint
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .path (sProcID)
+                                               .request ()).put (Entity.xml (_createEndpointXML (ESMPTransportProfile.TRANSPORT_PROFILE_AS2.getID (),
+                                                                                                "http://test.smpserver/as2")));
+        _testResponseJerseyClient (aResponseMsg, 200);
+
+        aSI = aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT);
+        assertNotNull (aSI);
+        assertEquals (1, aSI.getProcessCount ());
+        assertEquals (2, aSI.getProcessOfID (aProcID).getEndpointCount ());
+
+        // PUT Endpoint 3 - same Transport Profile as Endpoint 1 and overlapping
+        // validity, must be rejected
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .path (sProcID)
+                                               .request ()).put (Entity.xml (_createEndpointXML (ESMPTransportProfile.TRANSPORT_PROFILE_PEPPOL_AS4_V2.getID (),
+                                                                                                "http://test.smpserver/as4-other")));
+        _testResponseJerseyClient (aResponseMsg, 400);
+
+        aSI = aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT);
+        assertNotNull (aSI);
+        assertEquals (2, aSI.getProcessOfID (aProcID).getEndpointCount ());
+
+        // PUT Endpoint 4 - no Endpoint at all, must be rejected
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC)
+                                               .path ("services")
+                                               .path (sDT)
+                                               .path (sProcID)
+                                               .request ()).put (Entity.xml ("<Bogus xmlns=\"urn:phoss:smp:test\" />"));
+        _testResponseJerseyClient (aResponseMsg, 400);
+      }
+      finally
+      {
+        // DELETE ServiceInformation
+        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
+        _testResponseJerseyClient (aResponseMsg, 200, 404);
+        assertNull (aSIMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
+      }
+    }
+    finally
+    {
+      // DELETE ServiceGroup
+      aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+      _testResponseJerseyClient (aResponseMsg, 200, 404);
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI_LC));
     }
   }
