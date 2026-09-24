@@ -14,7 +14,7 @@ import jakarta.xml.bind.JAXBElement;
  * Specific marshaller for Peppol SMP Endpoint types.
  * 
  * @author Philip Helger
- * @since 8.4.4
+ * @since 8.5.0
  */
 public class SmpEndpointMarshaller extends AbstractSMPMarshaller <EndpointType>
 {

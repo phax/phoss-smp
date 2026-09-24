@@ -55,25 +55,25 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   /**
    * The name of the MongoDB collection used by this manager.
    *
-   * @since 8.4.4
+   * @since 8.5.0
    */
   public static final String COLLECTION_NAME = "smp-participant-migration";
   /**
    * The name of the field containing the migration direction.
    *
-   * @since 8.4.4
+   * @since 8.5.0
    */
   public static final String BSON_DIRECTION = "direction";
   /**
    * The name of the field containing the migration state.
    *
-   * @since 8.4.4
+   * @since 8.5.0
    */
   public static final String BSON_STATE = "state";
   /**
    * The name of the field containing the participant identifier.
    *
-   * @since 8.4.4
+   * @since 8.5.0
    */
   public static final String BSON_PARTICIPANT_ID = "pid";
 

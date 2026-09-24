@@ -394,7 +394,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    *         should be determined automatically (also the default). Any value other than
    *         <code>true</code> and <code>false</code> - like the default value <code>auto</code> -
    *         leads to {@link ETriState#UNDEFINED}.
-   * @since 8.4.4
+   * @since 8.5.0
    */
   @NonNull
   public static ETriState getSessionCookieSecure ()
@@ -408,7 +408,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    *         or empty, in which case the attribute should not be touched at all. The default value
    *         is {@link #DEFAULT_SESSION_COOKIE_SAMESITE}. The comparison of the value is case
    *         insensitive.
-   * @since 8.4.4
+   * @since 8.5.0
    */
   @Nullable
   public static String getSessionCookieSameSite ()

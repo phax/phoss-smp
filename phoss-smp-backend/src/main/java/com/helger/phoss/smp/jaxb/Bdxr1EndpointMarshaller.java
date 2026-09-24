@@ -14,7 +14,7 @@ import jakarta.xml.bind.JAXBElement;
  * Specific marshaller for OASIS BDXR SMP 1.0 Endpoint types.
  *
  * @author Philip Helger
- * @since 8.4.4
+ * @since 8.5.0
  */
 public class Bdxr1EndpointMarshaller extends AbstractBDXR1Marshaller <EndpointType>
 {

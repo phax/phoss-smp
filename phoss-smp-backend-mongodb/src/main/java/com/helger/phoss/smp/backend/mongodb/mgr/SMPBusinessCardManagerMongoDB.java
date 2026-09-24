@@ -71,13 +71,13 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   /**
    * The name of the MongoDB collection used by this manager.
    *
-   * @since 8.4.4
+   * @since 8.5.0
    */
   public static final String COLLECTION_NAME = "smp-businesscard";
   /**
    * The name of the field containing the ID of the Service Group of a Business Card.
    *
-   * @since 8.4.4
+   * @since 8.5.0
    */
   public static final String BSON_SERVICE_GROUP_ID = "sgid";
 

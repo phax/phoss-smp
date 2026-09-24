@@ -623,7 +623,7 @@ public final class BDXR2ServerAPI
    * @return {@link ESuccess}
    * @throws SMPServerException
    *         In case of error
-   * @since 8.4.4
+   * @since 8.5.0
    */
   @NonNull
   public ESuccess saveServiceRegistrationEndpoint (@NonNull final String sPathServiceGroupID,

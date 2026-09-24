@@ -210,7 +210,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *        The global search text to filter by. May be <code>null</code> or empty in which case no
    *        filtering by text takes place.
    * @return A non-<code>null</code> but maybe empty list.
-   * @since 8.4.4
+   * @since 8.5.0
    */
   @NonNull
   @ReturnsMutableCopy
@@ -293,7 +293,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *        matching entries are counted.
    * @return The number of matching entries. May be &lt; 0 in case there was an error querying (e.g.
    *         because of a missing SQL backend).
-   * @since 8.4.4
+   * @since 8.5.0
    */
   @CheckForSigned
   long getSMPServiceGroupCount (@NonNull ESMPServiceGroupFilter eFilter, @Nullable String sSearchText);
@@ -304,7 +304,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *
    * @return <code>true</code> if at least one Service Group is contained, <code>false</code>
    *         otherwise.
-   * @since 8.4.4
+   * @since 8.5.0
    */
   boolean containsAnySMPServiceGroup ();
 
@@ -316,7 +316,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    *        The predefined filter to be applied. May not be <code>null</code>.
    * @return <code>true</code> if at least one matching Service Group is contained,
    *         <code>false</code> otherwise.
-   * @since 8.4.4
+   * @since 8.5.0
    */
   boolean containsAnySMPServiceGroup (@NonNull ESMPServiceGroupFilter eFilter);
 }

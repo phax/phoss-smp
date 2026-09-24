@@ -31,7 +31,7 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
  * read.
  *
  * @author Philip Helger
- * @since 8.4.4
+ * @since 8.5.0
  */
 public enum ESMPServiceGroupFilter implements IHasID <String>
 {

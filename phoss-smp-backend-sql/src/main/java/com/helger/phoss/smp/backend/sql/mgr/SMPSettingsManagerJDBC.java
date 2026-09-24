@@ -140,7 +140,7 @@ public class SMPSettingsManagerJDBC extends AbstractJDBCEnabledManager implement
    *         party changed the value in the meantime. If the entry was expected to not exist, but
    *         was created by another party in the meantime, the surrounding transaction fails with a
    *         primary key violation.
-   * @since 8.4.4
+   * @since 8.5.0
    */
   @NonNull
   public static EChange compareAndSetSettingsValueInDB (@NonNull final DBExecutor aExecutor,

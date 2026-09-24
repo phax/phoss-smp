@@ -231,7 +231,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aDeleteAllServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteAllServiceMetadata);
     }
-    // Add a single Endpoint to a ServiceMetadata since 8.4.4
+    // Add a single Endpoint to a ServiceMetadata since 8.5.0
     {
       final APIDescriptor aPutServiceMetadataEndpoint = new APIDescriptor (APIPath.put ("/{" +
                                                                                         PARAM_SERVICE_GROUP_ID +

@@ -37,7 +37,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
  * read.
  *
  * @author Philip Helger
- * @since 8.4.4
+ * @since 8.5.0
  */
 @Immutable
 public final class SMPServiceGroupSelectHelper

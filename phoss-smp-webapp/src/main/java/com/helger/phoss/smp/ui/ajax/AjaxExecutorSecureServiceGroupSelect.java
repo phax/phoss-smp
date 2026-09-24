@@ -42,7 +42,7 @@ import com.helger.photon.core.execcontext.LayoutExecutionContext;
  * </pre>
  *
  * @author Philip Helger
- * @since 8.4.4
+ * @since 8.5.0
  */
 public final class AjaxExecutorSecureServiceGroupSelect extends AbstractSMPAjaxExecutor
 {
