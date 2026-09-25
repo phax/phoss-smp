@@ -468,6 +468,11 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
                                       aProcess.getProcessIdentifier ().getURIEncoded ());
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("deleteSMPProcess - success");
+
+    // The service information itself still exists - it just contains one
+    // process less
+    m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aRealServiceInformation));
+
     return EChange.CHANGED;
   }
 

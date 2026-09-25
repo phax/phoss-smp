@@ -404,7 +404,14 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     if (eSuccess.isFailure ())
       return EChange.UNCHANGED;
 
-    return EChange.valueOf (ret.get ().longValue () > 0);
+    if (ret.get ().longValue () <= 0)
+      return EChange.UNCHANGED;
+
+    // The service information itself still exists - it just contains one
+    // process less
+    m_aCBs.forEach (x -> x.onSMPServiceInformationUpdated (aSMPServiceInformation));
+
+    return EChange.CHANGED;
   }
 
   @NonNull

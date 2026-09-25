@@ -20,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -39,6 +41,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
+import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationCallback;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
@@ -235,6 +238,98 @@ public final class SMPServiceInformationManagerXMLTest
     finally
     {
       aServiceGroupMgr.deleteSMPServiceGroup (aPI, true);
+    }
+  }
+
+  @Test
+  public void testDeleteEndpointAndProcessFiresUpdateCallback () throws SMPServerException
+  {
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
+
+    final IParticipantIdentifier aPI = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                       "0088:xml-callback");
+    assertNotNull (aPI);
+    final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                 "xml::xml##xml-callback::1");
+    assertNotNull (aDocTypeID);
+    final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
+                                                                                      "xml-callback");
+    assertNotNull (aProcessID);
+
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
+    final ISMPServiceGroup aSG = aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID,
+                                                                         aPI,
+                                                                         null,
+                                                                         null,
+                                                                         true);
+    assertNotNull (aSG);
+
+    final AtomicInteger aUpdatedCount = new AtomicInteger ();
+    final ISMPServiceInformationCallback aCallback = new ISMPServiceInformationCallback ()
+    {
+      @Override
+      public void onSMPServiceInformationUpdated (final ISMPServiceInformation aServiceInformation)
+      {
+        aUpdatedCount.incrementAndGet ();
+      }
+    };
+    aServiceInformationMgr.serviceInformationCallbacks ().add (aCallback);
+    try
+    {
+      final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
+      final XMLOffsetDateTime aEndDT = aStartDT.plusYears (1);
+      final SMPEndpoint aEP1 = new SMPEndpoint ("ep1",
+                                                "tp1",
+                                                "http://localhost/tp1",
+                                                false,
+                                                "minauth",
+                                                aStartDT,
+                                                aEndDT,
+                                                "cert",
+                                                "sd",
+                                                "tc",
+                                                "ti",
+                                                null);
+      final SMPEndpoint aEP2 = new SMPEndpoint ("ep2",
+                                                "tp2",
+                                                "http://localhost/tp2",
+                                                false,
+                                                "minauth",
+                                                aStartDT,
+                                                aEndDT,
+                                                "cert",
+                                                "sd",
+                                                "tc",
+                                                "ti",
+                                                null);
+      final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP1, aEP2), null);
+      assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI,
+                                                                                                 aDocTypeID,
+                                                                                                 new CommonsArrayList <> (aProcess),
+                                                                                                 null))
+                                        .isSuccess ());
+      assertEquals (0, aUpdatedCount.get ());
+
+      // Delete a single endpoint - as done in the Endpoint Tree page
+      final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
+                                                                                                                       aDocTypeID);
+      assertNotNull (aSI);
+      final ISMPProcess aSelectedProcess = aSI.getProcessOfID (aProcessID);
+      assertNotNull (aSelectedProcess);
+      assertTrue (aSelectedProcess.deleteEndpointByID ("ep1").isChanged ());
+      assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (aSI).isSuccess ());
+      assertEquals (1, aUpdatedCount.get ());
+
+      // Delete the whole process - as done in the Endpoint Tree page
+      assertTrue (aServiceInformationMgr.deleteSMPProcess (aSI, aSelectedProcess).isChanged ());
+      assertEquals (2, aUpdatedCount.get ());
+    }
+    finally
+    {
+      aServiceInformationMgr.serviceInformationCallbacks ().removeObject (aCallback);
+      aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
     }
   }
 }
