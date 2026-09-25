@@ -29,6 +29,7 @@ import com.helger.mime.IMimeType;
 import com.helger.mime.MimeType;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardMicroTypeConverter;
@@ -123,10 +124,15 @@ public final class ServiceGroupExport
       final IMicroElement eServiceInfo = MicroTypeConverter.convertToMicroElement (aServiceInfo,
                                                                                    CSMPExchange.ELEMENT_SERVICEINFO);
       // Remove the "id" attribute from all endpoints because we cannot guarantee it's uniqueness
-      // over multiple installations
+      // over multiple installations. For the same reason, the Access Point reference is resolved
+      // and inlined, so that the export is self-contained.
+      final ISMPAccessPointManager aAccessPointMgr = SMPMetaManager.getAccessPointMgr ();
       for (final var eProcess : eServiceInfo.getAllChildElements (SMPServiceInformationMicroTypeConverter.ELEMENT_PROCESS))
         for (final var eEndpoint : eProcess.getAllChildElements (SMPProcessMicroTypeConverter.ELEMENT_ENDPOINT))
+        {
           eEndpoint.removeAttribute (SMPEndpointMicroTypeConverter.ATTR_ID);
+          SMPEndpointMicroTypeConverter.makeSelfContained (eEndpoint, aAccessPointMgr);
+        }
 
       eServiceGroup.addChild (eServiceInfo);
     }

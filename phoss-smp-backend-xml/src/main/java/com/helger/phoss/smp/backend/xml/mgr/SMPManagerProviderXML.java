@@ -25,6 +25,7 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
@@ -53,6 +54,7 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   public static final String SMP_SERVICE_GROUP_XML = "smp-servicegroup.xml";
   public static final String SMP_REDIRECT_XML = "smp-redirect.xml";
   public static final String SMP_SERVICE_INFORMATION_XML = "smp-serviceinformation.xml";
+  public static final String SMP_ACCESS_POINT_XML = "smp-accesspoint.xml";
   public static final String SMP_PARTICIPANT_MIGRATION_XML = "smp-participant-migration.xml";
   public static final String SMP_BUSINESS_CARD_XML = "smp-business-card.xml";
   public static final String SMP_USER_TOTP_XML = "smp-user-totp.xml";
@@ -132,11 +134,25 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
   }
 
   @NonNull
-  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
+  public ISMPAccessPointManager createAccessPointMgr ()
   {
     try
     {
-      return new SMPServiceInformationManagerXML (SMP_SERVICE_INFORMATION_XML);
+      return new SMPAccessPointManagerXML (SMP_ACCESS_POINT_XML);
+    }
+    catch (final DAOException ex)
+    {
+      throw new InitializationException (ex.getMessage (), ex);
+    }
+  }
+
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                                    @NonNull final ISMPAccessPointManager aAccessPointMgr)
+  {
+    try
+    {
+      return new SMPServiceInformationManagerXML (SMP_SERVICE_INFORMATION_XML, aAccessPointMgr);
     }
     catch (final DAOException ex)
     {

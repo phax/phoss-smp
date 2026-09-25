@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -71,7 +72,14 @@ public final class MockSMPManagerProvider implements ISMPManagerProvider
   }
 
   @NonNull
-  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
+  public ISMPAccessPointManager createAccessPointMgr ()
+  {
+    return new MockSMPAccessPointManager ();
+  }
+
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                                    @NonNull final ISMPAccessPointManager aAccessPointMgr)
   {
     return new MockSMPServiceInformationManager ();
   }
