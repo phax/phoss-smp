@@ -56,6 +56,36 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   private String m_sSubjectUniqueIdentifier;
   private X509Certificate m_aCertificate;
 
+  @NonNull
+  @Nonempty
+  private static String _createID (@NonNull @Nonempty final String sServiceGroupID,
+                                   @NonNull final IDocumentTypeIdentifier aDocTypeID)
+  {
+    return sServiceGroupID + "-" + aDocTypeID.getURIEncoded ();
+  }
+
+  /**
+   * Create the deterministic ID of an SMP redirect, based on the participant ID and the document
+   * type ID. The participant ID is unified the same way as for the owning service group.
+   *
+   * @param aParticipantID
+   *        The participant ID to use. May not be <code>null</code>.
+   * @param aDocTypeID
+   *        The document type ID to use. May not be <code>null</code>.
+   * @return The ID of the respective {@link SMPRedirect}. Never <code>null</code>.
+   * @since 8.5.1
+   */
+  @NonNull
+  @Nonempty
+  public static String createSMPRedirectID (@NonNull final IParticipantIdentifier aParticipantID,
+                                            @NonNull final IDocumentTypeIdentifier aDocTypeID)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+    ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
+
+    return _createID (SMPServiceGroup.createSMPServiceGroupID (aParticipantID), aDocTypeID);
+  }
+
   public SMPRedirect (@NonNull final IParticipantIdentifier aParticipantID,
                       @NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                       @NonNull @Nonempty final String sTargetHref,
@@ -70,7 +100,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     setSubjectUniqueIdentifier (sSubjectUniqueIdentifier);
     setCertificate (aCertificate);
     getExtensions ().setExtensionAsString (sExtension);
-    m_sID = m_sServiceGroupID + "-" + aDocumentTypeIdentifier.getURIEncoded ();
+    m_sID = _createID (m_sServiceGroupID, aDocumentTypeIdentifier);
   }
 
   @NonNull

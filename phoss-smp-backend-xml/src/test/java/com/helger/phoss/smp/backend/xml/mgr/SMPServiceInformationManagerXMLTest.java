@@ -18,10 +18,12 @@ package com.helger.phoss.smp.backend.xml.mgr;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -37,6 +39,7 @@ import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -379,6 +382,117 @@ public final class SMPServiceInformationManagerXMLTest
     {
       aServiceInformationMgr.serviceInformationCallbacks ().removeObject (aCallback);
       aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, true);
+    }
+  }
+
+  @NonNull
+  private static SMPServiceInformation _createServiceInfo (@NonNull final IParticipantIdentifier aParticipantID,
+                                                           @NonNull final IDocumentTypeIdentifier aDocTypeID,
+                                                           @NonNull final IProcessIdentifier aProcessID,
+                                                           @NonNull final String sEndpointReference)
+  {
+    final XMLOffsetDateTime aStartDT = PDTFactory.getCurrentXMLOffsetDateTime ();
+    final SMPEndpoint aEP = new SMPEndpoint ("epid",
+                                             "tp",
+                                             sEndpointReference,
+                                             false,
+                                             "minauth",
+                                             aStartDT,
+                                             aStartDT.plusYears (1),
+                                             "cert",
+                                             "sd",
+                                             "tc",
+                                             "ti",
+                                             null);
+    final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), null);
+    return new SMPServiceInformation (aParticipantID, aDocTypeID, new CommonsArrayList <> (aProcess), null);
+  }
+
+  @Test
+  public void testGetServiceInformationOfServiceGroupAndDocumentType () throws SMPServerException
+  {
+    // Ensure the user is present
+    final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
+    assertNotNull (aTestUser);
+
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPServiceInformationManager aServiceInformationMgr = SMPMetaManager.getServiceInformationMgr ();
+    assertEquals (0, aServiceInformationMgr.getSMPServiceInformationCount ());
+
+    final IParticipantIdentifier aPI1 = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                        "0088:xml-lookup-1");
+    assertNotNull (aPI1);
+    final IParticipantIdentifier aPI2 = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                        "0088:xml-lookup-2");
+    assertNotNull (aPI2);
+    final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
+                                                                                      "xml-lookup");
+    assertNotNull (aProcessID);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI2, true);
+
+    assertNotNull (aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI1, null, null, true));
+    try
+    {
+      assertNotNull (aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI2, null, null, true));
+      try
+      {
+        // Create a bunch of unrelated registrations
+        final int nServiceInfos = 20;
+        for (int i = 0; i < nServiceInfos; ++i)
+        {
+          final IDocumentTypeIdentifier aCurDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                         "xml::xml##lookup" +
+                                                                                                                                                                     i +
+                                                                                                                                                                     "::1");
+          assertNotNull (aCurDocTypeID);
+          assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (_createServiceInfo (aPI1,
+                                                                                             aCurDocTypeID,
+                                                                                             aProcessID,
+                                                                                             "http://localhost/ep" + i))
+                                            .isSuccess ());
+        }
+        assertEquals (nServiceInfos, aServiceInformationMgr.getSMPServiceInformationCount ());
+
+        // Exact hit in the middle of many unrelated registrations
+        final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                    "xml::xml##lookup7::1");
+        assertNotNull (aDocTypeID);
+        final ISMPServiceInformation aSI = aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI1,
+                                                                                                                         aDocTypeID);
+        assertNotNull (aSI);
+        assertEquals ("http://localhost/ep7",
+                      aSI.getAllProcesses ().get (0).getAllEndpoints ().get (0).getEndpointReference ());
+
+        // Unknown document type
+        final IDocumentTypeIdentifier aUnknownDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                           "xml::xml##lookup-unknown::1");
+        assertNotNull (aUnknownDocTypeID);
+        assertNull (aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI1,
+                                                                                                  aUnknownDocTypeID));
+
+        // Same document type, but a different participant
+        assertNull (aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI2, aDocTypeID));
+
+        // A participant ID that only matches after the unification
+        final IParticipantIdentifier aNonUnifiedPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                      "0088:XML-Lookup-1");
+        assertNotNull (aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aNonUnifiedPI,
+                                                                                                     aDocTypeID));
+
+        // Undefined parameters
+        assertNull (aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (null, aDocTypeID));
+        assertNull (aServiceInformationMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI1, null));
+      }
+      finally
+      {
+        aServiceGroupMgr.deleteSMPServiceGroup (aPI2, true);
+      }
+    }
+    finally
+    {
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI1, true);
     }
   }
 }

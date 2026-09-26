@@ -280,7 +280,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     if (aDocTypeID == null)
       return null;
 
-    return findFirst (x -> x.getServiceGroupID ().equals (aParticipantID.getURIEncoded ()) &&
-                           aDocTypeID.hasSameContent (x.getDocumentTypeIdentifier ()));
+    // Use the deterministic ID to avoid a linear scan over all redirects
+    return getOfID (SMPRedirect.createSMPRedirectID (aParticipantID, aDocTypeID));
   }
 }

@@ -30,6 +30,7 @@ import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.peppolid.peppol.PeppolIdentifierHelper;
+import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -145,6 +146,88 @@ public final class SMPRedirectManagerXMLTest
     finally
     {
       aServiceGroupMgr.deleteSMPServiceGroup (aPI, true);
+    }
+  }
+
+  @Test
+  public void testGetRedirectOfServiceGroupAndDocumentType () throws SMPServerException
+  {
+    // Ensure the user is present
+    final IUser aTestUser = PhotonSecurityManager.getUserMgr ().getUserOfID (CSecurity.USER_ADMINISTRATOR_ID);
+    assertNotNull (aTestUser);
+
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+    final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+    assertEquals (0, aRedirectMgr.getSMPRedirectCount ());
+
+    final IParticipantIdentifier aPI1 = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                        "0088:xml-redirect-1");
+    assertNotNull (aPI1);
+    final IParticipantIdentifier aPI2 = aIdentifierFactory.createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                        "0088:xml-redirect-2");
+    assertNotNull (aPI2);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI1, true);
+    aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI2, true);
+
+    assertNotNull (aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI1, null, null, true));
+    try
+    {
+      assertNotNull (aServiceGroupMgr.createSMPServiceGroup (aTestUser.getID (), aPI2, null, null, true));
+      try
+      {
+        // Create a bunch of unrelated registrations
+        final int nRedirects = 20;
+        for (int i = 0; i < nRedirects; ++i)
+        {
+          final IDocumentTypeIdentifier aCurDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                         "xml::xml##redirect" +
+                                                                                                                                                                     i +
+                                                                                                                                                                     "::1");
+          assertNotNull (aCurDocTypeID);
+          assertNotNull (aRedirectMgr.createOrUpdateSMPRedirect (aPI1,
+                                                                 aCurDocTypeID,
+                                                                 "target" + i,
+                                                                 "suid" + i,
+                                                                 null,
+                                                                 null));
+        }
+        assertEquals (nRedirects, aRedirectMgr.getSMPRedirectCount ());
+
+        // Exact hit in the middle of many unrelated registrations
+        final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                    "xml::xml##redirect7::1");
+        assertNotNull (aDocTypeID);
+        final ISMPRedirect aRedirect = aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPI1, aDocTypeID);
+        assertNotNull (aRedirect);
+        assertEquals ("target7", aRedirect.getTargetHref ());
+
+        // Unknown document type
+        final IDocumentTypeIdentifier aUnknownDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
+                                                                                                           "xml::xml##redirect-unknown::1");
+        assertNotNull (aUnknownDocTypeID);
+        assertNull (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPI1, aUnknownDocTypeID));
+
+        // Same document type, but a different participant
+        assertNull (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPI2, aDocTypeID));
+
+        // A participant ID that only matches after the unification
+        final IParticipantIdentifier aNonUnifiedPI = new SimpleParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                      "0088:XML-Redirect-1");
+        assertNotNull (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aNonUnifiedPI, aDocTypeID));
+
+        // Undefined parameters
+        assertNull (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (null, aDocTypeID));
+        assertNull (aRedirectMgr.getSMPRedirectOfServiceGroupAndDocumentType (aPI1, null));
+      }
+      finally
+      {
+        aServiceGroupMgr.deleteSMPServiceGroup (aPI2, true);
+      }
+    }
+    finally
+    {
+      aServiceGroupMgr.deleteSMPServiceGroup (aPI1, true);
     }
   }
 }

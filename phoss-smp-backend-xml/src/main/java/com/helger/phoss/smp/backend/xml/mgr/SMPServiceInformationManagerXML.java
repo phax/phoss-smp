@@ -339,21 +339,8 @@ public final class SMPServiceInformationManagerXML extends
     if (aDocumentTypeIdentifier == null)
       return null;
 
-    final String sServiceGroupID = aParticipantID.getURIEncoded ();
-    final ICommonsList <ISMPServiceInformation> ret = getAll (aSI -> aSI.getServiceGroupID ()
-                                                                        .equals (sServiceGroupID) &&
-                                                                     aSI.getDocumentTypeIdentifier ()
-                                                                        .hasSameContent (aDocumentTypeIdentifier));
-
-    if (ret.isEmpty ())
-      return null;
-    if (ret.size () > 1)
-      LOGGER.warn ("Found more than one entry for service group '" +
-                   sServiceGroupID +
-                   "' and document type '" +
-                   aDocumentTypeIdentifier.getValue () +
-                   "'. This seems to be a bug! Using the first one.");
-    return ret.getFirstOrNull ();
+    // Use the deterministic ID to avoid a linear scan over all service information
+    return getOfID (SMPServiceInformation.createSMPServiceInformationID (aParticipantID, aDocumentTypeIdentifier));
   }
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)

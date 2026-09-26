@@ -58,6 +58,36 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
   private IDocumentTypeIdentifier m_aDocumentTypeIdentifier;
   private final ICommonsOrderedMap <String, SMPProcess> m_aProcesses = new CommonsLinkedHashMap <> ();
 
+  @NonNull
+  @Nonempty
+  private static String _createID (@NonNull @Nonempty final String sServiceGroupID,
+                                   @NonNull final IDocumentTypeIdentifier aDocTypeID)
+  {
+    return sServiceGroupID + "-" + aDocTypeID.getURIEncoded ();
+  }
+
+  /**
+   * Create the deterministic ID of an SMP service information, based on the participant ID and the
+   * document type ID. The participant ID is unified the same way as for the owning service group.
+   *
+   * @param aParticipantID
+   *        The participant ID to use. May not be <code>null</code>.
+   * @param aDocTypeID
+   *        The document type ID to use. May not be <code>null</code>.
+   * @return The ID of the respective {@link SMPServiceInformation}. Never <code>null</code>.
+   * @since 8.5.1
+   */
+  @NonNull
+  @Nonempty
+  public static String createSMPServiceInformationID (@NonNull final IParticipantIdentifier aParticipantID,
+                                                      @NonNull final IDocumentTypeIdentifier aDocTypeID)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+    ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
+
+    return _createID (SMPServiceGroup.createSMPServiceGroupID (aParticipantID), aDocTypeID);
+  }
+
   /**
    * Constructor for new service information
    *
@@ -82,7 +112,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
       for (final SMPProcess aProcess : aProcesses)
         addProcess (aProcess);
     getExtensions ().setExtensionAsString (sExtension);
-    m_sID = m_sServiceGroupID + "-" + aDocumentTypeIdentifier.getURIEncoded ();
+    m_sID = _createID (m_sServiceGroupID, aDocumentTypeIdentifier);
   }
 
   @NonNull
