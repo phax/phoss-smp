@@ -309,7 +309,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     {
       // Replace existing in a single database operation. In particular, REST
       // API calls pass a newly created object rather than the stored instance.
-      getCollection ().replaceOne (new Document (BSON_ID, aOldInformation.getID ()), toBson (aSMPServiceInformation));
+      if (!getCollection ().replaceOne (new Document (BSON_ID, aOldInformation.getID ()),
+                                        toBson (aSMPServiceInformation))
+                           .wasAcknowledged ())
+        throw new IllegalStateException ("Failed to replace in MongoDB Collection");
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
@@ -424,8 +427,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     }
 
     // Save new one
-    getCollection ().replaceOne (new Document (BSON_ID, aSMPServiceInformation.getID ()),
-                                 toBson (aRealServiceInformation));
+    if (!getCollection ().replaceOne (new Document (BSON_ID, aSMPServiceInformation.getID ()),
+                                      toBson (aRealServiceInformation))
+                         .wasAcknowledged ())
+      throw new IllegalStateException ("Failed to replace in MongoDB Collection");
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),

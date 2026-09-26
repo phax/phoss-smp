@@ -21,7 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +28,7 @@ import org.junit.rules.TestRule;
 
 import com.helger.collection.CollectionFind;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -145,19 +145,19 @@ public final class SMPServiceInformationManagerXMLTest
                                                  "<extep />");
         final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP), "<extproc />");
         final IAuditor aOldAuditor = AuditHelper.getAuditor ();
-        final AtomicReference <EAuditActionType> aAuditAction = new AtomicReference <> ();
+        final ICommonsList <EAuditActionType> aAuditActions = new CommonsArrayList <> ();
         try
         {
           AuditHelper.setAuditor ((eActionType, eSuccess, aActionObjectType, sAction, aArgs) -> {
             if (SMPServiceInformation.OT.equals (aActionObjectType))
-              aAuditAction.set (eActionType);
+              aAuditActions.add (eActionType);
           });
           assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI,
                                                                                                     aDocTypeID,
                                                                                                     new CommonsArrayList <> (aProcess),
                                                                                                     "<extsi-rest />"))
                                             .isSuccess ());
-          assertEquals (EAuditActionType.MODIFY, aAuditAction.get ());
+          assertEquals (new CommonsArrayList <> (EAuditActionType.MODIFY), aAuditActions);
         }
         finally
         {

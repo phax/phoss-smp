@@ -48,7 +48,7 @@ public interface ISMPServiceInformationManager
 
   /**
    * Create or update an SMP service information object. An existing service information object is
-   * searched by service group, document type ID, process ID and transport profile.
+   * searched by service group and document type ID, and is completely replaced by the provided one.
    *
    * @param aServiceInformation
    *        The service information object to handle. May not be <code>null</code>.
