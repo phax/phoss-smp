@@ -296,10 +296,10 @@ public final class SMPRedirectManagerMongoDB extends AbstractManagerMongoDB impl
     final FindIterable <Document> aCursor = aFilter == null ? getCollection ().find ()
                                                             : getCollection ().find (aFilter);
     aCursor.sort (SMPMongoQueryHelper.createSort (COLUMNS, aPagingSpec));
-    if (aPagingSpec.getStartIndex () > 0)
-      aCursor.skip ((int) Math.min (aPagingSpec.getStartIndex (), Integer.MAX_VALUE));
-    if (!aPagingSpec.isUnlimited ())
-      aCursor.limit ((int) Math.min (aPagingSpec.getMaxCount (), Integer.MAX_VALUE));
+    if (aPagingSpec.hasStartIndex ())
+      aCursor.skip (aPagingSpec.getStartIndexAsInt ());
+    if (aPagingSpec.isLimited ())
+      aCursor.limit (aPagingSpec.getMaxCountAsInt ());
     aCursor.forEach (x -> ret.add (toDomain (x)));
     return ret;
   }
