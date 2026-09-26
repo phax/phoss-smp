@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,8 @@ import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.smlhook.SMLRegistrationCache;
+import com.helger.phoss.smp.smlhook.SMLRegistrationCheckResult;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.photon.security.CSecurity;
@@ -347,7 +350,81 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     }
   }
 
-  private void _checkSMLConfiguration (@NonNull final HCOL aOL)
+  @Nullable
+  private static String _getExpectedLogicalAddress ()
+  {
+    // Same priority as when registering this SMP at the SML
+    final String ret = SMPServerConfiguration.getSMLSMPHostname ();
+    if (StringHelper.isNotEmpty (ret))
+      return ret;
+    return SMPServerConfiguration.getPublicServerURL ();
+  }
+
+  /**
+   * Compare two logical addresses, ignoring a trailing slash and the case, because an SML may
+   * store the address in a normalized form.
+   */
+  private static boolean _isSameLogicalAddress (@NonNull final String sAddress1, @NonNull final String sAddress2)
+  {
+    return StringHelper.trimEnd (sAddress1, '/').equalsIgnoreCase (StringHelper.trimEnd (sAddress2, '/'));
+  }
+
+  private void _checkSMLRegistration (@NonNull final HCOL aOL, @NonNull final Locale aDisplayLocale)
+  {
+    // This may query the SML, but at most once per hour
+    final SMLRegistrationCheckResult aResult = SMLRegistrationCache.getRegistrationCheckResult ();
+    if (aResult == null)
+    {
+      // Nothing to check - no SML connection, no SML selected or no SMP ID configured
+      return;
+    }
+
+    final IHCNode aCheckedAt = div ("The SML was queried at " +
+                                    PDTToString.getAsString (aResult.getCheckDateTime (), aDisplayLocale) +
+                                    ". The result is cached for " +
+                                    SMLRegistrationCache.CACHE_DURATION.toHours () +
+                                    " hour(s).");
+
+    switch (aResult.getState ())
+    {
+      case CHECK_FAILED -> aOL.addItem (_createWarning ("The registration of this SMP at the SML could not be determined."),
+                                        div ("The SML could not be queried: " + aResult.getErrorMessage ()),
+                                        aCheckedAt);
+      case NOT_REGISTERED -> aOL.addItem (_createError ("This SMP is not registered at the SML."),
+                                          div ("The SML has no record for the SMP ID '" +
+                                               aResult.getSMPID () +
+                                               "'. No participant of this SMP can be resolved via DNS. Use the ")
+                                                                                                               .addChild (em ("Register at SML"))
+                                                                                                               .addChild (" page to create it."),
+                                          aCheckedAt);
+      case REGISTERED ->
+      {
+        final String sSMLAddress = aResult.getLogicalAddress ();
+        final String sExpectedAddress = _getExpectedLogicalAddress ();
+        if (StringHelper.isEmpty (sSMLAddress))
+        {
+          aOL.addItem (_createWarning ("The SML holds no logical address for this SMP."),
+                       div ("The SML knows the SMP ID '" +
+                            aResult.getSMPID () +
+                            "' but returned no logical address for it."),
+                       aCheckedAt);
+        }
+        else
+          if (StringHelper.isNotEmpty (sExpectedAddress) && !_isSameLogicalAddress (sSMLAddress, sExpectedAddress))
+          {
+            aOL.addItem (_createError ("The logical address registered at the SML does not match the address of this SMP."),
+                         div ("The SML resolves all participants of this SMP to ").addChild (code (sSMLAddress))
+                                                                                  .addChild (", but this SMP is configured as ")
+                                                                                  .addChild (code (sExpectedAddress))
+                                                                                  .addChild (". Deliveries to this SMP may end up at the wrong server."),
+                         aCheckedAt);
+          }
+        // else: everything is fine - nothing to report on this page
+      }
+    }
+  }
+
+  private void _checkSMLConfiguration (@NonNull final HCOL aOL, @NonNull final Locale aDisplayLocale)
   {
     final ISMPSettings aSMPSettings = SMPMetaManager.getSettings ();
 
@@ -358,6 +435,10 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       {
         aOL.addItem (_createError ("No SML is selected in the SMP settings."),
                      div ("All creations and deletions of service groups needs to be repeated when the SML connection is active!"));
+      }
+      else
+      {
+        _checkSMLRegistration (aOL, aDisplayLocale);
       }
     }
     else
@@ -464,7 +545,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     _checkTrustStore (aWPEC, aOL, aNowDT, aNowPlusDT);
 
     // Check SML configuration
-    _checkSMLConfiguration (aOL);
+    _checkSMLConfiguration (aOL, aDisplayLocale);
 
     // Check Directory configuration
     _checkDirectoryConfig (aWPEC, aOL, aNowDT, aNowPlusDT);
