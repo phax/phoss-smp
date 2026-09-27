@@ -42,6 +42,13 @@ public final class CSMLSync
   /** The ZIP entry holding the run metadata and the counts */
   public static final String ENTRY_SUMMARY = "summary.xml";
 
+  /**
+   * The ZIP entry holding all participants the SML has registered for this SMP, one per line. This
+   * is the input for restoring the participants after an SMP was unregistered from the SML, because
+   * unregistering deletes all of them.
+   */
+  public static final String ENTRY_ALL_IN_SML = "all-in-sml.txt";
+
   /** The ZIP entry holding the participants that are missing at the SML, one per line */
   public static final String ENTRY_MISSING_IN_SML = "missing-in-sml.txt";
 

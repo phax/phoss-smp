@@ -73,7 +73,7 @@ public final class SMLSyncReportTest
     Files.writeString (aOrphans.toPath (), PI3 + "\n");
 
     final ICommonsSet <String> aMissing = new CommonsTreeSet <> (PI1, PI2);
-    SMLSyncReport.writeReport (aZip, _createResult (2, 2, 1), aMissing, aOrphans);
+    SMLSyncReport.writeReport (aZip, _createResult (2, 2, 1), aOrphans, aMissing, aOrphans);
 
     assertTrue (aZip.isFile ());
     assertNotNull (_readEntry (aZip, CSMLSync.ENTRY_SUMMARY));
@@ -87,7 +87,7 @@ public final class SMLSyncReportTest
     final File aZip = new File (m_aTempFolder.getRoot (), "report.zip");
     final File aOrphans = new File (m_aTempFolder.getRoot (), "does-not-exist.tmp");
 
-    SMLSyncReport.writeReport (aZip, _createResult (7, 3, 0), new CommonsArrayList <> (PI1), aOrphans);
+    SMLSyncReport.writeReport (aZip, _createResult (7, 3, 0), aOrphans, new CommonsArrayList <> (PI1), aOrphans);
 
     final String sSummary = _readEntry (aZip, CSMLSync.ENTRY_SUMMARY);
     assertTrue (sSummary, sSummary.contains ("local-participants=\"7\""));
@@ -104,7 +104,7 @@ public final class SMLSyncReportTest
     final File aOrphans = new File (m_aTempFolder.getRoot (), "does-not-exist.tmp");
     assertFalse (aOrphans.exists ());
 
-    SMLSyncReport.writeReport (aZip, _createResult (1, 0, 0), new CommonsArrayList <> (), aOrphans);
+    SMLSyncReport.writeReport (aZip, _createResult (1, 0, 0), aOrphans, new CommonsArrayList <> (), aOrphans);
 
     assertEquals ("", _readEntry (aZip, CSMLSync.ENTRY_ORPHANS_IN_SML));
     assertEquals ("", _readEntry (aZip, CSMLSync.ENTRY_MISSING_IN_SML));
@@ -119,6 +119,7 @@ public final class SMLSyncReportTest
 
     SMLSyncReport.writeReport (aZip,
                                _createResult (2, 2, 0),
+                               aOrphans,
                                new CommonsArrayList <> (PI1, PI2),
                                aOrphans);
 
@@ -132,7 +133,7 @@ public final class SMLSyncReportTest
     final File aZip = new File (m_aTempFolder.getRoot (), "report.zip");
     final File aOrphans = new File (m_aTempFolder.getRoot (), "does-not-exist.tmp");
 
-    SMLSyncReport.writeReport (aZip, _createResult (5, 0, 0), new CommonsArrayList <> (), aOrphans);
+    SMLSyncReport.writeReport (aZip, _createResult (5, 0, 0), aOrphans, new CommonsArrayList <> (), aOrphans);
 
     final String sSummary = _readEntry (aZip, CSMLSync.ENTRY_SUMMARY);
     assertFalse (sSummary, sSummary.contains ("<note>"));

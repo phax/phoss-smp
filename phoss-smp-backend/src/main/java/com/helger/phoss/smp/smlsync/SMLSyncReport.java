@@ -146,6 +146,9 @@ public final class SMLSyncReport
    *        The ZIP file to be created. May not be <code>null</code>.
    * @param aResult
    *        The summary of the run. May not be <code>null</code>.
+   * @param aAllInSMLFile
+   *        A file containing all URI encoded participant identifiers the SML has registered for
+   *        this SMP, one per line. May not be <code>null</code>, but does not need to exist.
    * @param aMissingInSML
    *        The URI encoded participant identifiers that are missing at the SML. May not be
    *        <code>null</code>.
@@ -158,11 +161,13 @@ public final class SMLSyncReport
    */
   public static void writeReport (@NonNull final File aZipFile,
                                   @NonNull final SMLSyncResult aResult,
+                                  @NonNull final File aAllInSMLFile,
                                   @NonNull final Iterable <String> aMissingInSML,
                                   @NonNull final File aOrphansInSMLFile) throws IOException
   {
     ValueEnforcer.notNull (aZipFile, "ZipFile");
     ValueEnforcer.notNull (aResult, "Result");
+    ValueEnforcer.notNull (aAllInSMLFile, "AllInSMLFile");
     ValueEnforcer.notNull (aMissingInSML, "MissingInSML");
     ValueEnforcer.notNull (aOrphansInSMLFile, "OrphansInSMLFile");
 
@@ -173,6 +178,7 @@ public final class SMLSyncReport
     try (final ZipOutputStream aZOS = new ZipOutputStream (aOS, StandardCharsets.UTF_8))
     {
       _writeEntryFromString (aZOS, CSMLSync.ENTRY_SUMMARY, MicroWriter.getNodeAsString (_createSummaryDocument (aResult)));
+      _writeEntryFromFile (aZOS, CSMLSync.ENTRY_ALL_IN_SML, aAllInSMLFile);
       _writeEntryFromIterable (aZOS, CSMLSync.ENTRY_MISSING_IN_SML, aMissingInSML);
       _writeEntryFromFile (aZOS, CSMLSync.ENTRY_ORPHANS_IN_SML, aOrphansInSMLFile);
     }

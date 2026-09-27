@@ -41,12 +41,15 @@ import com.helger.io.file.FileOperationManager;
 import com.helger.io.file.FilenameHelper;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
+import com.helger.peppol.smlclient.SMLExceptionHelper;
+import com.helger.peppolid.CIdentifier;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.SmpSmlHelper;
+import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.io.WebFileIO;
 import com.helger.photon.mgrs.PhotonBasicManager;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
@@ -56,6 +59,7 @@ import com.helger.photon.mgrs.longrun.LongRunningJobData;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
 import com.helger.text.ReadOnlyMultilingualText;
 import com.helger.web.scope.mgr.WebScoped;
+import com.helger.xsds.peppol.id1.ParticipantIdentifierType;
 
 /**
  * The long running job that reconciles the Service Groups of this SMP with the participants the
@@ -240,12 +244,26 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
   @Nonnegative
   private static int _readSMLParticipants (@NonNull final ISMLInfo aSMLInfo,
                                            @NonNull @Nonempty final String sSMPID,
-                                           @NonNull final SMLSyncDiffer aDiffer) throws Exception
+                                           @NonNull final SMLSyncDiffer aDiffer,
+                                           @NonNull final Writer aAllWriter) throws Exception
   {
     final Duration aPageDelay = SMPServerConfiguration.getSMLSyncPageDelay ();
     final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSMLInfo);
 
     return aCaller.listAllPages (sSMPID, aPage -> {
+      // Record the complete list first - it is the input for restoring the participants after an
+      // SMP was unregistered from the SML
+      for (final ParticipantIdentifierType aPI : aPage.getParticipantIdentifier ())
+        try
+        {
+          aAllWriter.write (CIdentifier.getURIEncoded (aPI));
+          aAllWriter.write ('\n');
+        }
+        catch (final IOException ex)
+        {
+          throw new UncheckedIOException (ex);
+        }
+
       aDiffer.addSMLPage (aPage);
 
       if (aPageDelay != null && !aPageDelay.isZero () && !aPageDelay.isNegative ())
@@ -319,6 +337,7 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final File aSyncDir = getSyncDirectory ();
     final File aZipFile = new File (aSyncDir, createSyncFilename ());
+    final File aAllInSMLFile = new File (aSyncDir, aZipFile.getName () + ".all.tmp");
     final File aOrphanCandidateFile = new File (aSyncDir, aZipFile.getName () + ".candidates.tmp");
     final File aOrphanVerifiedFile = new File (aSyncDir, aZipFile.getName () + ".orphans.tmp");
 
@@ -337,7 +356,9 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
       final SMLSyncDiffer aDiffer;
       final int nPageCount;
       try (final Writer aOrphanWriter = StreamHelper.createWriter (FileHelper.getBufferedOutputStream (aOrphanCandidateFile),
-                                                                   StandardCharsets.UTF_8))
+                                                                   StandardCharsets.UTF_8);
+           final Writer aAllWriter = StreamHelper.createWriter (FileHelper.getBufferedOutputStream (aAllInSMLFile),
+                                                               StandardCharsets.UTF_8))
       {
         aDiffer = new SMLSyncDiffer (aLocalIDs, sID -> {
           try
@@ -350,7 +371,7 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
             throw new UncheckedIOException (ex);
           }
         });
-        nPageCount = _readSMLParticipants (aSMLInfo, sSMPID, aDiffer);
+        nPageCount = _readSMLParticipants (aSMLInfo, sSMPID, aDiffer, aAllWriter);
       }
 
       // The SML list was read over a period of time, during which Service Groups may have been
@@ -371,21 +392,44 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
                                                        aMissing.size (),
                                                        nOrphans);
 
-      SMLSyncReport.writeReport (aZipFile, aResult, aMissing, aOrphanVerifiedFile);
+      SMLSyncReport.writeReport (aZipFile, aResult, aAllInSMLFile, aMissing, aOrphanVerifiedFile);
 
       LOGGER.info ("Successfully created the SML reconciliation report in '" +
                    aZipFile.getAbsolutePath () +
                    "': " +
                    aResult.toString ());
+      AuditHelper.onAuditExecuteSuccess ("smp-sml-sync",
+                                         sSMPID,
+                                         aSMLInfo.getID (),
+                                         Integer.valueOf (aResult.getSMLParticipantCount ()),
+                                         Integer.valueOf (aResult.getLocalParticipantCount ()),
+                                         Integer.valueOf (aResult.getMissingInSMLCount ()),
+                                         Integer.valueOf (aResult.getOrphansInSMLCount ()));
     }
     catch (final Exception ex)
     {
       // Don't leave a partially written report behind
       FileOperationManager.INSTANCE.deleteFileIfExisting (aZipFile);
-      throw new IllegalStateException ("Failed to reconcile the Service Groups with the SML", ex);
+
+      // Prefer the SML fault message. It is far more specific than the exception class name, and it
+      // is this message that ends up in the stored job result and therefore in the UI - the cause
+      // is only visible in the stack trace of the server log.
+      String sErrorMsg = SMLExceptionHelper.getFaultMessage (ex);
+      if (StringHelper.isEmpty (sErrorMsg))
+        sErrorMsg = ex.getClass ().getName () + " - " + ex.getMessage ();
+
+      AuditHelper.onAuditExecuteFailure ("smp-sml-sync", sSMPID, aSMLInfo.getID (), sErrorMsg);
+      throw new IllegalStateException ("Failed to reconcile the Service Groups of SMP '" +
+                                       sSMPID +
+                                       "' with the SML '" +
+                                       aSMLInfo.getManagementServiceURL () +
+                                       "': " +
+                                       sErrorMsg,
+                                       ex);
     }
     finally
     {
+      FileOperationManager.INSTANCE.deleteFileIfExisting (aAllInSMLFile);
       FileOperationManager.INSTANCE.deleteFileIfExisting (aOrphanCandidateFile);
       FileOperationManager.INSTANCE.deleteFileIfExisting (aOrphanVerifiedFile);
     }

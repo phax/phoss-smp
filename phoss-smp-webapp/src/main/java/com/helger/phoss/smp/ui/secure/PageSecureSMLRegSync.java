@@ -48,6 +48,8 @@ import com.helger.photon.ajax.decl.IAjaxFunctionDeclaration;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.badge.BootstrapBadge;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.execcontext.LayoutExecutionContext;
@@ -151,23 +153,31 @@ public final class PageSecureSMLRegSync extends AbstractPageSecureSMLReg
   }
 
   /**
-   * @return All long running job results that refer to an existing, downloadable report, the
-   *         newest one first. Never <code>null</code>.
+   * @return All reconciliation runs, successful as well as failed ones. A failed run must be listed
+   *         too - otherwise an operator who starts a reconciliation that fails sees the "is running
+   *         in the background" message and then nothing at all, forever. Never <code>null</code>.
    */
   @NonNull
-  private static ICommonsList <LongRunningJobData> _getAllDownloadableReports ()
+  private static ICommonsList <LongRunningJobData> _getAllRuns ()
   {
     final ICommonsList <LongRunningJobData> ret = new CommonsArrayList <> ();
-    PhotonBasicManager.getLongRunningJobResultMgr ().forEachJobResult (SMLSyncJob.JOB_TYPE, aJobData -> {
-      final LongRunningJobResult aResult = aJobData.getResult ();
-      if (aResult != null &&
-          aResult.getType () == ELongRunningJobResultType.FILE &&
-          SMLSyncJob.getValidSyncFile (aResult.getResultFile ()) != null)
-      {
-        ret.add (aJobData);
-      }
-    });
+    PhotonBasicManager.getLongRunningJobResultMgr ().forEachJobResult (SMLSyncJob.JOB_TYPE, ret::add);
     return ret;
+  }
+
+  /**
+   * @param aJobData
+   *        The run to be checked. May not be <code>null</code>.
+   * @return The report of a successfully finished run, or <code>null</code> if the run failed or
+   *         its report was meanwhile deleted.
+   */
+  @Nullable
+  private static File _getReportOfRun (@NonNull final LongRunningJobData aJobData)
+  {
+    final LongRunningJobResult aResult = aJobData.getResult ();
+    if (aResult == null || aResult.getType () != ELongRunningJobResultType.FILE)
+      return null;
+    return SMLSyncJob.getValidSyncFile (aResult.getResultFile ());
   }
 
   private void _startSync (@NonNull final WebPageExecutionContext aWPEC)
@@ -253,33 +263,62 @@ public final class PageSecureSMLRegSync extends AbstractPageSecureSMLReg
                                              .setDisabled (bSyncRunning));
     aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
 
-    final ICommonsList <LongRunningJobData> aAllReports = _getAllDownloadableReports ();
-    if (aAllReports.isEmpty ())
-      aNodeList.addChild (warn ("No SML reconciliation report is currently available for download."));
+    final ICommonsList <LongRunningJobData> aAllRuns = _getAllRuns ();
+    if (aAllRuns.isEmpty ())
+      aNodeList.addChild (warn ("No reconciliation was performed yet."));
     else
     {
-      final HCTable aTable = new HCTable (new DTCol ("Created").setDisplayType (EDTColType.DATETIME, aDisplayLocale)
-                                                               .setInitialSorting (ESortOrder.DESCENDING),
+      final HCTable aTable = new HCTable (new DTCol ("Date").setDisplayType (EDTColType.DATETIME, aDisplayLocale)
+                                                            .setInitialSorting (ESortOrder.DESCENDING),
                                           new DTCol ("Started by"),
-                                          new DTCol ("File name"),
+                                          new DTCol ("Result"),
                                           new DTCol ("Size").setDisplayType (EDTColType.INT, aDisplayLocale),
                                           new DTCol ("Download")).setID (getID ());
-      for (final LongRunningJobData aJobData : aAllReports)
+      for (final LongRunningJobData aJobData : aAllRuns)
       {
-        // Never null - it was checked in _getAllDownloadableReports
-        final File aFile = SMLSyncJob.getValidSyncFile (aJobData.getResult ().getResultFile ());
-
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (PDTToString.getAsString (aJobData.getEndDateTime () != null ? aJobData.getEndDateTime ()
                                                                                   : aJobData.getStartDateTime (),
                                                aDisplayLocale));
         aRow.addCell (SecurityHelper.getUserDisplayName (aJobData.getStartingUserID (), aDisplayLocale));
-        aRow.addCell (aFile.getName ());
-        aRow.addCell (aSH.getAsMatching (aFile.length (), 2));
-        aRow.addCell (new BootstrapButton ().addChild ("Download")
-                                            .setIcon (EDefaultIcon.SAVE)
-                                            .setOnClick (AJAX_DOWNLOAD_REPORT.getInvocationURL (aRequestScope)
-                                                                             .add (PARAM_JOB_ID, aJobData.getID ())));
+
+        final File aFile = _getReportOfRun (aJobData);
+        if (aFile != null)
+        {
+          aRow.addCell (aFile.getName ());
+          aRow.addCell (aSH.getAsMatching (aFile.length (), 2));
+          aRow.addCell (new BootstrapButton ().addChild ("Download")
+                                              .setIcon (EDefaultIcon.SAVE)
+                                              .setOnClick (AJAX_DOWNLOAD_REPORT.getInvocationURL (aRequestScope)
+                                                                               .add (PARAM_JOB_ID,
+                                                                                     aJobData.getID ())));
+        }
+        else
+          if (aJobData.getExecutionSuccess ().isFalse ())
+          {
+            // Show why it failed - the reason is otherwise only in the server log
+            final LongRunningJobResult aResult = aJobData.getResult ();
+            // The stored text is the exception message followed by the stack trace. Only the first
+            // line is shown - it carries the SML fault message, whereas the stack trace belongs in
+            // the server log.
+            final String sError = aResult == null ? null : aResult.getResultText ();
+            String sHeadline = "No further details are available.";
+            if (StringHelper.isNotEmpty (sError))
+            {
+              final int nIndex = sError.indexOf ('\n');
+              sHeadline = nIndex < 0 ? sError : sError.substring (0, nIndex);
+            }
+            aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Failed"))
+                .addChild (div (sHeadline))
+                .setColspan (3);
+          }
+          else
+          {
+            // Succeeded, but the report was deleted by the retention handling. A running job is
+            // never in this list - results are only stored when a job ends.
+            aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("The report is no longer available"))
+                .setColspan (3);
+          }
       }
       aNodeList.addChild (aTable);
 
