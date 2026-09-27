@@ -58,6 +58,7 @@ public final class CMenuSecure
   public static final String MENU_SML_REG_DELETE = "sml_reg_delete";
   public static final String MENU_SML_CERTIFICATE_UPDATE = "sml_certificate_update";
   public static final String MENU_SML_REG_SYNC = "sml_reg_sync";
+  public static final String MENU_SML_REG_REPAIR = "sml_reg_repair";
   public static final String MENU_SMP_SETTINGS = "smp_settings";
   public static final String MENU_SMP_CONFIGURATION = "smp_configuration";
   public static final String MENU_SMP_IDENTIFIER_MAPPINGS = "smp_id_mappings";

@@ -16,15 +16,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.io.stream.StreamHelper;
+import com.helger.base.string.StringHelper;
 import com.helger.io.file.FileHelper;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
@@ -137,6 +141,53 @@ public final class SMLSyncReport
     aZOS.putNextEntry (new ZipEntry (sEntryName));
     aZOS.write (sContent.getBytes (StandardCharsets.UTF_8));
     aZOS.closeEntry ();
+  }
+
+  /**
+   * Read one of the participant list entries of a previously created report, line by line, so that
+   * a large list never has to be held in memory.
+   *
+   * @param aZipFile
+   *        The report to be read. May not be <code>null</code>.
+   * @param sEntryName
+   *        The ZIP entry to be read, one of {@link CSMLSync#ENTRY_ALL_IN_SML},
+   *        {@link CSMLSync#ENTRY_MISSING_IN_SML} or {@link CSMLSync#ENTRY_ORPHANS_IN_SML}. May
+   *        neither be <code>null</code> nor empty.
+   * @param aLineConsumer
+   *        Invoked for every non-empty line, in file order. May not be <code>null</code>.
+   * @return The number of lines that were handed over. Always &ge; 0.
+   * @throws IOException
+   *         In case of an IO error, or if the entry does not exist
+   */
+  @Nonnegative
+  public static int readEntry (@NonNull final File aZipFile,
+                               @NonNull @Nonempty final String sEntryName,
+                               @NonNull final Consumer <String> aLineConsumer) throws IOException
+  {
+    ValueEnforcer.notNull (aZipFile, "ZipFile");
+    ValueEnforcer.notEmpty (sEntryName, "EntryName");
+    ValueEnforcer.notNull (aLineConsumer, "LineConsumer");
+
+    int ret = 0;
+    try (final ZipFile aZip = new ZipFile (aZipFile))
+    {
+      final ZipEntry aEntry = aZip.getEntry (sEntryName);
+      if (aEntry == null)
+        throw new IOException ("The report '" + aZipFile.getName () + "' contains no entry '" + sEntryName + "'");
+
+      try (final BufferedReader aReader = new BufferedReader (StreamHelper.createReader (aZip.getInputStream (aEntry),
+                                                                                         StandardCharsets.UTF_8)))
+      {
+        String sLine;
+        while ((sLine = aReader.readLine ()) != null)
+          if (StringHelper.isNotEmpty (sLine))
+          {
+            aLineConsumer.accept (sLine);
+            ret++;
+          }
+      }
+    }
+    return ret;
   }
 
   /**
