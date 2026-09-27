@@ -92,6 +92,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_SYNC_RETENTION_DAYS = "sml.sync.retention.days";
   public static final String KEY_SML_SYNC_PAGE_DELAY = "sml.sync.page.delay";
   public static final String KEY_SML_REPAIR_CHUNK_SIZE = "sml.repair.chunk.size";
+  public static final String KEY_SMP_DNSCHECK_ASYNC_THRESHOLD = "smp.dnscheck.async.threshold";
+  public static final String KEY_SMP_DNSCHECK_THREADS = "smp.dnscheck.threads";
   /**
    * @deprecated Since 8.1.8; use {@link #KEY_SML_CONNECTION_TIMEOUT} with the duration grammar
    *             (e.g. <code>5s</code>, <code>1m 30s</code>) instead.
@@ -126,6 +128,12 @@ public final class SMPServerConfiguration
 
   /** The default number of participants sent to the SML in a single CreateList or DeleteList call */
   public static final int DEFAULT_SML_REPAIR_CHUNK_SIZE = 100;
+
+  /** From this number of Service Groups on, the DNS state check runs as a background job */
+  public static final int DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD = 500;
+
+  /** The default number of parallel DNS lookups of the DNS state check */
+  public static final int DEFAULT_SMP_DNSCHECK_THREADS = 8;
 
   /** The default maximum duration a single readiness check may take */
   public static final Duration DEFAULT_SMP_READY_TIMEOUT = Duration.ofSeconds (2);
@@ -405,6 +413,31 @@ public final class SMPServerConfiguration
    *         fails as a whole. The default value is {@value #DEFAULT_SML_REPAIR_CHUNK_SIZE}.
    * @since 8.5.1
    */
+  /**
+   * @return The number of Service Groups from which on the DNS state check is performed as a
+   *         background job instead of while the page is rendered. A value &le; 0 means that it
+   *         always runs in the background. The default value is
+   *         {@value #DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD}.
+   * @since 8.5.1
+   */
+  public static int getDNSCheckAsyncThreshold ()
+  {
+    return _getConfig ().getAsInt (KEY_SMP_DNSCHECK_ASYNC_THRESHOLD, DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD);
+  }
+
+  /**
+   * @return The number of DNS lookups that are performed in parallel by the DNS state check. A few
+   *         hundred concurrent NAPTR queries are unkind to a resolver, so this is deliberately
+   *         conservative. The default value is {@value #DEFAULT_SMP_DNSCHECK_THREADS}.
+   * @since 8.5.1
+   */
+  @Nonnegative
+  public static int getDNSCheckThreadCount ()
+  {
+    final int ret = _getConfig ().getAsInt (KEY_SMP_DNSCHECK_THREADS, DEFAULT_SMP_DNSCHECK_THREADS);
+    return ret <= 0 ? DEFAULT_SMP_DNSCHECK_THREADS : ret;
+  }
+
   @Nonnegative
   public static int getSMLRepairChunkSize ()
   {
