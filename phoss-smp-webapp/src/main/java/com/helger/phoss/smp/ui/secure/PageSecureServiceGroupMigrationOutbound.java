@@ -42,6 +42,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
+import com.helger.phoss.smp.smlsync.SMLFirstPage;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
@@ -61,6 +62,8 @@ import com.helger.photon.bootstrap5.form.BootstrapViewForm;
 import com.helger.photon.bootstrap5.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerWithQuery;
+import com.helger.photon.bootstrap5.badge.BootstrapBadge;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.core.form.FormErrorList;
@@ -424,17 +427,48 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     }
   }
 
+  /**
+   * Render what the SML says about an in progress outbound migration. After the receiving SMP
+   * called <code>Migrate()</code>, the participant is no longer registered for this SMP, so its
+   * absence from the SML list is the evidence that the migration completed.
+   *
+   * @param aFirstPage
+   *        The SML participant list, or <code>null</code> if it was not read.
+   * @param aMig
+   *        The migration to be checked. May not be <code>null</code>.
+   * @return The node for the cell. Never <code>null</code>.
+   */
+  @NonNull
+  private static IHCNode _createSMLStateCell (@Nullable final SMLFirstPage aFirstPage,
+                                              @NonNull final ISMPParticipantMigration aMig)
+  {
+    if (aFirstPage == null)
+      return new BootstrapBadge (EBootstrapBadgeType.SECONDARY).addChild ("Not checked");
+    if (aFirstPage.hasError ())
+      return new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("SML not reachable");
+
+    return switch (aFirstPage.isParticipantRegistered (aMig.getParticipantIdentifier ()))
+    {
+      case TRUE -> new BootstrapBadge (EBootstrapBadgeType.INFO).addChild ("Still registered to this SMP");
+      case FALSE -> new BootstrapBadge (EBootstrapBadgeType.SUCCESS).addChild ("Migrated away - can be finalized");
+      default -> new BootstrapBadge (EBootstrapBadgeType.SECONDARY).addChild ("Unknown - too many participants to tell");
+    };
+  }
+
   @NonNull
   private IHCNode _createTable (@NonNull final WebPageExecutionContext aWPEC,
                                 @NonNull final ICommonsIterable <ISMPParticipantMigration> aMigs,
-                                @NonNull final EParticipantMigrationState eState)
+                                @NonNull final EParticipantMigrationState eState,
+                                @Nullable final SMLFirstPage aFirstPage)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
+    final boolean bShowSMLState = eState.isInProgress ();
 
     final HCTable aTable = new HCTable (new DTCol ("ID").setVisible (false),
                                         new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Initiation").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
                                         new DTCol ("Migration Key"),
+                                        new DTCol ("SML state").setVisible (bShowSMLState),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID () + eState.getID ());
     for (final ISMPParticipantMigration aCurObject : aMigs)
     {
@@ -446,6 +480,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
       aRow.addCell (a (aViewLink).addChild (sParticipantID));
       aRow.addCell (PDTToString.getAsString (aCurObject.getInitiationDateTime (), aDisplayLocale));
       aRow.addCell (code (aCurObject.getMigrationKey ()));
+      aRow.addCell (bShowSMLState ? _createSMLStateCell (aFirstPage, aCurObject) : null);
 
       final IHCCell <?> aActionCell = aRow.addCell ();
       aActionCell.addChild (eState.isInProgress () ? new HCA (aWPEC.getSelfHref ()
@@ -550,13 +585,25 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
 
     final ICommonsList <ISMPParticipantMigration> aAllMigs = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (null);
+
+    // Read the SML participant list at most once per rendering, and only if there is an in progress
+    // migration whose completion could be verified at all
+    SMLFirstPage aFirstPage = null;
+    if (aSettings.isSMLEnabled () &&
+        aSettings.getSMLInfo () != null &&
+        StringHelper.isNotEmpty (SMPServerConfiguration.getSMLSMPID ()) &&
+        aAllMigs.containsAny (x -> x.getState ().isInProgress ()))
+    {
+      aFirstPage = SMLFirstPage.read (aSettings.getSMLInfo (), SMPServerConfiguration.getSMLSMPID ());
+    }
+
     for (final EParticipantMigrationState eState : EParticipantMigrationState.values ())
       if (eState.isOutboundState ())
       {
         final ICommonsList <ISMPParticipantMigration> aMatchingMigs = aAllMigs.getAll (x -> x.getState () == eState);
         aTabBox.addTab (eState.getID (),
                         eState.getDisplayName () + " (" + aMatchingMigs.size () + ")",
-                        _createTable (aWPEC, aMatchingMigs, eState));
+                        _createTable (aWPEC, aMatchingMigs, eState, aFirstPage));
       }
   }
 }
