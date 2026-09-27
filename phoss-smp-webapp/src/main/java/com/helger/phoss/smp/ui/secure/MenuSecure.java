@@ -153,6 +153,8 @@ public final class MenuSecure
                  .setDisplayFilter (aFilterSMLConnectionActive);
         aMenuTree.createItem (aAdminSML, new PageSecureSMLCertificateUpdate (CMenuSecure.MENU_SML_CERTIFICATE_UPDATE))
                  .setDisplayFilter (aFilterSMLConnectionActive);
+        aMenuTree.createItem (aAdminSML, new PageSecureSMLRegSync (CMenuSecure.MENU_SML_REG_SYNC))
+                 .setDisplayFilter (aFilterSMLConnectionActive);
       }
       aMenuTree.createItem (aAdmin, new PageSecureSMPSettings (CMenuSecure.MENU_SMP_SETTINGS));
       aMenuTree.createItem (aAdmin, new PageSecureSMPConfiguration (CMenuSecure.MENU_SMP_CONFIGURATION));

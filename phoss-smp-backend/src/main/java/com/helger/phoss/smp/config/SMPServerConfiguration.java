@@ -88,6 +88,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
   public static final String KEY_SML_CONNECTION_TIMEOUT = "sml.connection.timeout";
   public static final String KEY_SML_REQUEST_TIMEOUT = "sml.request.timeout";
+  public static final String KEY_SML_SYNC_RETENTION_DAYS = "sml.sync.retention.days";
+  public static final String KEY_SML_SYNC_PAGE_DELAY = "sml.sync.page.delay";
   /**
    * @deprecated Since 8.1.8; use {@link #KEY_SML_CONNECTION_TIMEOUT} with the duration grammar
    *             (e.g. <code>5s</code>, <code>1m 30s</code>) instead.
@@ -116,6 +118,9 @@ public final class SMPServerConfiguration
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
+
+  /** The default number of days an SML reconciliation report is kept on disk */
+  public static final int DEFAULT_SML_SYNC_RETENTION_DAYS = 30;
 
   /** The default maximum duration a single readiness check may take */
   public static final Duration DEFAULT_SMP_READY_TIMEOUT = Duration.ofSeconds (2);
@@ -369,6 +374,34 @@ public final class SMPServerConfiguration
   public static int getExportRetentionDays ()
   {
     return _getConfig ().getAsInt (KEY_SMP_EXPORT_RETENTION_DAYS, DEFAULT_SMP_EXPORT_RETENTION_DAYS);
+  }
+
+  /**
+   * @return The number of days a created SML reconciliation report is kept on disk, before it is
+   *         deleted. If the value is &le; 0, the reports are kept forever. The default value is
+   *         {@value #DEFAULT_SML_SYNC_RETENTION_DAYS} days.
+   * @since 8.5.1
+   */
+  public static int getSMLSyncRetentionDays ()
+  {
+    return _getConfig ().getAsInt (KEY_SML_SYNC_RETENTION_DAYS, DEFAULT_SML_SYNC_RETENTION_DAYS);
+  }
+
+  /**
+   * @return The delay to be applied between two page requests of the SML <code>List()</code>
+   *         operation, so that reading the participants of a large SMP does not hammer the SML.
+   *         May be <code>null</code> or zero, in which case the pages are requested without any
+   *         delay. That is the default.
+   * @since 8.5.1
+   */
+  @Nullable
+  public static Duration getSMLSyncPageDelay ()
+  {
+    return _getConfig ().getAsConfigDuration (KEY_SML_SYNC_PAGE_DELAY,
+                                              sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                   KEY_SML_SYNC_PAGE_DELAY +
+                                                                   "' as duration: " +
+                                                                   sMsg));
   }
 
   /**
