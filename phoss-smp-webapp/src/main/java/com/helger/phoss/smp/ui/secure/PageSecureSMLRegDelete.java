@@ -20,16 +20,19 @@ import java.util.Locale;
 import java.util.function.Predicate;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.smlhook.SmpSmlHelper;
+import com.helger.phoss.smp.smlsync.SMLFirstPage;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCSMLSelect;
 import com.helger.photon.audit.AuditHelper;
@@ -39,6 +42,7 @@ import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
+import com.helger.base.string.StringHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
@@ -99,6 +103,44 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       aNodeList.addChild (BootstrapWebPageUIHandler.INSTANCE.createIncorrectInputBox (aWPEC));
   }
 
+  /**
+   * Determine how many participants would be deleted by unregistering this SMP, by reading only the
+   * first page of the SML participant list. That is a constant time operation, so it can run while
+   * the page is rendered.<br>
+   * A failure to reach the SML deliberately does not block the deletion - this is a safety net, not
+   * a gate.
+   *
+   * @param aSMLInfo
+   *        The SML that would be used. May be <code>null</code> if none is selected.
+   * @param sSMPID
+   *        The configured SMP ID. May be <code>null</code> or empty if none is configured.
+   * @return The node to be shown, or <code>null</code> if nothing can be said.
+   */
+  @Nullable
+  private IHCNode _createParticipantWarning (@Nullable final ISMLInfo aSMLInfo, @Nullable final String sSMPID)
+  {
+    if (aSMLInfo == null || StringHelper.isEmpty (sSMPID))
+      return null;
+
+    final SMLFirstPage aFirstPage = SMLFirstPage.read (aSMLInfo, sSMPID);
+    if (aFirstPage.hasError ())
+    {
+      return warn (div ("The number of affected participants could not be determined, because the SML could not be queried: " +
+                        aFirstPage.getErrorMessage ())).addChild (div ("Unregistering is still possible - please make sure yourself that no participant is left."));
+    }
+
+    final int nCount = aFirstPage.getParticipantCount ();
+    if (nCount == 0)
+      return success ("The SML currently has no participant registered for this SMP, so unregistering deletes nothing.");
+
+    final String sCount = aFirstPage.hasMorePages () ? "at least " + nCount : Integer.toString (nCount);
+    return error (div ("Unregistering this SMP deletes " +
+                       sCount +
+                       " participant(s) at the SML.")).addChild (div ("Every deleted participant becomes free for another SMP to claim, so re-creating them later may fail. Create a reconciliation report first - its ")
+                                                                                                    .addChild (code ("all-in-sml.txt"))
+                                                                                                    .addChild (" is the list you need to restore them."));
+  }
+
   @Override
   protected void fillContent (@NonNull final WebPageExecutionContext aWPEC)
   {
@@ -130,6 +172,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       final BootstrapForm aForm = getUIHandler ().createFormSelf (aWPEC);
       aForm.addChild (info ("Delete this SMP from the SML."));
       aForm.addChild (error ("This will remove ALL participants / Service Groups from the network! Your local Service Groups will become unreachable."));
+      aForm.addChild (_createParticipantWarning (aDefaultSML, sSMPID));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("SML")
                                                    .setCtrl (new HCSMLSelect (new RequestField (FIELD_SML_ID,
                                                                                                 aDefaultSML == null ? null
