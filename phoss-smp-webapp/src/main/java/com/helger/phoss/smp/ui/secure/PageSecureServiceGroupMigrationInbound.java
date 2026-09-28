@@ -47,6 +47,7 @@ import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
+import com.helger.phoss.smp.smlsync.SMLFirstPage;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
@@ -67,6 +68,8 @@ import com.helger.photon.bootstrap5.form.BootstrapViewForm;
 import com.helger.photon.bootstrap5.grid.BootstrapRow;
 import com.helger.photon.bootstrap5.nav.BootstrapTabBox;
 import com.helger.photon.bootstrap5.pages.handler.AbstractBootstrapWebPageActionHandlerDelete;
+import com.helger.photon.bootstrap5.badge.BootstrapBadge;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDTColAction;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.bootstrap5.uictrls.ext.BootstrapTechnicalUI;
@@ -454,10 +457,39 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     }
   }
 
+  /**
+   * Render what the SML says about a completed inbound migration. After this SMP called
+   * <code>Migrate()</code>, the participant must be registered for this SMP - if it is not, the
+   * takeover did not take effect, even though the migration was recorded as successful.
+   *
+   * @param aFirstPage
+   *        The SML participant list, or <code>null</code> if it was not read.
+   * @param aMig
+   *        The migration to be checked. May not be <code>null</code>.
+   * @return The node for the cell. Never <code>null</code>.
+   */
+  @NonNull
+  private static IHCNode _createSMLStateCell (@Nullable final SMLFirstPage aFirstPage,
+                                              @NonNull final ISMPParticipantMigration aMig)
+  {
+    if (aFirstPage == null)
+      return new BootstrapBadge (EBootstrapBadgeType.SECONDARY).addChild ("Not checked");
+    if (aFirstPage.hasError ())
+      return new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("SML not reachable");
+
+    return switch (aFirstPage.isParticipantRegistered (aMig.getParticipantIdentifier ()))
+    {
+      case TRUE -> new BootstrapBadge (EBootstrapBadgeType.SUCCESS).addChild ("Registered to this SMP");
+      case FALSE -> new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("NOT registered to this SMP");
+      default -> new BootstrapBadge (EBootstrapBadgeType.SECONDARY).addChild ("Unknown - too many participants to tell");
+    };
+  }
+
   @NonNull
   private IHCNode _createTable (@NonNull final WebPageExecutionContext aWPEC,
                                 @NonNull final ICommonsIterable <ISMPParticipantMigration> aMigs,
-                                @NonNull final EParticipantMigrationState eState)
+                                @NonNull final EParticipantMigrationState eState,
+                                @Nullable final SMLFirstPage aFirstPage)
   {
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
 
@@ -465,6 +497,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
                                         new DTCol ("Participant ID").setInitialSorting (ESortOrder.ASCENDING),
                                         new DTCol ("Migration").setDisplayType (EDTColType.DATETIME, aDisplayLocale),
                                         new DTCol ("Migration Key"),
+                                        new DTCol ("SML state"),
                                         new BootstrapDTColAction (aDisplayLocale)).setID (getID () + eState.getID ());
     for (final ISMPParticipantMigration aCurObject : aMigs)
     {
@@ -476,6 +509,7 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
       aRow.addCell (a (aViewLink).addChild (sParticipantID));
       aRow.addCell (PDTToString.getAsString (aCurObject.getInitiationDateTime (), aDisplayLocale));
       aRow.addCell (code (aCurObject.getMigrationKey ()));
+      aRow.addCell (_createSMLStateCell (aFirstPage, aCurObject));
 
       final IHCCell <?> aActionCell = aRow.addCell ();
       aActionCell.addChild (createDeleteLink (aWPEC,
@@ -548,13 +582,24 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
     final BootstrapTabBox aTabBox = aNodeList.addAndReturnChild (new BootstrapTabBox ());
 
     final ICommonsList <ISMPParticipantMigration> aAllMigs = aParticipantMigrationMgr.getAllInboundParticipantMigrations (null);
+
+    // Read the SML participant list at most once per rendering
+    SMLFirstPage aFirstPage = null;
+    if (aSettings.isSMLEnabled () &&
+        aSettings.getSMLInfo () != null &&
+        StringHelper.isNotEmpty (SMPServerConfiguration.getSMLSMPID ()) &&
+        aAllMigs.isNotEmpty ())
+    {
+      aFirstPage = SMLFirstPage.read (aSettings.getSMLInfo (), SMPServerConfiguration.getSMLSMPID ());
+    }
+
     for (final EParticipantMigrationState eState : EParticipantMigrationState.values ())
       if (eState.isInboundState ())
       {
         final ICommonsList <ISMPParticipantMigration> aMatchingMigs = aAllMigs.getAll (x -> x.getState () == eState);
         aTabBox.addTab (eState.getID (),
                         eState.getDisplayName () + " (" + aMatchingMigs.size () + ")",
-                        _createTable (aWPEC, aMatchingMigs, eState));
+                        _createTable (aWPEC, aMatchingMigs, eState, aFirstPage));
       }
   }
 }

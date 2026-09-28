@@ -16,7 +16,11 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import java.time.Duration;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.typeconvert.collection.StringMap;
+import com.helger.photon.io.PhotonWorkerPool;
+import com.helger.datetime.format.PDTToString;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Locale;
 
@@ -30,7 +34,6 @@ import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
-import com.helger.base.timing.StopWatch;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
@@ -62,6 +65,11 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPInternalErrorHandler;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
+import com.helger.phoss.smp.dnscheck.DNSCheckCache;
+import com.helger.phoss.smp.dnscheck.DNSCheckEntry;
+import com.helger.phoss.smp.dnscheck.DNSCheckJob;
+import com.helger.phoss.smp.dnscheck.DNSCheckResult;
+import com.helger.phoss.smp.dnscheck.DNSChecker;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
@@ -143,7 +151,6 @@ import com.helger.servlet.request.IRequestParamMap;
 import com.helger.servlet.request.RequestParamMap;
 import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.smpclient.url.ISMPURLProvider;
-import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.smpclient.url.dns.IBDXLURLProvider;
 import com.helger.typeconvert.collection.StringMap;
 import com.helger.url.ISimpleURL;
@@ -164,6 +171,34 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       super (false);
     }
 
+    /**
+     * Start the DNS check as a background job. Above a configurable number of Service Groups this is
+     * the only sensible way to perform it - one NAPTR lookup per participant while a page is
+     * rendered does not scale.
+     */
+    private void _startBackgroundCheck (@NonNull final WebPageExecutionContext aWPEC)
+    {
+      if (!DNSCheckCache.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+      {
+        aWPEC.postRedirectGetInternal (warn ("A DNS check is already running in the background. Please wait until it is finished."));
+      }
+      else
+      {
+        try
+        {
+          PhotonWorkerPool.getInstance ().run (DNSCheckJob.JOB_TYPE, new DNSCheckJob (aWPEC.getLoggedInUserID ()));
+        }
+        catch (final RuntimeException ex)
+        {
+          // The job was never started, so it can never release the lock
+          DNSCheckCache.LOCK.release ();
+          throw ex;
+        }
+        aWPEC.postRedirectGetInternal (success ("The DNS check is now running in the background. Refresh this page to see the result."),
+                                       new StringMap ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS));
+      }
+    }
+
     @NonNull
     public EShowList handleAction (@NonNull final WebPageExecutionContext aWPEC,
                                    @Nullable final ISMPServiceGroup aSelectedObject)
@@ -173,15 +208,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
       final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
       final ISMPSettings aSettings = SMPMetaManager.getSettings ();
 
-      aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
-
+      if (aWPEC.hasSubAction (ACTION_START_DNS_CHECK))
       {
-        final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
-        aToolbar.addButton ("Refresh",
-                            aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
-                            EDefaultIcon.REFRESH);
-        aNodeList.addChild (aToolbar);
+        _startBackgroundCheck (aWPEC);
+        // Never reached - the action performs a redirect
       }
+
+      aNodeList.addChild (getUIHandler ().createActionHeader ("Check DNS state of participants"));
 
       // If your local Linux client does not allow you to
       // query e.g. NAPTR records
@@ -206,100 +239,137 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
         aNodeList.addChild (info ("Please note that some DNS changes need some time to propagate! All changes should usually be visible within 1 hour!"));
       }
 
-      final String sSMLZoneName = aSettings.getSMLDNSZone ();
       final ISMPURLProvider aURLProvider = SMPMetaManager.getSMPURLProvider ();
-
-      final HCTable aTable = new HCTable (new DTCol ("Service group"),
-                                          new DTCol ("DNS name (not clickable)").setWidth ("50%"),
-                                          new DTCol ("SMP URI").setDataSort (2, 0),
-                                          new DTCol ("Action")).setID (getID () + "_checkdns");
-
-      final ICommonsList <ISMPServiceGroup> aAllServiceGroups = aServiceGroupMgr.getAllSMPServiceGroups ();
-      final StopWatch aSW = StopWatch.createdStarted ();
-      for (final ISMPServiceGroup aServiceGroup : aAllServiceGroups)
+      if (!(aURLProvider instanceof final IBDXLURLProvider aRealProvider))
       {
-        // Avoid endless actions
-        final Duration aDuration = aSW.getLapDuration ();
-        final boolean bTookTooLong = aDuration.compareTo (Duration.ofSeconds (30)) > 0;
-
-        String sDNSName = null;
-        String sURI = null;
-        try
-        {
-          if (!(aURLProvider instanceof final IBDXLURLProvider aRealProvider))
-          {
-            // Of course this should never happen
-            LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
-            continue;
-          }
-
-          // Fallback by not resolving the NAPTR
-          sDNSName = aRealProvider.getDNSNameOfParticipant (aServiceGroup.getParticipantIdentifier (), sSMLZoneName);
-
-          if (bTookTooLong)
-          {
-            // We ignore this participant, because we're
-            // already running some time
-            sURI = "n/a (out of processing time)";
-          }
-          else
-          {
-            // This may perform a NAPTR lookup which might be time consuming
-            sURI = aURLProvider.getSMPURIOfParticipant (aServiceGroup.getParticipantIdentifier (), sSMLZoneName)
-                               .toString ();
-          }
-        }
-        catch (final SMPDNSResolutionException ex)
-        {
-          // Ignore - participant not registered
-        }
-
-        final HCRow aRow = aTable.addBodyRow ();
-        aRow.addCell (aServiceGroup.getParticipantIdentifier ().getURIEncoded ());
-        if (sDNSName != null)
-        {
-          // This host name cannot be opened in the browser, so no link
-          aRow.addCell (sDNSName);
-        }
-        else
-          aRow.addCell (new HCEM ().addChild ("DNS resolve failed"));
-        if (sURI != null)
-        {
-          aRow.addCell (new HCA (new SimpleURL (sURI)).setTargetBlank ().addChild (sURI));
-          aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER, EBootstrapButtonSize.SMALL).addChild (
-                                                                                                                "Unregister from SML")
-                                                                                                     .setOnClick (aWPEC.getSelfHref ()
-                                                                                                                       .add (CPageParam.PARAM_ACTION,
-                                                                                                                             ACTION_UNREGISTER_FROM_SML)
-                                                                                                                       .add (CPageParam.PARAM_OBJECT,
-                                                                                                                             aServiceGroup.getID ()))
-                                                                                                     .setDisabled (bOffline ||
-                                                                                                       !aSettings.isSMLEnabled ()));
-        }
-        else
-        {
-          if (bTookTooLong)
-          {
-            aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Was not checked - took too long"))
-                .setColspan (2);
-          }
-          else
-          {
-            aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
-            aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
-                                                                          .setOnClick (aWPEC.getSelfHref ()
-                                                                                            .add (CPageParam.PARAM_ACTION,
-                                                                                                  ACTION_REGISTER_TO_SML)
-                                                                                            .add (CPageParam.PARAM_OBJECT,
-                                                                                                  aServiceGroup.getID ()))
-                                                                          .setDisabled (bOffline ||
-                                                                            !aSettings.isSMLEnabled ()));
-          }
-        }
+        // Of course this should never happen
+        LOGGER.error ("Unexpected URL provider found: " + aURLProvider);
+        aNodeList.addChild (error ("The configured URL provider cannot resolve participants via DNS."));
+        return EShowList.DONT_SHOW_LIST;
       }
 
-      final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
-      aNodeList.addChild (aTable).addChild (aDataTables);
+      final ICommonsList <IParticipantIdentifier> aAllParticipantIDs = new CommonsArrayList <> ();
+      for (final ISMPServiceGroup aServiceGroup : aServiceGroupMgr.getAllSMPServiceGroups ())
+        aAllParticipantIDs.add (aServiceGroup.getParticipantIdentifier ());
+
+      final boolean bAsync = DNSChecker.isAsyncNeeded (aAllParticipantIDs);
+      final boolean bCheckRunning = DNSCheckCache.LOCK.isRunning ();
+      final DNSCheckResult aResult;
+      if (bAsync)
+      {
+        // Too many participants to check them while this page is rendered
+        aNodeList.addChild (info ("This SMP holds " +
+                                  aAllParticipantIDs.size () +
+                                  " Service Group(s), so the DNS check runs in the background and this page shows the result of the last run."));
+        if (bCheckRunning)
+        {
+          final LocalDateTime aStartDT = DNSCheckCache.LOCK.getStartDateTime ();
+          aNodeList.addChild (warn ("A DNS check is currently running in the background" +
+                                    (aStartDT == null ? ""
+                                                      : " (started at " +
+                                                        PDTToString.getAsString (aStartDT, aDisplayLocale) +
+                                                        ")") +
+                                    "."));
+        }
+        aResult = DNSCheckCache.getResult ();
+      }
+      else
+      {
+        // Few enough participants to check them right away
+        aResult = DNSChecker.checkAll (aRealProvider, aAllParticipantIDs, aSettings.getSMLDNSZone ());
+      }
+
+      {
+        final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
+        aToolbar.addButton ("Refresh",
+                            aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
+                            EDefaultIcon.REFRESH);
+        if (bAsync)
+        {
+          aToolbar.addChild (new BootstrapButton ().addChild ("Check now in the background")
+                                                   .setIcon (EDefaultIcon.NEXT)
+                                                   .setOnClick (aWPEC.getSelfHref ()
+                                                                     .add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS)
+                                                                     .add (CPageParam.PARAM_SUBACTION,
+                                                                           ACTION_START_DNS_CHECK))
+                                                   .setDisabled (bCheckRunning || bOffline));
+        }
+        aNodeList.addChild (aToolbar);
+      }
+
+      if (aResult == null)
+      {
+        aNodeList.addChild (warn ("No DNS check was performed yet. Please start one."));
+      }
+      else
+      {
+        aNodeList.addChild (info ("The result below was determined at " +
+                                  PDTToString.getAsString (aResult.getStartDateTime (), aDisplayLocale) +
+                                  " and took " +
+                                  aResult.getDuration ().toMillis () +
+                                  " ms for " +
+                                  aResult.getEntryCount () +
+                                  " participant(s)."));
+
+        final HCTable aTable = new HCTable (new DTCol ("Service group"),
+                                            new DTCol ("DNS name (not clickable)").setWidth ("50%"),
+                                            new DTCol ("SMP URI").setDataSort (2, 0),
+                                            new DTCol ("Action")).setID (getID () + "_checkdns");
+        for (final DNSCheckEntry aEntry : aResult.getAllEntries ())
+        {
+          final IParticipantIdentifier aParticipantID = aEntry.getParticipantIdentifier ();
+          final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+
+          final HCRow aRow = aTable.addBodyRow ();
+          aRow.addCell (aParticipantID.getURIEncoded ());
+          // This host name cannot be opened in the browser, so no link
+          aRow.addCell (aEntry.getDNSName () != null ? new HCTextNode (aEntry.getDNSName ())
+                                                     : new HCEM ().addChild ("DNS resolve failed"));
+
+          switch (aEntry.getState ())
+          {
+            case RESOLVED ->
+            {
+              final String sURI = aEntry.getSMPURI ();
+              aRow.addCell (new HCA (new SimpleURL (sURI)).setTargetBlank ().addChild (sURI));
+              aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER,
+                                                 EBootstrapButtonSize.SMALL).addChild ("Unregister from SML")
+                                                                            .setOnClick (aWPEC.getSelfHref ()
+                                                                                              .add (CPageParam.PARAM_ACTION,
+                                                                                                    ACTION_UNREGISTER_FROM_SML)
+                                                                                              .add (CPageParam.PARAM_OBJECT,
+                                                                                                    sServiceGroupID))
+                                                                            .setDisabled (bOffline ||
+                                                                                          !aSettings.isSMLEnabled ()));
+            }
+            case NOT_REGISTERED ->
+            {
+              aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
+              aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
+                                                                           .setOnClick (aWPEC.getSelfHref ()
+                                                                                             .add (CPageParam.PARAM_ACTION,
+                                                                                                   ACTION_REGISTER_TO_SML)
+                                                                                             .add (CPageParam.PARAM_OBJECT,
+                                                                                                   sServiceGroupID))
+                                                                           .setDisabled (bOffline ||
+                                                                                         !aSettings.isSMLEnabled ()));
+            }
+            default ->
+            {
+              // Every row must have one cell per column - DataTables counts cells and does not
+              // support colspan in a body row
+              aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Lookup failed" +
+                                                                                      (aEntry.getErrorMessage () == null ? ""
+                                                                                                                        : ": " +
+                                                                                                                          aEntry.getErrorMessage ())));
+              aRow.addCell ();
+            }
+          }
+        }
+
+        final DataTables aDataTables = BootstrapDataTables.createDefaultDataTables (aWPEC, aTable);
+        aNodeList.addChild (aTable).addChild (aDataTables);
+      }
 
       {
         final BootstrapButtonToolbar aToolbar = new BootstrapButtonToolbar (aWPEC);
@@ -324,6 +394,7 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
   private static final String TMP_ID_PREFIX = "tmp";
 
   private static final String ACTION_CHECK_DNS = "checkdns";
+  private static final String ACTION_START_DNS_CHECK = "startdnscheck";
   private static final String ACTION_REGISTER_TO_SML = "register-to-sml";
   private static final String ACTION_UNREGISTER_FROM_SML = "unregister-from-sml";
 

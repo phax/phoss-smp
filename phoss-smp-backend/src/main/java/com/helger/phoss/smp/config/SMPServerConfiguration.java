@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.misc.ChangeNextMajorRelease;
 import com.helger.config.IConfig;
@@ -88,6 +89,11 @@ public final class SMPServerConfiguration
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
   public static final String KEY_SML_CONNECTION_TIMEOUT = "sml.connection.timeout";
   public static final String KEY_SML_REQUEST_TIMEOUT = "sml.request.timeout";
+  public static final String KEY_SML_SYNC_RETENTION_DAYS = "sml.sync.retention.days";
+  public static final String KEY_SML_SYNC_PAGE_DELAY = "sml.sync.page.delay";
+  public static final String KEY_SML_REPAIR_CHUNK_SIZE = "sml.repair.chunk.size";
+  public static final String KEY_SMP_DNSCHECK_ASYNC_THRESHOLD = "smp.dnscheck.async.threshold";
+  public static final String KEY_SMP_DNSCHECK_THREADS = "smp.dnscheck.threads";
   /**
    * @deprecated Since 8.1.8; use {@link #KEY_SML_CONNECTION_TIMEOUT} with the duration grammar
    *             (e.g. <code>5s</code>, <code>1m 30s</code>) instead.
@@ -116,6 +122,18 @@ public final class SMPServerConfiguration
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
+
+  /** The default number of days an SML reconciliation report is kept on disk */
+  public static final int DEFAULT_SML_SYNC_RETENTION_DAYS = 30;
+
+  /** The default number of participants sent to the SML in a single CreateList or DeleteList call */
+  public static final int DEFAULT_SML_REPAIR_CHUNK_SIZE = 100;
+
+  /** From this number of Service Groups on, the DNS state check runs as a background job */
+  public static final int DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD = 500;
+
+  /** The default number of parallel DNS lookups of the DNS state check */
+  public static final int DEFAULT_SMP_DNSCHECK_THREADS = 8;
 
   /** The default maximum duration a single readiness check may take */
   public static final Duration DEFAULT_SMP_READY_TIMEOUT = Duration.ofSeconds (2);
@@ -369,6 +387,72 @@ public final class SMPServerConfiguration
   public static int getExportRetentionDays ()
   {
     return _getConfig ().getAsInt (KEY_SMP_EXPORT_RETENTION_DAYS, DEFAULT_SMP_EXPORT_RETENTION_DAYS);
+  }
+
+  /**
+   * @return The number of days a created SML reconciliation report is kept on disk, before it is
+   *         deleted. If the value is &le; 0, the reports are kept forever. The default value is
+   *         {@value #DEFAULT_SML_SYNC_RETENTION_DAYS} days.
+   * @since 8.5.1
+   */
+  public static int getSMLSyncRetentionDays ()
+  {
+    return _getConfig ().getAsInt (KEY_SML_SYNC_RETENTION_DAYS, DEFAULT_SML_SYNC_RETENTION_DAYS);
+  }
+
+  /**
+   * @return The delay to be applied between two page requests of the SML <code>List()</code>
+   *         operation, so that reading the participants of a large SMP does not hammer the SML.
+   *         May be <code>null</code> or zero, in which case the pages are requested without any
+   *         delay. That is the default.
+   * @since 8.5.1
+   */
+  /**
+   * @return The number of participants that are sent to the SML in a single <code>CreateList()</code>
+   *         or <code>DeleteList()</code> call. A smaller chunk limits the damage of a chunk that
+   *         fails as a whole. The default value is {@value #DEFAULT_SML_REPAIR_CHUNK_SIZE}.
+   * @since 8.5.1
+   */
+  /**
+   * @return The number of Service Groups from which on the DNS state check is performed as a
+   *         background job instead of while the page is rendered. A value &le; 0 means that it
+   *         always runs in the background. The default value is
+   *         {@value #DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD}.
+   * @since 8.5.1
+   */
+  public static int getDNSCheckAsyncThreshold ()
+  {
+    return _getConfig ().getAsInt (KEY_SMP_DNSCHECK_ASYNC_THRESHOLD, DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD);
+  }
+
+  /**
+   * @return The number of DNS lookups that are performed in parallel by the DNS state check. A few
+   *         hundred concurrent NAPTR queries are unkind to a resolver, so this is deliberately
+   *         conservative. The default value is {@value #DEFAULT_SMP_DNSCHECK_THREADS}.
+   * @since 8.5.1
+   */
+  @Nonnegative
+  public static int getDNSCheckThreadCount ()
+  {
+    final int ret = _getConfig ().getAsInt (KEY_SMP_DNSCHECK_THREADS, DEFAULT_SMP_DNSCHECK_THREADS);
+    return ret <= 0 ? DEFAULT_SMP_DNSCHECK_THREADS : ret;
+  }
+
+  @Nonnegative
+  public static int getSMLRepairChunkSize ()
+  {
+    final int ret = _getConfig ().getAsInt (KEY_SML_REPAIR_CHUNK_SIZE, DEFAULT_SML_REPAIR_CHUNK_SIZE);
+    return ret <= 0 ? DEFAULT_SML_REPAIR_CHUNK_SIZE : ret;
+  }
+
+  @Nullable
+  public static Duration getSMLSyncPageDelay ()
+  {
+    return _getConfig ().getAsConfigDuration (KEY_SML_SYNC_PAGE_DELAY,
+                                              sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                   KEY_SML_SYNC_PAGE_DELAY +
+                                                                   "' as duration: " +
+                                                                   sMsg));
   }
 
   /**
