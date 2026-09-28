@@ -43,6 +43,7 @@ import com.helger.phoss.smp.smlsync.SMLRepairJob;
 import com.helger.phoss.smp.smlsync.SMLSyncJob;
 import com.helger.phoss.smp.smlsync.SMLSyncReport;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.button.EBootstrapButtonType;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.io.PhotonWorkerPool;
@@ -174,15 +175,27 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       return;
     }
 
-    aNodeList.addChild (info (div ("This would send " +
-                                   nTotal +
-                                   " participant(s) to the SML, in chunks of " +
-                                   SMPServerConfiguration.getSMLRepairChunkSize () +
-                                   ".")).addChild (div ("The report was created at a point in time and the SML may have changed since. Participants that are already in the wanted state are counted separately and are not treated as an error.")));
-
-    if (eAction.isDestructive ())
+    if (eAction.isLocalOperation ())
     {
-      aNodeList.addChild (error (div ("This removes participants from the SML, which makes them unreachable.")).addChild (div ("Every removed participant becomes free for another SMP to claim, so this cannot reliably be undone.")));
+      aNodeList.addChild (info (div ("This would create " +
+                                     nTotal +
+                                     " Service Group(s) locally, owned by you.")).addChild (div ("Nothing is sent to the SML - these participants are already registered there, which is exactly why they show up as orphans."))
+                                                                                  .addChild (div ("The Service Groups are created without any endpoint, so the participants stay unreachable until their endpoints are added.")));
+    }
+    else
+    {
+      aNodeList.addChild (info (div ("This would send " +
+                                     nTotal +
+                                     " participant(s) to the SML, in chunks of " +
+                                     SMPServerConfiguration.getSMLRepairChunkSize () +
+                                     ".")).addChild (div ("The report was created at a point in time and the SML may have changed since. Participants that are already in the wanted state are counted separately and are not treated as an error.")));
+
+      if (eAction.isDestructive ())
+      {
+        aNodeList.addChild (error (div ("This removes participants from the SML, which makes them unreachable.")).addChild (div ("Every removed participant becomes free for another SMP to claim, so this cannot reliably be undone.")));
+        aNodeList.addChild (info (div ("If these participants are missing locally because local data was lost, ")).addChild (em ("Create orphans locally"))
+                                                                                                                  .addChild (" is what you want instead - it adopts them rather than deleting them from the network."));
+      }
     }
 
     final HCUL aUL = new HCUL ();
@@ -230,7 +243,7 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       return;
     }
 
-    aNodeList.addChild (info (div ("Register the participants that are missing at the SML, or remove the ones the SML has registered for this SMP that do not exist here.")).addChild (div ("Both are based on a report created on the ")
+    aNodeList.addChild (info (div ("Register the participants that are missing at the SML, and resolve the ones the SML has registered for this SMP that do not exist here - either by removing them from the SML or by creating them locally.")).addChild (div ("Both are based on a report created on the ")
                                                                                                                                                                                        .addChild (em ("Reconcile participants"))
                                                                                                                                                                                        .addChild (" page, so create a report first and then repair from it.")));
 
@@ -258,11 +271,16 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
     // The available reports to repair from
     {
       final ICommonsList <LongRunningJobData> aAllReports = _getAllOfType (SMLSyncJob.JOB_TYPE);
-      final HCTable aTable = new HCTable (new DTCol ("Report of").setDisplayType (EDTColType.DATETIME, aDisplayLocale)
-                                                                .setInitialSorting (ESortOrder.DESCENDING),
-                                          new DTCol ("Created by"),
-                                          new DTCol ("Register missing"),
-                                          new DTCol ("Remove orphans")).setID (getID () + "reports");
+
+      // One column per action, derived from the enum - a hard coded list would silently drift from
+      // the cells below, and DataTables fails if a row has fewer cells than the table has columns
+      final ICommonsList <DTCol> aCols = new CommonsArrayList <> ();
+      aCols.add (new DTCol ("Report of").setDisplayType (EDTColType.DATETIME, aDisplayLocale)
+                                        .setInitialSorting (ESortOrder.DESCENDING));
+      aCols.add (new DTCol ("Created by"));
+      for (final ESMLRepairAction e : ESMLRepairAction.values ())
+        aCols.add (new DTCol (e.getShortName ()));
+      final HCTable aTable = new HCTable (aCols).setID (getID () + "reports");
       for (final LongRunningJobData aJobData : aAllReports)
       {
         final File aFile = _getReport (aJobData.getID ());
@@ -276,12 +294,16 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
         aRow.addCell (SecurityHelper.getUserDisplayName (aJobData.getStartingUserID (), aDisplayLocale));
         for (final ESMLRepairAction e : ESMLRepairAction.values ())
         {
-          aRow.addCell (new BootstrapButton ().addChild (e.isDestructive () ? "Remove orphans" : "Register missing")
-                                              .setIcon (e.isDestructive () ? EDefaultIcon.DELETE : EDefaultIcon.PLUS)
-                                              .setOnClick (aWPEC.getSelfHref ()
-                                                                .add (PARAM_JOB_ID, aJobData.getID ())
-                                                                .add (PARAM_REPAIR_ACTION, e.getID ()))
-                                              .setDisabled (bRunning));
+          aRow.addCell (new BootstrapButton (e.isDestructive () ? EBootstrapButtonType.DANGER
+                                                                : EBootstrapButtonType.SECONDARY).addChild (e.getShortName ())
+                                                                                                 .setIcon (e.isDestructive () ? EDefaultIcon.DELETE
+                                                                                                                              : EDefaultIcon.PLUS)
+                                                                                                 .setOnClick (aWPEC.getSelfHref ()
+                                                                                                                   .add (PARAM_JOB_ID,
+                                                                                                                         aJobData.getID ())
+                                                                                                                   .add (PARAM_REPAIR_ACTION,
+                                                                                                                         e.getID ()))
+                                                                                                 .setDisabled (bRunning));
         }
       }
       if (aTable.hasBodyRows ())

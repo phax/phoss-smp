@@ -30,6 +30,7 @@ import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
 import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.photon.audit.AuditHelper;
@@ -64,6 +65,7 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
 
   private final File m_aReportFile;
   private final ESMLRepairAction m_eAction;
+  private final String m_sUserID;
 
   public SMLRepairJob (@NonNull final File aReportFile,
                        @NonNull final ESMLRepairAction eAction,
@@ -77,6 +79,7 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
     ValueEnforcer.notEmpty (sUserID, "UserID");
     m_aReportFile = aReportFile;
     m_eAction = eAction;
+    m_sUserID = sUserID;
   }
 
   /**
@@ -182,6 +185,46 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
     int nAlreadyDone = 0;
     int nFailed = 0;
 
+    if (m_eAction.isLocalOperation ())
+    {
+      // Nothing is sent to the SML at all - the participants are already registered there, which
+      // is exactly why they show up as orphans. Creating them with bCreateInSML = true would be
+      // rejected by the SML as "already in use".
+      final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+      for (final IParticipantIdentifier aPI : aAll)
+      {
+        final String sURI = aPI.getURIEncoded ();
+        if (aServiceGroupMgr.containsSMPServiceGroupWithID (aPI))
+        {
+          // Created in the meantime, or the report is out of date
+          nAlreadyDone++;
+          aLog.append ("ALREADY DONE - ").append (sURI).append (" - the Service Group already exists\n");
+          continue;
+        }
+
+        try
+        {
+          aServiceGroupMgr.createSMPServiceGroup (m_sUserID, aPI, null, null, false);
+          nSucceeded++;
+          aLog.append ("OK - ").append (sURI).append ('\n');
+        }
+        catch (final Exception ex)
+        {
+          nFailed++;
+          aLog.append ("FAILED - ")
+              .append (sURI)
+              .append (" - ")
+              .append (ex.getClass ().getName ())
+              .append (" - ")
+              .append (ex.getMessage ())
+              .append ('\n');
+          LOGGER.error ("Failed to create the Service Group '" + sURI + "' locally", ex);
+        }
+      }
+
+      return _createResult (aLog, sSMPID, nSucceeded, nAlreadyDone, nFailed);
+    }
+
     final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSMLInfo);
     for (int nStart = 0; nStart < aAll.size (); nStart += nChunkSize)
     {
@@ -238,6 +281,16 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
       }
     }
 
+    return _createResult (aLog, sSMPID, nSucceeded, nAlreadyDone, nFailed);
+  }
+
+  @NonNull
+  private LongRunningJobResult _createResult (@NonNull final StringBuilder aLog,
+                                              @NonNull @Nonempty final String sSMPID,
+                                              final int nSucceeded,
+                                              final int nAlreadyDone,
+                                              final int nFailed)
+  {
     aLog.append ("\nSucceeded: ")
         .append (nSucceeded)
         .append ("\nAlready done: ")
