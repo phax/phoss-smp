@@ -42,6 +42,7 @@ import com.helger.phoss.smp.smlsync.ESMLRepairAction;
 import com.helger.phoss.smp.smlsync.SMLRepairJob;
 import com.helger.phoss.smp.smlsync.SMLSyncJob;
 import com.helger.phoss.smp.smlsync.SMLSyncReport;
+import com.helger.phoss.smp.smlsync.SMLSyncResult;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.button.EBootstrapButtonType;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -287,6 +288,18 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
         if (aFile == null)
           continue;
 
+        // The counts come from the summary of the report, which is a few hundred bytes - counting
+        // the lines of the participant lists instead would mean reading the whole report
+        SMLSyncResult aSummary = null;
+        try
+        {
+          aSummary = SMLSyncReport.readSummary (aFile);
+        }
+        catch (final Exception ex)
+        {
+          LOGGER.warn ("Failed to read the summary of the report '" + aFile.getName () + "': " + ex.getMessage ());
+        }
+
         final HCRow aRow = aTable.addBodyRow ();
         aRow.addCell (PDTToString.getAsString (aJobData.getEndDateTime () != null ? aJobData.getEndDateTime ()
                                                                                   : aJobData.getStartDateTime (),
@@ -294,8 +307,15 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
         aRow.addCell (SecurityHelper.getUserDisplayName (aJobData.getStartingUserID (), aDisplayLocale));
         for (final ESMLRepairAction e : ESMLRepairAction.values ())
         {
+          // Without a readable summary the count is unknown, so the button stays enabled rather
+          // than pretending there is nothing to do
+          final int nAffected = aSummary == null ? -1 : e.getAffectedCount (aSummary);
           aRow.addCell (new BootstrapButton (e.isDestructive () ? EBootstrapButtonType.DANGER
-                                                                : EBootstrapButtonType.SECONDARY).addChild (e.getShortName ())
+                                                                : EBootstrapButtonType.SECONDARY).addChild (nAffected < 0 ? e.getShortName ()
+                                                                                                                          : e.getShortName () +
+                                                                                                                            " (" +
+                                                                                                                            nAffected +
+                                                                                                                            ")")
                                                                                                  .setIcon (e.isDestructive () ? EDefaultIcon.DELETE
                                                                                                                               : EDefaultIcon.PLUS)
                                                                                                  .setOnClick (aWPEC.getSelfHref ()
@@ -303,7 +323,8 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
                                                                                                                          aJobData.getID ())
                                                                                                                    .add (PARAM_REPAIR_ACTION,
                                                                                                                          e.getID ()))
-                                                                                                 .setDisabled (bRunning));
+                                                                                                 .setDisabled (bRunning ||
+                                                                                                               nAffected == 0));
         }
       }
       if (aTable.hasBodyRows ())

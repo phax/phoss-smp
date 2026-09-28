@@ -14,6 +14,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
+import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.id.IHasID;
 import com.helger.base.lang.EnumHelper;
 import com.helger.base.name.IHasDisplayName;
@@ -124,6 +126,20 @@ public enum ESMLRepairAction implements IHasID <String>, IHasDisplayName
   public boolean isLocalOperation ()
   {
     return m_bLocalOperation;
+  }
+
+  /**
+   * @param aResult
+   *        The summary of a reconciliation report. May not be <code>null</code>.
+   * @return The number of participants this action would act on for that report. Always &ge; 0.
+   */
+  @Nonnegative
+  public int getAffectedCount (@NonNull final SMLSyncResult aResult)
+  {
+    ValueEnforcer.notNull (aResult, "Result");
+    // Kept next to getReportEntry () - both express which side of the difference this action acts
+    // on, and they must not drift apart
+    return this == REGISTER_MISSING ? aResult.getMissingInSMLCount () : aResult.getOrphansInSMLCount ();
   }
 
   @Nullable

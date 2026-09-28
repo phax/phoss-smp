@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -33,6 +34,7 @@ import com.helger.io.file.FileHelper;
 import com.helger.xml.microdom.IMicroDocument;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroDocument;
+import com.helger.xml.microdom.serialize.MicroReader;
 import com.helger.xml.microdom.serialize.MicroWriter;
 
 /**
@@ -55,6 +57,24 @@ import com.helger.xml.microdom.serialize.MicroWriter;
 @Immutable
 public final class SMLSyncReport
 {
+  // The element and attribute names of the summary, shared by the writer and the reader
+  private static final String EL_ROOT = "sml-sync-report";
+  private static final String EL_RUN = "run";
+  private static final String EL_SML = "sml";
+  private static final String EL_SMP = "smp";
+  private static final String EL_COUNTS = "counts";
+  private static final String EL_NOTE = "note";
+  private static final String ATTR_VERSION = "version";
+  private static final String ATTR_START = "start";
+  private static final String ATTR_END = "end";
+  private static final String ATTR_DURATION = "duration";
+  private static final String ATTR_ID = "id";
+  private static final String ATTR_SML_PAGES = "sml-pages";
+  private static final String ATTR_SML_PARTICIPANTS = "sml-participants";
+  private static final String ATTR_LOCAL_PARTICIPANTS = "local-participants";
+  private static final String ATTR_MISSING_IN_SML = "missing-in-sml";
+  private static final String ATTR_ORPHANS_IN_SML = "orphans-in-sml";
+
   private SMLSyncReport ()
   {}
 
@@ -62,31 +82,31 @@ public final class SMLSyncReport
   private static IMicroDocument _createSummaryDocument (@NonNull final SMLSyncResult aResult)
   {
     final IMicroDocument aDoc = new MicroDocument ();
-    final IMicroElement eRoot = aDoc.addElement ("sml-sync-report");
-    eRoot.setAttribute ("version", "1.0");
+    final IMicroElement eRoot = aDoc.addElement (EL_ROOT);
+    eRoot.setAttribute (ATTR_VERSION, "1.0");
 
-    final IMicroElement eRun = eRoot.addElement ("run");
-    eRun.setAttribute ("start", aResult.getStartDateTime ().toString ());
-    eRun.setAttribute ("end", aResult.getEndDateTime ().toString ());
-    eRun.setAttribute ("duration", aResult.getDuration ().toString ());
+    final IMicroElement eRun = eRoot.addElement (EL_RUN);
+    eRun.setAttribute (ATTR_START, aResult.getStartDateTime ().toString ());
+    eRun.setAttribute (ATTR_END, aResult.getEndDateTime ().toString ());
+    eRun.setAttribute (ATTR_DURATION, aResult.getDuration ().toString ());
 
-    final IMicroElement eSML = eRoot.addElement ("sml");
-    eSML.setAttribute ("id", aResult.getSMLID ());
+    final IMicroElement eSML = eRoot.addElement (EL_SML);
+    eSML.setAttribute (ATTR_ID, aResult.getSMLID ());
 
-    final IMicroElement eSMP = eRoot.addElement ("smp");
-    eSMP.setAttribute ("id", aResult.getSMPID ());
+    final IMicroElement eSMP = eRoot.addElement (EL_SMP);
+    eSMP.setAttribute (ATTR_ID, aResult.getSMPID ());
 
-    final IMicroElement eCounts = eRoot.addElement ("counts");
-    eCounts.setAttribute ("sml-pages", aResult.getSMLPageCount ());
-    eCounts.setAttribute ("sml-participants", aResult.getSMLParticipantCount ());
-    eCounts.setAttribute ("local-participants", aResult.getLocalParticipantCount ());
-    eCounts.setAttribute ("missing-in-sml", aResult.getMissingInSMLCount ());
-    eCounts.setAttribute ("orphans-in-sml", aResult.getOrphansInSMLCount ());
+    final IMicroElement eCounts = eRoot.addElement (EL_COUNTS);
+    eCounts.setAttribute (ATTR_SML_PAGES, aResult.getSMLPageCount ());
+    eCounts.setAttribute (ATTR_SML_PARTICIPANTS, aResult.getSMLParticipantCount ());
+    eCounts.setAttribute (ATTR_LOCAL_PARTICIPANTS, aResult.getLocalParticipantCount ());
+    eCounts.setAttribute (ATTR_MISSING_IN_SML, aResult.getMissingInSMLCount ());
+    eCounts.setAttribute (ATTR_ORPHANS_IN_SML, aResult.getOrphansInSMLCount ());
 
     if (aResult.isAllLocalParticipantsMissing ())
     {
       // Make the most important finding impossible to overlook
-      eRoot.addElement ("note")
+      eRoot.addElement (EL_NOTE)
            .addText ("All local participants are missing at the SML. Unregistering an SMP from the SML" +
                         " deletes all of its participants, so this is the signature of an SMP that was" +
                         " unregistered and re-registered - and not of a broken SML connection.");
@@ -141,6 +161,62 @@ public final class SMLSyncReport
     aZOS.putNextEntry (new ZipEntry (sEntryName));
     aZOS.write (sContent.getBytes (StandardCharsets.UTF_8));
     aZOS.closeEntry ();
+  }
+
+  /**
+   * Read the summary of a previously created report. This is a cheap operation - the summary is a
+   * few hundred bytes, in contrast to the participant lists next to it.
+   *
+   * @param aZipFile
+   *        The report to be read. May not be <code>null</code>.
+   * @return The summary of the run. Never <code>null</code>.
+   * @throws IOException
+   *         If the report cannot be read, or does not contain a well formed summary
+   */
+  @NonNull
+  public static SMLSyncResult readSummary (@NonNull final File aZipFile) throws IOException
+  {
+    ValueEnforcer.notNull (aZipFile, "ZipFile");
+
+    try (final ZipFile aZip = new ZipFile (aZipFile))
+    {
+      final ZipEntry aEntry = aZip.getEntry (CSMLSync.ENTRY_SUMMARY);
+      if (aEntry == null)
+        throw new IOException ("The report '" +
+                               aZipFile.getName () +
+                               "' contains no entry '" +
+                               CSMLSync.ENTRY_SUMMARY +
+                               "'");
+
+      final IMicroDocument aDoc = MicroReader.readMicroXML (aZip.getInputStream (aEntry));
+      final IMicroElement eRoot = aDoc == null ? null : aDoc.getDocumentElement ();
+      if (eRoot == null)
+        throw new IOException ("The summary of the report '" + aZipFile.getName () + "' is not well formed XML");
+
+      final IMicroElement eRun = eRoot.getFirstChildElement (EL_RUN);
+      final IMicroElement eSML = eRoot.getFirstChildElement (EL_SML);
+      final IMicroElement eSMP = eRoot.getFirstChildElement (EL_SMP);
+      final IMicroElement eCounts = eRoot.getFirstChildElement (EL_COUNTS);
+      if (eRun == null || eSML == null || eSMP == null || eCounts == null)
+        throw new IOException ("The summary of the report '" + aZipFile.getName () + "' is incomplete");
+
+      try
+      {
+        return new SMLSyncResult (LocalDateTime.parse (eRun.getAttributeValue (ATTR_START)),
+                                  LocalDateTime.parse (eRun.getAttributeValue (ATTR_END)),
+                                  eSML.getAttributeValue (ATTR_ID),
+                                  eSMP.getAttributeValue (ATTR_ID),
+                                  eCounts.getAttributeValueAsInt (ATTR_SML_PAGES, 0),
+                                  eCounts.getAttributeValueAsInt (ATTR_SML_PARTICIPANTS, 0),
+                                  eCounts.getAttributeValueAsInt (ATTR_LOCAL_PARTICIPANTS, 0),
+                                  eCounts.getAttributeValueAsInt (ATTR_MISSING_IN_SML, 0),
+                                  eCounts.getAttributeValueAsInt (ATTR_ORPHANS_IN_SML, 0));
+      }
+      catch (final RuntimeException ex)
+      {
+        throw new IOException ("The summary of the report '" + aZipFile.getName () + "' cannot be interpreted", ex);
+      }
+    }
   }
 
   /**

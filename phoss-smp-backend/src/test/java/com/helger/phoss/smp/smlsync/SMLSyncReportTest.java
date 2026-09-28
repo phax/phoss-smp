@@ -140,6 +140,43 @@ public final class SMLSyncReportTest
   }
 
   @Test
+  public void testSummaryRoundTrip () throws IOException
+  {
+    // The writer and the reader must agree on every attribute
+    final File aZip = new File (m_aTempFolder.getRoot (), "report.zip");
+    final File aOrphans = new File (m_aTempFolder.getRoot (), "does-not-exist.tmp");
+    final SMLSyncResult aWritten = _createResult (7, 3, 2);
+
+    SMLSyncReport.writeReport (aZip, aWritten, aOrphans, new CommonsArrayList <> (PI1), aOrphans);
+    final SMLSyncResult aRead = SMLSyncReport.readSummary (aZip);
+
+    assertEquals (aWritten.getStartDateTime (), aRead.getStartDateTime ());
+    assertEquals (aWritten.getEndDateTime (), aRead.getEndDateTime ());
+    assertEquals (aWritten.getSMLID (), aRead.getSMLID ());
+    assertEquals (aWritten.getSMPID (), aRead.getSMPID ());
+    assertEquals (aWritten.getSMLPageCount (), aRead.getSMLPageCount ());
+    assertEquals (aWritten.getSMLParticipantCount (), aRead.getSMLParticipantCount ());
+    assertEquals (aWritten.getLocalParticipantCount (), aRead.getLocalParticipantCount ());
+    assertEquals (aWritten.getMissingInSMLCount (), aRead.getMissingInSMLCount ());
+    assertEquals (aWritten.getOrphansInSMLCount (), aRead.getOrphansInSMLCount ());
+  }
+
+  @Test
+  public void testAffectedCountPerAction () throws IOException
+  {
+    // This is what drives the number in the button and whether it is disabled
+    final File aZip = new File (m_aTempFolder.getRoot (), "report.zip");
+    final File aOrphans = new File (m_aTempFolder.getRoot (), "does-not-exist.tmp");
+    SMLSyncReport.writeReport (aZip, _createResult (7, 3, 2), aOrphans, new CommonsArrayList <> (PI1), aOrphans);
+
+    final SMLSyncResult aRead = SMLSyncReport.readSummary (aZip);
+    assertEquals (3, ESMLRepairAction.REGISTER_MISSING.getAffectedCount (aRead));
+    // Both orphan actions act on the same bucket
+    assertEquals (2, ESMLRepairAction.REMOVE_ORPHANS.getAffectedCount (aRead));
+    assertEquals (2, ESMLRepairAction.CREATE_LOCALLY.getAffectedCount (aRead));
+  }
+
+  @Test
   public void testGetValidSyncFileRejectsNull ()
   {
     // The download gate must reject anything that is not a report in the report directory.
