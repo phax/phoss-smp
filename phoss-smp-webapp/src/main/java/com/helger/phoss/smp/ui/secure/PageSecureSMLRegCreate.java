@@ -181,7 +181,7 @@ public class PageSecureSMLRegCreate extends AbstractPageSecureSMLReg
                                                                               aSMLFilter))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
-                                                   .setCtrl (em (sSMPID))
+                                                   .setCtrl (div (em (sSMPID)))
                                                    .setHelpText (HELPTEXT_SMP_ID));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabelMandatory ("Logical address")
                                                    .setCtrl (new HCEdit (new RequestField (FIELD_LOGICAL_ADDRESS,
