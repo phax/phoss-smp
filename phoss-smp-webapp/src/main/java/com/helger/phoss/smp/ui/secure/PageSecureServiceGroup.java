@@ -356,11 +356,13 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
             }
             default ->
             {
-              aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Lookup failed" +
-                                                                                               (aEntry.getErrorMessage () == null ? ""
-                                                                                                                                 : ": " +
-                                                                                                                                   aEntry.getErrorMessage ())))
-                  .setColspan (2);
+              // Every row must have one cell per column - DataTables counts cells and does not
+              // support colspan in a body row
+              aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Lookup failed" +
+                                                                                      (aEntry.getErrorMessage () == null ? ""
+                                                                                                                        : ": " +
+                                                                                                                          aEntry.getErrorMessage ())));
+              aRow.addCell ();
             }
           }
         }

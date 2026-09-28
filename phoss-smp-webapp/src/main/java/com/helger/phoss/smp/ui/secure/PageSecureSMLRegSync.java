@@ -308,16 +308,19 @@ public final class PageSecureSMLRegSync extends AbstractPageSecureSMLReg
               final int nIndex = sError.indexOf ('\n');
               sHeadline = nIndex < 0 ? sError : sError.substring (0, nIndex);
             }
-            aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Failed"))
-                .addChild (div (sHeadline))
-                .setColspan (3);
+            // Every row must have one cell per column - DataTables counts cells and does not
+            // support colspan in a body row
+            aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("Failed"), div (sHeadline));
+            aRow.addCell ();
+            aRow.addCell ();
           }
           else
           {
             // Succeeded, but the report was deleted by the retention handling. A running job is
             // never in this list - results are only stored when a job ends.
-            aRow.addAndReturnCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("The report is no longer available"))
-                .setColspan (3);
+            aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("The report is no longer available"));
+            aRow.addCell ();
+            aRow.addCell ();
           }
       }
       aNodeList.addChild (aTable);
