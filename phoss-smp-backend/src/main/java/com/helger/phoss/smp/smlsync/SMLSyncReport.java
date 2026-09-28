@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.smlsync;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,6 +27,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.io.nonblocking.NonBlockingBufferedReader;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.io.file.FileHelper;
@@ -108,8 +108,8 @@ public final class SMLSyncReport
       // Make the most important finding impossible to overlook
       eRoot.addElement (EL_NOTE)
            .addText ("All local participants are missing at the SML. Unregistering an SMP from the SML" +
-                        " deletes all of its participants, so this is the signature of an SMP that was" +
-                        " unregistered and re-registered - and not of a broken SML connection.");
+                     " deletes all of its participants, so this is the signature of an SMP that was" +
+                     " unregistered and re-registered - and not of a broken SML connection.");
     }
 
     return aDoc;
@@ -123,8 +123,7 @@ public final class SMLSyncReport
     if (aSrcFile.isFile ())
     {
       // Copy line by line, so that the content is never held in memory at once
-      try (final BufferedReader aReader = new BufferedReader (StreamHelper.createReader (FileHelper.getInputStream (aSrcFile),
-                                                                                         StandardCharsets.UTF_8)))
+      try (final NonBlockingBufferedReader aReader = FileHelper.getBufferedReader (aSrcFile, StandardCharsets.UTF_8))
       {
         final Writer aWriter = StreamHelper.createWriter (aZOS, StandardCharsets.UTF_8);
         String sLine;
@@ -251,8 +250,8 @@ public final class SMLSyncReport
       if (aEntry == null)
         throw new IOException ("The report '" + aZipFile.getName () + "' contains no entry '" + sEntryName + "'");
 
-      try (final BufferedReader aReader = new BufferedReader (StreamHelper.createReader (aZip.getInputStream (aEntry),
-                                                                                         StandardCharsets.UTF_8)))
+      try (final NonBlockingBufferedReader aReader = new NonBlockingBufferedReader (StreamHelper.createReader (aZip.getInputStream (aEntry),
+                                                                                                               StandardCharsets.UTF_8)))
       {
         String sLine;
         while ((sLine = aReader.readLine ()) != null)
@@ -304,7 +303,9 @@ public final class SMLSyncReport
 
     try (final ZipOutputStream aZOS = new ZipOutputStream (aOS, StandardCharsets.UTF_8))
     {
-      _writeEntryFromString (aZOS, CSMLSync.ENTRY_SUMMARY, MicroWriter.getNodeAsString (_createSummaryDocument (aResult)));
+      _writeEntryFromString (aZOS,
+                             CSMLSync.ENTRY_SUMMARY,
+                             MicroWriter.getNodeAsString (_createSummaryDocument (aResult)));
       _writeEntryFromFile (aZOS, CSMLSync.ENTRY_ALL_IN_SML, aAllInSMLFile);
       _writeEntryFromIterable (aZOS, CSMLSync.ENTRY_MISSING_IN_SML, aMissingInSML);
       _writeEntryFromFile (aZOS, CSMLSync.ENTRY_ORPHANS_IN_SML, aOrphansInSMLFile);
