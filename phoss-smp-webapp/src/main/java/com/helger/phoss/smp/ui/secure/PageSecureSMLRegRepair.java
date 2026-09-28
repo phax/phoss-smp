@@ -31,6 +31,7 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.format.PDTToString;
+import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -39,10 +40,13 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.smlsync.CSMLSync;
 import com.helger.phoss.smp.smlsync.ESMLRepairAction;
+import com.helger.phoss.smp.smlsync.SMLRepairHistory;
 import com.helger.phoss.smp.smlsync.SMLRepairJob;
 import com.helger.phoss.smp.smlsync.SMLSyncJob;
 import com.helger.phoss.smp.smlsync.SMLSyncReport;
 import com.helger.phoss.smp.smlsync.SMLSyncResult;
+import com.helger.photon.bootstrap5.badge.BootstrapBadge;
+import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.button.EBootstrapButtonType;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -139,7 +143,7 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       }
 
       LOGGER.info ("Started the SML repair '" + eAction.getID () + "' from report '" + aReportFile.getName () + "'");
-      aWPEC.postRedirectGetInternal (success ("The repair is now running in the background. The result appears on this page as soon as it is finished."));
+      aWPEC.postRedirectGetInternal (success (div ("The repair is now running in the background. The result appears on this page as soon as it is finished.")).addChild (div ("The numbers of the report will not change - run a new reconciliation afterwards to see the current state.")));
     }
   }
 
@@ -310,26 +314,47 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
           // Without a readable summary the count is unknown, so the button stays enabled rather
           // than pretending there is nothing to do
           final int nAffected = aSummary == null ? -1 : e.getAffectedCount (aSummary);
-          aRow.addCell (new BootstrapButton (e.isDestructive () ? EBootstrapButtonType.DANGER
-                                                                : EBootstrapButtonType.SECONDARY).addChild (nAffected < 0 ? e.getShortName ()
-                                                                                                                          : e.getShortName () +
-                                                                                                                            " (" +
-                                                                                                                            nAffected +
-                                                                                                                            ")")
-                                                                                                 .setIcon (e.isDestructive () ? EDefaultIcon.DELETE
-                                                                                                                              : EDefaultIcon.PLUS)
-                                                                                                 .setOnClick (aWPEC.getSelfHref ()
-                                                                                                                   .add (PARAM_JOB_ID,
-                                                                                                                         aJobData.getID ())
-                                                                                                                   .add (PARAM_REPAIR_ACTION,
-                                                                                                                         e.getID ()))
-                                                                                                 .setDisabled (bRunning ||
-                                                                                                               nAffected == 0));
+          final SMLRepairHistory.Entry aLastRepair = SMLRepairHistory.getLastRepair (aFile.getName (), e);
+
+          final IHCNode aButton = new BootstrapButton (e.isDestructive () ? EBootstrapButtonType.DANGER
+                                                                          : EBootstrapButtonType.SECONDARY).addChild (nAffected < 0 ? e.getShortName ()
+                                                                                                                                    : e.getShortName () +
+                                                                                                                                      " (" +
+                                                                                                                                      nAffected +
+                                                                                                                                      ")")
+                                                                                                           .setIcon (e.isDestructive () ? EDefaultIcon.DELETE
+                                                                                                                                        : EDefaultIcon.PLUS)
+                                                                                                           .setOnClick (aWPEC.getSelfHref ()
+                                                                                                                             .add (PARAM_JOB_ID,
+                                                                                                                                   aJobData.getID ())
+                                                                                                                             .add (PARAM_REPAIR_ACTION,
+                                                                                                                                   e.getID ()))
+                                                                                                           .setDisabled (bRunning ||
+                                                                                                                         nAffected == 0);
+          if (aLastRepair == null)
+            aRow.addCell (aButton);
+          else
+          {
+            // Explains why the number next to it did not change
+            aRow.addCell (aButton,
+                          div (new BootstrapBadge (aLastRepair.isComplete () ? EBootstrapBadgeType.SUCCESS
+                                                                             : EBootstrapBadgeType.WARNING).addChild ("Repaired at " +
+                                                                                                                      PDTToString.getAsString (aLastRepair.getDateTime (),
+                                                                                                                                               aDisplayLocale) +
+                                                                                                                      ": " +
+                                                                                                                      aLastRepair.getSucceededCount () +
+                                                                                                                      " done, " +
+                                                                                                                      aLastRepair.getAlreadyDoneCount () +
+                                                                                                                      " already done, " +
+                                                                                                                      aLastRepair.getFailedCount () +
+                                                                                                                      " failed")));
+          }
         }
       }
       if (aTable.hasBodyRows ())
       {
         aNodeList.addChild (h3 ("Available reconciliation reports"));
+        aNodeList.addChild (info (div ("The numbers are the ones of the respective report and therefore do not change when you repair - a report is a snapshot of the moment it was created.")).addChild (div ("Run a new reconciliation to see the current state.")));
         aNodeList.addChild (aTable);
         aNodeList.addChild (BootstrapDataTables.createDefaultDataTables (aWPEC, aTable));
       }

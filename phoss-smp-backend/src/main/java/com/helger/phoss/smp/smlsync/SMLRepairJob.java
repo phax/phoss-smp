@@ -315,6 +315,10 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
                                        Integer.valueOf (nAlreadyDone),
                                        Integer.valueOf (nFailed));
 
+    // The counts of the report never change - it is a snapshot and this job does not rewrite it.
+    // Remembering the repair is what lets the UI explain why the numbers stayed the same.
+    SMLRepairHistory.recordRepair (m_aReportFile.getName (), m_eAction, nSucceeded, nAlreadyDone, nFailed);
+
     return LongRunningJobResult.createText (aLog.toString ());
   }
 
