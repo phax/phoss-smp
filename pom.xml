@@ -92,7 +92,7 @@
       <dependency>
         <groupId>com.helger.schedule</groupId>
         <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>6.2.0</version>
+        <version>6.2.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -134,7 +134,7 @@
       <dependency>
         <groupId>com.helger.peppol</groupId>
         <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>13.0.1-SNAPSHOT</version>
+        <version>13.1.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

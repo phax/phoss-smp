@@ -29,8 +29,8 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
-import com.helger.smpclient.url.dns.IBDXLURLProvider;
 import com.helger.smpclient.url.SMPDNSResolutionException;
+import com.helger.smpclient.url.dns.IBDXLURLProvider;
 
 /**
  * Performs the DNS check of a set of participants.<br>
@@ -75,7 +75,7 @@ public final class DNSChecker
       // Does not perform a lookup - it only builds the name
       sDNSName = aURLProvider.getDNSNameOfParticipant (aParticipantID, sSMLZoneName);
     }
-    catch (final SMPDNSResolutionException | RuntimeException ex)
+    catch (final RuntimeException ex)
     {
       return new DNSCheckEntry (aParticipantID, EDNSCheckState.LOOKUP_FAILED, null, null, ex.getMessage ());
     }
@@ -123,14 +123,18 @@ public final class DNSChecker
       return new DNSCheckResult (aStartDT, PDTFactory.getCurrentLocalDateTime (), aEntries);
 
     final int nThreads = Math.min (SMPServerConfiguration.getDNSCheckThreadCount (), aParticipantIDs.size ());
-    LOGGER.info ("Checking the DNS state of " + aParticipantIDs.size () + " participant(s) using " + nThreads + " thread(s)");
+    LOGGER.info ("Checking the DNS state of " +
+                 aParticipantIDs.size () +
+                 " participant(s) using " +
+                 nThreads +
+                 " thread(s)");
 
     final ExecutorService aES = Executors.newFixedThreadPool (nThreads);
     try
     {
       final ICommonsList <Future <DNSCheckEntry>> aFutures = new CommonsArrayList <> ();
       for (final IParticipantIdentifier aParticipantID : aParticipantIDs)
-        aFutures.add (aES.submit ( () -> checkParticipant (aURLProvider, aParticipantID, sSMLZoneName)));
+        aFutures.add (aES.submit (() -> checkParticipant (aURLProvider, aParticipantID, sSMLZoneName)));
 
       for (final Future <DNSCheckEntry> aFuture : aFutures)
         try
