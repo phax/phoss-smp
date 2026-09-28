@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.base.string.StringHelper;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.peppol.sml.ISMLInfo;
@@ -42,7 +43,6 @@ import com.helger.photon.bootstrap5.form.BootstrapFormGroup;
 import com.helger.photon.bootstrap5.pages.BootstrapWebPageUIHandler;
 import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
-import com.helger.base.string.StringHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
 
@@ -134,11 +134,9 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
       return success ("The SML currently has no participant registered for this SMP, so unregistering deletes nothing.");
 
     final String sCount = aFirstPage.hasMorePages () ? "at least " + nCount : Integer.toString (nCount);
-    return error (div ("Unregistering this SMP deletes " +
-                       sCount +
-                       " participant(s) at the SML.")).addChild (div ("Every deleted participant becomes free for another SMP to claim, so re-creating them later may fail. Create a reconciliation report first - its ")
-                                                                                                    .addChild (code ("all-in-sml.txt"))
-                                                                                                    .addChild (" is the list you need to restore them."));
+    return error (div ("Unregistering this SMP deletes " + sCount + " participant(s) at the SML.")).addChild (div (
+                                                                                                                   "Every deleted participant becomes free for another SMP to claim, so re-creating them later may fail. Create a reconciliation report first - its ").addChild (code ("all-in-sml.txt"))
+                                                                                                                                                                                                                                                                      .addChild (" is the list you need to restore them."));
   }
 
   @Override
@@ -181,7 +179,7 @@ public class PageSecureSMLRegDelete extends AbstractPageSecureSMLReg
                                                                               aSMLFilter))
                                                    .setErrorList (aFormErrors.getListOfField (FIELD_SML_ID)));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("SMP ID")
-                                                   .setCtrl (em (sSMPID))
+                                                   .setCtrl (div (em (sSMPID)))
                                                    .setHelpText (HELPTEXT_SMP_ID));
 
       final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (new BootstrapButtonToolbar (aWPEC));
