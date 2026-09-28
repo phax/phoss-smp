@@ -124,6 +124,54 @@ public final class SMPJDBCQueryHelper
   }
 
   /**
+   * Create the database specific SQL statement that returns one row if the provided table contains
+   * at least one row, and no row otherwise.
+   *
+   * @param sTableName
+   *        The name of the table to be checked. May neither be <code>null</code> nor empty.
+   * @return The SQL statement. Never <code>null</code>.
+   * @since 8.5.1
+   */
+  @NonNull
+  public static String getExistsAnyRow (@NonNull @Nonempty final String sTableName)
+  {
+    return getExistsAnyRow (SMPDataSourceSingleton.getDatabaseType (), sTableName);
+  }
+
+  /**
+   * Create the database specific SQL statement that returns one row if the provided table contains
+   * at least one row, and no row otherwise. A plain <code>COUNT(*)</code> would be portable but
+   * scans the whole table, which is wasteful if all that is asked is whether the table is empty.
+   * <br>
+   * The SQL standard <code>FETCH FIRST n ROWS ONLY</code> cannot be used for all systems: MySQL
+   * does not support that syntax at all and needs <code>LIMIT</code>, and SQL Server rejects
+   * <code>OFFSET</code>/<code>FETCH</code> unless the query also has an <code>ORDER BY</code>, so
+   * it needs <code>TOP</code>.
+   *
+   * @param eDBType
+   *        The database system to create the statement for. May not be <code>null</code>.
+   * @param sTableName
+   *        The name of the table to be checked. May neither be <code>null</code> nor empty.
+   * @return The SQL statement. Never <code>null</code>.
+   * @since 8.5.1
+   */
+  @NonNull
+  public static String getExistsAnyRow (@NonNull final EDatabaseSystemType eDBType,
+                                        @NonNull @Nonempty final String sTableName)
+  {
+    ValueEnforcer.notNull (eDBType, "DBType");
+    ValueEnforcer.notEmpty (sTableName, "TableName");
+
+    return switch (eDBType)
+    {
+      case MYSQL -> "SELECT 1 FROM " + sTableName + " LIMIT 1";
+      case SQLSERVER -> "SELECT TOP 1 1 FROM " + sTableName;
+      // DB2, Oracle and PostgreSQL support the SQL standard
+      default -> "SELECT 1 FROM " + sTableName + " FETCH FIRST 1 ROW ONLY";
+    };
+  }
+
+  /**
    * Create the database specific SQL expression that concatenates the provided SQL expressions to a
    * single string.
    *

@@ -613,7 +613,9 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
   public boolean containsAnySMPServiceGroup ()
   {
-    return newExecutor ().queryCount ("SELECT 1 FROM " + m_sTableNameSG + " FETCH FIRST 1 ROW ONLY") > 0;
+    // Note: queryCount returns -1 both for an empty result and for a failed query, so a statement
+    // that is not valid for the configured database silently reads as "no Service Group at all"
+    return newExecutor ().queryCount (SMPJDBCQueryHelper.getExistsAnyRow (m_sTableNameSG)) > 0;
   }
 
   public boolean containsAnySMPServiceGroup (@NonNull final ESMPServiceGroupFilter eFilter)

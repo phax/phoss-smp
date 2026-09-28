@@ -40,6 +40,40 @@ import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 public final class SMPJDBCQueryHelperTest
 {
   @Test
+  public void testExistsAnyRowPerDatabase ()
+  {
+    // MySQL has no FETCH FIRST at all, and SQL Server rejects OFFSET/FETCH without an ORDER BY,
+    // so the standard syntax cannot be used for all of them
+    assertEquals ("SELECT 1 FROM smp_sg LIMIT 1",
+                  SMPJDBCQueryHelper.getExistsAnyRow (EDatabaseSystemType.MYSQL, "smp_sg"));
+    assertEquals ("SELECT TOP 1 1 FROM smp_sg",
+                  SMPJDBCQueryHelper.getExistsAnyRow (EDatabaseSystemType.SQLSERVER, "smp_sg"));
+    assertEquals ("SELECT 1 FROM smp_sg FETCH FIRST 1 ROW ONLY",
+                  SMPJDBCQueryHelper.getExistsAnyRow (EDatabaseSystemType.POSTGRESQL, "smp_sg"));
+    assertEquals ("SELECT 1 FROM smp_sg FETCH FIRST 1 ROW ONLY",
+                  SMPJDBCQueryHelper.getExistsAnyRow (EDatabaseSystemType.ORACLE, "smp_sg"));
+    assertEquals ("SELECT 1 FROM smp_sg FETCH FIRST 1 ROW ONLY",
+                  SMPJDBCQueryHelper.getExistsAnyRow (EDatabaseSystemType.DB2, "smp_sg"));
+  }
+
+  @Test
+  public void testExistsAnyRowIsDefinedForEverySupportedDatabase ()
+  {
+    // Every database the SQL backend accepts must produce a statement - a new one must not
+    // silently fall into a syntax that it does not support
+    for (final EDatabaseSystemType e : new EDatabaseSystemType [] { EDatabaseSystemType.DB2,
+                                                                    EDatabaseSystemType.MYSQL,
+                                                                    EDatabaseSystemType.ORACLE,
+                                                                    EDatabaseSystemType.POSTGRESQL,
+                                                                    EDatabaseSystemType.SQLSERVER })
+    {
+      final String sSQL = SMPJDBCQueryHelper.getExistsAnyRow (e, "smp_sg");
+      assertTrue (e.toString (), sSQL.startsWith ("SELECT "));
+      assertTrue (e.toString (), sSQL.contains ("smp_sg"));
+    }
+  }
+
+  @Test
   public void testColumnNameResolver ()
   {
     final IDBColumnNameResolver aResolver = SMPJDBCQueryHelper.createColumnNameResolver (ESMPServiceGroupColumn.values ());
