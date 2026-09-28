@@ -10,7 +10,6 @@
  */
 package com.helger.phoss.smp.smlsync;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -28,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.base.enforce.ValueEnforcer;
+import com.helger.base.io.nonblocking.NonBlockingBufferedReader;
+import com.helger.base.io.nonblocking.NonBlockingBufferedWriter;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.state.EContinue;
 import com.helger.base.string.StringHelper;
@@ -62,8 +63,8 @@ import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xsds.peppol.id1.ParticipantIdentifierType;
 
 /**
- * The long running job that reconciles the Service Groups of this SMP with the participants the
- * SML holds for this SMP, using the <code>List()</code> operation of chapter 3.1.2.7 of the SML
+ * The long running job that reconciles the Service Groups of this SMP with the participants the SML
+ * holds for this SMP, using the <code>List()</code> operation of chapter 3.1.2.7 of the SML
  * specification.<br>
  * The caller must acquire {@link CSMLSync#LOCK} before starting this job - the job itself releases
  * the lock.
@@ -127,8 +128,8 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
    *
    * @param aFile
    *        The file to be checked. May be <code>null</code>.
-   * @return <code>null</code> if the provided file is not a downloadable report, the canonical
-   *         file otherwise.
+   * @return <code>null</code> if the provided file is not a downloadable report, the canonical file
+   *         otherwise.
    */
   @Nullable
   public static File getValidSyncFile (@Nullable final File aFile)
@@ -284,8 +285,8 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
   }
 
   /**
-   * Remove the false positives from the orphan candidates, by keeping only those that are still
-   * not held locally after the SML list was read.
+   * Remove the false positives from the orphan candidates, by keeping only those that are still not
+   * held locally after the SML list was read.
    *
    * @return The number of real orphans.
    */
@@ -295,10 +296,9 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
                                      @NonNull final File aVerifiedFile) throws IOException
   {
     int ret = 0;
-    try (final BufferedReader aReader = new BufferedReader (StreamHelper.createReader (FileHelper.getInputStream (aCandidateFile),
-                                                                                       StandardCharsets.UTF_8));
-         final Writer aWriter = StreamHelper.createWriter (FileHelper.getBufferedOutputStream (aVerifiedFile),
-                                                           StandardCharsets.UTF_8))
+    try (final NonBlockingBufferedReader aReader = FileHelper.getBufferedReader (aCandidateFile,
+                                                                                 StandardCharsets.UTF_8);
+         final NonBlockingBufferedWriter aWriter = FileHelper.getBufferedWriter (aVerifiedFile, StandardCharsets.UTF_8))
     {
       String sLine;
       while ((sLine = aReader.readLine ()) != null)
@@ -358,7 +358,7 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
       try (final Writer aOrphanWriter = StreamHelper.createWriter (FileHelper.getBufferedOutputStream (aOrphanCandidateFile),
                                                                    StandardCharsets.UTF_8);
            final Writer aAllWriter = StreamHelper.createWriter (FileHelper.getBufferedOutputStream (aAllInSMLFile),
-                                                               StandardCharsets.UTF_8))
+                                                                StandardCharsets.UTF_8))
       {
         aDiffer = new SMLSyncDiffer (aLocalIDs, sID -> {
           try
