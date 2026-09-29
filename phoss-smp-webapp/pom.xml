@@ -104,8 +104,8 @@
       <artifactId>peppol-ui</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>phoss-directory-client</artifactId>
+      <groupId>com.helger.peppol.directory</groupId>
+      <artifactId>peppol-directory-client</artifactId>
     </dependency>
     <dependency>
       <groupId>com.helger.peppol.ui</groupId>

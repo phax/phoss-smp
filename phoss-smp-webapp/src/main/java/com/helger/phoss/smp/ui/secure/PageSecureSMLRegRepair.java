@@ -60,7 +60,6 @@ import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.WebPageExecutionContext;
-import com.helger.photon.uictrls.datatables.DataTables;
 import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 
@@ -182,10 +181,9 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
 
     if (eAction.isLocalOperation ())
     {
-      aNodeList.addChild (info (div ("This would create " +
-                                     nTotal +
-                                     " Service Group(s) locally, owned by you.")).addChild (div ("Nothing is sent to the SML - these participants are already registered there, which is exactly why they show up as orphans."))
-                                                                                  .addChild (div ("The Service Groups are created without any endpoint, so the participants stay unreachable until their endpoints are added.")));
+      aNodeList.addChild (info (div ("This would create " + nTotal + " Service Group(s) locally, owned by you."))
+                                                                                                                 .addChild (div ("Nothing is sent to the SML - these participants are already registered there, which is exactly why they show up as orphans."))
+                                                                                                                 .addChild (div ("The Service Groups are created without any endpoint, so the participants stay unreachable until their endpoints are added.")));
     }
     else
     {
@@ -214,11 +212,9 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
     aToolbar.addChild (new BootstrapButton ().addChild ("Yes, perform this on the SML")
                                              .setIcon (EDefaultIcon.YES)
                                              .setOnClick (aWPEC.getSelfHref ()
-                                                               .add (CPageParam.PARAM_ACTION,
-                                                                     CPageParam.ACTION_PERFORM)
+                                                               .add (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM)
                                                                .add (PARAM_JOB_ID,
-                                                                     aWPEC.params ()
-                                                                          .getAsStringTrimmed (PARAM_JOB_ID))
+                                                                     aWPEC.params ().getAsStringTrimmed (PARAM_JOB_ID))
                                                                .add (PARAM_REPAIR_ACTION, eAction.getID ()))
                                              .setDisabled (CSMLSync.LOCK.isRunning ()));
     aToolbar.addButton ("Cancel", aWPEC.getSelfHref (), EDefaultIcon.CANCEL);
@@ -248,9 +244,8 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       return;
     }
 
-    aNodeList.addChild (info (div ("Register the participants that are missing at the SML, and resolve the ones the SML has registered for this SMP that do not exist here - either by removing them from the SML or by creating them locally.")).addChild (div ("Both are based on a report created on the ")
-                                                                                                                                                                                       .addChild (em ("Reconcile participants"))
-                                                                                                                                                                                       .addChild (" page, so create a report first and then repair from it.")));
+    aNodeList.addChild (info (div ("Register the participants that are missing at the SML, and resolve the ones the SML has registered for this SMP that do not exist here - either by removing them from the SML or by creating them locally.")).addChild (div ("Both are based on a report created on the ").addChild (em ("Reconcile participants"))
+                                                                                                                                                                                                                                                                                                              .addChild (" page, so create a report first and then repair from it.")));
 
     final boolean bRunning = CSMLSync.LOCK.isRunning ();
     if (bRunning)
@@ -368,7 +363,7 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       if (aAllRepairs.isNotEmpty ())
       {
         final HCTable aTable = new HCTable (new DTCol ("Date").setDisplayType (EDTColType.DATETIME, aDisplayLocale)
-                                                             .setInitialSorting (ESortOrder.DESCENDING),
+                                                              .setInitialSorting (ESortOrder.DESCENDING),
                                             new DTCol ("Started by"),
                                             new DTCol ("Result")).setID (getID () + "repairs");
         for (final LongRunningJobData aJobData : aAllRepairs)
@@ -381,8 +376,7 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
 
           final LongRunningJobResult aResult = aJobData.getResult ();
           final String sText = aResult == null ? null : aResult.getResultText ();
-          aRow.addCell (StringHelper.isEmpty (sText) ? em ("No details available")
-                                                     : new HCCode ().addChild (sText));
+          aRow.addCell (StringHelper.isEmpty (sText) ? em ("No details available") : new HCCode ().addChild (sText));
         }
         aNodeList.addChild (h3 ("Previous repairs"));
         aNodeList.addChild (aTable);

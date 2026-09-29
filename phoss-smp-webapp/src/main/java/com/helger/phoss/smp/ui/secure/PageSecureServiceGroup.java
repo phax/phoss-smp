@@ -16,10 +16,6 @@
  */
 package com.helger.phoss.smp.ui.secure;
 
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
-import com.helger.typeconvert.collection.StringMap;
-import com.helger.photon.io.PhotonWorkerPool;
-import com.helger.datetime.format.PDTToString;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Locale;
@@ -37,6 +33,7 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.HC_Target;
 import com.helger.html.hc.html.forms.HCCheckBox;
@@ -79,6 +76,7 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
@@ -131,6 +129,7 @@ import com.helger.photon.core.form.FormErrorList;
 import com.helger.photon.core.form.RequestField;
 import com.helger.photon.core.form.RequestFieldBoolean;
 import com.helger.photon.icon.fontawesome6.EFontAwesome6Icon;
+import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.user.IUser;
@@ -172,8 +171,8 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
     }
 
     /**
-     * Start the DNS check as a background job. Above a configurable number of Service Groups this is
-     * the only sensible way to perform it - one NAPTR lookup per participant while a page is
+     * Start the DNS check as a background job. Above a configurable number of Service Groups this
+     * is the only sensible way to perform it - one NAPTR lookup per participant while a page is
      * rendered does not scale.
      */
     private void _startBackgroundCheck (@NonNull final WebPageExecutionContext aWPEC)
@@ -332,36 +331,36 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
             {
               final String sURI = aEntry.getSMPURI ();
               aRow.addCell (new HCA (new SimpleURL (sURI)).setTargetBlank ().addChild (sURI));
-              aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER,
-                                                 EBootstrapButtonSize.SMALL).addChild ("Unregister from SML")
-                                                                            .setOnClick (aWPEC.getSelfHref ()
-                                                                                              .add (CPageParam.PARAM_ACTION,
-                                                                                                    ACTION_UNREGISTER_FROM_SML)
-                                                                                              .add (CPageParam.PARAM_OBJECT,
-                                                                                                    sServiceGroupID))
-                                                                            .setDisabled (bOffline ||
-                                                                                          !aSettings.isSMLEnabled ()));
+              aRow.addCell (new BootstrapButton (EBootstrapButtonType.DANGER, EBootstrapButtonSize.SMALL).addChild (
+                                                                                                                    "Unregister from SML")
+                                                                                                         .setOnClick (aWPEC.getSelfHref ()
+                                                                                                                           .add (CPageParam.PARAM_ACTION,
+                                                                                                                                 ACTION_UNREGISTER_FROM_SML)
+                                                                                                                           .add (CPageParam.PARAM_OBJECT,
+                                                                                                                                 sServiceGroupID))
+                                                                                                         .setDisabled (bOffline ||
+                                                                                                                       !aSettings.isSMLEnabled ()));
             }
             case NOT_REGISTERED ->
             {
               aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.DANGER).addChild ("is not registered in SML"));
               aRow.addCell (new BootstrapButton (EBootstrapButtonSize.SMALL).addChild ("Register in SML")
-                                                                           .setOnClick (aWPEC.getSelfHref ()
-                                                                                             .add (CPageParam.PARAM_ACTION,
-                                                                                                   ACTION_REGISTER_TO_SML)
-                                                                                             .add (CPageParam.PARAM_OBJECT,
-                                                                                                   sServiceGroupID))
-                                                                           .setDisabled (bOffline ||
-                                                                                         !aSettings.isSMLEnabled ()));
+                                                                            .setOnClick (aWPEC.getSelfHref ()
+                                                                                              .add (CPageParam.PARAM_ACTION,
+                                                                                                    ACTION_REGISTER_TO_SML)
+                                                                                              .add (CPageParam.PARAM_OBJECT,
+                                                                                                    sServiceGroupID))
+                                                                            .setDisabled (bOffline ||
+                                                                                          !aSettings.isSMLEnabled ()));
             }
             default ->
             {
               // Every row must have one cell per column - DataTables counts cells and does not
               // support colspan in a body row
               aRow.addCell (new BootstrapBadge (EBootstrapBadgeType.WARNING).addChild ("Lookup failed" +
-                                                                                      (aEntry.getErrorMessage () == null ? ""
-                                                                                                                        : ": " +
-                                                                                                                          aEntry.getErrorMessage ())));
+                                                                                       (aEntry.getErrorMessage () == null ? ""
+                                                                                                                          : ": " +
+                                                                                                                            aEntry.getErrorMessage ())));
               aRow.addCell ();
             }
           }
@@ -1361,9 +1360,9 @@ public final class PageSecureServiceGroup extends AbstractSMPWebPageForm <ISMPSe
                                    aWPEC.getSelfHref ().add (CPageParam.PARAM_ACTION, ACTION_CHECK_DNS),
                                    EDefaultIcon.MAGNIFIER)
               .setDisabled (aSettings.getSMLDNSZone () == null ||
-                nTotalServiceGroupCount <= 0 ||
-                bTooMany ||
-                !aSettings.isSMLEnabled ());
+                            nTotalServiceGroupCount <= 0 ||
+                            bTooMany ||
+                            !aSettings.isSMLEnabled ());
     }
     aNodeList.addChild (aToolbar);
 
