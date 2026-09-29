@@ -22,7 +22,7 @@ import com.helger.base.name.IHasDisplayName;
  * The outcome of the DNS check of a single participant.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public enum EDNSCheckState implements IHasID <String>, IHasDisplayName
 {

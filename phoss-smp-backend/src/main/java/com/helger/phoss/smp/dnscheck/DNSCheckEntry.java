@@ -22,7 +22,7 @@ import com.helger.peppolid.IParticipantIdentifier;
  * The DNS check outcome of a single participant.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class DNSCheckEntry

@@ -42,7 +42,7 @@ import com.helger.phoss.smp.settings.ISMPSettings;
  * deliberately no background job refreshing this - the value is only ever determined on demand.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @ThreadSafe
 public final class SMLRegistrationCache

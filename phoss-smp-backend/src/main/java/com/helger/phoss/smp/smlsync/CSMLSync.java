@@ -17,7 +17,7 @@ import com.helger.photon.security.lock.SingleRunLock;
  * Constants for the reconciliation of the local Service Groups with the SML.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class CSMLSync

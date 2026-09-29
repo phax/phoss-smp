@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  * 3.1.3.2 of the SML specification.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public enum ESMLRegistrationState implements IHasID <String>, IHasDisplayName
 {

@@ -75,7 +75,7 @@ public class SMPServiceInformation extends AbstractSMPHasExtension implements IS
    * @param aDocTypeID
    *        The document type ID to use. May not be <code>null</code>.
    * @return The ID of the respective {@link SMPServiceInformation}. Never <code>null</code>.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   @NonNull
   @Nonempty

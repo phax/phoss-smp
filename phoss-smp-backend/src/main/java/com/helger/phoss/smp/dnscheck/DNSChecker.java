@@ -40,7 +40,7 @@ import com.helger.smpclient.url.dns.IBDXLURLProvider;
  * the DNS round trips, not by CPU.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class DNSChecker

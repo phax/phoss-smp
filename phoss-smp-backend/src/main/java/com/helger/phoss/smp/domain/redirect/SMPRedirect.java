@@ -73,7 +73,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
    * @param aDocTypeID
    *        The document type ID to use. May not be <code>null</code>.
    * @return The ID of the respective {@link SMPRedirect}. Never <code>null</code>.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   @NonNull
   @Nonempty

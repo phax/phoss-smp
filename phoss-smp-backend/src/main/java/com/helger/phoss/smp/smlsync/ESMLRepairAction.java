@@ -25,7 +25,7 @@ import com.helger.base.name.IHasDisplayName;
  * a reconciliation report of {@link SMLSyncJob}.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public enum ESMLRepairAction implements IHasID <String>, IHasDisplayName
 {

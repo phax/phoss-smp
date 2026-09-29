@@ -39,7 +39,7 @@ import com.helger.xsds.peppol.id1.ParticipantIdentifierType;
  * remains in the set afterwards are the participants that are missing at the SML.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @NotThreadSafe
 public final class SMLSyncDiffer

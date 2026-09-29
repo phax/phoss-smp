@@ -27,7 +27,7 @@ import com.helger.base.tostring.ToStringGenerator;
  * report file, because there may be hundreds of thousands of them.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class SMLSyncResult

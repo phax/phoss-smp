@@ -54,7 +54,7 @@ import com.helger.web.scope.mgr.WebScoped;
  * the lock.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public class SMLRepairJob extends AbstractLongRunningJobRunnable
 {

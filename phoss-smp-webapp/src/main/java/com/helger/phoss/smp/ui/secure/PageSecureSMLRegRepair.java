@@ -68,7 +68,7 @@ import com.helger.photon.uictrls.datatables.column.EDTColType;
  * the <em>Reconcile participants</em> page.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
 {

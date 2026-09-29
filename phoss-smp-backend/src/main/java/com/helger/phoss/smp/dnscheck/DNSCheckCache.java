@@ -28,7 +28,7 @@ import com.helger.photon.security.lock.SingleRunLock;
  * snapshot of something that is looked up again anyway, not persistent state.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @ThreadSafe
 public final class DNSCheckCache

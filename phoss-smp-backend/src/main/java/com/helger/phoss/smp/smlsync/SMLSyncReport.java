@@ -52,7 +52,7 @@ import com.helger.xml.microdom.serialize.MicroWriter;
  * well.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class SMLSyncReport

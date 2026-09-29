@@ -72,7 +72,7 @@ import com.helger.web.scope.IRequestWebScopeWithoutResponse;
  * the created reports for download.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public final class PageSecureSMLRegSync extends AbstractPageSecureSMLReg
 {

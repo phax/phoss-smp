@@ -70,7 +70,7 @@ import com.helger.xsds.peppol.id1.ParticipantIdentifierType;
  * the lock.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 public class SMLSyncJob extends AbstractLongRunningJobRunnable
 {

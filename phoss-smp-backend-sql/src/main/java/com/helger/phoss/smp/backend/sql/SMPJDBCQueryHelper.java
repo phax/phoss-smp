@@ -130,7 +130,7 @@ public final class SMPJDBCQueryHelper
    * @param sTableName
    *        The name of the table to be checked. May neither be <code>null</code> nor empty.
    * @return The SQL statement. Never <code>null</code>.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   @NonNull
   public static String getExistsAnyRow (@NonNull @Nonempty final String sTableName)
@@ -153,7 +153,7 @@ public final class SMPJDBCQueryHelper
    * @param sTableName
    *        The name of the table to be checked. May neither be <code>null</code> nor empty.
    * @return The SQL statement. Never <code>null</code>.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   @NonNull
   public static String getExistsAnyRow (@NonNull final EDatabaseSystemType eDBType,

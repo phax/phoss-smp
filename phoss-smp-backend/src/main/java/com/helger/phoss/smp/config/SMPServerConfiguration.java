@@ -393,7 +393,7 @@ public final class SMPServerConfiguration
    * @return The number of days a created SML reconciliation report is kept on disk, before it is
    *         deleted. If the value is &le; 0, the reports are kept forever. The default value is
    *         {@value #DEFAULT_SML_SYNC_RETENTION_DAYS} days.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   public static int getSMLSyncRetentionDays ()
   {
@@ -405,20 +405,20 @@ public final class SMPServerConfiguration
    *         operation, so that reading the participants of a large SMP does not hammer the SML.
    *         May be <code>null</code> or zero, in which case the pages are requested without any
    *         delay. That is the default.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   /**
    * @return The number of participants that are sent to the SML in a single <code>CreateList()</code>
    *         or <code>DeleteList()</code> call. A smaller chunk limits the damage of a chunk that
    *         fails as a whole. The default value is {@value #DEFAULT_SML_REPAIR_CHUNK_SIZE}.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   /**
    * @return The number of Service Groups from which on the DNS state check is performed as a
    *         background job instead of while the page is rendered. A value &le; 0 means that it
    *         always runs in the background. The default value is
    *         {@value #DEFAULT_SMP_DNSCHECK_ASYNC_THRESHOLD}.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   public static int getDNSCheckAsyncThreshold ()
   {
@@ -429,7 +429,7 @@ public final class SMPServerConfiguration
    * @return The number of DNS lookups that are performed in parallel by the DNS state check. A few
    *         hundred concurrent NAPTR queries are unkind to a resolver, so this is deliberately
    *         conservative. The default value is {@value #DEFAULT_SMP_DNSCHECK_THREADS}.
-   * @since 8.5.1
+   * @since 8.6.0
    */
   @Nonnegative
   public static int getDNSCheckThreadCount ()

@@ -35,7 +35,7 @@ import com.helger.datetime.helper.PDTFactory;
  * interface, not state anything depends on.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @ThreadSafe
 public final class SMLRepairHistory

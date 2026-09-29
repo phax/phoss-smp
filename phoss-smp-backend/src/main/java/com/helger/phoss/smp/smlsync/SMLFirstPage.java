@@ -47,7 +47,7 @@ import com.helger.xsds.peppol.id1.ParticipantIdentifierType;
  * </ul>
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class SMLFirstPage

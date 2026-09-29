@@ -28,7 +28,7 @@ import com.helger.collection.commons.ICommonsList;
  * The outcome of a DNS check over a set of participants.
  *
  * @author Philip Helger
- * @since 8.5.1
+ * @since 8.6.0
  */
 @Immutable
 public final class DNSCheckResult
