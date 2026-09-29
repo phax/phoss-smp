@@ -22,14 +22,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.UUID;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.helger.http.CHttpHeader;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.audit.EAuditActionType;
 import com.helger.photon.audit.IAuditItem;
@@ -39,16 +42,10 @@ import com.helger.photon.security.token.user.IUserToken;
 import com.helger.photon.security.token.user.IUserTokenManager;
 import com.helger.photon.security.user.IUser;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.mgr.WebScoped;
-import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
-
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Verify that authenticated REST operations persist the API user in SQL audit entries.
@@ -60,51 +57,61 @@ public final class AuditUserInterfaceTest extends AbstractSMPWebAppSQLTest
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (PROPERTIES_FILE);
 
+  private MockHttpClient m_aClient;
+
+  @Before
+  public void before ()
+  {
+    m_aClient = new MockHttpClient (m_aRule.getFullURL ());
+  }
+
+  @After
+  public void after ()
+  {
+    m_aClient.close ();
+  }
+
   private void _testAuditUser (final String sAuthorization)
   {
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme (PID_PREFIX_9999_PHOSS +
                                                                                                                       "-audit-" +
                                                                                                                       UUID.randomUUID ());
     final String sParticipantID = aPI.getURIEncoded ();
+    final String sPath = aPI.getURIPercentEncoded ();
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-    try (final Client aClient = ClientBuilder.newClient ())
+    try
     {
-      final WebTarget aTarget = aClient.target (m_aRule.getFullURL ()).path (sParticipantID);
-      try
+      // Exercise the HTTP authentication and SQL persistence paths together.
       {
-        // Exercise the HTTP authentication and SQL persistence paths together.
-        try (final Response aResponse = aTarget.request ()
-                                               .header (CHttpHeader.AUTHORIZATION, sAuthorization)
-                                               .put (Entity.xml (new ObjectFactory ().createServiceGroup (aSG))))
-        {
-          assertEquals (aResponse.readEntity (String.class), 200, aResponse.getStatus ());
-        }
-        assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
-
-        // Read the saved audit row, not the current request's identity provider.
-        // Match this operation explicitly rather than assuming the last row is ours.
-        int nMatchingItems = 0;
-        for (final IAuditItem aItem : PhotonSecurityManager.getAuditMgr ().getLastAuditItems (100))
-          if (aItem.getType () == EAuditActionType.CREATE && aItem.getAction ().contains (sParticipantID))
-          {
-            assertTrue (aItem.isSuccess ());
-            assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aItem.getUserID ());
-            ++nMatchingItems;
-          }
-        assertEquals ("Expected one persisted service-group creation audit entry", 1, nMatchingItems);
+        final MockHttpResponse aResponse = m_aClient.put (sPath,
+                                                          sAuthorization,
+                                                          MockHttpClient.createXMLEntity (new SMPMarshallerServiceGroupType (),
+                                                                                          aSG));
+        assertEquals (aResponse.getBodyAsString (), 200, aResponse.getStatusCode ());
       }
-      finally
+      assertTrue (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI));
+
+      // Read the saved audit row, not the current request's identity provider.
+      // Match this operation explicitly rather than assuming the last row is ours.
+      int nMatchingItems = 0;
+      for (final IAuditItem aItem : PhotonSecurityManager.getAuditMgr ().getLastAuditItems (100))
+        if (aItem.getType () == EAuditActionType.CREATE && aItem.getAction ().contains (sParticipantID))
+        {
+          assertTrue (aItem.isSuccess ());
+          assertEquals (CSecurity.USER_ADMINISTRATOR_ID, aItem.getUserID ());
+          ++nMatchingItems;
+        }
+      assertEquals ("Expected one persisted service-group creation audit entry", 1, nMatchingItems);
+    }
+    finally
+    {
+      if (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI))
       {
-        if (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI))
-          try (final Response aResponse = aTarget.request ()
-                                                 .header (CHttpHeader.AUTHORIZATION, sAuthorization)
-                                                 .delete ())
-          {
-            assertEquals (aResponse.readEntity (String.class), 200, aResponse.getStatus ());
-          }
+        final MockHttpResponse aResponse = m_aClient.delete (sPath, sAuthorization);
+        assertEquals (aResponse.getBodyAsString (), 200, aResponse.getStatusCode ());
       }
     }
   }

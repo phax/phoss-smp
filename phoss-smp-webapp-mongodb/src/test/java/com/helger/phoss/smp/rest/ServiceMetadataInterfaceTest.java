@@ -24,7 +24,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.apache.hc.core5.http.HttpEntity;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
-import com.helger.http.CHttpHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -50,6 +53,8 @@ import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.phoss.smp.mock.MockSMPClient;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
@@ -57,10 +62,11 @@ import com.helger.servlet.mock.MockHttpServletRequest;
 import com.helger.smpclient.exception.SMPClientException;
 import com.helger.smpclient.exception.SMPClientNotFoundException;
 import com.helger.smpclient.peppol.SMPClient;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.xsds.peppol.smp1.EndpointType;
-import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ProcessListType;
 import com.helger.xsds.peppol.smp1.ProcessType;
 import com.helger.xsds.peppol.smp1.RedirectType;
@@ -69,12 +75,6 @@ import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
-
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.Invocation.Builder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Test class for class {@link SMPRestFilter}.
@@ -90,44 +90,69 @@ public final class ServiceMetadataInterfaceTest
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-mongodb.properties"));
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
+  private MockHttpClient m_aClient;
 
-  @NonNull
-  private static Builder _addCredentials (@NonNull final Builder aBuilder)
+  @Before
+  public void before ()
   {
-    // Use default credentials for SQL backend
-    return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
+    m_aClient = new MockHttpClient (m_aRule.getFullURL ());
   }
 
-  private static int _testResponseJerseyClient (final Response aResponseMsg, final int... aStatusCodes)
+  @After
+  public void after ()
+  {
+    m_aClient.close ();
+  }
+
+  @NonNull
+  private static HttpEntity _xmlEntity (@NonNull final ServiceGroupType aSG)
+  {
+    return MockHttpClient.createXMLEntity (new SMPMarshallerServiceGroupType (), aSG);
+  }
+
+  @NonNull
+  private static HttpEntity _xmlEntity (@NonNull final ServiceMetadataType aSM)
+  {
+    return MockHttpClient.createXMLEntity (new SMPMarshallerServiceMetadataType (), aSM);
+  }
+
+  private static int _testResponse (final MockHttpResponse aResponseMsg, final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
 
-    assertNotNull (aResponseMsg);
     // Read response
-    final String sResponse = aResponseMsg.readEntity (String.class);
+    final String sResponse = aResponseMsg.getBodyAsString ();
     if (StringHelper.isNotEmpty (sResponse))
       LOGGER.info ("HTTP Response: " + sResponse);
-    assertTrue (Arrays.toString (aStatusCodes) + " does not contain " + aResponseMsg.getStatus (),
-                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
-    return aResponseMsg.getStatus ();
+    assertTrue (Arrays.toString (aStatusCodes) + " does not contain " + aResponseMsg.getStatusCode (),
+                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatusCode ()));
+    return aResponseMsg.getStatusCode ();
+  }
+
+  @Nullable
+  private ServiceGroupType _getServiceGroup (@NonNull final String sPath)
+  {
+    final MockHttpResponse aResponseMsg = m_aClient.get (sPath);
+    assertEquals (200, aResponseMsg.getStatusCode ());
+    final String sBody = aResponseMsg.getBodyAsString ();
+    return sBody == null ? null : new SMPMarshallerServiceGroupType ().read (sBody);
   }
 
   @Test
-  public void testCreateAndDeleteServiceInformationJerseyClient ()
+  public void testCreateAndDeleteServiceInformationHttpClient ()
   {
     try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
     {
       // Lower case
       final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
-      final String sPI_LC = aPI_LC.getURIEncoded ();
+      final String sPI_LC = aPI_LC.getURIPercentEncoded ();
       // Upper case
       final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:XXX");
-      final String sPI_UC = aPI_UC.getURIEncoded ();
+      final String sPI_UC = aPI_UC.getURIPercentEncoded ();
 
       final PeppolDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
-      final String sDT = aDT.getURIEncoded ();
+      final String sDT = aDT.getURIPercentEncoded ();
 
       final PeppolProcessIdentifier aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
 
@@ -158,27 +183,25 @@ public final class ServiceMetadataInterfaceTest
       }
       aSM.setServiceInformation (aSI);
 
-      final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-      Response aResponseMsg;
+      MockHttpResponse aResponseMsg;
 
-      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404, 500);
+      final int nStatus = _testResponse (m_aClient.get (sPI_LC), 404, 500);
       if (nStatus == 500)
       {
         // Seems like MySQL is not running
         return;
       }
-      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+      _testResponse (m_aClient.get (sPI_UC), 404);
 
       try
       {
         // PUT ServiceGroup
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
-                                                                                                        .createServiceGroup (aSG)));
-        _testResponseJerseyClient (aResponseMsg, 200);
+        aResponseMsg = m_aClient.put (sPI_LC, CREDENTIALS, _xmlEntity (aSG));
+        _testResponse (aResponseMsg, 200);
 
         // Read both
-        assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
-        assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+        assertNotNull (_getServiceGroup (sPI_LC));
+        assertNotNull (_getServiceGroup (sPI_UC));
 
         final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI_LC);
         assertNotNull (aServiceGroup);
@@ -188,45 +211,43 @@ public final class ServiceMetadataInterfaceTest
         try
         {
           // PUT 1 ServiceInformation
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).put (Entity
-                                                                                                                    .xml (m_aObjFactory.createServiceMetadata (aSM)));
-          _testResponseJerseyClient (aResponseMsg, 200);
+          aResponseMsg = m_aClient.put (sPI_LC + "/services/" + sDT, CREDENTIALS, _xmlEntity (aSM));
+          _testResponse (aResponseMsg, 200);
           assertNotNull (SMPMetaManager.getServiceInformationMgr ()
                                        .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // PUT 2 ServiceInformation
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).put (Entity
-                                                                                                                    .xml (m_aObjFactory.createServiceMetadata (aSM)));
-          _testResponseJerseyClient (aResponseMsg, 200);
+          aResponseMsg = m_aClient.put (sPI_LC + "/services/" + sDT, CREDENTIALS, _xmlEntity (aSM));
+          _testResponse (aResponseMsg, 200);
           assertNotNull (SMPMetaManager.getServiceInformationMgr ()
                                        .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // DELETE 1 ServiceInformation
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-          _testResponseJerseyClient (aResponseMsg, 200);
+          aResponseMsg = m_aClient.delete (sPI_LC + "/services/" + sDT, CREDENTIALS);
+          _testResponse (aResponseMsg, 200);
           assertNull (SMPMetaManager.getServiceInformationMgr ()
                                     .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
         finally
         {
           // DELETE 2 ServiceInformation
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-          _testResponseJerseyClient (aResponseMsg, 200, 404);
+          aResponseMsg = m_aClient.delete (sPI_LC + "/services/" + sDT, CREDENTIALS);
+          _testResponse (aResponseMsg, 200, 404);
           assertNull (SMPMetaManager.getServiceInformationMgr ()
                                     .getSMPServiceInformationOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
 
-        assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+        assertNotNull (_getServiceGroup (sPI_LC));
       }
       finally
       {
         // DELETE ServiceGroup
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
+        aResponseMsg = m_aClient.delete (sPI_LC, CREDENTIALS);
         // May be 500 if no MySQL is running
-        _testResponseJerseyClient (aResponseMsg, 200, 404);
+        _testResponse (aResponseMsg, 200, 404);
 
-        _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
-        _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+        _testResponse (m_aClient.get (sPI_LC), 404);
+        _testResponse (m_aClient.get (sPI_UC), 404);
         assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
         assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
       }
@@ -356,19 +377,19 @@ public final class ServiceMetadataInterfaceTest
   }
 
   @Test
-  public void testCreateAndDeleteRedirectJerseyClient ()
+  public void testCreateAndDeleteRedirectHttpClient ()
   {
     try (final WebScoped aWS = new WebScoped (new MockHttpServletRequest ()))
     {
       // Lower case
       final IParticipantIdentifier aPI_LC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:xxx");
-      final String sPI_LC = aPI_LC.getURIEncoded ();
+      final String sPI_LC = aPI_LC.getURIPercentEncoded ();
       // Upper case
       final IParticipantIdentifier aPI_UC = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9915:XXX");
-      final String sPI_UC = aPI_UC.getURIEncoded ();
+      final String sPI_UC = aPI_UC.getURIPercentEncoded ();
 
       final IDocumentTypeIdentifier aDT = EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30.getAsDocumentTypeIdentifier ();
-      final String sDT = aDT.getURIEncoded ();
+      final String sDT = aDT.getURIPercentEncoded ();
 
       final ServiceGroupType aSG = new ServiceGroupType ();
       aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI_LC));
@@ -380,26 +401,24 @@ public final class ServiceMetadataInterfaceTest
       aRedir.setCertificateUID ("APP_0000000000000");
       aSM.setRedirect (aRedir);
 
-      final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-      Response aResponseMsg;
+      MockHttpResponse aResponseMsg;
 
-      final int nStatus = _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404, 500);
+      final int nStatus = _testResponse (m_aClient.get (sPI_LC), 404, 500);
       if (nStatus == 500)
       {
         // Seems like MySQL is not running
         return;
       }
-      _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+      _testResponse (m_aClient.get (sPI_UC), 404);
 
       try
       {
         // PUT ServiceGroup
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).put (Entity.xml (m_aObjFactory
-                                                                                                        .createServiceGroup (aSG)));
-        _testResponseJerseyClient (aResponseMsg, 200);
+        aResponseMsg = m_aClient.put (sPI_LC, CREDENTIALS, _xmlEntity (aSG));
+        _testResponse (aResponseMsg, 200);
 
-        assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
-        assertNotNull (aTarget.path (sPI_UC).request ().get (ServiceGroupType.class));
+        assertNotNull (_getServiceGroup (sPI_LC));
+        assertNotNull (_getServiceGroup (sPI_UC));
 
         final ISMPServiceGroup aServiceGroup = SMPMetaManager.getServiceGroupMgr ().getSMPServiceGroupOfID (aPI_LC);
         assertNotNull (aServiceGroup);
@@ -409,40 +428,38 @@ public final class ServiceMetadataInterfaceTest
         try
         {
           // PUT 1 ServiceInformation
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).put (Entity
-                                                                                                                    .xml (m_aObjFactory.createServiceMetadata (aSM)));
-          _testResponseJerseyClient (aResponseMsg, 200);
+          aResponseMsg = m_aClient.put (sPI_LC + "/services/" + sDT, CREDENTIALS, _xmlEntity (aSM));
+          _testResponse (aResponseMsg, 200);
           assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // PUT 2 ServiceInformation
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).put (Entity
-                                                                                                                    .xml (m_aObjFactory.createServiceMetadata (aSM)));
-          _testResponseJerseyClient (aResponseMsg, 200);
+          aResponseMsg = m_aClient.put (sPI_LC + "/services/" + sDT, CREDENTIALS, _xmlEntity (aSM));
+          _testResponse (aResponseMsg, 200);
           assertNotNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aPI_LC, aDT));
 
           // DELETE 1 Redirect
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-          _testResponseJerseyClient (aResponseMsg, 200);
+          aResponseMsg = m_aClient.delete (sPI_LC + "/services/" + sDT, CREDENTIALS);
+          _testResponse (aResponseMsg, 200);
           assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
         finally
         {
           // DELETE 2 Redirect
-          aResponseMsg = _addCredentials (aTarget.path (sPI_LC).path ("services").path (sDT).request ()).delete ();
-          _testResponseJerseyClient (aResponseMsg, 200, 404);
+          aResponseMsg = m_aClient.delete (sPI_LC + "/services/" + sDT, CREDENTIALS);
+          _testResponse (aResponseMsg, 200, 404);
           assertNull (SMPMetaManager.getRedirectMgr ().getSMPRedirectOfServiceGroupAndDocumentType (aPI_LC, aDT));
         }
 
-        assertNotNull (aTarget.path (sPI_LC).request ().get (ServiceGroupType.class));
+        assertNotNull (_getServiceGroup (sPI_LC));
       }
       finally
       {
         // DELETE ServiceGroup
-        aResponseMsg = _addCredentials (aTarget.path (sPI_LC).request ()).delete ();
-        _testResponseJerseyClient (aResponseMsg, 200, 404);
+        aResponseMsg = m_aClient.delete (sPI_LC, CREDENTIALS);
+        _testResponse (aResponseMsg, 200, 404);
 
-        _testResponseJerseyClient (aTarget.path (sPI_LC).request ().get (), 404);
-        _testResponseJerseyClient (aTarget.path (sPI_UC).request ().get (), 404);
+        _testResponse (m_aClient.get (sPI_LC), 404);
+        _testResponse (m_aClient.get (sPI_UC), 404);
         assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_LC));
         assertFalse (SMPMetaManager.getServiceGroupMgr ().containsSMPServiceGroupWithID (aPI_UC));
       }

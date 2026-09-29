@@ -17,18 +17,17 @@
 package com.helger.phoss.smp.servlet;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import com.helger.io.resource.FileSystemResource;
+import com.helger.mime.CMimeType;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
-
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Test class for {@link SMPReadyServlet}.
@@ -40,18 +39,26 @@ public final class SMPReadyServletTest
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
+  private MockHttpClient m_aClient;
+
+  @Before
+  public void before ()
+  {
+    m_aClient = new MockHttpClient (m_aRule.getFullURL ());
+  }
+
+  @After
+  public void after ()
+  {
+    m_aClient.close ();
+  }
+
   @Test
   public void testXMLBackendIsReady ()
   {
-    try (final Client aClient = ClientBuilder.newClient ();
-         final Response aResponse = aClient.target (m_aRule.getFullURL ())
-                                           .path (SMPReadyServlet.SERVLET_DEFAULT_NAME)
-                                           .request ()
-                                           .get ())
-    {
-      assertEquals (200, aResponse.getStatus ());
-      assertTrue (MediaType.APPLICATION_JSON_TYPE.isCompatible (aResponse.getMediaType ()));
-      assertEquals ("{\"ready\":true}", aResponse.readEntity (String.class));
-    }
+    final MockHttpResponse aResponse = m_aClient.get (SMPReadyServlet.SERVLET_DEFAULT_NAME);
+    assertEquals (200, aResponse.getStatusCode ());
+    assertEquals (CMimeType.APPLICATION_JSON.getAsString (), aResponse.getMimeType ());
+    assertEquals ("{\"ready\":true}", aResponse.getBodyAsString ());
   }
 }

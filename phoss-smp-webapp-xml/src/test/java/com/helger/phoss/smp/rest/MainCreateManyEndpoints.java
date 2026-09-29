@@ -26,7 +26,6 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
-import com.helger.http.CHttpHeader;
 import com.helger.peppol.smp.ESMPTransportProfile;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.doctype.EPredefinedDocumentTypeIdentifier;
@@ -35,22 +34,20 @@ import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceMetadataType;
 import com.helger.smpclient.peppol.utils.W3CEndpointReferenceHelper;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
 import com.helger.xsds.peppol.id1.ProcessIdentifierType;
 import com.helger.xsds.peppol.smp1.EndpointType;
-import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ProcessListType;
 import com.helger.xsds.peppol.smp1.ProcessType;
 import com.helger.xsds.peppol.smp1.ServiceEndpointList;
 import com.helger.xsds.peppol.smp1.ServiceInformationType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataType;
-
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Create one million endpoints. Run this AFTER {@link MainCreateManyServiceGroups}.
@@ -61,26 +58,24 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainCreateManyEndpoints.class);
 
-  private static void _testResponseJerseyClient (@NonNull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponse (@NonNull final MockHttpResponse aResponseMsg, @Nonempty final int... aStatusCodes)
   {
-    final String sResponse = aResponseMsg.readEntity (String.class);
+    final String sResponse = aResponseMsg.getBodyAsString ();
     if (StringHelper.isNotEmpty (sResponse))
       LOGGER.error ("HTTP Response: " + sResponse);
-    if (!ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()))
-      throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
+    if (!ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatusCode ()))
+      throw new IllegalStateException (aResponseMsg.getStatusCode () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
   @SuppressWarnings ("deprecation")
   public static void main (final String [] args) throws Throwable
   {
-    final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
     aRule.before ();
-    try
+    try (final MockHttpClient aClient = new MockHttpClient ("http://localhost:90"))
     {
       final StopWatch aSWOverall = StopWatch.createdStarted ();
-      final ObjectFactory aObjFactory = new ObjectFactory ();
+      final SMPMarshallerServiceMetadataType aMarshaller = new SMPMarshallerServiceMetadataType ();
 
       for (final EPredefinedDocumentTypeIdentifier aEDT : new EPredefinedDocumentTypeIdentifier [] { EPredefinedDocumentTypeIdentifier.INVOICE_EN16931_PEPPOL_V30,
                                                                                                      EPredefinedDocumentTypeIdentifier.CREDITNOTE_EN16931_PEPPOL_V30,
@@ -94,7 +89,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
 
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
-        final String sDT = aDT.getURIEncoded ();
+        final String sDT = aDT.getURIPercentEncoded ();
         final ProcessIdentifierType aProcID;
         if (true)
           aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
@@ -109,7 +104,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
           final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
                                                                                                                                  StringHelper.getLeadingZero (i,
                                                                                                                                                               7));
-          final String sPI = aPI.getURIEncoded ();
+          final String sPI = aPI.getURIPercentEncoded ();
 
           final ServiceMetadataType aSM = new ServiceMetadataType ();
           final ServiceInformationType aSI = new ServiceInformationType ();
@@ -138,26 +133,13 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
           {
             // Delete old - don't care about the result
             if (false)
-              ClientBuilder.newClient ()
-                           .target (sServerBasePath)
-                           .path (sPI)
-                           .path ("services")
-                           .path (sDT)
-                           .request ()
-                           .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                           .delete ();
+              aClient.delete (sPI + "/services/" + sDT, CREDENTIALS);
 
             // Create a new
-            final Response aResponseMsg = ClientBuilder.newClient ()
-                                                       .target (sServerBasePath)
-                                                       .path (sPI)
-                                                       .path ("services")
-                                                       .path (sDT)
-                                                       .request ()
-                                                       .header (CHttpHeader.AUTHORIZATION,
-                                                                CREDENTIALS.getRequestValue ())
-                                                       .put (Entity.xml (aObjFactory.createServiceMetadata (aSM)));
-            _testResponseJerseyClient (aResponseMsg, 200);
+            _testResponse (aClient.put (sPI + "/services/" + sDT,
+                                        CREDENTIALS,
+                                        MockHttpClient.createXMLEntity (aMarshaller, aSM)),
+                           200);
           }
 
           aSW.stop ();

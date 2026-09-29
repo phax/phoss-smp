@@ -26,19 +26,16 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
-import com.helger.http.CHttpHeader;
 import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.servlet.mock.MockHttpServletRequest;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.mgr.WebScoped;
 import com.helger.web.scope.mock.WebScopeTestRule;
-import com.helger.xsds.peppol.smp1.ObjectFactory;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
-
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Create many service groups - please make sure the SML connection is not enabled.
@@ -49,24 +46,22 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (MainCreateManyServiceGroups.class);
 
-  private static void _testResponseJerseyClient (@NonNull final Response aResponseMsg,
-                                                 @Nonempty final int... aStatusCodes)
+  private static void _testResponse (@NonNull final MockHttpResponse aResponseMsg, @Nonempty final int... aStatusCodes)
   {
-    final String sResponse = aResponseMsg.readEntity (String.class);
+    final String sResponse = aResponseMsg.getBodyAsString ();
     if (StringHelper.isNotEmpty (sResponse))
       LOGGER.error ("HTTP Response: " + sResponse);
-    if (!ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()))
-      throw new IllegalStateException (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes));
+    if (!ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatusCode ()))
+      throw new IllegalStateException (aResponseMsg.getStatusCode () + " is not in " + Arrays.toString (aStatusCodes));
   }
 
   public static void main (final String [] args) throws Throwable
   {
-    final String sServerBasePath = "http://localhost:90";
     final WebScopeTestRule aRule = new WebScopeTestRule ();
     aRule.before ();
-    try
+    try (final MockHttpClient aClient = new MockHttpClient ("http://localhost:90"))
     {
-      final ObjectFactory aObjFactory = new ObjectFactory ();
+      final SMPMarshallerServiceGroupType aMarshaller = new SMPMarshallerServiceGroupType ();
       final StopWatch aSWOverall = StopWatch.createdStarted ();
       for (int i = START_INDEX; i < START_INDEX + PARTICIPANTS; ++i)
       {
@@ -74,7 +69,7 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
         final PeppolParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:test-philip-" +
                                                                                                                                StringHelper.getLeadingZero (i,
                                                                                                                                                             7));
-        final String sPI = aPI.getURIEncoded ();
+        final String sPI = aPI.getURIPercentEncoded ();
 
         final ServiceGroupType aSG = new ServiceGroupType ();
         aSG.setParticipantIdentifier (aPI);
@@ -84,21 +79,10 @@ public final class MainCreateManyServiceGroups extends AbstractCreateMany
         {
           // Delete old - don't care about the result
           if (false)
-            ClientBuilder.newClient ()
-                         .target (sServerBasePath)
-                         .path (sPI)
-                         .request ()
-                         .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                         .delete ();
+            aClient.delete (sPI, CREDENTIALS);
 
           // Create a new
-          final Response aResponseMsg = ClientBuilder.newClient ()
-                                                     .target (sServerBasePath)
-                                                     .path (sPI)
-                                                     .request ()
-                                                     .header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ())
-                                                     .put (Entity.xml (aObjFactory.createServiceGroup (aSG)));
-          _testResponseJerseyClient (aResponseMsg, 200);
+          _testResponse (aClient.put (sPI, CREDENTIALS, MockHttpClient.createXMLEntity (aMarshaller, aSG)), 200);
         }
 
         aSW.stop ();

@@ -68,7 +68,6 @@
 
   <properties>
     <flyway.version>13.7.0</flyway.version>
-    <jersey.version>3.1.12</jersey.version>
     <log4j.version>2.26.1</log4j.version>
     <mongodb.version>5.12.0</mongodb.version>
     <protobuf.version>4.36.2</protobuf.version>

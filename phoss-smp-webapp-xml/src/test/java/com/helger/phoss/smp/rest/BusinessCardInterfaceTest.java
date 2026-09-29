@@ -24,7 +24,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.apache.hc.core5.http.HttpEntity;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -34,16 +38,18 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
-import com.helger.http.CHttpHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.peppol.businesscard.v1.PD1APIHelper;
+import com.helger.peppol.businesscard.v1.PD1BusinessCardMarshaller;
 import com.helger.peppol.businesscard.v1.PD1BusinessCardType;
 import com.helger.peppol.businesscard.v1.PD1BusinessEntityType;
 import com.helger.peppol.businesscard.v2.PD2APIHelper;
+import com.helger.peppol.businesscard.v2.PD2BusinessCardMarshaller;
 import com.helger.peppol.businesscard.v2.PD2BusinessCardType;
 import com.helger.peppol.businesscard.v2.PD2BusinessEntityType;
 import com.helger.peppol.businesscard.v3.PD3APIHelper;
+import com.helger.peppol.businesscard.v3.PD3BusinessCardMarshaller;
 import com.helger.peppol.businesscard.v3.PD3BusinessCardType;
 import com.helger.peppol.businesscard.v3.PD3BusinessEntityType;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -53,17 +59,13 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.photon.security.CSecurity;
-import com.helger.xsds.peppol.smp1.ObjectFactory;
+import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
-
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.Invocation.Builder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Test class for class {@link SMPRestFilter}
@@ -79,32 +81,74 @@ public final class BusinessCardInterfaceTest
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
-  private final ObjectFactory m_aObjFactory = new ObjectFactory ();
-  private final com.helger.peppol.businesscard.v1.ObjectFactory m_aBC1ObjFactory = new com.helger.peppol.businesscard.v1.ObjectFactory ();
-  private final com.helger.peppol.businesscard.v2.ObjectFactory m_aBC2ObjFactory = new com.helger.peppol.businesscard.v2.ObjectFactory ();
-  private final com.helger.peppol.businesscard.v3.ObjectFactory m_aBC3ObjFactory = new com.helger.peppol.businesscard.v3.ObjectFactory ();
+  private MockHttpClient m_aClient;
 
-  @NonNull
-  private static Builder _addCredentials (@NonNull final Builder aBuilder)
+  @Before
+  public void before ()
   {
-    // Use default credentials for XML backend
-    return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
+    m_aClient = new MockHttpClient (m_aRule.getFullURL ());
   }
 
-  private static int _testResponseJerseyClient (@NonNull final Response aResponseMsg,
-                                                @Nonempty final int... aStatusCodes)
+  @After
+  public void after ()
+  {
+    m_aClient.close ();
+  }
+
+  @NonNull
+  private static HttpEntity _xmlEntity (@NonNull final ServiceGroupType aSG)
+  {
+    return MockHttpClient.createXMLEntity (new SMPMarshallerServiceGroupType (), aSG);
+  }
+
+  @NonNull
+  private static HttpEntity _xmlEntity (@NonNull final PD1BusinessCardType aBC)
+  {
+    return MockHttpClient.createXMLEntity (new PD1BusinessCardMarshaller (), aBC);
+  }
+
+  @NonNull
+  private static HttpEntity _xmlEntity (@NonNull final PD2BusinessCardType aBC)
+  {
+    return MockHttpClient.createXMLEntity (new PD2BusinessCardMarshaller (), aBC);
+  }
+
+  @NonNull
+  private static HttpEntity _xmlEntity (@NonNull final PD3BusinessCardType aBC)
+  {
+    return MockHttpClient.createXMLEntity (new PD3BusinessCardMarshaller (), aBC);
+  }
+
+  private static int _testResponse (@NonNull final MockHttpResponse aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
 
-    assertNotNull (aResponseMsg);
     // Read response
-    final String sResponse = aResponseMsg.readEntity (String.class);
+    final String sResponse = aResponseMsg.getBodyAsString ();
     if (StringHelper.isNotEmpty (sResponse))
       LOGGER.info ("HTTP Response: " + sResponse);
-    assertTrue (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes),
-                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
-    return aResponseMsg.getStatus ();
+    assertTrue (aResponseMsg.getStatusCode () + " is not in " + Arrays.toString (aStatusCodes),
+                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatusCode ()));
+    return aResponseMsg.getStatusCode ();
+  }
+
+  @Nullable
+  private ServiceGroupType _getServiceGroup (@NonNull final String sPath)
+  {
+    final MockHttpResponse aResponseMsg = m_aClient.get (sPath);
+    assertEquals (200, aResponseMsg.getStatusCode ());
+    final String sBody = aResponseMsg.getBodyAsString ();
+    return sBody == null ? null : new SMPMarshallerServiceGroupType ().read (sBody);
+  }
+
+  @Nullable
+  private PD3BusinessCardType _getBusinessCard (@NonNull final String sPath)
+  {
+    final MockHttpResponse aResponseMsg = m_aClient.get (sPath);
+    assertEquals (200, aResponseMsg.getStatusCode ());
+    final String sBody = aResponseMsg.getBodyAsString ();
+    return sBody == null ? null : new PD3BusinessCardMarshaller ().read (sBody);
   }
 
   @Test
@@ -116,29 +160,27 @@ public final class BusinessCardInterfaceTest
     assertNotNull (aBCMgr);
 
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:tester");
-    final String sPI = aPI.getURIEncoded ();
+    final String sPI = aPI.getURIPercentEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-    Response aResponseMsg;
+    MockHttpResponse aResponseMsg;
 
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (
-                                                                                                                        aSG)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put (sPI, CREDENTIALS, _xmlEntity (aSG));
+      _testResponse (aResponseMsg, 200);
 
       // Get SG - must work
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+      assertNotNull (_getServiceGroup (sPI));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI));
 
       // Get BC - not existing
-      aResponseMsg = aTarget.path ("businesscard").path (sPI).request ().get ();
-      _testResponseJerseyClient (aResponseMsg, 404);
+      aResponseMsg = m_aClient.get ("businesscard/" + sPI);
+      _testResponse (aResponseMsg, 404);
 
       // Create BC with some entities
       final PD1BusinessCardType aBC = new PD1BusinessCardType ();
@@ -154,12 +196,11 @@ public final class BusinessCardInterfaceTest
       aBE.setGeographicalInformation ("Berlin");
       aBC.addBusinessEntity (aBE);
 
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
-                                                                                                            m_aBC1ObjFactory.createBusinessCard (aBC)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put ("businesscard/" + sPI, CREDENTIALS, _xmlEntity (aBC));
+      _testResponse (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
-      PD3BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
+      PD3BusinessCardType aReadBC = _getBusinessCard ("businesscard/" + sPI);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
@@ -172,12 +213,11 @@ public final class BusinessCardInterfaceTest
       aBE.setCountryCode ("SE");
       aBE.setGeographicalInformation ("Stockholm");
       aBC.addBusinessEntity (aBE);
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
-                                                                                                            m_aBC1ObjFactory.createBusinessCard (aBC)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put ("businesscard/" + sPI, CREDENTIALS, _xmlEntity (aBC));
+      _testResponse (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
-      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
+      aReadBC = _getBusinessCard ("businesscard/" + sPI);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
@@ -187,19 +227,19 @@ public final class BusinessCardInterfaceTest
     finally
     {
       // Delete Business Card
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
+      aResponseMsg = m_aClient.delete ("businesscard/" + sPI, CREDENTIALS);
+      _testResponse (aResponseMsg, 200, 404);
 
       // must be deleted
-      _testResponseJerseyClient (aTarget.path ("businesscard").path (sPI).request ().get (), 404);
+      _testResponse (m_aClient.get ("businesscard/" + sPI), 404);
       assertNull (aBCMgr.getSMPBusinessCardOfID (aPI));
 
       // Delete service Group
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
+      aResponseMsg = m_aClient.delete (sPI, CREDENTIALS);
+      _testResponse (aResponseMsg, 200, 404);
 
       // must be deleted
-      _testResponseJerseyClient (aTarget.path (sPI).request ().get (), 404);
+      _testResponse (m_aClient.get (sPI), 404);
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI));
     }
   }
@@ -213,29 +253,27 @@ public final class BusinessCardInterfaceTest
     assertNotNull (aBCMgr);
 
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:tester");
-    final String sPI = aPI.getURIEncoded ();
+    final String sPI = aPI.getURIPercentEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-    Response aResponseMsg;
+    MockHttpResponse aResponseMsg;
 
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (
-                                                                                                                        aSG)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put (sPI, CREDENTIALS, _xmlEntity (aSG));
+      _testResponse (aResponseMsg, 200);
 
       // Get SG - must work
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+      assertNotNull (_getServiceGroup (sPI));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI));
 
       // Get BC - not existing
-      aResponseMsg = aTarget.path ("businesscard").path (sPI).request ().get ();
-      _testResponseJerseyClient (aResponseMsg, 404);
+      aResponseMsg = m_aClient.get ("businesscard/" + sPI);
+      _testResponse (aResponseMsg, 404);
 
       // Create BC with some entities
       final PD2BusinessCardType aBC = new PD2BusinessCardType ();
@@ -251,12 +289,11 @@ public final class BusinessCardInterfaceTest
       aBE.setGeographicalInformation ("Berlin");
       aBC.addBusinessEntity (aBE);
 
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
-                                                                                                            m_aBC2ObjFactory.createBusinessCard (aBC)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put ("businesscard/" + sPI, CREDENTIALS, _xmlEntity (aBC));
+      _testResponse (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
-      PD3BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
+      PD3BusinessCardType aReadBC = _getBusinessCard ("businesscard/" + sPI);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
@@ -269,12 +306,11 @@ public final class BusinessCardInterfaceTest
       aBE.setCountryCode ("SE");
       aBE.setGeographicalInformation ("Stockholm");
       aBC.addBusinessEntity (aBE);
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
-                                                                                                            m_aBC2ObjFactory.createBusinessCard (aBC)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put ("businesscard/" + sPI, CREDENTIALS, _xmlEntity (aBC));
+      _testResponse (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
-      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
+      aReadBC = _getBusinessCard ("businesscard/" + sPI);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
@@ -284,19 +320,19 @@ public final class BusinessCardInterfaceTest
     finally
     {
       // Delete Business Card
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
+      aResponseMsg = m_aClient.delete ("businesscard/" + sPI, CREDENTIALS);
+      _testResponse (aResponseMsg, 200, 404);
 
       // must be deleted
-      _testResponseJerseyClient (aTarget.path ("businesscard").path (sPI).request ().get (), 404);
+      _testResponse (m_aClient.get ("businesscard/" + sPI), 404);
       assertNull (aBCMgr.getSMPBusinessCardOfID (aPI));
 
       // Delete service Group
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
+      aResponseMsg = m_aClient.delete (sPI, CREDENTIALS);
+      _testResponse (aResponseMsg, 200, 404);
 
       // must be deleted
-      _testResponseJerseyClient (aTarget.path (sPI).request ().get (), 404);
+      _testResponse (m_aClient.get (sPI), 404);
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI));
     }
   }
@@ -310,29 +346,27 @@ public final class BusinessCardInterfaceTest
     assertNotNull (aBCMgr);
 
     final IParticipantIdentifier aPI = PeppolIdentifierFactory.INSTANCE.createParticipantIdentifierWithDefaultScheme ("9999:tester");
-    final String sPI = aPI.getURIEncoded ();
+    final String sPI = aPI.getURIPercentEncoded ();
 
     final ServiceGroupType aSG = new ServiceGroupType ();
     aSG.setParticipantIdentifier (new SimpleParticipantIdentifier (aPI));
     aSG.setServiceMetadataReferenceCollection (new ServiceMetadataReferenceCollectionType ());
 
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-    Response aResponseMsg;
+    MockHttpResponse aResponseMsg;
 
     try
     {
       // Create SG
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).put (Entity.xml (m_aObjFactory.createServiceGroup (
-                                                                                                                        aSG)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put (sPI, CREDENTIALS, _xmlEntity (aSG));
+      _testResponse (aResponseMsg, 200);
 
       // Get SG - must work
-      assertNotNull (aTarget.path (sPI).request ().get (ServiceGroupType.class));
+      assertNotNull (_getServiceGroup (sPI));
       assertTrue (aSGMgr.containsSMPServiceGroupWithID (aPI));
 
       // Get BC - not existing
-      aResponseMsg = aTarget.path ("businesscard").path (sPI).request ().get ();
-      _testResponseJerseyClient (aResponseMsg, 404);
+      aResponseMsg = m_aClient.get ("businesscard/" + sPI);
+      _testResponse (aResponseMsg, 404);
 
       // Create BC with some entities
       final PD3BusinessCardType aBC = new PD3BusinessCardType ();
@@ -348,12 +382,11 @@ public final class BusinessCardInterfaceTest
       aBE.setGeographicalInformation ("Berlin");
       aBC.addBusinessEntity (aBE);
 
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
-                                                                                                            m_aBC3ObjFactory.createBusinessCard (aBC)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put ("businesscard/" + sPI, CREDENTIALS, _xmlEntity (aBC));
+      _testResponse (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
-      PD3BusinessCardType aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
+      PD3BusinessCardType aReadBC = _getBusinessCard ("businesscard/" + sPI);
       assertNotNull (aReadBC);
       assertEquals (2, aReadBC.getBusinessEntityCount ());
 
@@ -366,12 +399,11 @@ public final class BusinessCardInterfaceTest
       aBE.setCountryCode ("SE");
       aBE.setGeographicalInformation ("Stockholm");
       aBC.addBusinessEntity (aBE);
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).put (Entity.xml (
-                                                                                                            m_aBC3ObjFactory.createBusinessCard (aBC)));
-      _testResponseJerseyClient (aResponseMsg, 200);
+      aResponseMsg = m_aClient.put ("businesscard/" + sPI, CREDENTIALS, _xmlEntity (aBC));
+      _testResponse (aResponseMsg, 200);
 
       // Get BC - must work (always V3)
-      aReadBC = aTarget.path ("businesscard").path (sPI).request ().get (PD3BusinessCardType.class);
+      aReadBC = _getBusinessCard ("businesscard/" + sPI);
       assertNotNull (aReadBC);
       assertEquals (3, aReadBC.getBusinessEntityCount ());
 
@@ -381,19 +413,19 @@ public final class BusinessCardInterfaceTest
     finally
     {
       // Delete Business Card
-      aResponseMsg = _addCredentials (aTarget.path ("businesscard").path (sPI).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
+      aResponseMsg = m_aClient.delete ("businesscard/" + sPI, CREDENTIALS);
+      _testResponse (aResponseMsg, 200, 404);
 
       // must be deleted
-      _testResponseJerseyClient (aTarget.path ("businesscard").path (sPI).request ().get (), 404);
+      _testResponse (m_aClient.get ("businesscard/" + sPI), 404);
       assertNull (aBCMgr.getSMPBusinessCardOfID (aPI));
 
       // Delete service Group
-      aResponseMsg = _addCredentials (aTarget.path (sPI).request ()).delete ();
-      _testResponseJerseyClient (aResponseMsg, 200, 404);
+      aResponseMsg = m_aClient.delete (sPI, CREDENTIALS);
+      _testResponse (aResponseMsg, 200, 404);
 
       // must be deleted
-      _testResponseJerseyClient (aTarget.path (sPI).request ().get (), 404);
+      _testResponse (m_aClient.get (sPI), 404);
       assertFalse (aSGMgr.containsSMPServiceGroupWithID (aPI));
     }
   }
