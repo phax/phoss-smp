@@ -23,7 +23,10 @@ import org.jspecify.annotations.NonNull;
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.mime.CMimeType;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.cache.SMPRestCache;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
@@ -48,6 +51,23 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+
+    // Check if a previously created response can be reused. The HREF is part of the cache key,
+    // because the response contains absolute URLs based on the public URL of this SMP.
+    final IParticipantIdentifier aCacheParticipantID = SMPMetaManager.getIdentifierFactory ()
+                                                                     .parseParticipantIdentifier (sPathServiceGroupID);
+    final String sCacheHref = aCacheParticipantID == null ? null : aDataProvider.getServiceGroupHref (aCacheParticipantID);
+    if (aCacheParticipantID != null)
+    {
+      final byte [] aCachedBytes = SMPRestCache.getServiceGroupPayload (aCacheParticipantID, sCacheHref);
+      if (aCachedBytes != null)
+      {
+        aUnifiedResponse.setContent (aCachedBytes)
+                        .setMimeType (CMimeType.TEXT_XML)
+                        .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+        return;
+      }
+    }
 
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
@@ -79,6 +99,9 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
       // Internal error serializing the payload
       throw new SMPInternalErrorException ("Failed to convert the returned ServiceGroup to XML");
     }
+
+    if (aCacheParticipantID != null)
+      SMPRestCache.setServiceGroupPayload (aCacheParticipantID, sCacheHref, aBytes);
 
     aUnifiedResponse.setContent (aBytes)
                     .setMimeType (CMimeType.TEXT_XML)

@@ -111,6 +111,14 @@
     </dependency>
     
     <dependency>
+      <groupId>com.alicp.jetcache</groupId>
+      <artifactId>jetcache-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.alicp.jetcache</groupId>
+      <artifactId>jetcache-redis-lettuce</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>

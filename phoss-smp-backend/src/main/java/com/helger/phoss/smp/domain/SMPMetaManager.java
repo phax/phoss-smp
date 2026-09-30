@@ -25,6 +25,7 @@ import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
+import com.helger.phoss.smp.cache.SMPRestCacheInvalidationCallback;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.LoggingSMPBusinessCardCallback;
@@ -127,6 +128,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     m_aServiceGroupMgr.serviceGroupCallbacks ().add (new LoggingSMPServiceGroupCallback ());
     m_aRedirectMgr.redirectCallbacks ().add (new LoggingSMPRedirectCallback ());
     m_aServiceInformationMgr.serviceInformationCallbacks ().add (new LoggingSMPServiceInformationCallback ());
+
+    // Ensure the cached REST API responses are dropped, as soon as anything of a participant
+    // changes
+    final SMPRestCacheInvalidationCallback aRestCacheCB = new SMPRestCacheInvalidationCallback ();
+    m_aServiceGroupMgr.serviceGroupCallbacks ().add (aRestCacheCB);
+    m_aRedirectMgr.redirectCallbacks ().add (aRestCacheCB);
+    m_aServiceInformationMgr.serviceInformationCallbacks ().add (aRestCacheCB);
 
     if (m_aBusinessCardMgr != null)
     {
