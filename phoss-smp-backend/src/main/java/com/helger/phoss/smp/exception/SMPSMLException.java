@@ -25,8 +25,8 @@ public class SMPSMLException extends SMPServerException
   /**
    * Append the message of the causing exception, so that the SML fault details survive into the
    * REST error payload - only the message of the top-level exception is serialized there (see
-   * <code>SMPRestExceptionMapper</code>). This mirrors what
-   * <code>RegistrationHookException</code> does with the SOAP fault message.
+   * <code>SMPRestExceptionMapper</code>). This mirrors what <code>RegistrationHookException</code>
+   * does with the SOAP fault message.
    *
    * @param sMsg
    *        The message of this exception. May not be <code>null</code>.

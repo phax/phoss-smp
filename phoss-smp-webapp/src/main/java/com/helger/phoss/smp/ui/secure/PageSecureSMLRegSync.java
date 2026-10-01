@@ -241,7 +241,9 @@ public final class PageSecureSMLRegSync extends AbstractPageSecureSMLReg
       final LocalDateTime aStartDT = CSMLSync.LOCK.getStartDateTime ();
       aNodeList.addChild (warn ("An SML operation is currently running in the background" +
                                 (aStartDT == null ? ""
-                                                  : " (started at " + PDTToString.getAsString (aStartDT, aDisplayLocale) + ")") +
+                                                  : " (started at " +
+                                                    PDTToString.getAsString (aStartDT, aDisplayLocale) +
+                                                    ")") +
                                 ". Please wait until it is finished before starting a new one."));
     }
 
@@ -290,8 +292,7 @@ public final class PageSecureSMLRegSync extends AbstractPageSecureSMLReg
           aRow.addCell (new BootstrapButton ().addChild ("Download")
                                               .setIcon (EDefaultIcon.SAVE)
                                               .setOnClick (AJAX_DOWNLOAD_REPORT.getInvocationURL (aRequestScope)
-                                                                               .add (PARAM_JOB_ID,
-                                                                                     aJobData.getID ())));
+                                                                               .add (PARAM_JOB_ID, aJobData.getID ())));
         }
         else
           if (aJobData.getExecutionSuccess ().isFalse ())

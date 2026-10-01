@@ -54,8 +54,8 @@ public final class SMLSyncDiffer
    *        All URI encoded participant identifiers this SMP holds locally. May not be
    *        <code>null</code>. The provided collection is not modified - a copy is taken.
    * @param aOrphanConsumer
-   *        Invoked for every participant identifier the SML holds that is not held locally. May
-   *        not be <code>null</code>. Note that these are only <em>candidates</em> - see
+   *        Invoked for every participant identifier the SML holds that is not held locally. May not
+   *        be <code>null</code>. Note that these are only <em>candidates</em> - see
    *        {@link #getVerifiedOrphansInSML(Iterable, Set, Consumer)}.
    */
   public SMLSyncDiffer (@NonNull final Set <String> aLocalIDs, @NonNull final Consumer <String> aOrphanConsumer)
@@ -101,8 +101,8 @@ public final class SMLSyncDiffer
   }
 
   /**
-   * @return The number of participant identifiers that were added from the SML so far. Always
-   *         &ge; 0.
+   * @return The number of participant identifiers that were added from the SML so far. Always &ge;
+   *         0.
    */
   @Nonnegative
   public int getSMLParticipantCount ()
@@ -134,11 +134,11 @@ public final class SMLSyncDiffer
 
   /**
    * Remove the false positives from the "missing at the SML" candidates.<br>
-   * Chapter 3.1.2.7 of the SML specification states that the underlying data may change between
-   * two page reads, and a live SMP additionally creates and deletes Service Groups while the list
-   * is being read. A Service Group that was created during the run is therefore not contained in
-   * the SML list although nothing is wrong with it. Re-reading the local identifiers after the run
-   * and keeping only the candidates that are still held locally removes exactly those cases.<br>
+   * Chapter 3.1.2.7 of the SML specification states that the underlying data may change between two
+   * page reads, and a live SMP additionally creates and deletes Service Groups while the list is
+   * being read. A Service Group that was created during the run is therefore not contained in the
+   * SML list although nothing is wrong with it. Re-reading the local identifiers after the run and
+   * keeping only the candidates that are still held locally removes exactly those cases.<br>
    * Note that the SML offers no way to read a single participant - <code>List()</code> is the only
    * read operation of the <code>ManageBusinessIdentifier</code> interface - so the verification can
    * only be performed against the local state.
@@ -168,8 +168,8 @@ public final class SMLSyncDiffer
   /**
    * Remove the false positives from the "registered at the SML but unknown here" candidates.<br>
    * A Service Group that was deleted while the SML list was being read shows up as an orphan
-   * although nothing is wrong with it. Only the candidates that are still not held locally are
-   * real orphans.
+   * although nothing is wrong with it. Only the candidates that are still not held locally are real
+   * orphans.
    *
    * @param aCandidates
    *        The orphan candidates collected during the run, in the order in which they were found.

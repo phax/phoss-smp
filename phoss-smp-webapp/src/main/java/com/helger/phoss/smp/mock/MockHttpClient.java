@@ -88,8 +88,7 @@ public class MockHttpClient implements AutoCloseable
   }
 
   @NonNull
-  private MockHttpResponse _execute (@NonNull final HttpUriRequestBase aRequest,
-                                     @Nullable final String sAuthorization)
+  private MockHttpResponse _execute (@NonNull final HttpUriRequestBase aRequest, @Nullable final String sAuthorization)
   {
     if (sAuthorization != null)
       aRequest.addHeader (CHttpHeader.AUTHORIZATION, sAuthorization);
@@ -110,8 +109,8 @@ public class MockHttpClient implements AutoCloseable
   }
 
   /**
-   * @return The base URL of all requests, as provided in the constructor. Neither
-   *         <code>null</code> nor empty.
+   * @return The base URL of all requests, as provided in the constructor. Neither <code>null</code>
+   *         nor empty.
    */
   @NonNull
   @Nonempty
@@ -165,8 +164,7 @@ public class MockHttpClient implements AutoCloseable
   }
 
   @NonNull
-  public MockHttpResponse delete (@Nullable final String sPath,
-                                  @NonNull final BasicAuthClientCredentials aCredentials)
+  public MockHttpResponse delete (@Nullable final String sPath, @NonNull final BasicAuthClientCredentials aCredentials)
   {
     return delete (sPath, aCredentials.getRequestValue ());
   }

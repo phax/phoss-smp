@@ -126,7 +126,9 @@ public final class SMPServerConfiguration
   /** The default number of days an SML reconciliation report is kept on disk */
   public static final int DEFAULT_SML_SYNC_RETENTION_DAYS = 30;
 
-  /** The default number of participants sent to the SML in a single CreateList or DeleteList call */
+  /**
+   * The default number of participants sent to the SML in a single CreateList or DeleteList call
+   */
   public static final int DEFAULT_SML_REPAIR_CHUNK_SIZE = 100;
 
   /** From this number of Service Groups on, the DNS state check runs as a background job */
@@ -402,15 +404,16 @@ public final class SMPServerConfiguration
 
   /**
    * @return The delay to be applied between two page requests of the SML <code>List()</code>
-   *         operation, so that reading the participants of a large SMP does not hammer the SML.
-   *         May be <code>null</code> or zero, in which case the pages are requested without any
-   *         delay. That is the default.
+   *         operation, so that reading the participants of a large SMP does not hammer the SML. May
+   *         be <code>null</code> or zero, in which case the pages are requested without any delay.
+   *         That is the default.
    * @since 8.6.0
    */
   /**
-   * @return The number of participants that are sent to the SML in a single <code>CreateList()</code>
-   *         or <code>DeleteList()</code> call. A smaller chunk limits the damage of a chunk that
-   *         fails as a whole. The default value is {@value #DEFAULT_SML_REPAIR_CHUNK_SIZE}.
+   * @return The number of participants that are sent to the SML in a single
+   *         <code>CreateList()</code> or <code>DeleteList()</code> call. A smaller chunk limits the
+   *         damage of a chunk that fails as a whole. The default value is
+   *         {@value #DEFAULT_SML_REPAIR_CHUNK_SIZE}.
    * @since 8.6.0
    */
   /**

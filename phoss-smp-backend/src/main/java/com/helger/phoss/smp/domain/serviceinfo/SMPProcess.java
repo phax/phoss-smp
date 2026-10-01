@@ -271,7 +271,7 @@ public class SMPProcess extends AbstractSMPHasExtension implements ISMPProcess
 
     final SMPProcess rhs = (SMPProcess) o;
     return EqualsHelper.equals (m_aProcessIdentifier, rhs.m_aProcessIdentifier) &&
-      EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
+           EqualsHelper.equals (m_aEndpoints, rhs.m_aEndpoints);
   }
 
   @Override

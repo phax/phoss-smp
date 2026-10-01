@@ -304,7 +304,7 @@ public final class SMPServiceInformationManagerXMLTest
                                                                                        "0088:xml-callback");
     assertNotNull (aPI);
     final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
-                                                                                                 "xml::xml##xml-callback::1");
+                                                                                                "xml::xml##xml-callback::1");
     assertNotNull (aDocTypeID);
     final IProcessIdentifier aProcessID = aIdentifierFactory.createProcessIdentifier (PeppolIdentifierHelper.DEFAULT_PROCESS_SCHEME,
                                                                                       "xml-callback");
@@ -358,10 +358,9 @@ public final class SMPServiceInformationManagerXMLTest
                                                 null);
       final SMPProcess aProcess = new SMPProcess (aProcessID, new CommonsArrayList <> (aEP1, aEP2), null);
       assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI,
-                                                                                                 aDocTypeID,
-                                                                                                 new CommonsArrayList <> (aProcess),
-                                                                                                 null))
-                                        .isSuccess ());
+                                                                                                aDocTypeID,
+                                                                                                new CommonsArrayList <> (aProcess),
+                                                                                                null)).isSuccess ());
       assertEquals (0, aUpdatedCount.get ());
 
       // Delete a single endpoint - as done in the Endpoint Tree page
@@ -444,8 +443,8 @@ public final class SMPServiceInformationManagerXMLTest
         {
           final IDocumentTypeIdentifier aCurDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                                          "xml::xml##lookup" +
-                                                                                                                                                                     i +
-                                                                                                                                                                     "::1");
+                                                                                                                                                                       i +
+                                                                                                                                                                       "::1");
           assertNotNull (aCurDocTypeID);
           assertTrue (aServiceInformationMgr.mergeSMPServiceInformation (_createServiceInfo (aPI1,
                                                                                              aCurDocTypeID,

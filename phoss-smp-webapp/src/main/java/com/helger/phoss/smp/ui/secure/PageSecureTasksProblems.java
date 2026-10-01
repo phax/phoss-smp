@@ -361,8 +361,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
   }
 
   /**
-   * Compare two logical addresses, ignoring a trailing slash and the case, because an SML may
-   * store the address in a normalized form.
+   * Compare two logical addresses, ignoring a trailing slash and the case, because an SML may store
+   * the address in a normalized form.
    */
   private static boolean _isSameLogicalAddress (@NonNull final String sAddress1, @NonNull final String sAddress2)
   {
@@ -393,9 +393,8 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
       case NOT_REGISTERED -> aOL.addItem (_createError ("This SMP is not registered at the SML."),
                                           div ("The SML has no record for the SMP ID '" +
                                                aResult.getSMPID () +
-                                               "'. No participant of this SMP can be resolved via DNS. Use the ")
-                                                                                                               .addChild (em ("Register at SML"))
-                                                                                                               .addChild (" page to create it."),
+                                               "'. No participant of this SMP can be resolved via DNS. Use the ").addChild (em ("Register at SML"))
+                                                                                                                 .addChild (" page to create it."),
                                           aCheckedAt);
       case REGISTERED ->
       {

@@ -160,8 +160,7 @@ public final class SMPWebAppConfiguration extends AbstractGlobalSingleton
    */
   public static boolean isSecurityLoginShowErrorDetails ()
   {
-    return _getConfig ().getAsBoolean (WEBAPP_KEY_SECURITY_LOGIN_ERRORDETAILS,
-                                       DEFAULT_SECURITY_LOGIN_ERRORDETAILS);
+    return _getConfig ().getAsBoolean (WEBAPP_KEY_SECURITY_LOGIN_ERRORDETAILS, DEFAULT_SECURITY_LOGIN_ERRORDETAILS);
   }
 
   /**

@@ -135,7 +135,7 @@ public final class SMLRepairHistory
     ValueEnforcer.notNull (eAction, "Action");
 
     final String sKey = _getKey (sReportFilename, eAction);
-    RW_LOCK.writeLocked ( () -> MAP.put (sKey, new Entry (nSucceeded, nAlreadyDone, nFailed)));
+    RW_LOCK.writeLocked (() -> MAP.put (sKey, new Entry (nSucceeded, nAlreadyDone, nFailed)));
   }
 
   /**
@@ -154,7 +154,7 @@ public final class SMLRepairHistory
     ValueEnforcer.notNull (eAction, "Action");
 
     final String sKey = _getKey (sReportFilename, eAction);
-    return RW_LOCK.readLockedGet ( () -> MAP.get (sKey));
+    return RW_LOCK.readLockedGet (() -> MAP.get (sKey));
   }
 
   /**

@@ -182,8 +182,8 @@ public final class SMPRedirectManagerXMLTest
         {
           final IDocumentTypeIdentifier aCurDocTypeID = aIdentifierFactory.createDocumentTypeIdentifier (PeppolIdentifierHelper.DOCUMENT_TYPE_SCHEME_BUSDOX_DOCID_QNS,
                                                                                                          "xml::xml##redirect" +
-                                                                                                                                                                     i +
-                                                                                                                                                                     "::1");
+                                                                                                                                                                       i +
+                                                                                                                                                                       "::1");
           assertNotNull (aCurDocTypeID);
           assertNotNull (aRedirectMgr.createOrUpdateSMPRedirect (aPI1,
                                                                  aCurDocTypeID,

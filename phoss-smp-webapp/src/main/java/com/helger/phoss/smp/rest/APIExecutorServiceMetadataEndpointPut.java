@@ -145,8 +145,7 @@ public final class APIExecutorServiceMetadataEndpointPut extends AbstractSMPAPIE
       {
         _checkRootElement (aEndpointDoc, Bdxr2EndpointMarshaller.ENDPOINT_QNAME, aDataProvider);
         // In contrast to the other two REST types, this payload can be validated
-        final var aEndpoint = new Bdxr2EndpointMarshaller ().setUseSchema (XML_SCHEMA_VALIDATION)
-                                                            .read (aEndpointDoc);
+        final var aEndpoint = new Bdxr2EndpointMarshaller ().setUseSchema (XML_SCHEMA_VALIDATION).read (aEndpointDoc);
         if (aEndpoint == null)
         {
           throw new SMPBadRequestException ("Failed to parse provided payload as an Endpoint",

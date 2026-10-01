@@ -114,13 +114,13 @@ public final class SMLRegistrationCache
   }
 
   /**
-   * Drop the cached result, so that the next invocation of
-   * {@link #getRegistrationCheckResult()} queries the SML again. This should be called whenever
-   * the registration of this SMP at the SML was changed.
+   * Drop the cached result, so that the next invocation of {@link #getRegistrationCheckResult()}
+   * queries the SML again. This should be called whenever the registration of this SMP at the SML
+   * was changed.
    */
   public static void clearCache ()
   {
-    RW_LOCK.writeLocked ( () -> {
+    RW_LOCK.writeLocked (() -> {
       s_sCacheKey = null;
       s_aResult = null;
     });
@@ -137,8 +137,8 @@ public final class SMLRegistrationCache
    * block all other readers. Two threads racing for an expired entry may therefore both query the
    * SML once.
    *
-   * @return <code>null</code> if the SML connection is disabled, if no SML is selected or if no
-   *         SMP ID is configured, because in those cases there is nothing to check.
+   * @return <code>null</code> if the SML connection is disabled, if no SML is selected or if no SMP
+   *         ID is configured, because in those cases there is nothing to check.
    */
   @Nullable
   public static SMLRegistrationCheckResult getRegistrationCheckResult ()
@@ -158,7 +158,7 @@ public final class SMLRegistrationCache
     final String sCacheKey = _getCacheKey (aSMLInfo, sSMPID);
     final LocalDateTime aNotBefore = PDTFactory.getCurrentLocalDateTime ().minus (CACHE_DURATION);
 
-    final SMLRegistrationCheckResult aCached = RW_LOCK.readLockedGet ( () -> {
+    final SMLRegistrationCheckResult aCached = RW_LOCK.readLockedGet (() -> {
       if (s_aResult != null && sCacheKey.equals (s_sCacheKey) && s_aResult.getCheckDateTime ().isAfter (aNotBefore))
         return s_aResult;
       return null;
@@ -168,7 +168,7 @@ public final class SMLRegistrationCache
 
     // Query the SML outside of the lock
     final SMLRegistrationCheckResult ret = _readFromSML (aSMLInfo, sSMPID);
-    RW_LOCK.writeLocked ( () -> {
+    RW_LOCK.writeLocked (() -> {
       s_sCacheKey = sCacheKey;
       s_aResult = ret;
     });

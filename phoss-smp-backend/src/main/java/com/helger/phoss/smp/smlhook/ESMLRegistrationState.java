@@ -67,8 +67,8 @@ public enum ESMLRegistrationState implements IHasID <String>, IHasDisplayName
   }
 
   /**
-   * @return <code>true</code> if the SML could not be queried, so that neither
-   *         {@link #REGISTERED} nor {@link #NOT_REGISTERED} could be determined.
+   * @return <code>true</code> if the SML could not be queried, so that neither {@link #REGISTERED}
+   *         nor {@link #NOT_REGISTERED} could be determined.
    */
   public boolean isCheckFailed ()
   {

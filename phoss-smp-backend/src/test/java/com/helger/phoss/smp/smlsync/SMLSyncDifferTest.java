@@ -170,9 +170,8 @@ public final class SMLSyncDifferTest
     final ICommonsSet <String> aLocalNow = new CommonsHashSet <> (PI1, PI2);
 
     assertTrue (SMLSyncDiffer.getVerifiedMissingInSML (new CommonsHashSet <> (), aLocalNow).isEmpty ());
-    assertEquals (0,
-                  SMLSyncDiffer.getVerifiedOrphansInSML (new CommonsArrayList <> (), aLocalNow, x -> {
-                    throw new IllegalStateException ("Must not be called");
-                  }));
+    assertEquals (0, SMLSyncDiffer.getVerifiedOrphansInSML (new CommonsArrayList <> (), aLocalNow, x -> {
+      throw new IllegalStateException ("Must not be called");
+    }));
   }
 }

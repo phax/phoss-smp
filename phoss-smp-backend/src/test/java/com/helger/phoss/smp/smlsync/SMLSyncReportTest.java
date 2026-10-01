@@ -117,11 +117,7 @@ public final class SMLSyncReportTest
     final File aZip = new File (m_aTempFolder.getRoot (), "report.zip");
     final File aOrphans = new File (m_aTempFolder.getRoot (), "does-not-exist.tmp");
 
-    SMLSyncReport.writeReport (aZip,
-                               _createResult (2, 2, 0),
-                               aOrphans,
-                               new CommonsArrayList <> (PI1, PI2),
-                               aOrphans);
+    SMLSyncReport.writeReport (aZip, _createResult (2, 2, 0), aOrphans, new CommonsArrayList <> (PI1, PI2), aOrphans);
 
     final String sSummary = _readEntry (aZip, CSMLSync.ENTRY_SUMMARY);
     assertTrue (sSummary, sSummary.contains ("unregistered and re-registered"));

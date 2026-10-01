@@ -43,9 +43,9 @@ public enum ESMLRepairAction implements IHasID <String>, IHasDisplayName
                   false),
   /**
    * Create the participants the SML holds for this SMP that do not exist locally as local Service
-   * Groups. This is the constructive resolution of the same difference that
-   * {@link #REMOVE_ORPHANS} resolves destructively - after a restore that lost local data, adopting
-   * the participants is what is wanted, not deleting them from the network.
+   * Groups. This is the constructive resolution of the same difference that {@link #REMOVE_ORPHANS}
+   * resolves destructively - after a restore that lost local data, adopting the participants is
+   * what is wanted, not deleting them from the network.
    */
   CREATE_LOCALLY ("createlocally",
                   "Create orphans locally",
@@ -120,8 +120,8 @@ public enum ESMLRepairAction implements IHasID <String>, IHasDisplayName
   /**
    * @return <code>true</code> if this action only changes the local Service Groups and performs no
    *         SML call at all. The participants of such an action are by definition already
-   *         registered at the SML, so the Service Groups must be created without informing the
-   *         SML - otherwise the SML rejects them as already in use.
+   *         registered at the SML, so the Service Groups must be created without informing the SML
+   *         - otherwise the SML rejects them as already in use.
    */
   public boolean isLocalOperation ()
   {

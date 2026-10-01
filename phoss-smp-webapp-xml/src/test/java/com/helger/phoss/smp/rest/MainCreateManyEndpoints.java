@@ -138,8 +138,7 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
             // Create a new
             _testResponse (aClient.put (sPI + "/services/" + sDT,
                                         CREDENTIALS,
-                                        MockHttpClient.createXMLEntity (aMarshaller, aSM)),
-                           200);
+                                        MockHttpClient.createXMLEntity (aMarshaller, aSM)), 200);
           }
 
           aSW.stop ();

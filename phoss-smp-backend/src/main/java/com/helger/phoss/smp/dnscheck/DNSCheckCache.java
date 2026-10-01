@@ -55,7 +55,7 @@ public final class DNSCheckCache
   @Nullable
   public static DNSCheckResult getResult ()
   {
-    return RW_LOCK.readLockedGet ( () -> s_aResult);
+    return RW_LOCK.readLockedGet (() -> s_aResult);
   }
 
   /**
@@ -65,7 +65,7 @@ public final class DNSCheckCache
   public static void setResult (@NonNull final DNSCheckResult aResult)
   {
     ValueEnforcer.notNull (aResult, "Result");
-    RW_LOCK.writeLocked ( () -> s_aResult = aResult);
+    RW_LOCK.writeLocked (() -> s_aResult = aResult);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("The DNS check cache was updated with " + aResult.getEntryCount () + " entries");
   }
@@ -75,7 +75,7 @@ public final class DNSCheckCache
    */
   public static void clearCache ()
   {
-    RW_LOCK.writeLocked ( () -> s_aResult = null);
+    RW_LOCK.writeLocked (() -> s_aResult = null);
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("The DNS check cache was cleared");
   }

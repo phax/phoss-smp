@@ -228,8 +228,7 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
     final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSMLInfo);
     for (int nStart = 0; nStart < aAll.size (); nStart += nChunkSize)
     {
-      final List <IParticipantIdentifier> aChunk = aAll.subList (nStart,
-                                                                 Math.min (nStart + nChunkSize, aAll.size ()));
+      final List <IParticipantIdentifier> aChunk = aAll.subList (nStart, Math.min (nStart + nChunkSize, aAll.size ()));
       try
       {
         _sendChunk (aCaller, sSMPID, m_eAction, aChunk);

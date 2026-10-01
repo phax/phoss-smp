@@ -28,8 +28,7 @@ public class SMPSMLExceptionTest
     final Exception aCause = new IllegalStateException ("Could not create business x in SML - [ERR-106] already exist");
     final SMPSMLException aEx = new SMPSMLException ("Failed to create 'x' in SML", aCause);
 
-    assertEquals ("Failed to create 'x' in SML" +
-                  " - Could not create business x in SML - [ERR-106] already exist",
+    assertEquals ("Failed to create 'x' in SML" + " - Could not create business x in SML - [ERR-106] already exist",
                   aEx.getMessage ());
     assertSame (aCause, aEx.getCause ());
   }
