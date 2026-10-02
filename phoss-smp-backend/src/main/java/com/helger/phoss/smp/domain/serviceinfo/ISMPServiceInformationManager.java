@@ -310,4 +310,48 @@ public interface ISMPServiceInformationManager
    */
   @Nonnegative
   long updateAllEndpointCertificates (@NonNull String sOldCert, @NonNull String sNewCert);
+
+  /**
+   * Count the endpoints that currently reference the Access Point with the provided ID.
+   *
+   * @param sAccessPointID
+   *        The ID of the Access Point to search. May be <code>null</code>.
+   * @return The number of endpoints referencing that Access Point. Always &ge; 0.
+   * @since 8.4.4
+   */
+  @Nonnegative
+  long getEndpointCountUsingAccessPoint (@Nullable String sAccessPointID);
+
+  /**
+   * Check if the Access Point with the provided ID is referenced by at least one endpoint.
+   *
+   * @param sAccessPointID
+   *        The ID of the Access Point to search. May be <code>null</code>.
+   * @return <code>true</code> if at least one endpoint references that Access Point.
+   * @since 8.4.4
+   */
+  default boolean containsAnyEndpointWithAccessPoint (@Nullable final String sAccessPointID)
+  {
+    return getEndpointCountUsingAccessPoint (sAccessPointID) > 0;
+  }
+
+  /**
+   * Let all endpoints that currently contain the certificate of the provided Access Point directly
+   * reference that Access Point instead. This is the opt-in replacement of an automatic data
+   * migration: it is only performed if the user explicitly triggers it.
+   * <p>
+   * Endpoints that already reference an Access Point are never touched.
+   *
+   * @param sAccessPointID
+   *        The ID of the Access Point to be referenced. May not be <code>null</code>.
+   * @param bRequireSameEndpointReference
+   *        if <code>true</code>, only endpoints that additionally have the same endpoint reference
+   *        URL as the Access Point are changed, so that the data of the endpoints stays exactly the
+   *        same. If <code>false</code>, all endpoints with a matching certificate are changed and
+   *        therefore take over the endpoint reference URL of the Access Point.
+   * @return The number of changed endpoints. Always &ge; 0.
+   * @since 8.4.4
+   */
+  @Nonnegative
+  long useAccessPointForMatchingEndpoints (@NonNull String sAccessPointID, boolean bRequireSameEndpointReference);
 }

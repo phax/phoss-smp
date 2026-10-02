@@ -35,6 +35,7 @@ import com.helger.phoss.smp.backend.mongodb.security.UserGroupManagerMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.UserManagerMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.UserTokenManagerMongoDB;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -397,9 +398,16 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
   }
 
   @NonNull
-  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                                    @NonNull final ISMPAccessPointManager aAccessPointMgr)
   {
-    return new SMPServiceInformationManagerMongoDB (aIdentifierFactory);
+    return new SMPServiceInformationManagerMongoDB (aIdentifierFactory, aAccessPointMgr);
+  }
+
+  @NonNull
+  public ISMPAccessPointManager createAccessPointMgr ()
+  {
+    return new SMPAccessPointManagerMongoDB ();
   }
 
   @NonNull

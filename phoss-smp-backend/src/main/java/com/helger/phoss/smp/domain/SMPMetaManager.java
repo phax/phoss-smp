@@ -26,6 +26,7 @@ import com.helger.peppolid.factory.ESMPIdentifierType;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.SMPBackendRegistry;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.businesscard.LoggingSMPBusinessCardCallback;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
@@ -72,6 +73,7 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private ISMPTransportProfileManager m_aTransportProfileMgr;
   private ISMPServiceGroupManager m_aServiceGroupMgr;
   private ISMPRedirectManager m_aRedirectMgr;
+  private ISMPAccessPointManager m_aAccessPointMgr;
   private ISMPServiceInformationManager m_aServiceInformationMgr;
   private ISMPBusinessCardManager m_aBusinessCardMgr;
   private ISMPParticipantMigrationManager m_aParticipantMigrationMgr;
@@ -234,7 +236,13 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aRedirectMgr == null)
         throw new IllegalStateException ("Failed to create Redirect manager!");
 
-      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory);
+      // Access Point manager must be before the service information manager!
+      m_aAccessPointMgr = s_aManagerProvider.createAccessPointMgr ();
+      if (m_aAccessPointMgr == null)
+        throw new IllegalStateException ("Failed to create AccessPoint manager!");
+
+      m_aServiceInformationMgr = s_aManagerProvider.createServiceInformationMgr (m_aIdentifierFactory,
+                                                                                m_aAccessPointMgr);
       if (m_aServiceInformationMgr == null)
         throw new IllegalStateException ("Failed to create ServiceInformation manager!");
 
@@ -289,6 +297,17 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMLInfoManager getSMLInfoMgr ()
   {
     return getInstance ().m_aSMLInfoMgr;
+  }
+
+  /**
+   * @return The Access Point manager, holding the unique combinations of endpoint reference URL and
+   *         AP certificate. Never <code>null</code>.
+   * @since 8.4.4
+   */
+  @NonNull
+  public static ISMPAccessPointManager getAccessPointMgr ()
+  {
+    return getInstance ().m_aAccessPointMgr;
   }
 
   @NonNull
