@@ -42,7 +42,7 @@ public interface ISMLInfoManager
    * @param sDNSZone
    *        The DNS zone on which this SML is operating. May not be <code>null</code>. It must be
    *        ensured that the value consists only of lower case characters for comparability!
-   *        Example: <code>acc.edelivery.tech.ec.europa.eu</code>
+   *        Example: <code>participant.sml.test.tech.peppol.org</code>
    * @param sManagementServiceURL
    *        The service URL where the management application is running on incl. the host name. May
    *        not be <code>null</code>. The difference to the host name is the eventually present
@@ -79,7 +79,7 @@ public interface ISMLInfoManager
    * @param sDNSZone
    *        The DNS zone on which this SML is operating. May not be <code>null</code>. It must be
    *        ensured that the value consists only of lower case characters for comparability!
-   *        Example: <code>acc.edelivery.tech.ec.europa.eu</code>
+   *        Example: <code>participant.sml.test.tech.peppol.org</code>
    * @param sManagementServiceURL
    *        The service URL where the management application is running on incl. the host name. May
    *        not be <code>null</code>. The difference to the host name is the eventually present
