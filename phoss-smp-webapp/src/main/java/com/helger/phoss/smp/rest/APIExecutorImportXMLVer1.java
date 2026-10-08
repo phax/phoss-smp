@@ -79,6 +79,12 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
 
   public static final String PARAM_OVERVWRITE_EXISTING = "overwrite-existing";
 
+  /** @since 8.6.1 */
+  public static final boolean DEFAULT_DRY_RUN = false;
+
+  /** @since 8.6.1 */
+  public static final String PARAM_DRY_RUN = "dry-run";
+
   public static final IPeppolDirectoryPushCallback PD_PUSH = (@NonNull final IParticipantIdentifier aParticipantID) -> {
     final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
     if (aPDClient != null)
@@ -146,6 +152,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     final boolean bOverwriteExisting = aRequestScope.params ()
                                                     .getAsBoolean (PARAM_OVERVWRITE_EXISTING,
                                                                    DEFAULT_OVERWRITE_EXISTING);
+    final boolean bDryRun = aRequestScope.params ().getAsBoolean (PARAM_DRY_RUN, DEFAULT_DRY_RUN);
 
     final byte [] aPayload = StreamHelper.getAllBytes (aRequestScope.getRequest ().getInputStream ());
     final IMicroDocument aDoc = MicroReader.readMicroXML (aPayload);
@@ -173,6 +180,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     final ImportSummary aImportSummary = new ImportSummary ();
     ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                        bOverwriteExisting,
+                                       bDryRun,
                                        aDefaultOwner,
                                        aAllServiceGroupIDs,
                                        aAllBusinessCardIDs,
@@ -195,6 +203,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
 
       final IMicroElement eSettings = eRoot.addElement ("settings");
       eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
+      eSettings.setAttribute ("dryRun", bDryRun);
       eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
       eSettings.setAttribute ("defaultOwnerLoginName", aDefaultOwner.getLoginName ());
 
@@ -226,6 +235,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
       aJson.add ("importStartDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
       aJson.add ("settings",
                  new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
+                                  .add ("dryRun", bDryRun)
                                   .add ("defaultOwnerID", aDefaultOwner.getID ())
                                   .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
       final IJsonArray aActions = new JsonArray ();

@@ -136,11 +136,11 @@ public final class ServiceGroupImport
       {
         // Select the default owner if an unknown user is contained
         aOwner = aDefaultOwner;
-        LOGGER.warn ("Failed to resolve stored owner '" +
-                     sUserID +
-                     "' - using default owner '" +
-                     aDefaultOwner.getID () +
-                     "'");
+        aImportLogger.warn ("Failed to resolve stored owner '" +
+                            sUserID +
+                            "' - using default owner '" +
+                            aDefaultOwner.getID () +
+                            "'");
       }
       // If the user is deleted, but existing - keep the deleted user
       return aOwner;
@@ -194,10 +194,8 @@ public final class ServiceGroupImport
                                      if (bIsServiceGroupContained)
                                        aThreadSafeServiceGroupsToDelete.put (sServiceGroupID, aServiceGroup);
                                      aImportLogger.success (sServiceGroupID,
-                                                            "Will " +
-                                                                             (bIsServiceGroupContained ? "overwrite"
-                                                                                                       : "import") +
-                                                                             " Service Group");
+                                                            bIsServiceGroupContained ? "Will overwrite Service Group - all existing Service Information and Redirects of it will be deleted"
+                                                                                     : "Will import Service Group");
 
                                      // read all contained service information
                                      {
@@ -350,6 +348,54 @@ public final class ServiceGroupImport
                                      @NonNull final ICommonsList <ImportActionItem> aActionList,
                                      @NonNull final ImportSummary aSummary)
   {
+    importXMLVer10 (eRoot,
+                    bOverwriteExisting,
+                    false,
+                    aDefaultOwner,
+                    aAllExistingServiceGroupIDs,
+                    aAllExistingBusinessCardIDs,
+                    aMainPushToDirectory,
+                    aActionList,
+                    aSummary);
+  }
+
+  /**
+   * Import Service Groups and Business Cards from V1.0 format
+   *
+   * @param eRoot
+   *        XML root element to read. May not be <code>null</code>.
+   * @param bOverwriteExisting
+   *        <code>true</code> to overwrite existing items, <code>false</code> to skip them
+   * @param bDryRun
+   *        <code>true</code> to only analyze the source and report what would be done, without
+   *        performing any change, <code>false</code> to perform the import
+   * @param aDefaultOwner
+   *        The default owner to be used, in case no user can be deduced from the uploaded file. May
+   *        not be <code>null</code>.
+   * @param aAllExistingServiceGroupIDs
+   *        A read-only set with existing service group IDs. May not be <code>null</code>.
+   * @param aAllExistingBusinessCardIDs
+   *        A read-only set with existing service group IDs that have business cards. May not be
+   *        <code>null</code>.
+   * @param aMainPushToDirectory
+   *        The action to actually push data to Peppol Directory. May not be <code>null</code>.
+   * @param aActionList
+   *        The action list to be filled. May not be <code>null</code>.
+   * @param aSummary
+   *        The import summary to be filled. May not be <code>null</code>. In dry run mode it stays
+   *        empty, as nothing is executed.
+   * @since 8.6.1
+   */
+  public static void importXMLVer10 (@NonNull final IMicroElement eRoot,
+                                     final boolean bOverwriteExisting,
+                                     final boolean bDryRun,
+                                     @NonNull final IUser aDefaultOwner,
+                                     @NonNull final ICommonsSet <String> aAllExistingServiceGroupIDs,
+                                     @NonNull final ICommonsSet <String> aAllExistingBusinessCardIDs,
+                                     @NonNull final IPeppolDirectoryPushCallback aMainPushToDirectory,
+                                     @NonNull final ICommonsList <ImportActionItem> aActionList,
+                                     @NonNull final ImportSummary aSummary)
+  {
     ValueEnforcer.notNull (eRoot, "Root");
     ValueEnforcer.notNull (aDefaultOwner, "DefaultOwner");
     ValueEnforcer.notNull (aAllExistingServiceGroupIDs, "AllExistingServiceGroupIDs");
@@ -360,7 +406,9 @@ public final class ServiceGroupImport
     // Make 'em thread-safe
     final ImportLogger aImportLogger = new ImportLogger (aActionList, aSummary, COUNTER.incrementAndGet ());
 
-    LOGGER.info ("Starting import of Service Groups from XML v1.0, overwrite is " +
+    LOGGER.info ("Starting " +
+                 (bDryRun ? "dry run " : "") +
+                 "import of Service Groups from XML v1.0, overwrite is " +
                  (bOverwriteExisting ? "enabled" : "disabled"));
 
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
@@ -399,318 +447,337 @@ public final class ServiceGroupImport
         aImportLogger.error ("Nothing will be imported because of the previous errors.");
       }
       else
-      {
-        final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
-        final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
-        final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
-        final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
-
-        // Filled in block 1, but needed later for PDF
-        final ICommonsSet <IParticipantIdentifier> aDeletedServiceGroups = new CommonsHashSet <> ();
-        final Set <IParticipantIdentifier> aThreadSafeDeletedServiceGroups = Collections.synchronizedSet (aDeletedServiceGroups);
-
-        // Remember all the Participant IDs that could have an impact on the Directory
-        final Set <IParticipantIdentifier> aServiceGroupsWithDocTypesForBC = Collections.synchronizedSet (new HashSet <> ());
-
-        final boolean bOriginalPDAutoUpdate = bDirectoryIntegrationEnabled &&
-                                              aSettings.isDirectoryIntegrationAutoUpdate ();
-        try
+        if (bDryRun)
         {
-          // Disable auto update for SG/SI import
-          if (bOriginalPDAutoUpdate)
-            ((SMPSettings) aSettings).setDirectoryIntegrationAutoUpdate (false);
+          // Only report what would be done - perform no changes at all
+          final int nSGToOverwrite = aServiceGroupsToDelete.size ();
+          final int nBCToOverwrite = aBusinessCardsToDelete.size ();
+          aImportLogger.info ("Dry run: would import " +
+                              (aServiceGroupsToImport.size () - nSGToOverwrite) +
+                              " and overwrite " +
+                              nSGToOverwrite +
+                              " Service Groups" +
+                              (bDirectoryIntegrationEnabled ? ", import " +
+                                                              (aBusinessCardsToImport.size () - nBCToOverwrite) +
+                                                              " and overwrite " +
+                                                              nBCToOverwrite +
+                                                              " Business Cards"
+                                                            : ""));
+          aImportLogger.info ("Dry run: nothing was changed");
+        }
+        else
+        {
+          final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
+          final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+          final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
+          final ISMPBusinessCardManager aBusinessCardMgr = SMPMetaManager.getBusinessCardMgr ();
 
-          // Start importing
-          aImportLogger.info ("Import is now performed with " + nImportThreadCount + " parallel threads");
+          // Filled in block 1, but needed later for PDF
+          final ICommonsSet <IParticipantIdentifier> aDeletedServiceGroups = new CommonsHashSet <> ();
+          final Set <IParticipantIdentifier> aThreadSafeDeletedServiceGroups = Collections.synchronizedSet (aDeletedServiceGroups);
 
-          // 1. delete all existing service groups to be imported (if overwrite);
-          // this may implicitly delete business cards
+          // Remember all the Participant IDs that could have an impact on the Directory
+          final Set <IParticipantIdentifier> aServiceGroupsWithDocTypesForBC = Collections.synchronizedSet (new HashSet <> ());
 
-          if (aServiceGroupsToDelete.isNotEmpty ())
+          final boolean bOriginalPDAutoUpdate = bDirectoryIntegrationEnabled &&
+                                                aSettings.isDirectoryIntegrationAutoUpdate ();
+          try
           {
-            aImportLogger.info ("Trying to delete " + aServiceGroupsToDelete.size () + " Service Groups");
-            final StopWatch aSW = StopWatch.createdStarted ();
-            final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+            // Disable auto update for SG/SI import
+            if (bOriginalPDAutoUpdate)
+              ((SMPSettings) aSettings).setDirectoryIntegrationAutoUpdate (false);
 
-            // This requires more sophisticated threading, as scopes are needed
-            aServiceGroupsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
-              try (final WebScoped aWebScoped = new WebScoped ())
-              {
-                final String sServiceGroupID = aEntry.getKey ();
-                final ISMPServiceGroup aDeleteServiceGroup = aEntry.getValue ();
-                final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticipantIdentifier ();
-                try
+            // Start importing
+            aImportLogger.info ("Import is now performed with " + nImportThreadCount + " parallel threads");
+
+            // 1. delete all existing service groups to be imported (if overwrite);
+            // this may implicitly delete business cards
+
+            if (aServiceGroupsToDelete.isNotEmpty ())
+            {
+              aImportLogger.info ("Trying to delete " + aServiceGroupsToDelete.size () + " Service Groups");
+              final StopWatch aSW = StopWatch.createdStarted ();
+              final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+
+              // This requires more sophisticated threading, as scopes are needed
+              aServiceGroupsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
+                try (final WebScoped aWebScoped = new WebScoped ())
                 {
-                  // Delete locally only
-                  if (aServiceGroupMgr.deleteSMPServiceGroup (aPI, false).isChanged ())
+                  final String sServiceGroupID = aEntry.getKey ();
+                  final ISMPServiceGroup aDeleteServiceGroup = aEntry.getValue ();
+                  final IParticipantIdentifier aPI = aDeleteServiceGroup.getParticipantIdentifier ();
+                  try
                   {
-                    aImportLogger.success (sServiceGroupID, "Successfully deleted Service Group");
-                    aThreadSafeDeletedServiceGroups.add (aPI);
-                    aImportLogger.onSuccess (EImportSummaryAction.DELETE_SG);
+                    // Delete locally only
+                    if (aServiceGroupMgr.deleteSMPServiceGroup (aPI, false).isChanged ())
+                    {
+                      aImportLogger.success (sServiceGroupID, "Successfully deleted Service Group");
+                      aThreadSafeDeletedServiceGroups.add (aPI);
+                      aImportLogger.onSuccess (EImportSummaryAction.DELETE_SG);
+                    }
+                    else
+                    {
+                      aImportLogger.error (sServiceGroupID, "Failed to delete Service Group");
+                      aImportLogger.onError (EImportSummaryAction.DELETE_SG);
+                    }
                   }
-                  else
+                  catch (final SMPServerException ex)
                   {
-                    aImportLogger.error (sServiceGroupID, "Failed to delete Service Group");
+                    aImportLogger.error (sServiceGroupID, "Failed to delete Service Group", ex);
                     aImportLogger.onError (EImportSummaryAction.DELETE_SG);
                   }
                 }
-                catch (final SMPServerException ex)
+              }));
+
+              ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
+              aSW.stop ();
+              aImportLogger.info ("Service Group deletion is finalized after " + aSW.getDuration ());
+            }
+
+            // 2. create all service groups
+            final Map <String, ISMPBusinessCard> aThreadSafeBusinessCardsToImport = Collections.synchronizedMap (aBusinessCardsToImport);
+
+            {
+              aImportLogger.info ("Trying to create " + aServiceGroupsToImport.size () + " Service Groups");
+              final StopWatch aSW = StopWatch.createdStarted ();
+              final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+
+              final AtomicInteger aSGCount = new AtomicInteger (0);
+              aServiceGroupsToImport.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
+                try (final WebScoped aWebScoped = new WebScoped ())
                 {
-                  aImportLogger.error (sServiceGroupID, "Failed to delete Service Group", ex);
-                  aImportLogger.onError (EImportSummaryAction.DELETE_SG);
-                }
-              }
-            }));
+                  final ISMPServiceGroup aImportServiceGroup = aEntry.getKey ();
+                  final String sServiceGroupID = aImportServiceGroup.getID ();
 
-            ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
-            aSW.stop ();
-            aImportLogger.info ("Service Group deletion is finalized after " + aSW.getDuration ());
-          }
-
-          // 2. create all service groups
-          final Map <String, ISMPBusinessCard> aThreadSafeBusinessCardsToImport = Collections.synchronizedMap (aBusinessCardsToImport);
-
-          {
-            aImportLogger.info ("Trying to create " + aServiceGroupsToImport.size () + " Service Groups");
-            final StopWatch aSW = StopWatch.createdStarted ();
-            final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
-
-            final AtomicInteger aSGCount = new AtomicInteger (0);
-            aServiceGroupsToImport.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
-              try (final WebScoped aWebScoped = new WebScoped ())
-              {
-                final ISMPServiceGroup aImportServiceGroup = aEntry.getKey ();
-                final String sServiceGroupID = aImportServiceGroup.getID ();
-
-                ISMPServiceGroup aNewServiceGroup = null;
-                try
-                {
-                  // Create in SML only for newly created entries
-                  // If the SG was deleted before, it was also only deleted locally and not in SML
-                  final boolean bCreateInSML = !aServiceGroupsToDelete.containsKey (sServiceGroupID);
-                  aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
-                                                                             aImportServiceGroup.getParticipantIdentifier (),
-                                                                             aImportServiceGroup.getExtensions ()
-                                                                                                .getExtensionsAsJsonString (),
-                                                                             aImportServiceGroup.getCustomProperties (),
-                                                                             bCreateInSML);
-                  aImportLogger.success (sServiceGroupID, "Successfully created Service Group");
-                  aImportLogger.onSuccess (EImportSummaryAction.CREATE_SG);
-                }
-                catch (final Exception ex)
-                {
-                  // E.g. if SML connection failed
-                  aImportLogger.error (sServiceGroupID, "Error creating the new Service Group", ex);
-
-                  // Delete Business Card again, if already present
-                  aThreadSafeBusinessCardsToImport.remove (sServiceGroupID);
-                  aImportLogger.onError (EImportSummaryAction.CREATE_SG);
-                }
-
-                if (aNewServiceGroup != null)
-                {
-                  final IParticipantIdentifier aServiceGroupID = aImportServiceGroup.getParticipantIdentifier ();
-
-                  // 3a. create all endpoints
-                  for (final ISMPServiceInformation aServiceInfoToImport : aEntry.getValue ().getServiceInfo ())
+                  ISMPServiceGroup aNewServiceGroup = null;
+                  try
                   {
-                    try
+                    // Create in SML only for newly created entries
+                    // If the SG was deleted before, it was also only deleted locally and not in SML
+                    final boolean bCreateInSML = !aServiceGroupsToDelete.containsKey (sServiceGroupID);
+                    aNewServiceGroup = aServiceGroupMgr.createSMPServiceGroup (aImportServiceGroup.getOwnerID (),
+                                                                               aImportServiceGroup.getParticipantIdentifier (),
+                                                                               aImportServiceGroup.getExtensions ()
+                                                                                                  .getExtensionsAsJsonString (),
+                                                                               aImportServiceGroup.getCustomProperties (),
+                                                                               bCreateInSML);
+                    aImportLogger.success (sServiceGroupID, "Successfully created Service Group");
+                    aImportLogger.onSuccess (EImportSummaryAction.CREATE_SG);
+                  }
+                  catch (final Exception ex)
+                  {
+                    // E.g. if SML connection failed
+                    aImportLogger.error (sServiceGroupID, "Error creating the new Service Group", ex);
+
+                    // Delete Business Card again, if already present
+                    aThreadSafeBusinessCardsToImport.remove (sServiceGroupID);
+                    aImportLogger.onError (EImportSummaryAction.CREATE_SG);
+                  }
+
+                  if (aNewServiceGroup != null)
+                  {
+                    final IParticipantIdentifier aServiceGroupID = aImportServiceGroup.getParticipantIdentifier ();
+
+                    // 3a. create all endpoints
+                    for (final ISMPServiceInformation aServiceInfoToImport : aEntry.getValue ().getServiceInfo ())
                     {
-                      if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfoToImport).isSuccess ())
+                      try
                       {
-                        aImportLogger.success (sServiceGroupID, "Successfully created Service Information");
-                        aImportLogger.onSuccess (EImportSummaryAction.CREATE_SI);
-                        if (bOriginalPDAutoUpdate)
-                          aServiceGroupsWithDocTypesForBC.add (aServiceGroupID);
+                        if (aServiceInfoMgr.mergeSMPServiceInformation (aServiceInfoToImport).isSuccess ())
+                        {
+                          aImportLogger.success (sServiceGroupID, "Successfully created Service Information");
+                          aImportLogger.onSuccess (EImportSummaryAction.CREATE_SI);
+                          if (bOriginalPDAutoUpdate)
+                            aServiceGroupsWithDocTypesForBC.add (aServiceGroupID);
+                        }
+                        else
+                        {
+                          aImportLogger.error (sServiceGroupID, "Error creating the new Service Information");
+                          aImportLogger.onError (EImportSummaryAction.CREATE_SI);
+                        }
                       }
-                      else
+                      catch (final Exception ex)
                       {
-                        aImportLogger.error (sServiceGroupID, "Error creating the new Service Information");
+                        aImportLogger.error (sServiceGroupID, "Error creating the new Service Information", ex);
                         aImportLogger.onError (EImportSummaryAction.CREATE_SI);
                       }
                     }
-                    catch (final Exception ex)
-                    {
-                      aImportLogger.error (sServiceGroupID, "Error creating the new Service Information", ex);
-                      aImportLogger.onError (EImportSummaryAction.CREATE_SI);
-                    }
-                  }
 
-                  // 3b. create all redirects
-                  for (final ISMPRedirect aImportRedirect : aEntry.getValue ().getRedirects ())
-                  {
-                    try
+                    // 3b. create all redirects
+                    for (final ISMPRedirect aImportRedirect : aEntry.getValue ().getRedirects ())
                     {
-                      if (aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup.getParticipantIdentifier (),
-                                                                  aImportRedirect.getDocumentTypeIdentifier (),
-                                                                  aImportRedirect.getTargetHref (),
-                                                                  aImportRedirect.getSubjectUniqueIdentifier (),
-                                                                  aImportRedirect.getCertificate (),
-                                                                  aImportRedirect.getExtensions ()
-                                                                                 .getExtensionsAsJsonString ()) != null)
+                      try
                       {
-                        aImportLogger.success (sServiceGroupID, "Successfully created Redirect");
-                        aImportLogger.onSuccess (EImportSummaryAction.CREATE_REDIRECT);
-                        if (bOriginalPDAutoUpdate)
-                          aServiceGroupsWithDocTypesForBC.add (aServiceGroupID);
+                        if (aRedirectMgr.createOrUpdateSMPRedirect (aNewServiceGroup.getParticipantIdentifier (),
+                                                                    aImportRedirect.getDocumentTypeIdentifier (),
+                                                                    aImportRedirect.getTargetHref (),
+                                                                    aImportRedirect.getSubjectUniqueIdentifier (),
+                                                                    aImportRedirect.getCertificate (),
+                                                                    aImportRedirect.getExtensions ()
+                                                                                   .getExtensionsAsJsonString ()) != null)
+                        {
+                          aImportLogger.success (sServiceGroupID, "Successfully created Redirect");
+                          aImportLogger.onSuccess (EImportSummaryAction.CREATE_REDIRECT);
+                          if (bOriginalPDAutoUpdate)
+                            aServiceGroupsWithDocTypesForBC.add (aServiceGroupID);
+                        }
+                        else
+                        {
+                          aImportLogger.error (sServiceGroupID, "Error creating the new Redirect");
+                          aImportLogger.onError (EImportSummaryAction.CREATE_REDIRECT);
+                        }
                       }
-                      else
+                      catch (final Exception ex)
                       {
-                        aImportLogger.error (sServiceGroupID, "Error creating the new Redirect");
+                        aImportLogger.error (sServiceGroupID, "Error creating the new Redirect", ex);
                         aImportLogger.onError (EImportSummaryAction.CREATE_REDIRECT);
                       }
                     }
-                    catch (final Exception ex)
-                    {
-                      aImportLogger.error (sServiceGroupID, "Error creating the new Redirect", ex);
-                      aImportLogger.onError (EImportSummaryAction.CREATE_REDIRECT);
-                    }
                   }
+                  final int nCount = aSGCount.incrementAndGet ();
+                  if ((nCount % 1_000) == 0)
+                    LOGGER.info ("  Imported " + nCount + " Service Groups so far");
                 }
-                final int nCount = aSGCount.incrementAndGet ();
-                if ((nCount % 1_000) == 0)
-                  LOGGER.info ("  Imported " + nCount + " Service Groups so far");
-              }
-            }));
+              }));
 
-            ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
-            aSW.stop ();
-            aImportLogger.info ("Service Group creation is finalized after " + aSW.getDuration ());
+              ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
+              aSW.stop ();
+              aImportLogger.info ("Service Group creation is finalized after " + aSW.getDuration ());
+            }
           }
-        }
-        finally
-        {
-          // Re-enable auto update again
-          if (bOriginalPDAutoUpdate)
-            ((SMPSettings) aSettings).setDirectoryIntegrationAutoUpdate (true);
-        }
-
-        if (bDirectoryIntegrationEnabled)
-        {
-          // 4. delete all existing business cards to be imported (if overwrite)
-          // Note: if PD integration is disabled, the list is empty
-          if (aBusinessCardsToDelete.isNotEmpty ())
+          finally
           {
-            aImportLogger.info ("Trying to delete " + aBusinessCardsToDelete.size () + " Business Cards");
-            final StopWatch aSW = StopWatch.createdStarted ();
-            final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
-
-            aBusinessCardsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
-              try (final WebScoped aWebScoped = new WebScoped ())
-              {
-                final String sServiceGroupID = aEntry.getKey ();
-                final ISMPBusinessCard aDeleteBusinessCard = aEntry.getValue ();
-
-                try
-                {
-                  // No need to sync to the directory, because the update comes later anyway
-                  if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard, false).isChanged ())
-                  {
-                    aImportLogger.success (sServiceGroupID, "Successfully deleted Business Card");
-                    aImportLogger.onSuccess (EImportSummaryAction.DELETE_BC);
-                  }
-                  else
-                  {
-                    // If the service group to which the business card belongs was
-                    // already deleted, don't display an error, as the business card
-                    // was automatically deleted afterwards
-                    if (!aThreadSafeDeletedServiceGroups.contains (aDeleteBusinessCard.getParticipantIdentifier ()))
-                    {
-                      aImportLogger.error (sServiceGroupID, "Failed to delete Business Card");
-                      aImportLogger.onError (EImportSummaryAction.DELETE_BC);
-                    }
-                  }
-                }
-                catch (final Exception ex)
-                {
-                  aImportLogger.error (sServiceGroupID, "Failed to delete Business Card", ex);
-                  aImportLogger.onError (EImportSummaryAction.DELETE_BC);
-                }
-              }
-            }));
-
-            ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
-            aSW.stop ();
-            aImportLogger.info ("Business Card deletion is finalized after " + aSW.getDuration ());
+            // Re-enable auto update again
+            if (bOriginalPDAutoUpdate)
+              ((SMPSettings) aSettings).setDirectoryIntegrationAutoUpdate (true);
           }
 
-          // 5. create all new business cards
-          // Note: if PD integration is disabled, the list is empty
+          if (bDirectoryIntegrationEnabled)
           {
-            aImportLogger.info ("Trying to create " + aBusinessCardsToImport.size () + " Business Cards");
-            final StopWatch aSW = StopWatch.createdStarted ();
-            final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+            // 4. delete all existing business cards to be imported (if overwrite)
+            // Note: if PD integration is disabled, the list is empty
+            if (aBusinessCardsToDelete.isNotEmpty ())
+            {
+              aImportLogger.info ("Trying to delete " + aBusinessCardsToDelete.size () + " Business Cards");
+              final StopWatch aSW = StopWatch.createdStarted ();
+              final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
 
-            final AtomicInteger aBCCount = new AtomicInteger (0);
-            aBusinessCardsToImport.values ().forEach (aImportBusinessCard -> aExecutorSvc.submit (() -> {
-              try (final WebScoped aWebScoped = new WebScoped ())
-              {
-                final String sParticipantCardID = aImportBusinessCard.getID ();
-                final IParticipantIdentifier aParticipantID = aImportBusinessCard.getParticipantIdentifier ();
-
-                // Remove this ID from the the Service Groups that need a push, as the create call
-                // does it anyway
-                if (bOriginalPDAutoUpdate)
-                  aServiceGroupsWithDocTypesForBC.remove (aParticipantID);
-
-                try
+              aBusinessCardsToDelete.entrySet ().forEach (aEntry -> aExecutorSvc.submit (() -> {
+                try (final WebScoped aWebScoped = new WebScoped ())
                 {
-                  // Always sync to the Directory after the creation
-                  if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aParticipantID,
-                                                                      aImportBusinessCard.getAllEntities (),
-                                                                      true) != null)
+                  final String sServiceGroupID = aEntry.getKey ();
+                  final ISMPBusinessCard aDeleteBusinessCard = aEntry.getValue ();
+
+                  try
                   {
-                    aImportLogger.success (sParticipantCardID, "Successfully created Business Card");
-                    aImportLogger.onSuccess (EImportSummaryAction.CREATE_BC);
+                    // No need to sync to the directory, because the update comes later anyway
+                    if (aBusinessCardMgr.deleteSMPBusinessCard (aDeleteBusinessCard, false).isChanged ())
+                    {
+                      aImportLogger.success (sServiceGroupID, "Successfully deleted Business Card");
+                      aImportLogger.onSuccess (EImportSummaryAction.DELETE_BC);
+                    }
+                    else
+                    {
+                      // If the service group to which the business card belongs was
+                      // already deleted, don't display an error, as the business card
+                      // was automatically deleted afterwards
+                      if (!aThreadSafeDeletedServiceGroups.contains (aDeleteBusinessCard.getParticipantIdentifier ()))
+                      {
+                        aImportLogger.error (sServiceGroupID, "Failed to delete Business Card");
+                        aImportLogger.onError (EImportSummaryAction.DELETE_BC);
+                      }
+                    }
                   }
-                  else
+                  catch (final Exception ex)
                   {
-                    aImportLogger.error (sParticipantCardID, "Failed to create Business Card");
+                    aImportLogger.error (sServiceGroupID, "Failed to delete Business Card", ex);
+                    aImportLogger.onError (EImportSummaryAction.DELETE_BC);
+                  }
+                }
+              }));
+
+              ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
+              aSW.stop ();
+              aImportLogger.info ("Business Card deletion is finalized after " + aSW.getDuration ());
+            }
+
+            // 5. create all new business cards
+            // Note: if PD integration is disabled, the list is empty
+            {
+              aImportLogger.info ("Trying to create " + aBusinessCardsToImport.size () + " Business Cards");
+              final StopWatch aSW = StopWatch.createdStarted ();
+              final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+
+              final AtomicInteger aBCCount = new AtomicInteger (0);
+              aBusinessCardsToImport.values ().forEach (aImportBusinessCard -> aExecutorSvc.submit (() -> {
+                try (final WebScoped aWebScoped = new WebScoped ())
+                {
+                  final String sParticipantCardID = aImportBusinessCard.getID ();
+                  final IParticipantIdentifier aParticipantID = aImportBusinessCard.getParticipantIdentifier ();
+
+                  // Remove this ID from the the Service Groups that need a push, as the create call
+                  // does it anyway
+                  if (bOriginalPDAutoUpdate)
+                    aServiceGroupsWithDocTypesForBC.remove (aParticipantID);
+
+                  try
+                  {
+                    // Always sync to the Directory after the creation
+                    if (aBusinessCardMgr.createOrUpdateSMPBusinessCard (aParticipantID,
+                                                                        aImportBusinessCard.getAllEntities (),
+                                                                        true) != null)
+                    {
+                      aImportLogger.success (sParticipantCardID, "Successfully created Business Card");
+                      aImportLogger.onSuccess (EImportSummaryAction.CREATE_BC);
+                    }
+                    else
+                    {
+                      aImportLogger.error (sParticipantCardID, "Failed to create Business Card");
+                      aImportLogger.onError (EImportSummaryAction.CREATE_BC);
+                    }
+                  }
+                  catch (final Exception ex)
+                  {
+                    aImportLogger.error (sParticipantCardID, "Failed to create Business Card", ex);
                     aImportLogger.onError (EImportSummaryAction.CREATE_BC);
                   }
+
+                  final int nCount = aBCCount.incrementAndGet ();
+                  if ((nCount % 1_000) == 0)
+                    LOGGER.info ("  Imported " + nCount + " Business Groups so far");
                 }
-                catch (final Exception ex)
+              }));
+
+              ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
+              aSW.stop ();
+              aImportLogger.info ("Business Card creation is finalized after " + aSW.getDuration ());
+            }
+
+            // 6. Provide an additional update to the Peppol Directory for the affected participants
+            // remaining
+            {
+              aImportLogger.info ("Trying to push " + aServiceGroupsWithDocTypesForBC.size () + " Business Cards");
+              final StopWatch aSW = StopWatch.createdStarted ();
+              final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
+
+              final AtomicInteger aBCCount = new AtomicInteger (0);
+              aServiceGroupsWithDocTypesForBC.forEach (aParticipantID -> aExecutorSvc.submit (() -> {
+                try (final WebScoped aWebScoped = new WebScoped ())
                 {
-                  aImportLogger.error (sParticipantCardID, "Failed to create Business Card", ex);
-                  aImportLogger.onError (EImportSummaryAction.CREATE_BC);
+                  aMainPushToDirectory.pushToDirectory (aParticipantID);
+
+                  final int nCount = aBCCount.incrementAndGet ();
+                  if ((nCount % 1_000) == 0)
+                    LOGGER.info ("  Pushed " + nCount + " Business Groups so far");
                 }
+              }));
 
-                final int nCount = aBCCount.incrementAndGet ();
-                if ((nCount % 1_000) == 0)
-                  LOGGER.info ("  Imported " + nCount + " Business Groups so far");
-              }
-            }));
-
-            ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
-            aSW.stop ();
-            aImportLogger.info ("Business Card creation is finalized after " + aSW.getDuration ());
+              ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
+              aSW.stop ();
+              aImportLogger.info ("Business Card pushing is finalized after " + aSW.getDuration ());
+            }
           }
-
-          // 6. Provide an additional update to the Peppol Directory for the affected participants
-          // remaining
-          {
-            aImportLogger.info ("Trying to push " + aServiceGroupsWithDocTypesForBC.size () + " Business Cards");
-            final StopWatch aSW = StopWatch.createdStarted ();
-            final ExecutorService aExecutorSvc = Executors.newFixedThreadPool (nImportThreadCount);
-
-            final AtomicInteger aBCCount = new AtomicInteger (0);
-            aServiceGroupsWithDocTypesForBC.forEach (aParticipantID -> aExecutorSvc.submit (() -> {
-              try (final WebScoped aWebScoped = new WebScoped ())
-              {
-                aMainPushToDirectory.pushToDirectory (aParticipantID);
-
-                final int nCount = aBCCount.incrementAndGet ();
-                if ((nCount % 1_000) == 0)
-                  LOGGER.info ("  Pushed " + nCount + " Business Groups so far");
-              }
-            }));
-
-            ExecutorServiceHelper.shutdownAndWaitUntilAllTasksAreFinished (aExecutorSvc);
-            aSW.stop ();
-            aImportLogger.info ("Business Card pushing is finalized after " + aSW.getDuration ());
-          }
+          aImportLogger.info ("Import is finalized");
         }
-        aImportLogger.info ("Import is finalized");
-      }
   }
 }

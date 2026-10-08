@@ -79,7 +79,9 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
   private static final String FIELD_IMPORT_FILE = "importfile";
   private static final String FIELD_OVERWRITE_EXISTING = "overwriteexisting";
   private static final String FIELD_DEFAULT_OWNER = "defaultowner";
+  private static final String FIELD_DRY_RUN = "dryrun";
   private static final boolean DEFAULT_OVERWRITE_EXISTING = false;
+  private static final boolean DEFAULT_DRY_RUN = false;
 
   public PageSecureServiceGroupImport (@NonNull @Nonempty final String sID)
   {
@@ -100,6 +102,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
     final FormErrorList aFormErrors = new FormErrorList ();
 
     final HCUL aImportResultUL = new HCUL ();
+    boolean bDryRun = false;
 
     if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
     {
@@ -107,6 +110,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
       final IFileItem aImportFile = aWPEC.params ().getAsFileItem (FIELD_IMPORT_FILE);
       final boolean bOverwriteExisting = aWPEC.params ()
                                               .isCheckBoxChecked (FIELD_OVERWRITE_EXISTING, DEFAULT_OVERWRITE_EXISTING);
+      bDryRun = aWPEC.params ().isCheckBoxChecked (FIELD_DRY_RUN, DEFAULT_DRY_RUN);
       final String sDefaultOwnerID = aWPEC.params ().getAsStringTrimmed (FIELD_DEFAULT_OWNER);
       final IUser aDefaultOwner = aUserMgr.getActiveUserOfID (sDefaultOwnerID);
 
@@ -138,6 +142,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
             final ImportSummary aImportSummary = new ImportSummary ();
             ServiceGroupImport.importXMLVer10 (aDoc.getDocumentElement (),
                                                bOverwriteExisting,
+                                               bDryRun,
                                                aDefaultOwner,
                                                aAllServiceGroupIDs,
                                                aAllBusinessCardIDs,
@@ -188,7 +193,7 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
     if (aImportResultUL.hasChildren ())
     {
       final BootstrapCard aPanel = new BootstrapCard ();
-      aPanel.createAndAddHeader ().addChild ("Import results");
+      aPanel.createAndAddHeader ().addChild (bDryRun ? "Dry run results - nothing was changed" : "Import results");
       aPanel.createAndAddBody ().addChild (aImportResultUL);
       aNodeList.addChild (aPanel);
     }
@@ -214,6 +219,13 @@ public final class PageSecureServiceGroupImport extends AbstractSMPWebPage
                                                                              aDisplayLocale))
                                                  .setHelpText ("This owner is only selected, if the owner contained in the import file is unknown.")
                                                  .setErrorList (aFormErrors.getListOfField (FIELD_DEFAULT_OWNER)));
+    aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Dry run")
+                                                 .setCtrl (new HCCheckBox (new RequestFieldBoolean (FIELD_DRY_RUN,
+                                                                                                    DEFAULT_DRY_RUN)))
+                                                 .setHelpText ("If this box is checked, the file is only analyzed and the actions that would be performed are shown. Nothing is changed - neither locally nor in the SML or the " +
+                                                               SMPWebAppConfiguration.getDirectoryName () +
+                                                               ". Upload the file again with this box unchecked to perform the import.")
+                                                 .setErrorList (aFormErrors.getListOfField (FIELD_DRY_RUN)));
 
     final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
     aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
