@@ -44,6 +44,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -107,6 +108,11 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
       final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointURLs (m_aServiceGroupPID, m_sOldURL, m_sNewURL);
+      if (nEndpointsChanged > 0)
+      {
+        // The bulk update does not trigger the callbacks and affects an unknown number of participants
+        SMPRestResponseCache.invalidateAll ();
+      }
 
       final IHCNode aRes;
       if (nEndpointsChanged > 0)

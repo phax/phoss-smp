@@ -33,13 +33,20 @@ import com.helger.base.debug.GlobalDebug;
 import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.base.string.StringHelper;
 import com.helger.mime.CMimeType;
+import com.helger.peppolid.IDocumentTypeIdentifier;
+import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
+import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCacheKey;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
@@ -58,17 +65,11 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorServiceMetadataGet.class);
 
-  @Override
-  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
-                            @NonNull @Nonempty final String sPath,
-                            @NonNull final Map <String, String> aPathVariables,
-                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  @NonNull
+  private static byte [] _createSignedResponse (@NonNull final String sPathServiceGroupID,
+                                                @NonNull final String sPathDocumentTypeID,
+                                                @NonNull final ISMPServerAPIDataProvider aDataProvider) throws SMPServerException
   {
-    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final String sPathDocumentTypeID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID));
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
-
     // Create the unsigned response document
     final Document aDoc;
     switch (SMPServerConfiguration.getRESTType ())
@@ -182,9 +183,38 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
         }
       }
 
-      aUnifiedResponse.setContent (aBAOS.toByteArray ())
-                      .setMimeType (CMimeType.TEXT_XML)
-                      .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+      return aBAOS.toByteArray ();
     }
+  }
+
+  @Override
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  {
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final String sPathDocumentTypeID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID));
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+
+    SMPRestResponseCacheKey aCacheKey = null;
+    if (SMPRestResponseCache.isEnabled ())
+    {
+      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+      final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+      final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
+      if (aParticipantID != null && aDocTypeID != null)
+        aCacheKey = SMPRestResponseCacheKey.forServiceMetadata (aParticipantID, aDocTypeID);
+    }
+
+    final byte [] aBytes = SMPRestResponseCache.getOrCreate (aCacheKey,
+                                                             () -> _createSignedResponse (sPathServiceGroupID,
+                                                                                          sPathDocumentTypeID,
+                                                                                          aDataProvider));
+
+    aUnifiedResponse.setContent (aBytes)
+                    .setMimeType (CMimeType.TEXT_XML)
+                    .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
   }
 }

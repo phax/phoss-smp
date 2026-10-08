@@ -42,6 +42,8 @@ import com.helger.phoss.smp.domain.sml.ISMLInfoManager;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.totp.SMPUserTotpEnabledCache;
 import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCacheInvalidationCallback;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
 import com.helger.phoss.smp.settings.ISMPSettings;
@@ -127,6 +129,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     m_aServiceGroupMgr.serviceGroupCallbacks ().add (new LoggingSMPServiceGroupCallback ());
     m_aRedirectMgr.redirectCallbacks ().add (new LoggingSMPRedirectCallback ());
     m_aServiceInformationMgr.serviceInformationCallbacks ().add (new LoggingSMPServiceInformationCallback ());
+
+    // Drop the cached REST API responses of a participant, as soon as anything of it changes
+    final SMPRestResponseCacheInvalidationCallback aRestCacheCB = new SMPRestResponseCacheInvalidationCallback ();
+    m_aServiceGroupMgr.serviceGroupCallbacks ().add (aRestCacheCB);
+    m_aRedirectMgr.redirectCallbacks ().add (aRestCacheCB);
+    m_aServiceInformationMgr.serviceInformationCallbacks ().add (aRestCacheCB);
 
     if (m_aBusinessCardMgr != null)
     {
@@ -253,6 +261,9 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       m_aBusinessCardMgr = s_aManagerProvider.createBusinessCardMgr (m_aIdentifierFactory, m_aServiceGroupMgr);
 
       _initCallbacks ();
+
+      // Instantiate eagerly, so that an invalid configuration is detected on startup
+      SMPRestResponseCache.getInstance ();
 
       _performMigrations ();
 

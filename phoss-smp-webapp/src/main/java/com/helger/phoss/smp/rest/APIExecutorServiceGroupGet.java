@@ -23,12 +23,17 @@ import org.jspecify.annotations.NonNull;
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
 import com.helger.mime.CMimeType;
+import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.exception.SMPInternalErrorException;
+import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.phoss.smp.restapi.BDXR2ServerAPI;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPServerAPI;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCacheKey;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
@@ -39,16 +44,10 @@ import com.helger.xml.serialize.write.XMLWriterSettings;
 
 public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
 {
-  @Override
-  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
-                            @NonNull @Nonempty final String sPath,
-                            @NonNull final Map <String, String> aPathVariables,
-                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  @NonNull
+  private static byte [] _createResponse (@NonNull final String sPathServiceGroupID,
+                                          @NonNull final ISMPServerAPIDataProvider aDataProvider) throws SMPServerException
   {
-    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
-
     final byte [] aBytes;
     switch (SMPServerConfiguration.getRESTType ())
     {
@@ -79,6 +78,36 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
       // Internal error serializing the payload
       throw new SMPInternalErrorException ("Failed to convert the returned ServiceGroup to XML");
     }
+    return aBytes;
+  }
+
+  @Override
+  protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
+                            @NonNull @Nonempty final String sPath,
+                            @NonNull final Map <String, String> aPathVariables,
+                            @NonNull final IRequestWebScopeWithoutResponse aRequestScope,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
+  {
+    final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
+    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+
+    SMPRestResponseCacheKey aCacheKey = null;
+    if (SMPRestResponseCache.isEnabled ())
+    {
+      final IParticipantIdentifier aParticipantID = SMPMetaManager.getIdentifierFactory ()
+                                                                  .parseParticipantIdentifier (sPathServiceGroupID);
+      if (aParticipantID != null)
+      {
+        // The HREF is part of the key, because the response contains absolute URLs based on the
+        // public URL of this SMP
+        aCacheKey = SMPRestResponseCacheKey.forServiceGroup (aParticipantID,
+                                                             aDataProvider.getServiceGroupHref (aParticipantID));
+      }
+    }
+
+    final byte [] aBytes = SMPRestResponseCache.getOrCreate (aCacheKey,
+                                                             () -> _createResponse (sPathServiceGroupID,
+                                                                                    aDataProvider));
 
     aUnifiedResponse.setContent (aBytes)
                     .setMimeType (CMimeType.TEXT_XML)

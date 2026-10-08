@@ -47,6 +47,7 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -111,6 +112,11 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
       final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointCertificates (m_sOldUnifiedCert, m_sNewCert);
+      if (nEndpointsChanged > 0)
+      {
+        // The bulk update does not trigger the callbacks and affects an unknown number of participants
+        SMPRestResponseCache.invalidateAll ();
+      }
 
       final IHCNode aRes;
       if (nEndpointsChanged > 0)

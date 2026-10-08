@@ -68,6 +68,9 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_REMOTE_QUERY_API_DISABLED = "smp.rest.remote.queryapi.disabled";
   public static final String KEY_SMP_REST_DELETE_NOT_FOUND_AS_OK = "smp.rest.delete.notfound.as.ok";
   public static final String KEY_SMP_REST_AUTH_ERRORDETAILS = "smp.rest.auth.errordetails";
+  public static final String KEY_SMP_REST_CACHE_ENABLED = "smp.rest.cache.enabled";
+  public static final String KEY_SMP_REST_CACHE_TTL = "smp.rest.cache.ttl";
+  public static final String KEY_SMP_REST_CACHE_MAX_ITEMS = "smp.rest.cache.maxitems";
 
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
@@ -119,6 +122,12 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_REST_DELETE_NOT_FOUND_AS_OK = false;
   @ChangeNextMajorRelease ("Change default to false")
   public static final boolean DEFAULT_SMP_REST_AUTH_ERRORDETAILS = true;
+  /** The REST API response cache is opt-in and therefore disabled by default */
+  public static final boolean DEFAULT_SMP_REST_CACHE_ENABLED = false;
+  /** The default time a single REST API response is cached */
+  public static final Duration DEFAULT_SMP_REST_CACHE_TTL = Duration.ofSeconds (60);
+  /** The default maximum number of cached REST API responses */
+  public static final int DEFAULT_SMP_REST_CACHE_MAX_ITEMS = 10_000;
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
@@ -489,6 +498,47 @@ public final class SMPServerConfiguration
   public static boolean isRestAuthErrorDetails ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_AUTH_ERRORDETAILS, DEFAULT_SMP_REST_AUTH_ERRORDETAILS);
+  }
+
+  /**
+   * @return <code>true</code> if the responses of the read-only REST API endpoints
+   *         <code>GET /{ServiceGroupId}</code> and
+   *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code> should be cached,
+   *         <code>false</code> if not. By default caching is disabled. A change requires a
+   *         restart.
+   * @since 8.6.1
+   */
+  public static boolean isRestCacheEnabled ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_CACHE_ENABLED, DEFAULT_SMP_REST_CACHE_ENABLED);
+  }
+
+  /**
+   * @return The time a single REST API response is cached. In a multi-instance setup this is the
+   *         maximum time until a modification on one instance is visible on all other instances.
+   *         Missing, invalid, zero or negative values result in the default of 60 seconds. Never
+   *         <code>null</code>.
+   * @since 8.6.1
+   */
+  @NonNull
+  public static Duration getRestCacheTTL ()
+  {
+    final Duration ret = _getConfig ().getAsConfigDuration (KEY_SMP_REST_CACHE_TTL,
+                                                            sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                                 KEY_SMP_REST_CACHE_TTL +
+                                                                                 "' as duration: " +
+                                                                                 sMsg));
+    return ret != null && !ret.isZero () && !ret.isNegative () ? ret : DEFAULT_SMP_REST_CACHE_TTL;
+  }
+
+  /**
+   * @return The maximum number of cached REST API responses. Values &le; 0 mean unlimited. The
+   *         default is 10000.
+   * @since 8.6.1
+   */
+  public static int getRestCacheMaxItems ()
+  {
+    return _getConfig ().getAsInt (KEY_SMP_REST_CACHE_MAX_ITEMS, DEFAULT_SMP_REST_CACHE_MAX_ITEMS);
   }
 
   /**

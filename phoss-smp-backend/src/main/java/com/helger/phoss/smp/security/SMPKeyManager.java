@@ -54,6 +54,7 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.http.security.TrustManagerTrustAll;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
 import com.helger.security.keystore.KeyStoreHelper;
@@ -346,6 +347,9 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
         // _loadKeyStore () is called in the constructor
         getInstance ();
       }
+
+      // Cached responses were signed with the previous key
+      SMPRestResponseCache.invalidateAll ();
     }
     catch (final Exception ex)
     {
