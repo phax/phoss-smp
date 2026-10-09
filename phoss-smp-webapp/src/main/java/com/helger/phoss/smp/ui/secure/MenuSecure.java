@@ -115,6 +115,7 @@ public final class MenuSecure
       aMenuTree.createItem (aServiceGroups,
                             new PageSecureServiceGroupMigrationInbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_INBOUND));
     }
+    aMenuTree.createRootItem (new PageSecureAccessPoints (CMenuSecure.MENU_ACCESS_POINTS));
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_ENDPOINTS,
                                                                                               "Endpoints",
