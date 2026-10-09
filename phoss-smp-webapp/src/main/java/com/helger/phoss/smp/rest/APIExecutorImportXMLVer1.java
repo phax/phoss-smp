@@ -21,10 +21,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.style.VisibleForTesting;
 import com.helger.base.io.stream.StreamHelper;
 import com.helger.base.numeric.mutable.MutableInt;
 import com.helger.base.state.ESuccess;
@@ -36,10 +38,14 @@ import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.web.PDTWebDateHelper;
+import com.helger.http.CHttpHeader;
+import com.helger.http.header.specific.AcceptMimeTypeHandler;
 import com.helger.json.IJsonArray;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonArray;
 import com.helger.json.JsonObject;
+import com.helger.mime.CMimeType;
+import com.helger.mime.IMimeType;
 import com.helger.pd.client.PDClient;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.app.PDClientProvider;
@@ -93,6 +99,110 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
   };
 
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorImportXMLVer1.class);
+
+  /**
+   * Determine the response format from the provided <code>Accept</code> header value.
+   * XML is the default and listed first, so it wins on a quality tie, if no header is
+   * present and if the header matches neither format. An unsupported <code>Accept</code>
+   * value deliberately does NOT result in an HTTP 406: at the time the response is built
+   * the import was already executed, and refusing to report the outcome of work that was
+   * performed is worse than answering in a format the client did not ask for.
+   *
+   * @param sAcceptHeader
+   *        The value of the <code>Accept</code> header. May be <code>null</code>.
+   * @return <code>true</code> for XML, <code>false</code> for JSON.
+   */
+  @VisibleForTesting
+  static boolean isResponseAsXML (@Nullable final String sAcceptHeader)
+  {
+    final IMimeType aPreferredMimeType = AcceptMimeTypeHandler.getAcceptMimeTypes (sAcceptHeader)
+                                                              .getPreferredMimeType (CMimeType.APPLICATION_XML,
+                                                                                     CMimeType.APPLICATION_JSON);
+    return !CMimeType.APPLICATION_JSON.equals (aPreferredMimeType);
+  }
+
+  @VisibleForTesting
+  static void fillResponse (final boolean bResponseAsXML,
+                            @NonNull final ZonedDateTime aQueryDT,
+                            final boolean bOverwriteExisting,
+                            final boolean bDryRun,
+                            @NonNull final IUser aDefaultOwner,
+                            @NonNull final ICommonsList <ImportActionItem> aActionList,
+                            @NonNull final ImportSummary aImportSummary,
+                            final long nDurationMillis,
+                            @NonNull final PhotonUnifiedResponse aUnifiedResponse)
+  {
+
+    if (bResponseAsXML)
+    {
+      // Create XML version
+      final IMicroDocument aResponseDoc = new MicroDocument ();
+      final IMicroElement eRoot = aResponseDoc.addElement ("importResult");
+      eRoot.setAttribute ("version", "1");
+      eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
+
+      final IMicroElement eSettings = eRoot.addElement ("settings");
+      eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
+      eSettings.setAttribute ("dryRun", bDryRun);
+      eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
+      eSettings.setAttribute ("defaultOwnerLoginName", aDefaultOwner.getLoginName ());
+
+      final ICommonsMap <String, MutableInt> aErrorLevelCount = new CommonsTreeMap <> ();
+      for (final ImportActionItem aAction : aActionList)
+      {
+        eRoot.addChild (aAction.getAsMicroElement ("action"));
+        aErrorLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
+      }
+
+      {
+        final IMicroElement eSummary = eRoot.addElement ("summary");
+        eSummary.setAttribute ("durationMillis", nDurationMillis);
+        for (final Map.Entry <String, MutableInt> aEntry : aErrorLevelCount.entrySet ())
+          eSummary.addElement ("errorlevel")
+                  .setAttribute ("id", aEntry.getKey ())
+                  .setAttribute ("count", aEntry.getValue ().intValue ());
+
+        aImportSummary.appendTo (eSummary);
+      }
+
+      aUnifiedResponse.xml (aResponseDoc);
+    }
+    else
+    {
+      // Create JSON version
+      final IJsonObject aJson = new JsonObject ();
+      aJson.add ("version", "1");
+      aJson.add ("importStartDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
+      aJson.add ("settings",
+                 new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
+                                  .add ("dryRun", bDryRun)
+                                  .add ("defaultOwnerID", aDefaultOwner.getID ())
+                                  .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
+      final IJsonArray aActions = new JsonArray ();
+      final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
+      for (final ImportActionItem aAction : aActionList)
+      {
+        aActions.add (aAction.getAsJsonObject ());
+        aLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
+      }
+      aJson.add ("actions", aActions);
+
+      {
+        final IJsonObject aSummary = new JsonObject ();
+        aSummary.add ("durationMillis", nDurationMillis);
+        final IJsonArray aLevels = new JsonArray ();
+        for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
+          aLevels.add (new JsonObject ().add ("id", aEntry.getKey ()).add ("count", aEntry.getValue ().intValue ()));
+        aSummary.add ("errorlevels", aLevels);
+
+        aImportSummary.appendTo (aSummary);
+
+        aJson.add ("summary", aSummary);
+      }
+
+      aUnifiedResponse.json (aJson);
+    }
+  }
 
   @Override
   protected void invokeAPI (@NonNull final IAPIDescriptor aAPIDescriptor,
@@ -192,75 +302,17 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     LOGGER.info (sLogPrefix + "Finished import after " + aSW.getMillis () + " milliseconds");
 
     // Everything added to the action list is already logged
-    final boolean bResponseAsXML = true;
-    if (bResponseAsXML)
-    {
-      // Create XML version
-      final IMicroDocument aResponseDoc = new MicroDocument ();
-      final IMicroElement eRoot = aResponseDoc.addElement ("importResult");
-      eRoot.setAttribute ("version", "1");
-      eRoot.setAttribute ("importStartDateTime", PDTWebDateHelper.getAsStringXSD (aQueryDT));
+    // Honour the Accept header; XML remains the default
+    final boolean bResponseAsXML = isResponseAsXML (aRequestScope.headers ().getFirstHeaderValue (CHttpHeader.ACCEPT));
 
-      final IMicroElement eSettings = eRoot.addElement ("settings");
-      eSettings.setAttribute ("overwriteExisting", bOverwriteExisting);
-      eSettings.setAttribute ("dryRun", bDryRun);
-      eSettings.setAttribute ("defaultOwnerID", aDefaultOwner.getID ());
-      eSettings.setAttribute ("defaultOwnerLoginName", aDefaultOwner.getLoginName ());
-
-      final ICommonsMap <String, MutableInt> aErrorLevelCount = new CommonsTreeMap <> ();
-      for (final ImportActionItem aAction : aActionList)
-      {
-        eRoot.addChild (aAction.getAsMicroElement ("action"));
-        aErrorLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
-      }
-
-      {
-        final IMicroElement eSummary = eRoot.addElement ("summary");
-        eSummary.setAttribute ("durationMillis", aSW.getMillis ());
-        for (final Map.Entry <String, MutableInt> aEntry : aErrorLevelCount.entrySet ())
-          eSummary.addElement ("errorlevel")
-                  .setAttribute ("id", aEntry.getKey ())
-                  .setAttribute ("count", aEntry.getValue ().intValue ());
-
-        aImportSummary.appendTo (eSummary);
-      }
-
-      aUnifiedResponse.xml (aResponseDoc);
-    }
-    else
-    {
-      // Create JSON version
-      final IJsonObject aJson = new JsonObject ();
-      aJson.add ("version", "1");
-      aJson.add ("importStartDateTime", DateTimeFormatter.ISO_ZONED_DATE_TIME.format (aQueryDT));
-      aJson.add ("settings",
-                 new JsonObject ().add ("overwriteExisting", bOverwriteExisting)
-                                  .add ("dryRun", bDryRun)
-                                  .add ("defaultOwnerID", aDefaultOwner.getID ())
-                                  .add ("defaultOwnerLoginName", aDefaultOwner.getLoginName ()));
-      final IJsonArray aActions = new JsonArray ();
-      final ICommonsMap <String, MutableInt> aLevelCount = new CommonsTreeMap <> ();
-      for (final ImportActionItem aAction : aActionList)
-      {
-        aActions.add (aAction.getAsJsonObject ());
-        aLevelCount.computeIfAbsent (aAction.getErrorLevelName (), k -> new MutableInt (0)).inc ();
-      }
-      aJson.add ("actions", aActions);
-
-      {
-        final IJsonObject aSummary = new JsonObject ();
-        aSummary.add ("durationMillis", aSW.getMillis ());
-        final IJsonArray aLevels = new JsonArray ();
-        for (final Map.Entry <String, MutableInt> aEntry : aLevelCount.entrySet ())
-          aLevels.add (new JsonObject ().add ("id", aEntry.getKey ()).add ("count", aEntry.getValue ().intValue ()));
-        aSummary.add ("errorlevels", aLevels);
-
-        aImportSummary.appendTo (aSummary);
-
-        aJson.add ("summary", aSummary);
-      }
-
-      aUnifiedResponse.json (aJson);
-    }
+    fillResponse (bResponseAsXML,
+                  aQueryDT,
+                  bOverwriteExisting,
+                  bDryRun,
+                  aDefaultOwner,
+                  aActionList,
+                  aImportSummary,
+                  aSW.getMillis (),
+                  aUnifiedResponse);
   }
 }
