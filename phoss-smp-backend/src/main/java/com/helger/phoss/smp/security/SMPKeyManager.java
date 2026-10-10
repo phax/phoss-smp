@@ -14,6 +14,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -212,13 +213,48 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
   }
 
   /**
+   * Determine the XMLDSig signature method that fits a private key.
+   * <p>
+   * SHA-256 throughout, matching the digest method used for the reference. Only the key algorithm
+   * varies, and it has to: a signature method and a key of different families cannot be combined,
+   * and the failure surfaces as an <code>InvalidKeyException</code> at signing time.
+   * </p>
+   *
+   * @param aPrivateKey
+   *        The private key the response is signed with. May not be <code>null</code>.
+   * @return The URI of the signature method. Never <code>null</code>.
+   * @throws IllegalStateException
+   *         if the key algorithm is not supported for XML signatures.
+   * @since 8.6.2
+   */
+  @NonNull
+  public static String getSignatureMethodForKey (@NonNull final PrivateKey aPrivateKey)
+  {
+    ValueEnforcer.notNull (aPrivateKey, "PrivateKey");
+
+    final String sAlgorithm = aPrivateKey.getAlgorithm ();
+    // "EC" is what the JDK reports, "ECDSA" is what BouncyCastle reports for the same key
+    if ("EC".equalsIgnoreCase (sAlgorithm) || "ECDSA".equalsIgnoreCase (sAlgorithm))
+      return SignatureMethod.ECDSA_SHA256;
+    if ("RSA".equalsIgnoreCase (sAlgorithm))
+      return SignatureMethod.RSA_SHA256;
+
+    // Ed25519 is deliberately absent: SignatureMethod.ED25519 only exists from Java 21 on, and this
+    // project compiles against 17. Add it when the release target moves.
+    throw new IllegalStateException ("The key algorithm '" +
+                                     sAlgorithm +
+                                     "' is not supported for signing SMP responses. Supported are RSA and EC.");
+  }
+
+  /**
    * Sign the provided element with the configured certificate using XMLDSig.
    *
    * @param aElementToSign
    *        The XML element to sign. May not be <code>null</code>.
    * @param eRESTType
-   *        The REST type current configured. This differences are the hash algorithm as well as the
-   *        canonicalization algorithms.
+   *        The REST type currently configured. It decides the canonicalization algorithm. The
+   *        signature method follows the key algorithm instead - see
+   *        {@link #getSignatureMethodForKey(PrivateKey)}.
    * @throws NoSuchAlgorithmException
    *         An algorithm is not supported by the underlying platform.
    * @throws InvalidAlgorithmParameterException
@@ -258,26 +294,21 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
     // * CIPA and this server always used INCLUSIVE, but this was changed for
     // 5.0.1 to EXCLUSIVE
     // * Peppol SMP Spec 1.3.0 changed from SHA-1 to SHA-256
-    final String sC18N;
-    final String sSignatureMethod = switch (eRESTType)
+    final String sC18N = switch (eRESTType)
     {
-      case PEPPOL ->
-      {
-        sC18N = CanonicalizationMethod.INCLUSIVE;
-        yield SignatureMethod.RSA_SHA256;
-      }
-      case OASIS_BDXR_V1 ->
-      {
-        sC18N = CanonicalizationMethod.INCLUSIVE;
-        yield SignatureMethod.RSA_SHA256;
-      }
-      case OASIS_BDXR_V2 ->
-      {
-        sC18N = Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS;
-        yield SignatureMethod.RSA_SHA256;
-      }
+      case PEPPOL -> CanonicalizationMethod.INCLUSIVE;
+      case OASIS_BDXR_V1 -> CanonicalizationMethod.INCLUSIVE;
+      case OASIS_BDXR_V2 -> Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS;
       default -> throw new IllegalStateException ("Unsupported REST type");
     };
+
+    // The signature method follows the key and not the REST type. Up to and including 8.6.1 this
+    // was hard coded to RSA-SHA256 for all three REST types, which made an SMP with an EC key
+    // unusable: signing failed with "InvalidKeyException: No installed provider supports this key"
+    // on every ServiceMetadata query, because an RSA Signature instance refuses an EC key whatever
+    // provider is installed. Networks whose PKI issues EC keys - such as SilvaConnect on secp256r1 -
+    // could not be served at all.
+    final String sSignatureMethod = getSignatureMethodForKey (m_aKeyEntry.getPrivateKey ());
     final SignedInfo aSingedInfo = aSignatureFactory.newSignedInfo (aSignatureFactory.newCanonicalizationMethod (sC18N,
                                                                                                                  (C14NMethodParameterSpec) null),
                                                                     aSignatureFactory.newSignatureMethod (sSignatureMethod,
