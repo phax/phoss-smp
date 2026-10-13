@@ -47,14 +47,14 @@ public final class SmpSmlHelper
   /**
    * This is the centralized place to customize the SOAP client with transport specific settings.
    * 
-   * @param aSMLEndpointURL
+   * @param aSmlEndpointURL
    *        The target URL the call is targeted to. May not be <code>null</code>.
    * @param aCaller
    *        The SOAP client. May not be <code>null</code>.
    */
-  private static void _customizeSMLCaller (@NonNull final URL aSMLEndpointURL, @NonNull final WSClientConfig aCaller)
+  private static void _customizeSmlCaller (@NonNull final URL aSmlEndpointURL, @NonNull final WSClientConfig aCaller)
   {
-    final String sEndpointURL = aSMLEndpointURL.toExternalForm ();
+    final String sEndpointURL = aSmlEndpointURL.toExternalForm ();
     final String sLowerURL = sEndpointURL.toLowerCase (Locale.US);
 
     LOGGER.info ("Performing SML query to '" + sEndpointURL + "'");
@@ -78,7 +78,7 @@ public final class SmpSmlHelper
     // else local, http only access - no socket factory
 
     // Hostname verifier
-    final String sHost = aSMLEndpointURL.getHost ();
+    final String sHost = aSmlEndpointURL.getHost ();
     if ("localhost".equalsIgnoreCase (sHost) || "127.0.0.1".equals (sHost))
     {
       // Accept all hostnames
@@ -105,7 +105,7 @@ public final class SmpSmlHelper
     // Build WS client
     final ManageParticipantIdentifierServiceCaller ret = new ManageParticipantIdentifierServiceCaller (aSMLEndpointURL);
     // and customize
-    _customizeSMLCaller (aSMLEndpointURL, ret);
+    _customizeSmlCaller (aSMLEndpointURL, ret);
     return ret;
   }
 
@@ -117,7 +117,7 @@ public final class SmpSmlHelper
     // Build WS client
     final ManageServiceMetadataServiceCaller ret = new ManageServiceMetadataServiceCaller (aSMLEndpointURL);
     // and customize
-    _customizeSMLCaller (aSMLEndpointURL, ret);
+    _customizeSmlCaller (aSMLEndpointURL, ret);
     return ret;
   }
 
@@ -129,7 +129,7 @@ public final class SmpSmlHelper
     // Build WS client
     final BDMSLClient ret = new BDMSLClient (aSMLEndpointURL);
     // and customize
-    _customizeSMLCaller (aSMLEndpointURL, ret);
+    _customizeSmlCaller (aSMLEndpointURL, ret);
     return ret;
   }
 }

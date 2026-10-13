@@ -63,38 +63,38 @@ public final class SMLRegistrationCache
 
   @NonNull
   @Nonempty
-  private static String _getCacheKey (@NonNull final ISMLInfo aSMLInfo, @NonNull @Nonempty final String sSMPID)
+  private static String _getCacheKey (@NonNull final ISMLInfo aSmlInfo, @NonNull @Nonempty final String sSmpID)
   {
     // The result is only valid for the combination of SML and SMP ID it was determined for
-    return aSMLInfo.getID () + "|" + sSMPID;
+    return aSmlInfo.getID () + "|" + sSmpID;
   }
 
   @NonNull
-  private static SMLRegistrationCheckResult _readFromSML (@NonNull final ISMLInfo aSMLInfo,
-                                                          @NonNull @Nonempty final String sSMPID)
+  private static SMLRegistrationCheckResult _readFromSML (@NonNull final ISMLInfo aSmlInfo,
+                                                          @NonNull @Nonempty final String sSmpID)
   {
     try
     {
-      final ManageServiceMetadataServiceCaller aCaller = SmpSmlHelper.createSMLCallerSMP (aSMLInfo);
-      final ServiceMetadataPublisherServiceType aSMPService = aCaller.read (sSMPID);
+      final ManageServiceMetadataServiceCaller aCaller = SmpSmlHelper.createSMLCallerSMP (aSmlInfo);
+      final ServiceMetadataPublisherServiceType aSmpService = aCaller.read (sSmpID);
 
-      final PublisherEndpointType aEndpoint = aSMPService.getPublisherEndpoint ();
+      final PublisherEndpointType aEndpoint = aSmpService.getPublisherEndpoint ();
       final String sLogicalAddress = aEndpoint == null ? null : aEndpoint.getLogicalAddress ();
       final String sPhysicalAddress = aEndpoint == null ? null : aEndpoint.getPhysicalAddress ();
 
       LOGGER.info ("The SML '" +
-                   aSMLInfo.getManagementServiceURL () +
+                   aSmlInfo.getManagementServiceURL () +
                    "' knows the SMP '" +
-                   sSMPID +
+                   sSmpID +
                    "' with the logical address '" +
                    sLogicalAddress +
                    "'");
-      return SMLRegistrationCheckResult.createRegistered (sSMPID, sLogicalAddress, sPhysicalAddress);
+      return SMLRegistrationCheckResult.createRegistered (sSmpID, sLogicalAddress, sPhysicalAddress);
     }
     catch (final NotFoundFault ex)
     {
-      LOGGER.warn ("The SML '" + aSMLInfo.getManagementServiceURL () + "' does not know the SMP '" + sSMPID + "'");
-      return SMLRegistrationCheckResult.createNotRegistered (sSMPID);
+      LOGGER.warn ("The SML '" + aSmlInfo.getManagementServiceURL () + "' does not know the SMP '" + sSmpID + "'");
+      return SMLRegistrationCheckResult.createNotRegistered (sSmpID);
     }
     catch (final Exception ex)
     {
@@ -104,12 +104,12 @@ public final class SMLRegistrationCache
         sErrorMsg = ex.getClass ().getName () + " - " + ex.getMessage ();
 
       LOGGER.error ("Failed to read the registration of SMP '" +
-                    sSMPID +
+                    sSmpID +
                     "' from the SML '" +
-                    aSMLInfo.getManagementServiceURL () +
+                    aSmlInfo.getManagementServiceURL () +
                     "': " +
                     sErrorMsg);
-      return SMLRegistrationCheckResult.createCheckFailed (sSMPID, sErrorMsg);
+      return SMLRegistrationCheckResult.createCheckFailed (sSmpID, sErrorMsg);
     }
   }
 
@@ -147,15 +147,15 @@ public final class SMLRegistrationCache
     if (!aSettings.isSMLEnabled ())
       return null;
 
-    final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
-    if (aSMLInfo == null)
+    final ISMLInfo aSmlInfo = aSettings.getSMLInfo ();
+    if (aSmlInfo == null)
       return null;
 
-    final String sSMPID = SMPServerConfiguration.getSMLSMPID ();
-    if (StringHelper.isEmpty (sSMPID))
+    final String sSmpID = SMPServerConfiguration.getSMLSMPID ();
+    if (StringHelper.isEmpty (sSmpID))
       return null;
 
-    final String sCacheKey = _getCacheKey (aSMLInfo, sSMPID);
+    final String sCacheKey = _getCacheKey (aSmlInfo, sSmpID);
     final LocalDateTime aNotBefore = PDTFactory.getCurrentLocalDateTime ().minus (CACHE_DURATION);
 
     final SMLRegistrationCheckResult aCached = RW_LOCK.readLockedGet (() -> {
@@ -167,7 +167,7 @@ public final class SMLRegistrationCache
       return aCached;
 
     // Query the SML outside of the lock
-    final SMLRegistrationCheckResult ret = _readFromSML (aSMLInfo, sSMPID);
+    final SMLRegistrationCheckResult ret = _readFromSML (aSmlInfo, sSmpID);
     RW_LOCK.writeLocked (() -> {
       s_sCacheKey = sCacheKey;
       s_aResult = ret;
