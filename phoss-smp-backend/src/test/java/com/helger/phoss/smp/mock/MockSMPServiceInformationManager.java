@@ -22,8 +22,10 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -150,6 +152,17 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
 
   @Nonnegative
   public long updateAllEndpointCertificates (@NonNull final String sOldCert, @NonNull final String sNewCert)
+  {
+    return 0;
+  }
+
+  public long getEndpointCountUsingAccessPoint (@Nullable final String sAccessPointID)
+  {
+    return 0;
+  }
+
+  public long useAccessPointForMatchingEndpoints (@NonNull final String sAccessPointID,
+                                                  final boolean bRequireSameEndpointReference)
   {
     return 0;
   }
