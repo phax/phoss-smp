@@ -712,6 +712,7 @@ public final class ServiceMetadataInterfaceTest
     }
   }
 
+  @SuppressWarnings ("deprecation")
   @Test
   public void testAddSingleEndpointHttpClient ()
   {
