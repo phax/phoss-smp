@@ -44,6 +44,7 @@ import com.helger.http.EHttpMethod;
 import com.helger.http.EHttpVersion;
 import com.helger.mime.CMimeType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.photon.api.APIDescriptor;
 import com.helger.photon.api.APIPath;
 import com.helger.photon.api.GlobalAPIInvoker;
@@ -399,6 +400,20 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                           "}"), new APIExecutorImportXMLVer1 ());
       aSMPImportAll.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPImportAll);
+    }
+
+    // Migration list API since 8.6.2
+    {
+      final APIDescriptor aSMPMigrateOutboundList = new APIDescriptor (APIPath.get ("/migration/outbound"),
+                                                                       new APIExecutorMigrationListGet (EParticipantMigrationDirection.OUTBOUND));
+      aSMPMigrateOutboundList.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateOutboundList);
+    }
+    {
+      final APIDescriptor aSMPMigrateInboundList = new APIDescriptor (APIPath.get ("/migration/inbound"),
+                                                                      new APIExecutorMigrationListGet (EParticipantMigrationDirection.INBOUND));
+      aSMPMigrateInboundList.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aSMPMigrateInboundList);
     }
 
     // Migration API since 5.6.0
