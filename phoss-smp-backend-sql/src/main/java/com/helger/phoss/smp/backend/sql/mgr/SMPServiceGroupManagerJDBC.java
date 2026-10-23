@@ -245,8 +245,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
+      // The DBExecutor wraps the original exception in an SQLException
       if (ex instanceof RegistrationHookException)
         throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      if (ex != null && ex.getCause () instanceof final RegistrationHookException aHookEx)
+        throw new SMPSMLException ("Failed to create '" + aParticipantID.getURIEncoded () + "' in SML", aHookEx);
       throw new SMPInternalErrorException ("Error creating ServiceGroup '" + aParticipantID.getURIEncoded () + "'", ex);
     }
 
@@ -443,8 +446,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       final Exception ex = aCaughtException.get ();
       if (ex instanceof SMPServerException)
         throw (SMPServerException) ex;
+      // The DBExecutor wraps the original exception in an SQLException
       if (ex instanceof RegistrationHookException)
         throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", ex);
+      if (ex != null && ex.getCause () instanceof final RegistrationHookException aHookEx)
+        throw new SMPSMLException ("Failed to delete '" + aParticipantID.getURIEncoded () + "' in SML", aHookEx);
       throw new SMPInternalErrorException ("Failed to delete ServiceGroup '" + aParticipantID.getURIEncoded () + "'",
                                            ex);
     }
