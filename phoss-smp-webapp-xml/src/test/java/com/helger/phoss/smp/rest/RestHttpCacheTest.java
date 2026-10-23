@@ -29,9 +29,11 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.jspecify.annotations.NonNull;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.helger.annotation.misc.DevelopersNote;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.peppol.smp.ESMPTransportProfile;
@@ -63,6 +65,8 @@ import com.helger.xsds.peppol.smp1.ServiceMetadataType;
  *
  * @author Philip Helger
  */
+@Ignore
+@DevelopersNote ("This test can only be executed locally, if a proper signing certificate is configured for local execution (e.g. with a private-application.properties)")
 public final class RestHttpCacheTest
 {
   private static final BasicAuthClientCredentials CREDENTIALS = new BasicAuthClientCredentials (CSecurity.USER_ADMINISTRATOR_EMAIL,
