@@ -159,7 +159,7 @@ public final class RestHttpCacheTest
       aProcess.setProcessIdentifier (EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ());
       final ServiceEndpointList aSEL = new ServiceEndpointList ();
       final EndpointType aEndpoint = new EndpointType ();
-      aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as2"));
+      aEndpoint.setEndpointReference (W3CEndpointReferenceHelper.createEndpointReference ("http://test.smpserver/as4"));
       aEndpoint.setRequireBusinessLevelSignature (false);
       aEndpoint.setCertificate ("blacert");
       aEndpoint.setServiceDescription ("Unit test service");
