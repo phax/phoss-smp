@@ -454,87 +454,96 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
         final HCNodeList aTab = new HCNodeList ();
 
-        final LoadedKeyStore aKeyStoreLR = PDClientConfiguration.loadKeyStore ();
-        if (aKeyStoreLR.isFailure ())
+        // The type is mandatory and loading without it throws an exception
+        final LoadedKeyStore aKeyStoreLR = PDClientConfiguration.getKeyStoreType () == null ? null
+                                                                                            : PDClientConfiguration.loadKeyStore ();
+        if (aKeyStoreLR == null)
         {
-          aTab.addChild (error (LoadedKeyStore.getLoadError (aKeyStoreLR)));
+          aTab.addChild (error ("The configuration property 'pdclient.keystore.type' is missing."));
           aTabLabel = addErrorHint.apply (aTabLabel);
         }
         else
-        {
-          final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
-          final LoadedKey <KeyStore.PrivateKeyEntry> aKeyLoading = PDClientConfiguration.loadPrivateKey (aKeyStoreLR.getKeyStore ());
-          if (aKeyLoading.isFailure ())
+          if (aKeyStoreLR.isFailure ())
           {
-            aTab.addChild (success (div ("Keystore is located at '" +
-                                         sKeyStorePath +
-                                         "' and was successfully loaded.")));
-            aTab.addChild (error (LoadedKey.getLoadError (aKeyLoading)));
+            aTab.addChild (error (LoadedKeyStore.getLoadError (aKeyStoreLR)));
             aTabLabel = addErrorHint.apply (aTabLabel);
           }
           else
           {
-            // Successfully loaded private key
-            final String sAlias = PDClientConfiguration.getKeyStoreKeyAlias ();
-            final PrivateKeyEntry aKeyEntry = aKeyLoading.getKeyEntry ();
-            final Certificate [] aChain = aKeyEntry.getCertificateChain ();
-
-            // Key store path and password are fine
-            aTab.addChild (success (div ("Keystore is located at '" + sKeyStorePath + "' and was successfully loaded."))
-                                                                                                                        .addChild (div ("The private key with the alias '" +
-                                                                                                                                        sAlias +
-                                                                                                                                        "' was successfully loaded.")));
-
-            if (aChain.length > 0 && aChain[0] instanceof final X509Certificate aHead)
+            final String sKeyStorePath = PDClientConfiguration.getKeyStorePath ();
+            final LoadedKey <KeyStore.PrivateKeyEntry> aKeyLoading = PDClientConfiguration.loadPrivateKey (aKeyStoreLR.getKeyStore ());
+            if (aKeyLoading.isFailure ())
             {
-              final String sIssuer = aHead.getIssuerX500Principal ().getName ();
-              final EPredefinedCA eCert = EPredefinedCA.getFromIssuerOrNull (sIssuer);
-              if (eCert != null)
+              aTab.addChild (success (div ("Keystore is located at '" +
+                                           sKeyStorePath +
+                                           "' and was successfully loaded.")));
+              aTab.addChild (error (LoadedKey.getLoadError (aKeyLoading)));
+              aTabLabel = addErrorHint.apply (aTabLabel);
+            }
+            else
+            {
+              // Successfully loaded private key
+              final String sAlias = PDClientConfiguration.getKeyStoreKeyAlias ();
+              final PrivateKeyEntry aKeyEntry = aKeyLoading.getKeyEntry ();
+              final Certificate [] aChain = aKeyEntry.getCertificateChain ();
+
+              // Key store path and password are fine
+              aTab.addChild (success (div ("Keystore is located at '" +
+                                           sKeyStorePath +
+                                           "' and was successfully loaded.")).addChild (div ("The private key with the alias '" +
+                                                                                             sAlias +
+                                                                                             "' was successfully loaded.")));
+
+              if (aChain.length > 0 && aChain[0] instanceof final X509Certificate aHead)
               {
-                if (eCert.isDeprecated ())
+                final String sIssuer = aHead.getIssuerX500Principal ().getName ();
+                final EPredefinedCA eCert = EPredefinedCA.getFromIssuerOrNull (sIssuer);
+                if (eCert != null)
                 {
-                  aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
-                                                                    .addChild (" " +
-                                                                               eCert.getDisplayName () +
-                                                                               " certificate!"));
-                  aTabLabel = addErrorHint.apply (aTabLabel);
+                  if (eCert.isDeprecated ())
+                  {
+                    aTab.addChild (warn ("You are currently using a ").addChild (strong ("deprecated"))
+                                                                      .addChild (" " +
+                                                                                 eCert.getDisplayName () +
+                                                                                 " certificate!"));
+                    aTabLabel = addErrorHint.apply (aTabLabel);
+                  }
+                  else
+                    aTab.addChild (info ("You are currently using a " + eCert.getDisplayName () + " certificate!"));
+                  if (aChain.length != eCert.getCertificateTreeLength ())
+                  {
+                    aTab.addChild (error ("The private key should be a chain of " +
+                                          eCert.getCertificateTreeLength () +
+                                          " certificates but it has " +
+                                          aChain.length +
+                                          " certificates. Please ensure that the respective root certificates are contained!"));
+                    aTabLabel = addErrorHint.apply (aTabLabel);
+                  }
+                }
+                // else: we don't care
+              }
+
+              final HCOL aUL = new HCOL ();
+              for (final Certificate aCert : aChain)
+              {
+                if (aCert instanceof final X509Certificate aX509Cert)
+                {
+                  final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
+                                                                                                   aX509Cert,
+                                                                                                   aNowDT,
+                                                                                                   aDisplayLocale);
+                  aUL.addItem (aCertDetails);
                 }
                 else
-                  aTab.addChild (info ("You are currently using a " + eCert.getDisplayName () + " certificate!"));
-                if (aChain.length != eCert.getCertificateTreeLength ())
                 {
-                  aTab.addChild (error ("The private key should be a chain of " +
-                                        eCert.getCertificateTreeLength () +
-                                        " certificates but it has " +
-                                        aChain.length +
-                                        " certificates. Please ensure that the respective root certificates are contained!"));
+                  aUL.addItem ("A chain entry is not an X.509 certificate! It is internally a " +
+                               ClassHelper.getClassName (aCert));
                   aTabLabel = addErrorHint.apply (aTabLabel);
                 }
               }
-              // else: we don't care
+              aTab.addChild (aUL);
             }
-
-            final HCOL aUL = new HCOL ();
-            for (final Certificate aCert : aChain)
-            {
-              if (aCert instanceof final X509Certificate aX509Cert)
-              {
-                final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
-                                                                                                 aX509Cert,
-                                                                                                 aNowDT,
-                                                                                                 aDisplayLocale);
-                aUL.addItem (aCertDetails);
-              }
-              else
-              {
-                aUL.addItem ("A chain entry is not an X.509 certificate! It is internally a " +
-                             ClassHelper.getClassName (aCert));
-                aTabLabel = addErrorHint.apply (aTabLabel);
-              }
-            }
-            aTab.addChild (aUL);
           }
-        }
         aTabBox.addTab ("pdkeystore", addSuccessHint.apply (aTabLabel), aTab);
       }
 
@@ -544,54 +553,63 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
 
         final HCNodeList aTab = new HCNodeList ();
 
-        final LoadedKeyStore aTrustStoreLR = PDClientConfiguration.loadTrustStore ();
-        if (aTrustStoreLR.isFailure ())
+        // The type is mandatory and loading without it throws an exception
+        final LoadedKeyStore aTrustStoreLR = PDClientConfiguration.getTrustStoreType () == null ? null
+                                                                                                : PDClientConfiguration.loadTrustStore ();
+        if (aTrustStoreLR == null)
         {
-          aTab.addChild (error (LoadedKeyStore.getLoadError (aTrustStoreLR)));
+          // TODO use constant in peppol-directory-client >= 1.0.2
+          aTab.addChild (error ("The configuration property 'pdclient.truststore.type' is missing."));
           aTabLabel = addErrorHint.apply (aTabLabel);
         }
         else
-        {
-          // Successfully loaded trust store
-          final String sTrustStorePath = PDClientConfiguration.getTrustStorePath ();
-          final KeyStore aTrustStore = aTrustStoreLR.getKeyStore ();
-
-          // Trust store path and password are fine
-          aTab.addChild (success (div ("Truststore is located at '" +
-                                       sTrustStorePath +
-                                       "' and was successfully loaded.")));
-
-          final HCOL aOL = new HCOL ();
-          try
+          if (aTrustStoreLR.isFailure ())
           {
-            for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
-            {
-              final Certificate aCert = aTrustStore.getCertificate (sAlias);
-              if (aCert instanceof final X509Certificate aX509Cert)
-              {
-                final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
-                                                                                                 aX509Cert,
-                                                                                                 aNowDT,
-                                                                                                 aDisplayLocale);
-                aOL.addItem (aCertDetails);
-              }
-              else
-              {
-                aOL.addItem ("The entry with alias '" +
-                             sAlias +
-                             "' is not an X.509 certificate! It is internally a " +
-                             ClassHelper.getClassName (aCert));
-                aTabLabel = addErrorHint.apply (aTabLabel);
-              }
-            }
-          }
-          catch (final GeneralSecurityException ex)
-          {
-            aOL.addItem (error ("Error iterating trust store.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+            aTab.addChild (error (LoadedKeyStore.getLoadError (aTrustStoreLR)));
             aTabLabel = addErrorHint.apply (aTabLabel);
           }
-          aTab.addChild (aOL);
-        }
+          else
+          {
+            // Successfully loaded trust store
+            final String sTrustStorePath = PDClientConfiguration.getTrustStorePath ();
+            final KeyStore aTrustStore = aTrustStoreLR.getKeyStore ();
+
+            // Trust store path and password are fine
+            aTab.addChild (success (div ("Truststore is located at '" +
+                                         sTrustStorePath +
+                                         "' and was successfully loaded.")));
+
+            final HCOL aOL = new HCOL ();
+            try
+            {
+              for (final String sAlias : new CommonsArrayList <> (aTrustStore.aliases ()))
+              {
+                final Certificate aCert = aTrustStore.getCertificate (sAlias);
+                if (aCert instanceof final X509Certificate aX509Cert)
+                {
+                  final BootstrapTable aCertDetails = CertificateUI.createCertificateDetailsTable (sAlias,
+                                                                                                   aX509Cert,
+                                                                                                   aNowDT,
+                                                                                                   aDisplayLocale);
+                  aOL.addItem (aCertDetails);
+                }
+                else
+                {
+                  aOL.addItem ("The entry with alias '" +
+                               sAlias +
+                               "' is not an X.509 certificate! It is internally a " +
+                               ClassHelper.getClassName (aCert));
+                  aTabLabel = addErrorHint.apply (aTabLabel);
+                }
+              }
+            }
+            catch (final GeneralSecurityException ex)
+            {
+              aOL.addItem (error ("Error iterating trust store.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+              aTabLabel = addErrorHint.apply (aTabLabel);
+            }
+            aTab.addChild (aOL);
+          }
         aTabBox.addTab ("pdtruststore", addSuccessHint.apply (aTabLabel), aTab);
       }
     }

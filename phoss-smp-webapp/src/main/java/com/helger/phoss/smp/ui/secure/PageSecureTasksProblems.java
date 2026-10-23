@@ -465,40 +465,55 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                      div ("A connection to the " + sDirectoryName + " server cannot be establised!"));
 
       // Check key store
-      final LoadedKeyStore aLoadedKeyStore = PDClientConfiguration.loadKeyStore ();
-      if (aLoadedKeyStore.isFailure ())
-      {
+      if (PDClientConfiguration.getKeyStoreType () == null)
         aOL.addItem (_createError ("The " + sDirectoryName + " client key store configuration is invalid."),
-                     div (LoadedKeyStore.getLoadError (aLoadedKeyStore)));
-      }
+                     div ("The configuration property 'pdclient.keystore.type' is missing."));
       else
       {
-        final KeyStore aKeyStore = aLoadedKeyStore.getKeyStore ();
-        final LoadedKey <KeyStore.PrivateKeyEntry> aLoadedKey = PDClientConfiguration.loadPrivateKey (aKeyStore);
-        if (aLoadedKey.isFailure ())
+        final LoadedKeyStore aLoadedKeyStore = PDClientConfiguration.loadKeyStore ();
+        if (aLoadedKeyStore.isFailure ())
         {
-          aOL.addItem (_createError ("The " +
-                                     sDirectoryName +
-                                     " client key store could be read, but the private key configuration is invalid."),
-                       div (LoadedKey.getLoadError (aLoadedKey)));
+          aOL.addItem (_createError ("The " + sDirectoryName + " client key store configuration is invalid."),
+                       div (LoadedKeyStore.getLoadError (aLoadedKeyStore)));
         }
         else
         {
-          _checkPrivateKey (aWPEC, aOL, aNowDT, aNowPlusDT, aLoadedKey.getKeyEntry ());
+          final KeyStore aKeyStore = aLoadedKeyStore.getKeyStore ();
+          final LoadedKey <KeyStore.PrivateKeyEntry> aLoadedKey = PDClientConfiguration.loadPrivateKey (aKeyStore);
+          if (aLoadedKey.isFailure ())
+          {
+            aOL.addItem (_createError ("The " +
+                                       sDirectoryName +
+                                       " client key store could be read, but the private key configuration is invalid."),
+                         div (LoadedKey.getLoadError (aLoadedKey)));
+          }
+          else
+          {
+            _checkPrivateKey (aWPEC, aOL, aNowDT, aNowPlusDT, aLoadedKey.getKeyEntry ());
+          }
         }
       }
 
       // Check trust store
-      final LoadedKeyStore aLoadedTrustStore = PDClientConfiguration.loadTrustStore ();
-      if (aLoadedTrustStore.isFailure ())
+      if (PDClientConfiguration.getTrustStoreType () == null)
       {
+        // TODO use constant in peppol-directory-client >= 1.0.2
         aOL.addItem (_createError ("The " + sDirectoryName + " client trust store configuration is invalid."),
-                     div (LoadedKeyStore.getLoadError (aLoadedTrustStore)));
+                     div ("The configuration property 'pdclient.truststore.type' is missing."));
       }
       else
       {
-        final KeyStore aTrustStore = aLoadedTrustStore.getKeyStore ();
-        _iterateTrustStore (aWPEC, aOL, aNowDT, aNowPlusDT, aTrustStore);
+        final LoadedKeyStore aLoadedTrustStore = PDClientConfiguration.loadTrustStore ();
+        if (aLoadedTrustStore.isFailure ())
+        {
+          aOL.addItem (_createError ("The " + sDirectoryName + " client trust store configuration is invalid."),
+                       div (LoadedKeyStore.getLoadError (aLoadedTrustStore)));
+        }
+        else
+        {
+          final KeyStore aTrustStore = aLoadedTrustStore.getKeyStore ();
+          _iterateTrustStore (aWPEC, aOL, aNowDT, aNowPlusDT, aTrustStore);
+        }
       }
     }
     else
