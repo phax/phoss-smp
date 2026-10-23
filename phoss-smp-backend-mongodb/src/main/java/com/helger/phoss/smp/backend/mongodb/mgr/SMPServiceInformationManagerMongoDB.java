@@ -103,6 +103,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
 
   private static final String BSON_ENDPOINTS_PATH = BSON_PROCESSES + "." + BSON_ENDPOINTS;
   private static final String BSON_ENDPOINT_REFERENCE_PATH = BSON_ENDPOINTS_PATH + "." + BSON_ENDPOINT_REFERENCE;
+  private static final String BSON_TECHCONTACTURL_PATH = BSON_ENDPOINTS_PATH + "." + BSON_TECHCONTACTURL;
   private static final String BSON_TRANSPORT_PROFILE_PATH = BSON_ENDPOINTS_PATH + "." + BSON_TRANSPORT_PROFILE;
 
   private final IIdentifierFactory m_aIdentifierFactory;
@@ -706,6 +707,68 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
         }
       if (bDocChanged)
         getCollection ().replaceOne (Filters.eq (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointTechnicalContactUrlUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    final Document aGroupID = new Document (BSON_TECHCONTACTURL, "$" + BSON_TECHCONTACTURL_PATH).append (BSON_SERVICE_GROUP_ID,
+                                                                                                         "$" +
+                                                                                                                                BSON_SERVICE_GROUP_ID);
+    for (final Document aDoc : getCollection ().aggregate (_createEndpointGroupPipeline (aGroupID))
+                                               .allowDiskUse (Boolean.TRUE))
+    {
+      final Document aID = aDoc.get (BSON_MONGO_ID, Document.class);
+      final String sURL = aID.getString (BSON_TECHCONTACTURL);
+      if (StringHelper.isNotEmpty (sURL))
+      {
+        final String sServiceGroupID = aID.getString (BSON_SERVICE_GROUP_ID);
+        final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
+        aInfo.addForServiceGroupID (sServiceGroupID, ((Number) aDoc.get (BSON_COUNT)).intValue ());
+      }
+    }
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointTechnicalContactUrls (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                                     @NonNull final String sOldURL,
+                                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    long nEndpointsChanged = 0;
+
+    // Find all documents that have matching endpoints
+    Bson aFilter = Filters.eq (BSON_TECHCONTACTURL_PATH, sOldURL);
+    if (aServiceGroupID != null)
+      aFilter = Filters.and (aFilter, Filters.eq (BSON_SERVICE_GROUP_ID, aServiceGroupID.getURIEncoded ()));
+
+    // Iterate each matching document, update endpoints in Java, and replace
+    for (final Document aDoc : getCollection ().find (aFilter))
+    {
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+              if (sOldURL.equals (aEndpoint.getString (BSON_TECHCONTACTURL)))
+              {
+                aEndpoint.put (BSON_TECHCONTACTURL, sNewURL);
+                bDocChanged = true;
+                nEndpointsChanged++;
+              }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
     }
     return nEndpointsChanged;
   }

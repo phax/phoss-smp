@@ -310,4 +310,34 @@ public interface ISMPServiceInformationManager
    */
   @Nonnegative
   long updateAllEndpointCertificates (@NonNull String sOldCert, @NonNull String sNewCert);
+
+  /**
+   * Get a map from endpoint technical contact URL to {@link EndpointUsageInfo} containing the count
+   * and service group IDs for each distinct URL. Only endpoints that have a non-empty technical
+   * contact URL are included.
+   *
+   * @return A non-<code>null</code> mutable map.
+   * @since 8.6.3
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsMap <String, IEndpointUsageInfo> getEndpointTechnicalContactUrlUsageMap ();
+
+  /**
+   * Bulk-update the technical contact URL of all matching endpoints.
+   *
+   * @param aServiceGroupID
+   *        Optional service group ID to limit the update to. If <code>null</code>, all service
+   *        groups are updated.
+   * @param sOldURL
+   *        The old technical contact URL to search for. May not be <code>null</code>.
+   * @param sNewURL
+   *        The new technical contact URL to set. May not be <code>null</code>.
+   * @return The number of endpoints that were changed. Always &ge; 0.
+   * @since 8.6.3
+   */
+  @Nonnegative
+  long updateAllEndpointTechnicalContactUrls (@Nullable IParticipantIdentifier aServiceGroupID,
+                                              @NonNull String sOldURL,
+                                              @NonNull String sNewURL);
 }

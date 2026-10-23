@@ -869,4 +869,51 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     }
     return nEndpointsChanged;
   }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointTechnicalContactUrlUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT technicalContactUrl, businessIdentifierScheme, businessIdentifier FROM " +
+                                                                          m_sTableNameE +
+                                                                          " WHERE technicalContactUrl IS NOT NULL");
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+      {
+        final String sURL = aRow.getAsString (0);
+        if (StringHelper.isNotEmpty (sURL))
+        {
+          final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (1), aRow.getAsString (2));
+
+          final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sURL, k -> new EndpointUsageInfo ());
+          ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+        }
+      }
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointTechnicalContactUrls (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                                     @NonNull final String sOldURL,
+                                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    if (aServiceGroupID != null)
+    {
+      return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                    m_sTableNameE +
+                                                    " SET technicalContactUrl=? WHERE technicalContactUrl=? AND businessIdentifierScheme=? AND businessIdentifier=?",
+                                                    new ConstantPreparedStatementDataProvider (sNewURL,
+                                                                                               sOldURL,
+                                                                                               aServiceGroupID.getScheme (),
+                                                                                               aServiceGroupID.getValue ()));
+    }
+    return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
+                                                  m_sTableNameE +
+                                                  " SET technicalContactUrl=? WHERE technicalContactUrl=?",
+                                                  new ConstantPreparedStatementDataProvider (sNewURL, sOldURL));
+  }
 }

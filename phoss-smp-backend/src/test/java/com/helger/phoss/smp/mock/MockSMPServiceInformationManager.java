@@ -153,4 +153,19 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   {
     return 0;
   }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointTechnicalContactUrlUsageMap ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nonnegative
+  public long updateAllEndpointTechnicalContactUrls (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                                     @NonNull final String sOldURL,
+                                                     @NonNull final String sNewURL)
+  {
+    return 0;
+  }
 }

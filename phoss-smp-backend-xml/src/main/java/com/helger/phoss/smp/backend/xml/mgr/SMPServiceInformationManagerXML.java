@@ -461,4 +461,54 @@ public final class SMPServiceInformationManagerXML extends
     });
     return aEndpointsChanged.longValue ();
   }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointTechnicalContactUrlUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    forEachValue (aSI -> {
+      for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+        for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          if (aEndpoint.hasTechnicalContactUrl ())
+          {
+            final IEndpointUsageInfo aInfo = ret.computeIfAbsent (aEndpoint.getTechnicalContactUrl (),
+                                                                  k -> new EndpointUsageInfo ());
+            ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (aSI.getServiceGroupID ());
+          }
+    });
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointTechnicalContactUrls (@Nullable final IParticipantIdentifier aServiceGroupID,
+                                                     @NonNull final String sOldURL,
+                                                     @NonNull final String sNewURL)
+  {
+    ValueEnforcer.notNull (sOldURL, "OldURL");
+    ValueEnforcer.notNull (sNewURL, "NewURL");
+
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave (() -> {
+      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
+      for (final ISMPServiceInformation aSI : aAllSIs)
+      {
+        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+          continue;
+
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+            if (sOldURL.equals (aEndpoint.getTechnicalContactUrl ()))
+            {
+              ((SMPEndpoint) aEndpoint).setTechnicalContactUrl (sNewURL);
+              bSIChanged = true;
+              aEndpointsChanged.inc ();
+            }
+        if (bSIChanged)
+          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
+  }
 }
