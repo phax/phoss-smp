@@ -33,12 +33,14 @@ import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCHiddenField;
+import com.helger.html.hc.html.grouping.HCDiv;
 import com.helger.html.hc.html.forms.HCSelect;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
 import com.helger.html.hc.html.textlevel.HCA;
 import com.helger.html.hc.impl.HCNodeList;
 import com.helger.html.hc.render.HCRenderer;
+import com.helger.peppol.ui.nicename.NiceNameUI;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -317,17 +319,21 @@ public final class PageSecureEndpointChangeServiceValidity extends AbstractSMPWe
                                                                       : null;
       final int nSGCount = aDocTypeUsageInfo != null ? aDocTypeUsageInfo.getServiceGroupCount () : 0;
       final int nEPCount = aDocTypeUsageInfo != null ? aDocTypeUsageInfo.getEndpointCount () : 0;
-      aNodeList.addChild (info ("The selected document type '" +
-                                sDocTypeID +
-                                "' is currently used in " +
-                                nEPCount +
-                                " " +
-                                (nEPCount == 1 ? "endpoint" : "endpoints") +
-                                " of " +
-                                nSGCount +
-                                " " +
-                                (nSGCount == 1 ? "service group" : "service groups") +
-                                "."));
+      final HCDiv aDocTypeDiv = div ("Selected document type: ");
+      if (aDocTypeID != null)
+        aDocTypeDiv.addChild (NiceNameUI.createDocTypeID (aDocTypeID, true));
+      else
+        aDocTypeDiv.addChild (sDocTypeID);
+      aNodeList.addChild (info ().addChildren (aDocTypeDiv,
+                                               div ("It is currently used in " +
+                                                    nEPCount +
+                                                    " " +
+                                                    (nEPCount == 1 ? "endpoint" : "endpoints") +
+                                                    " of " +
+                                                    nSGCount +
+                                                    " " +
+                                                    (nSGCount == 1 ? "service group" : "service groups") +
+                                                    ".")));
 
       // Show edit screen
       final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
@@ -396,7 +402,11 @@ public final class PageSecureEndpointChangeServiceValidity extends AbstractSMPWe
                                           new BootstrapDTColAction (aDisplayLocale)).setID (getID ());
       aDocTypeUsage.forEach ((sDocTypeID, aUsageInfo) -> {
         final HCRow aRow = aTable.addBodyRow ();
-        aRow.addCell (sDocTypeID);
+        final IDocumentTypeIdentifier aRowDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sDocTypeID);
+        if (aRowDocTypeID != null)
+          aRow.addCell (NiceNameUI.createDocTypeID (aRowDocTypeID, false));
+        else
+          aRow.addCell (sDocTypeID);
 
         aRow.addCell (Integer.toString (aUsageInfo.getServiceGroupCount ()));
 
