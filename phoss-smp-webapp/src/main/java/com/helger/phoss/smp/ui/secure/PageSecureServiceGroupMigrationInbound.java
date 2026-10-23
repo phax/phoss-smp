@@ -46,6 +46,7 @@ import com.helger.phoss.smp.CSMPServer;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.smlsync.SMLFirstPage;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
@@ -299,11 +300,9 @@ public final class PageSecureServiceGroupMigrationInbound extends AbstractSMPWeb
             if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aParticipantID))
             {
               bParticipantSourceIsThisSMP = true;
-              final IParticipantIdentifier aFinalParticipantID = aParticipantID;
-              // TODO create a specific API for that
-              final ISMPParticipantMigration aOutboundMigration = aParticipantMigrationMgr.getAllOutboundParticipantMigrations (EParticipantMigrationState.IN_PROGRESS)
-                                                                                          .findFirst (x -> x.getParticipantIdentifier ()
-                                                                                                            .hasSameContent (aFinalParticipantID));
+              final ISMPParticipantMigration aOutboundMigration = aParticipantMigrationMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
+                                                                                                                                  EParticipantMigrationState.IN_PROGRESS,
+                                                                                                                                  aParticipantID);
               sOutboundMigrationID = aOutboundMigration == null ? null : aOutboundMigration.getID ();
               LOGGER.info ("The inbound participant migration is for a participant from this SMP (Migration ID '" +
                            sOutboundMigrationID +
