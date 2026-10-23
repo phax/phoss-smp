@@ -318,7 +318,7 @@ public interface ISMPServiceInformationManager
    * contact URL are included.
    *
    * @return A non-<code>null</code> mutable map.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   @NonNull
   @ReturnsMutableCopy
@@ -335,7 +335,7 @@ public interface ISMPServiceInformationManager
    * @param sNewURL
    *        The new technical contact URL to set. May not be <code>null</code>.
    * @return The number of endpoints that were changed. Always &ge; 0.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   @Nonnegative
   long updateAllEndpointTechnicalContactUrls (@Nullable IParticipantIdentifier aServiceGroupID,
@@ -347,7 +347,7 @@ public interface ISMPServiceInformationManager
    * the count and service group IDs for each distinct document type. All endpoints are included.
    *
    * @return A non-<code>null</code> mutable map.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   @NonNull
   @ReturnsMutableCopy
@@ -375,7 +375,7 @@ public interface ISMPServiceInformationManager
    *        The new service expiration date time. Only evaluated if <code>bChangeExpiration</code>
    *        is <code>true</code>. <code>null</code> removes the value.
    * @return The number of endpoints that were selected for the change. Always &ge; 0.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   @Nonnegative
   long updateAllEndpointServiceValidity (@NonNull IDocumentTypeIdentifier aDocTypeID,

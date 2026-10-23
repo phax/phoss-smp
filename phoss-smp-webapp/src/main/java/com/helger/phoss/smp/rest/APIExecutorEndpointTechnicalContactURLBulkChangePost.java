@@ -60,7 +60,7 @@ import jakarta.annotation.Nullable;
  * "Bulk change technical contact URL".
  *
  * @author Philip Helger
- * @since 8.6.3
+ * @since 8.7.0
  */
 public final class APIExecutorEndpointTechnicalContactURLBulkChangePost extends AbstractSMPAPIExecutor
 {

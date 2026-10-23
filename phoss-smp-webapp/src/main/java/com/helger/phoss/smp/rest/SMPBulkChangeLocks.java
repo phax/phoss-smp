@@ -23,7 +23,7 @@ import com.helger.photon.security.lock.SingleRunLock;
  * are shared between the UI and the REST API.
  *
  * @author Philip Helger
- * @since 8.6.3
+ * @since 8.7.0
  */
 public final class SMPBulkChangeLocks
 {

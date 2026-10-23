@@ -119,7 +119,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   /**
    * @return The server name mode that is effectively used to build absolute URLs. Never
    *         <code>null</code>.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   @NonNull
   public EServerNameMode getEffectiveServerNameMode ()

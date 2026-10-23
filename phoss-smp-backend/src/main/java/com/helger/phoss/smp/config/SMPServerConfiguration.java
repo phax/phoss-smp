@@ -551,7 +551,7 @@ public final class SMPServerConfiguration
    *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code>. A duration of zero
    *         means that no <code>max-age</code> is sent. Missing, invalid or negative values result
    *         in {@link Duration#ZERO}. Never <code>null</code>.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   @NonNull
   public static Duration getRestCacheHttpMaxAge ()
@@ -570,7 +570,7 @@ public final class SMPServerConfiguration
    *         <code>ETag</code> header (SHA-256 of the response) and answer conditional requests
    *         with <code>304 Not Modified</code>, <code>false</code> if not. By default this is
    *         disabled.
-   * @since 8.6.3
+   * @since 8.7.0
    */
   public static boolean isRestCacheHttpETagEnabled ()
   {

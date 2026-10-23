@@ -61,7 +61,7 @@ import jakarta.annotation.Nullable;
  * change URL".
  *
  * @author Philip Helger
- * @since 8.6.3
+ * @since 8.7.0
  */
 public final class APIExecutorEndpointURLBulkChangePost extends AbstractSMPAPIExecutor
 {

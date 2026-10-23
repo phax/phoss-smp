@@ -266,7 +266,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aDeleteServiceMetadataProcess);
     }
 
-    // Bulk change of endpoints since 8.6.3
+    // Bulk change of endpoints since 8.7.0
     {
       final APIDescriptor aBulkChangeEndpointURL = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
                                                                                     "/url/bulk-change"),
