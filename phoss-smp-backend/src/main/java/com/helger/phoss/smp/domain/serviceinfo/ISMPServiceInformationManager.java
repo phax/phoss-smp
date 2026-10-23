@@ -26,6 +26,7 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.paging.IPagingSpec;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -340,4 +341,47 @@ public interface ISMPServiceInformationManager
   long updateAllEndpointTechnicalContactUrls (@Nullable IParticipantIdentifier aServiceGroupID,
                                               @NonNull String sOldURL,
                                               @NonNull String sNewURL);
+
+  /**
+   * Get a map from document type ID (in URI encoded form) to {@link EndpointUsageInfo} containing
+   * the count and service group IDs for each distinct document type. All endpoints are included.
+   *
+   * @return A non-<code>null</code> mutable map.
+   * @since 8.6.3
+   */
+  @NonNull
+  @ReturnsMutableCopy
+  ICommonsMap <String, IEndpointUsageInfo> getEndpointDocumentTypeUsageMap ();
+
+  /**
+   * Bulk-update the service activation date and/or the service expiration date of all endpoints of
+   * the provided document type.
+   *
+   * @param aDocTypeID
+   *        The document type ID to select the endpoints. May not be <code>null</code>.
+   * @param aServiceGroupID
+   *        Optional service group ID to limit the update to. If <code>null</code>, all service
+   *        groups are updated.
+   * @param bChangeActivation
+   *        <code>true</code> to change the service activation date time of the endpoints,
+   *        <code>false</code> to keep it unchanged.
+   * @param aNewActivation
+   *        The new service activation date time. Only evaluated if <code>bChangeActivation</code>
+   *        is <code>true</code>. <code>null</code> removes the value.
+   * @param bChangeExpiration
+   *        <code>true</code> to change the service expiration date time of the endpoints,
+   *        <code>false</code> to keep it unchanged.
+   * @param aNewExpiration
+   *        The new service expiration date time. Only evaluated if <code>bChangeExpiration</code>
+   *        is <code>true</code>. <code>null</code> removes the value.
+   * @return The number of endpoints that were selected for the change. Always &ge; 0.
+   * @since 8.6.3
+   */
+  @Nonnegative
+  long updateAllEndpointServiceValidity (@NonNull IDocumentTypeIdentifier aDocTypeID,
+                                         @Nullable IParticipantIdentifier aServiceGroupID,
+                                         boolean bChangeActivation,
+                                         @Nullable XMLOffsetDateTime aNewActivation,
+                                         boolean bChangeExpiration,
+                                         @Nullable XMLOffsetDateTime aNewExpiration);
 }

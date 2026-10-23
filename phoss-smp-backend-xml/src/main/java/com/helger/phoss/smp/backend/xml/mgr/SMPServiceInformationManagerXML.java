@@ -40,6 +40,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -505,6 +506,59 @@ public final class SMPServiceInformationManagerXML extends
               bSIChanged = true;
               aEndpointsChanged.inc ();
             }
+        if (bSIChanged)
+          m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+      }
+    });
+    return aEndpointsChanged.longValue ();
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointDocumentTypeUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    forEachValue (aSI -> {
+      final String sDocTypeID = aSI.getDocumentTypeIdentifier ().getURIEncoded ();
+      final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sDocTypeID, k -> new EndpointUsageInfo ());
+      ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (aSI.getServiceGroupID ());
+    });
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointServiceValidity (@NonNull final IDocumentTypeIdentifier aDocTypeID,
+                                                @Nullable final IParticipantIdentifier aServiceGroupID,
+                                                final boolean bChangeActivation,
+                                                @Nullable final XMLOffsetDateTime aNewActivation,
+                                                final boolean bChangeExpiration,
+                                                @Nullable final XMLOffsetDateTime aNewExpiration)
+  {
+    ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
+    ValueEnforcer.isTrue (bChangeActivation || bChangeExpiration, "At least one date must be changed");
+
+    final MutableLong aEndpointsChanged = new MutableLong (0);
+    performWithoutAutoSave (() -> {
+      final ICommonsList <ISMPServiceInformation> aAllSIs = getAllSMPServiceInformation ();
+      for (final ISMPServiceInformation aSI : aAllSIs)
+      {
+        if (!aSI.getDocumentTypeIdentifier ().hasSameContent (aDocTypeID))
+          continue;
+        if (aServiceGroupID != null && !aSI.getServiceGroupParticipantIdentifier ().hasSameContent (aServiceGroupID))
+          continue;
+
+        boolean bSIChanged = false;
+        for (final ISMPProcess aProcess : aSI.getAllProcesses ())
+          for (final ISMPEndpoint aEndpoint : aProcess.getAllEndpoints ())
+          {
+            final SMPEndpoint aRealEndpoint = (SMPEndpoint) aEndpoint;
+            if (bChangeActivation)
+              aRealEndpoint.setServiceActivationDateTime (aNewActivation);
+            if (bChangeExpiration)
+              aRealEndpoint.setServiceExpirationDateTime (aNewExpiration);
+            bSIChanged = true;
+            aEndpointsChanged.inc ();
+          }
         if (bSIChanged)
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
       }

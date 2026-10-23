@@ -781,4 +781,81 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     // As simple as it can be
     return getCollection ().find (Filters.eq (BSON_TRANSPORT_PROFILE_PATH, sTransportProfileID)).iterator ().hasNext ();
   }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointDocumentTypeUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    final Document aGroupID = new Document (BSON_DOCTYPE_ID, "$" + BSON_DOCTYPE_ID).append (BSON_SERVICE_GROUP_ID,
+                                                                                          "$" + BSON_SERVICE_GROUP_ID);
+    for (final Document aDoc : getCollection ().aggregate (_createEndpointGroupPipeline (aGroupID))
+                                               .allowDiskUse (Boolean.TRUE))
+    {
+      final Document aID = aDoc.get (BSON_MONGO_ID, Document.class);
+      final IDocumentTypeIdentifier aDocTypeID = toDocumentTypeID (aID.get (BSON_DOCTYPE_ID, Document.class));
+      if (aDocTypeID != null)
+      {
+        final String sServiceGroupID = aID.getString (BSON_SERVICE_GROUP_ID);
+        final EndpointUsageInfo aInfo = (EndpointUsageInfo) ret.computeIfAbsent (aDocTypeID.getURIEncoded (),
+                                                                                 k -> new EndpointUsageInfo ());
+        aInfo.addForServiceGroupID (sServiceGroupID, ((Number) aDoc.get (BSON_COUNT)).intValue ());
+      }
+    }
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointServiceValidity (@NonNull final IDocumentTypeIdentifier aDocTypeID,
+                                                @Nullable final IParticipantIdentifier aServiceGroupID,
+                                                final boolean bChangeActivation,
+                                                @Nullable final XMLOffsetDateTime aNewActivation,
+                                                final boolean bChangeExpiration,
+                                                @Nullable final XMLOffsetDateTime aNewExpiration)
+  {
+    ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
+    ValueEnforcer.isTrue (bChangeActivation || bChangeExpiration, "At least one date must be changed");
+
+    long nEndpointsChanged = 0;
+
+    Bson aFilter = new Document (BSON_DOCTYPE_ID, toBson (aDocTypeID));
+    if (aServiceGroupID != null)
+      aFilter = Filters.and (aFilter, Filters.eq (BSON_SERVICE_GROUP_ID, aServiceGroupID.getURIEncoded ()));
+
+    // Iterate each matching document, update endpoints in Java, and replace
+    for (final Document aDoc : getCollection ().find (aFilter))
+    {
+      boolean bDocChanged = false;
+      final List <Document> aProcesses = aDoc.getList (BSON_PROCESSES, Document.class);
+      if (aProcesses != null)
+        for (final Document aProcess : aProcesses)
+        {
+          final List <Document> aEndpoints = aProcess.getList (BSON_ENDPOINTS, Document.class);
+          if (aEndpoints != null)
+            for (final Document aEndpoint : aEndpoints)
+            {
+              // Same storage logic as in toBson: absent if not set
+              if (bChangeActivation)
+              {
+                if (aNewActivation != null)
+                  aEndpoint.put (BSON_SERVICEACTIVATION, TypeConverter.convert (aNewActivation, Date.class));
+                else
+                  aEndpoint.remove (BSON_SERVICEACTIVATION);
+              }
+              if (bChangeExpiration)
+              {
+                if (aNewExpiration != null)
+                  aEndpoint.put (BSON_SERVICEEXPIRATION, TypeConverter.convert (aNewExpiration, Date.class));
+                else
+                  aEndpoint.remove (BSON_SERVICEEXPIRATION);
+              }
+              bDocChanged = true;
+              nEndpointsChanged++;
+            }
+        }
+      if (bDocChanged)
+        getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+    }
+    return nEndpointsChanged;
+  }
 }

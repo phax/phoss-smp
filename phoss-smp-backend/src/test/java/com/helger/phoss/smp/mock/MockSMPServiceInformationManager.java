@@ -24,6 +24,7 @@ import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -165,6 +166,24 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
   public long updateAllEndpointTechnicalContactUrls (@Nullable final IParticipantIdentifier aServiceGroupID,
                                                      @NonNull final String sOldURL,
                                                      @NonNull final String sNewURL)
+  {
+    return 0;
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointDocumentTypeUsageMap ()
+  {
+    throw new UnsupportedOperationException ();
+  }
+
+  @Nonnegative
+  public long updateAllEndpointServiceValidity (@NonNull final IDocumentTypeIdentifier aDocTypeID,
+                                                @Nullable final IParticipantIdentifier aServiceGroupID,
+                                                final boolean bChangeActivation,
+                                                @Nullable final XMLOffsetDateTime aNewActivation,
+                                                final boolean bChangeExpiration,
+                                                @Nullable final XMLOffsetDateTime aNewExpiration)
   {
     return 0;
   }

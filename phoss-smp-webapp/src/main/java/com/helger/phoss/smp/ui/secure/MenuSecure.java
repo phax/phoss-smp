@@ -125,6 +125,8 @@ public final class MenuSecure
       aMenuTree.createItem (aEndpoints,
                             new PageSecureEndpointChangeTechnicalContactURL (CMenuSecure.MENU_ENDPOINTS_CHANGE_TECHNICAL_CONTACT_URL));
       aMenuTree.createItem (aEndpoints,
+                            new PageSecureEndpointChangeServiceValidity (CMenuSecure.MENU_ENDPOINTS_CHANGE_SERVICE_VALIDITY));
+      aMenuTree.createItem (aEndpoints,
                             new PageSecureEndpointChangeCertificate (CMenuSecure.MENU_ENDPOINTS_CHANGE_CERTIFICATE));
     }
     aMenuTree.createRootItem (new PageSecureRedirect (CMenuSecure.MENU_REDIRECTS));

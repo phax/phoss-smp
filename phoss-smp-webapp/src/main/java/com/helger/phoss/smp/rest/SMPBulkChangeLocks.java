@@ -29,6 +29,7 @@ public final class SMPBulkChangeLocks
 {
   public static final SingleRunLock ENDPOINT_URL = new SingleRunLock ("Bulk change of the endpoint URL");
   public static final SingleRunLock ENDPOINT_TECHNICAL_CONTACT_URL = new SingleRunLock ("Bulk change of the endpoint technical contact URL");
+  public static final SingleRunLock ENDPOINT_SERVICE_VALIDITY = new SingleRunLock ("Bulk change of the endpoint service validity");
   public static final SingleRunLock ENDPOINT_CERTIFICATE = new SingleRunLock ("Bulk change of the endpoint certificate");
 
   private SMPBulkChangeLocks ()

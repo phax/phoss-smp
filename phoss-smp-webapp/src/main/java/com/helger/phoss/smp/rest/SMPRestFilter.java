@@ -284,6 +284,14 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aBulkChangeEndpointTechnicalContactURL);
     }
     {
+      final APIDescriptor aBulkChangeEndpointServiceValidity = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
+                                                                                                "/servicevalidity/bulk-change"),
+                                                                                  new APIExecutorEndpointServiceValidityBulkChangePost ());
+      aBulkChangeEndpointServiceValidity.allowedMimeTypes ().add (CMimeType.APPLICATION_JSON.getAsString ());
+      aBulkChangeEndpointServiceValidity.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aBulkChangeEndpointServiceValidity);
+    }
+    {
       final APIDescriptor aBulkChangeEndpointCertificate = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
                                                                                             "/certificate/bulk-change"),
                                                                               new APIExecutorEndpointCertificateBulkChangePost ());

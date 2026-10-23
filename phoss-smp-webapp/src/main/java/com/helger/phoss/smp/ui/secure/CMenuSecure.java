@@ -42,6 +42,7 @@ public final class CMenuSecure
   public static final String MENU_ENDPOINT_TREE = "endpoint_tree";
   public static final String MENU_ENDPOINTS_CHANGE_URL = "endpoints_change_url";
   public static final String MENU_ENDPOINTS_CHANGE_TECHNICAL_CONTACT_URL = "endpoints_change_technical_contact_url";
+  public static final String MENU_ENDPOINTS_CHANGE_SERVICE_VALIDITY = "endpoints_change_service_validity";
   public static final String MENU_ENDPOINTS_CHANGE_CERTIFICATE = "endpoints_change_certificate";
 
   public static final String MENU_REDIRECTS = "redirects";

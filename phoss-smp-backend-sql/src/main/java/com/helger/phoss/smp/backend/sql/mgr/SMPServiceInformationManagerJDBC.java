@@ -48,6 +48,7 @@ import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.peppolid.CIdentifier;
+import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -915,5 +916,62 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                   m_sTableNameE +
                                                   " SET technicalContactUrl=? WHERE technicalContactUrl=?",
                                                   new ConstantPreparedStatementDataProvider (sNewURL, sOldURL));
+  }
+
+  @NonNull
+  @ReturnsMutableCopy
+  public ICommonsMap <String, IEndpointUsageInfo> getEndpointDocumentTypeUsageMap ()
+  {
+    final ICommonsMap <String, IEndpointUsageInfo> ret = new CommonsHashMap <> ();
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT documentIdentifierScheme, documentIdentifier, businessIdentifierScheme, businessIdentifier FROM " +
+                                                                          m_sTableNameE);
+    if (aDBResult != null)
+      for (final DBResultRow aRow : aDBResult)
+      {
+        final String sDocTypeID = CIdentifier.getURIEncoded (aRow.getAsString (0), aRow.getAsString (1));
+        final String sServiceGroupID = CIdentifier.getURIEncoded (aRow.getAsString (2), aRow.getAsString (3));
+
+        final IEndpointUsageInfo aInfo = ret.computeIfAbsent (sDocTypeID, k -> new EndpointUsageInfo ());
+        ((EndpointUsageInfo) aInfo).incrementForServiceGroupID (sServiceGroupID);
+      }
+    return ret;
+  }
+
+  @Nonnegative
+  public long updateAllEndpointServiceValidity (@NonNull final IDocumentTypeIdentifier aDocTypeID,
+                                                @Nullable final IParticipantIdentifier aServiceGroupID,
+                                                final boolean bChangeActivation,
+                                                @Nullable final XMLOffsetDateTime aNewActivation,
+                                                final boolean bChangeExpiration,
+                                                @Nullable final XMLOffsetDateTime aNewExpiration)
+  {
+    ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
+    ValueEnforcer.isTrue (bChangeActivation || bChangeExpiration, "At least one date must be changed");
+
+    final ICommonsList <Object> aParams = new CommonsArrayList <> ();
+    final StringBuilder aSQL = new StringBuilder ("UPDATE ").append (m_sTableNameE).append (" SET ");
+    if (bChangeActivation)
+    {
+      aSQL.append ("serviceActivationDate=?");
+      aParams.add (DBValueHelper.toTimestamp (aNewActivation));
+    }
+    if (bChangeExpiration)
+    {
+      if (bChangeActivation)
+        aSQL.append (", ");
+      aSQL.append ("serviceExpirationDate=?");
+      aParams.add (DBValueHelper.toTimestamp (aNewExpiration));
+    }
+    aSQL.append (" WHERE documentIdentifierScheme=? AND documentIdentifier=?");
+    aParams.add (aDocTypeID.getScheme ());
+    aParams.add (aDocTypeID.getValue ());
+    if (aServiceGroupID != null)
+    {
+      aSQL.append (" AND businessIdentifierScheme=? AND businessIdentifier=?");
+      aParams.add (aServiceGroupID.getScheme ());
+      aParams.add (aServiceGroupID.getValue ());
+    }
+    return newExecutor ().insertOrUpdateOrDelete (aSQL.toString (),
+                                                  new ConstantPreparedStatementDataProvider (aParams));
   }
 }
