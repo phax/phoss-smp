@@ -12,8 +12,10 @@ package com.helger.phoss.smp.smlsync;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +68,25 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
   private final File m_aReportFile;
   private final ESMLRepairAction m_eAction;
   private final String m_sUserID;
+  private final Set <String> m_aSelectedURIs;
 
+  /**
+   * @param aReportFile
+   *        The reconciliation report. May not be <code>null</code>.
+   * @param eAction
+   *        The action to perform. May not be <code>null</code>.
+   * @param sUserID
+   *        The ID of the starting user. May neither be <code>null</code> nor empty.
+   * @param aSelectedURIs
+   *        The URI encoded participant identifiers to act on. Only entries that are contained in
+   *        the report are ever acted on, so this can never extend the report. May be
+   *        <code>null</code> to act on all participants of the report.
+   * @since 8.7.0
+   */
   public SMLRepairJob (@NonNull final File aReportFile,
                        @NonNull final ESMLRepairAction eAction,
-                       @NonNull @Nonempty final String sUserID)
+                       @NonNull @Nonempty final String sUserID,
+                       @Nullable final Set <String> aSelectedURIs)
   {
     super (JOB_TYPE,
            new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Repair the SML registration differences"),
@@ -80,6 +97,7 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
     m_aReportFile = aReportFile;
     m_eAction = eAction;
     m_sUserID = sUserID;
+    m_aSelectedURIs = aSelectedURIs;
   }
 
   /**
@@ -116,6 +134,18 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
       aCaller.delete (sSMPID, aPI);
   }
 
+  private static boolean _isNotFound (@NonNull final Exception ex)
+  {
+    return ex instanceof com.helger.peppol.smlclient.participant.NotFoundFault;
+  }
+
+  private static boolean _isAlreadyInUse (@NonNull final String sErrorMsg)
+  {
+    // The SML reports this as a badRequestFault with a message - there is no dedicated fault
+    final String sLower = sErrorMsg.toLowerCase (CSMPServer.DEFAULT_LOCALE);
+    return sLower.contains ("already in use") || sLower.contains ("already exist");
+  }
+
   @NonNull
   public LongRunningJobResult createLongRunningJobResult ()
   {
@@ -140,6 +170,10 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
     try
     {
       SMLSyncReport.readEntry (m_aReportFile, m_eAction.getReportEntry (), sURI -> {
+        // Not selected
+        if (m_aSelectedURIs != null && !m_aSelectedURIs.contains (sURI))
+          return;
+
         final IParticipantIdentifier aPI = aIdentifierFactory.parseParticipantIdentifier (sURI);
         if (aPI == null)
           aUnparsable.add (sURI);
@@ -172,7 +206,7 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
         .append (m_aReportFile.getName ())
         .append ("\nSMP ID: ")
         .append (sSMPID)
-        .append ("\nParticipants in the report: ")
+        .append (m_aSelectedURIs == null ? "\nParticipants in the report: " : "\nSelected participants of the report: ")
         .append (aAll.size ())
         .append ("\nChunk size: ")
         .append (nChunkSize)
@@ -319,18 +353,6 @@ public class SMLRepairJob extends AbstractLongRunningJobRunnable
     SMLRepairHistory.recordRepair (m_aReportFile.getName (), m_eAction, nSucceeded, nAlreadyDone, nFailed);
 
     return LongRunningJobResult.createText (aLog.toString ());
-  }
-
-  private static boolean _isAlreadyInUse (@NonNull final String sErrorMsg)
-  {
-    // The SML reports this as a badRequestFault with a message - there is no dedicated fault
-    final String sLower = sErrorMsg.toLowerCase (CSMPServer.DEFAULT_LOCALE);
-    return sLower.contains ("already in use") || sLower.contains ("already exist");
-  }
-
-  private static boolean _isNotFound (@NonNull final Exception ex)
-  {
-    return ex instanceof com.helger.peppol.smlclient.participant.NotFoundFault;
   }
 
   @Override

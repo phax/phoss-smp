@@ -19,6 +19,7 @@ package com.helger.phoss.smp.ui.secure;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -26,12 +27,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
+import com.helger.annotation.Nonnegative;
 import com.helger.base.compare.ESortOrder;
 import com.helger.base.string.StringHelper;
+import com.helger.base.string.StringParser;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsLinkedHashSet;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.datetime.format.PDTToString;
 import com.helger.html.hc.IHCNode;
+import com.helger.html.hc.html.forms.HCCheckBox;
+import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.grouping.HCUL;
 import com.helger.html.hc.html.tabular.HCRow;
 import com.helger.html.hc.html.tabular.HCTable;
@@ -48,8 +55,10 @@ import com.helger.phoss.smp.smlsync.SMLSyncResult;
 import com.helger.photon.bootstrap5.badge.BootstrapBadge;
 import com.helger.photon.bootstrap5.badge.EBootstrapBadgeType;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
+import com.helger.photon.bootstrap5.button.BootstrapSubmitButton;
 import com.helger.photon.bootstrap5.button.EBootstrapButtonType;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
+import com.helger.photon.bootstrap5.form.BootstrapForm;
 import com.helger.photon.bootstrap5.uictrls.datatables.BootstrapDataTables;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.PhotonBasicManager;
@@ -74,6 +83,15 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
 {
   private static final String PARAM_JOB_ID = "jobid";
   private static final String PARAM_REPAIR_ACTION = "repairaction";
+  private static final String PARAM_LIMIT = "limit";
+  private static final String PARAM_PRESELECT = "preselect";
+  /** The name of the checkbox of a single participant */
+  private static final String FIELD_PARTICIPANT = "pi";
+  private static final String ACTION_CONFIRM = "confirm";
+  private static final String VALUE_ALL = "all";
+  private static final String VALUE_NONE = "none";
+  private static final int DEFAULT_LIMIT = 100;
+  private static final int [] LIMITS = { DEFAULT_LIMIT, 1000, 10000 };
   private static final int PREVIEW_COUNT = 20;
 
   private static final Logger LOGGER = LoggerFactory.getLogger (PageSecureSMLRegRepair.class);
@@ -119,7 +137,8 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
 
   private void _startRepair (@NonNull final WebPageExecutionContext aWPEC,
                              @NonNull final File aReportFile,
-                             @NonNull final ESMLRepairAction eAction)
+                             @NonNull final ESMLRepairAction eAction,
+                             @NonNull final Set <String> aSelectedURIs)
   {
     // The same lock as the reconciliation - a repair must not run while the SML list is being read
     if (!CSMLSync.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
@@ -132,7 +151,7 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       {
         PhotonWorkerPool.getInstance ()
                         .run (SMLRepairJob.JOB_TYPE,
-                              new SMLRepairJob (aReportFile, eAction, aWPEC.getLoggedInUserID ()));
+                              new SMLRepairJob (aReportFile, eAction, aWPEC.getLoggedInUserID (), aSelectedURIs));
       }
       catch (final RuntimeException ex)
       {
@@ -141,28 +160,93 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
         throw ex;
       }
 
-      LOGGER.info ("Started the SML repair '" + eAction.getID () + "' from report '" + aReportFile.getName () + "'");
+      LOGGER.info ("Started the SML repair '" +
+                   eAction.getID () +
+                   "' from report '" +
+                   aReportFile.getName () +
+                   "' for " +
+                   aSelectedURIs.size () +
+                   " selected participant(s)");
       aWPEC.postRedirectGetInternal (success (div ("The repair is now running in the background. The result appears on this page as soon as it is finished.")).addChild (div ("The numbers of the report will not change - run a new reconciliation afterwards to see the current state.")));
     }
   }
 
+  @Nonnegative
+  private static int _getLimit (@Nullable final String sLimit)
+  {
+    if (VALUE_ALL.equals (sLimit))
+      return Integer.MAX_VALUE;
+
+    final int ret = StringParser.parseInt (sLimit, DEFAULT_LIMIT);
+    for (final int n : LIMITS)
+      if (n == ret)
+        return ret;
+    return DEFAULT_LIMIT;
+  }
+
+  @NonNull
+  private static ICommonsSet <String> _getSelected (@NonNull final WebPageExecutionContext aWPEC)
+  {
+    final ICommonsSet <String> ret = new CommonsLinkedHashSet <> ();
+    // The parameter container only offers single values
+    final String [] aValues = aWPEC.getRequestScope ().getRequest ().getParameterValues (FIELD_PARTICIPANT);
+    if (aValues != null)
+      for (final String sURI : aValues)
+        if (StringHelper.isNotEmpty (sURI))
+          ret.add (sURI.trim ());
+    return ret;
+  }
+
+  private void _addWarnings (@NonNull final HCNodeList aNodeList,
+                             @NonNull final ESMLRepairAction eAction,
+                             @NonNull final String sCount)
+  {
+    if (eAction.isLocalOperation ())
+    {
+      aNodeList.addChild (info (div ("This would create " + sCount + " Service Group(s) locally, owned by you."))
+                                                                                                                 .addChild (div ("Nothing is sent to the SML - these participants are already registered there, which is exactly why they show up as orphans."))
+                                                                                                                 .addChild (div ("The Service Groups are created without any endpoint, so the participants stay unreachable until their endpoints are added.")));
+    }
+    else
+    {
+      aNodeList.addChild (info (div ("This would send " +
+                                     sCount +
+                                     " participant(s) to the SML, in chunks of " +
+                                     SMPServerConfiguration.getSMLRepairChunkSize () +
+                                     ".")).addChild (div ("The report was created at a point in time and the SML may have changed since. Participants that are already in the wanted state are counted separately and are not treated as an error.")));
+
+      if (eAction.isDestructive ())
+      {
+        aNodeList.addChild (error (div ("This removes participants from the SML, which makes them unreachable.")).addChild (div ("Every removed participant becomes free for another SMP to claim, so this cannot reliably be undone.")));
+        aNodeList.addChild (info (div ("If these participants are missing locally because local data was lost, ")).addChild (em ("Create orphans locally"))
+                                                                                                                  .addChild (" is what you want instead - it adopts them rather than deleting them from the network."));
+      }
+    }
+  }
+
   /**
-   * Show what the selected action would do, and require an explicit confirmation before anything is
-   * sent to the SML.
+   * Show the participants of the report that the selected action operates on, so that the operator
+   * can select the ones to act on.
    */
-  private void _showDryRun (@NonNull final WebPageExecutionContext aWPEC,
-                            @NonNull final File aReportFile,
-                            @NonNull final ESMLRepairAction eAction)
+  private void _showSelection (@NonNull final WebPageExecutionContext aWPEC,
+                               @NonNull final File aReportFile,
+                               @NonNull final ESMLRepairAction eAction)
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
 
-    final ICommonsList <String> aPreview = new CommonsArrayList <> ();
+    final String sJobID = aWPEC.params ().getAsStringTrimmed (PARAM_JOB_ID);
+    final String sLimitParam = aWPEC.params ().getAsStringTrimmed (PARAM_LIMIT);
+    final int nLimit = _getLimit (sLimitParam);
+    final boolean bPreselect = VALUE_ALL.equals (aWPEC.params ().getAsStringTrimmed (PARAM_PRESELECT));
+
+    // Only the shown participants are kept in memory
+    final ICommonsList <String> aShown = new CommonsArrayList <> ();
     final int nTotal;
     try
     {
       nTotal = SMLSyncReport.readEntry (aReportFile, eAction.getReportEntry (), sURI -> {
-        if (aPreview.size () < PREVIEW_COUNT)
-          aPreview.add (sURI);
+        if (aShown.size () < nLimit)
+          aShown.add (sURI);
       });
     }
     catch (final Exception ex)
@@ -179,44 +263,112 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
       return;
     }
 
-    if (eAction.isLocalOperation ())
-    {
-      aNodeList.addChild (info (div ("This would create " + nTotal + " Service Group(s) locally, owned by you."))
-                                                                                                                 .addChild (div ("Nothing is sent to the SML - these participants are already registered there, which is exactly why they show up as orphans."))
-                                                                                                                 .addChild (div ("The Service Groups are created without any endpoint, so the participants stay unreachable until their endpoints are added.")));
-    }
-    else
-    {
-      aNodeList.addChild (info (div ("This would send " +
-                                     nTotal +
-                                     " participant(s) to the SML, in chunks of " +
-                                     SMPServerConfiguration.getSMLRepairChunkSize () +
-                                     ".")).addChild (div ("The report was created at a point in time and the SML may have changed since. Participants that are already in the wanted state are counted separately and are not treated as an error.")));
+    aNodeList.addChild (info ("Select the participants this action should be applied to. Nothing is selected by default and nothing is sent anywhere before you confirmed the selection on the next page."));
 
-      if (eAction.isDestructive ())
-      {
-        aNodeList.addChild (error (div ("This removes participants from the SML, which makes them unreachable.")).addChild (div ("Every removed participant becomes free for another SMP to claim, so this cannot reliably be undone.")));
-        aNodeList.addChild (info (div ("If these participants are missing locally because local data was lost, ")).addChild (em ("Create orphans locally"))
-                                                                                                                  .addChild (" is what you want instead - it adopts them rather than deleting them from the network."));
-      }
+    if (nTotal > aShown.size ())
+    {
+      aNodeList.addChild (warn ("The report contains " +
+                                nTotal +
+                                " participants for this action but only the first " +
+                                aShown.size () +
+                                " are shown. Increase the number of shown participants to be able to select more."));
     }
+
+    // Number of shown participants + select all/none
+    final BootstrapButtonToolbar aLimitToolbar = aNodeList.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
+    for (final int n : LIMITS)
+      aLimitToolbar.addChild (new BootstrapButton (nLimit == n ? EBootstrapButtonType.PRIMARY
+                                                               : EBootstrapButtonType.OUTLINE_SECONDARY).addChild ("Show " +
+                                                                                                                   n)
+                                                                                                        .setOnClick (aWPEC.getSelfHref ()
+                                                                                                                          .add (PARAM_JOB_ID,
+                                                                                                                                sJobID)
+                                                                                                                          .add (PARAM_REPAIR_ACTION,
+                                                                                                                                eAction.getID ())
+                                                                                                                          .add (PARAM_LIMIT,
+                                                                                                                                n)));
+    aLimitToolbar.addChild (new BootstrapButton (nLimit == Integer.MAX_VALUE ? EBootstrapButtonType.PRIMARY
+                                                                             : EBootstrapButtonType.OUTLINE_SECONDARY).addChild ("Show all")
+                                                                                                                      .setOnClick (aWPEC.getSelfHref ()
+                                                                                                                                        .add (PARAM_JOB_ID,
+                                                                                                                                              sJobID)
+                                                                                                                                        .add (PARAM_REPAIR_ACTION,
+                                                                                                                                              eAction.getID ())
+                                                                                                                                        .add (PARAM_LIMIT,
+                                                                                                                                              VALUE_ALL)));
+    for (final String sPreselect : new String [] { VALUE_ALL, VALUE_NONE })
+      aLimitToolbar.addButton (VALUE_ALL.equals (sPreselect) ? "Select all shown" : "Select none",
+                               aWPEC.getSelfHref ()
+                                    .add (PARAM_JOB_ID, sJobID)
+                                    .add (PARAM_REPAIR_ACTION, eAction.getID ())
+                                    .addIf (PARAM_LIMIT, sLimitParam, StringHelper::isNotEmpty)
+                                    .add (PARAM_PRESELECT, sPreselect),
+                               EDefaultIcon.REFRESH);
+
+    final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
+    aForm.addChild (new HCHiddenField (PARAM_JOB_ID, sJobID));
+    aForm.addChild (new HCHiddenField (PARAM_REPAIR_ACTION, eAction.getID ()));
+
+    // No DataTables here: it removes filtered and paged rows from the DOM, so checked
+    // participants on other pages would silently not be submitted
+    final HCTable aTable = new HCTable (new DTCol ("Select"), new DTCol ("Participant ID"));
+    for (final String sURI : aShown)
+      aTable.addBodyRow ()
+            .addCell (new HCCheckBox ().setName (FIELD_PARTICIPANT).setValue (sURI).setChecked (bPreselect))
+            .addCell (new HCCode ().addChild (sURI));
+    aForm.addChild (aTable);
+
+    final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
+    aToolbar.addHiddenField (CPageParam.PARAM_ACTION, ACTION_CONFIRM);
+    aToolbar.addChild (new BootstrapSubmitButton ().addChild ("Continue with the selected participants")
+                                                   .setIcon (EDefaultIcon.NEXT)
+                                                   .setDisabled (CSMLSync.LOCK.isRunning ()));
+    aToolbar.addButton ("Cancel", aWPEC.getSelfHref (), EDefaultIcon.CANCEL);
+  }
+
+  /**
+   * Show what the selected action would do for the selected participants, and require an explicit
+   * confirmation before anything is sent to the SML.
+   */
+  private void _showConfirm (@NonNull final WebPageExecutionContext aWPEC,
+                             @NonNull final ESMLRepairAction eAction,
+                             @NonNull final Set <String> aSelectedURIs)
+  {
+    final HCNodeList aNodeList = aWPEC.getNodeList ();
+
+    aNodeList.addChild (getUIHandler ().createActionHeader (eAction.getDisplayName ()));
+    _addWarnings (aNodeList, eAction, Integer.toString (aSelectedURIs.size ()));
 
     final HCUL aUL = new HCUL ();
-    for (final String sURI : aPreview)
+    int nShown = 0;
+    for (final String sURI : aSelectedURIs)
+    {
+      if (nShown++ >= PREVIEW_COUNT)
+        break;
       aUL.addItem (new HCCode ().addChild (sURI));
-    if (nTotal > aPreview.size ())
-      aUL.addItem (em ("... and " + (nTotal - aPreview.size ()) + " more - see the report for the complete list"));
+    }
+    if (aSelectedURIs.size () > PREVIEW_COUNT)
+      aUL.addItem (em ("... and " + (aSelectedURIs.size () - PREVIEW_COUNT) + " more"));
     aNodeList.addChild (aUL);
 
-    final BootstrapButtonToolbar aToolbar = aNodeList.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
-    aToolbar.addChild (new BootstrapButton ().addChild ("Yes, perform this on the SML")
-                                             .setIcon (EDefaultIcon.YES)
-                                             .setOnClick (aWPEC.getSelfHref ()
-                                                               .add (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM)
-                                                               .add (PARAM_JOB_ID,
-                                                                     aWPEC.params ().getAsStringTrimmed (PARAM_JOB_ID))
-                                                               .add (PARAM_REPAIR_ACTION, eAction.getID ()))
-                                             .setDisabled (CSMLSync.LOCK.isRunning ()));
+    final BootstrapForm aForm = aNodeList.addAndReturnChild (getUIHandler ().createFormSelf (aWPEC));
+    aForm.addChild (new HCHiddenField (PARAM_JOB_ID, aWPEC.params ().getAsStringTrimmed (PARAM_JOB_ID)));
+    aForm.addChild (new HCHiddenField (PARAM_REPAIR_ACTION, eAction.getID ()));
+    for (final String sURI : aSelectedURIs)
+      aForm.addChild (new HCHiddenField (FIELD_PARTICIPANT, sURI));
+
+    final BootstrapButtonToolbar aToolbar = aForm.addAndReturnChild (getUIHandler ().createToolbar (aWPEC));
+    aToolbar.addHiddenField (CPageParam.PARAM_ACTION, CPageParam.ACTION_PERFORM);
+    aToolbar.addChild (new BootstrapSubmitButton ().addChild ("Yes, perform this on the " +
+                                                              aSelectedURIs.size () +
+                                                              " selected participant(s)")
+                                                   .setIcon (EDefaultIcon.YES)
+                                                   .setDisabled (CSMLSync.LOCK.isRunning ()));
+    aToolbar.addButton ("Back to the selection",
+                        aWPEC.getSelfHref ()
+                             .add (PARAM_JOB_ID, aWPEC.params ().getAsStringTrimmed (PARAM_JOB_ID))
+                             .add (PARAM_REPAIR_ACTION, eAction.getID ()),
+                        EDefaultIcon.BACK);
     aToolbar.addButton ("Cancel", aWPEC.getSelfHref (), EDefaultIcon.CANCEL);
   }
 
@@ -235,12 +387,24 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
 
     if (aReportFile != null && eAction != null)
     {
-      if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
+      if (aWPEC.hasAction (CPageParam.ACTION_PERFORM) || aWPEC.hasAction (ACTION_CONFIRM))
       {
-        _startRepair (aWPEC, aReportFile, eAction);
-        // Never reached - the action performs a redirect
+        final ICommonsSet <String> aSelectedURIs = _getSelected (aWPEC);
+        if (aSelectedURIs.isEmpty ())
+          aNodeList.addChild (warn ("No participant was selected."));
+        else
+          if (aWPEC.hasAction (CPageParam.ACTION_PERFORM))
+          {
+            _startRepair (aWPEC, aReportFile, eAction, aSelectedURIs);
+            // Never reached - the action performs a redirect
+          }
+          else
+          {
+            _showConfirm (aWPEC, eAction, aSelectedURIs);
+            return;
+          }
       }
-      _showDryRun (aWPEC, aReportFile, eAction);
+      _showSelection (aWPEC, aReportFile, eAction);
       return;
     }
 
@@ -325,7 +489,7 @@ public final class PageSecureSMLRegRepair extends AbstractPageSecureSMLReg
                                                                                                                              .add (PARAM_REPAIR_ACTION,
                                                                                                                                    e.getID ()))
                                                                                                            .setDisabled (bRunning ||
-                                                                                                                         nAffected == 0);
+                                                                                                             nAffected == 0);
           if (aLastRepair == null)
             aRow.addCell (aButton);
           else
