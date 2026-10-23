@@ -116,8 +116,13 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
     m_sQueryPathPrefix = SMPServerConfiguration.getRESTType ().getQueryPathPrefix ();
   }
 
+  /**
+   * @return The server name mode that is effectively used to build absolute URLs. Never
+   *         <code>null</code>.
+   * @since 8.6.3
+   */
   @NonNull
-  private EServerNameMode _getEffectiveServerNameMode ()
+  public EServerNameMode getEffectiveServerNameMode ()
   {
     if (m_eServerNameMode == EServerNameMode.STATIC_SERVER_INFO)
     {
@@ -244,7 +249,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   @NonNull
   public URI getCurrentURI ()
   {
-    final String ret = switch (_getEffectiveServerNameMode ())
+    final String ret = switch (getEffectiveServerNameMode ())
     {
       /*
        * Do not decode params - '#' lets URI parser fail! getRequestURIEncoded contains the context
@@ -270,7 +275,7 @@ public class SMPRestDataProvider implements ISMPServerAPIDataProvider
   {
     final boolean bIsForceRoot = SMPServerConfiguration.isForceRoot ();
 
-    final String ret = switch (_getEffectiveServerNameMode ())
+    final String ret = switch (getEffectiveServerNameMode ())
     {
       case STATIC_SERVER_INFO -> StaticServerInfo.getInstance ().getFullServerPath () +
                                  (bIsForceRoot ? "" : m_aRequestScope.getContextPath ());

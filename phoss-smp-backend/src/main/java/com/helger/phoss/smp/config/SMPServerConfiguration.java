@@ -71,6 +71,8 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_CACHE_ENABLED = "smp.rest.cache.enabled";
   public static final String KEY_SMP_REST_CACHE_TTL = "smp.rest.cache.ttl";
   public static final String KEY_SMP_REST_CACHE_MAX_ITEMS = "smp.rest.cache.maxitems";
+  public static final String KEY_SMP_REST_CACHE_HTTP_MAXAGE = "smp.rest.cache.http.maxage";
+  public static final String KEY_SMP_REST_CACHE_HTTP_ETAG = "smp.rest.cache.http.etag";
 
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
@@ -128,6 +130,8 @@ public final class SMPServerConfiguration
   public static final Duration DEFAULT_SMP_REST_CACHE_TTL = Duration.ofSeconds (60);
   /** The default maximum number of cached REST API responses */
   public static final int DEFAULT_SMP_REST_CACHE_MAX_ITEMS = 10_000;
+  /** The ETag of the REST API responses is opt-in and therefore disabled by default */
+  public static final boolean DEFAULT_SMP_REST_CACHE_HTTP_ETAG = false;
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
@@ -539,6 +543,38 @@ public final class SMPServerConfiguration
   public static int getRestCacheMaxItems ()
   {
     return _getConfig ().getAsInt (KEY_SMP_REST_CACHE_MAX_ITEMS, DEFAULT_SMP_REST_CACHE_MAX_ITEMS);
+  }
+
+  /**
+   * @return The value of the HTTP header <code>Cache-Control: public, max-age=N</code> that is sent
+   *         for the REST API endpoints <code>GET /{ServiceGroupId}</code> and
+   *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code>. A duration of zero
+   *         means that no <code>max-age</code> is sent. Missing, invalid or negative values result
+   *         in {@link Duration#ZERO}. Never <code>null</code>.
+   * @since 8.6.3
+   */
+  @NonNull
+  public static Duration getRestCacheHttpMaxAge ()
+  {
+    final Duration ret = _getConfig ().getAsConfigDuration (KEY_SMP_REST_CACHE_HTTP_MAXAGE,
+                                                            sMsg -> LOGGER.warn ("Failed to parse configuration key '" +
+                                                                                 KEY_SMP_REST_CACHE_HTTP_MAXAGE +
+                                                                                 "' as duration: " +
+                                                                                 sMsg));
+    return ret != null && !ret.isNegative () ? ret : Duration.ZERO;
+  }
+
+  /**
+   * @return <code>true</code> if the REST API endpoints <code>GET /{ServiceGroupId}</code> and
+   *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code> should send an
+   *         <code>ETag</code> header (SHA-256 of the response) and answer conditional requests
+   *         with <code>304 Not Modified</code>, <code>false</code> if not. By default this is
+   *         disabled.
+   * @since 8.6.3
+   */
+  public static boolean isRestCacheHttpETagEnabled ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_CACHE_HTTP_ETAG, DEFAULT_SMP_REST_CACHE_HTTP_ETAG);
   }
 
   /**

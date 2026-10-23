@@ -22,7 +22,6 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.mime.CMimeType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -40,7 +39,6 @@ import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
 import com.helger.smpclient.bdxr2.marshal.BDXR2MarshallerServiceGroup;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
-import com.helger.xml.serialize.write.XMLWriterSettings;
 
 public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
 {
@@ -89,7 +87,7 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
                             @NonNull final PhotonUnifiedResponse aUnifiedResponse) throws Exception
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
-    final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+    final SMPRestDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
     SMPRestResponseCacheKey aCacheKey = null;
     if (SMPRestResponseCache.isEnabled ())
@@ -109,8 +107,6 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
                                                              () -> _createResponse (sPathServiceGroupID,
                                                                                     aDataProvider));
 
-    aUnifiedResponse.setContent (aBytes)
-                    .setMimeType (CMimeType.TEXT_XML)
-                    .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+    SMPRestHttpCacheHelper.applyResponse (aRequestScope, aUnifiedResponse, aBytes, aDataProvider);
   }
 }

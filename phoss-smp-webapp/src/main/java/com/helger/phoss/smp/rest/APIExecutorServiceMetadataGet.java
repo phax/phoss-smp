@@ -32,7 +32,6 @@ import com.helger.annotation.Nonempty;
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.io.nonblocking.NonBlockingByteArrayOutputStream;
 import com.helger.base.string.StringHelper;
-import com.helger.mime.CMimeType;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
@@ -213,8 +212,6 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                           sPathDocumentTypeID,
                                                                                           aDataProvider));
 
-    aUnifiedResponse.setContent (aBytes)
-                    .setMimeType (CMimeType.TEXT_XML)
-                    .setCharset (XMLWriterSettings.DEFAULT_XML_CHARSET_OBJ);
+    SMPRestHttpCacheHelper.applyResponse (aRequestScope, aUnifiedResponse, aBytes, null);
   }
 }

@@ -17,6 +17,8 @@
 package com.helger.phoss.smp.mock;
 
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.hc.core5.http.ContentType;
 import org.jspecify.annotations.NonNull;
@@ -40,14 +42,26 @@ public class MockHttpResponse
   private final int m_nStatusCode;
   private final ContentType m_aContentType;
   private final byte [] m_aBody;
+  // Header names are case insensitive
+  private final Map <String, String> m_aHeaders = new TreeMap <> (String.CASE_INSENSITIVE_ORDER);
 
   public MockHttpResponse (final int nStatusCode,
                            @Nullable final ContentType aContentType,
                            final byte @Nullable [] aBody)
   {
+    this (nStatusCode, aContentType, aBody, null);
+  }
+
+  public MockHttpResponse (final int nStatusCode,
+                           @Nullable final ContentType aContentType,
+                           final byte @Nullable [] aBody,
+                           @Nullable final Map <String, String> aHeaders)
+  {
     m_nStatusCode = nStatusCode;
     m_aContentType = aContentType;
     m_aBody = aBody;
+    if (aHeaders != null)
+      m_aHeaders.putAll (aHeaders);
   }
 
   /**
@@ -117,11 +131,25 @@ public class MockHttpResponse
     return m_aBody == null ? null : new String (m_aBody, getCharset ());
   }
 
+  /**
+   * @param sName
+   *        The name of the response header to query. Case insensitive. May not be
+   *        <code>null</code>.
+   * @return The value of the first response header with the provided name or <code>null</code> if
+   *         no such header is present.
+   */
+  @Nullable
+  public final String getFirstHeaderValue (@NonNull final String sName)
+  {
+    return m_aHeaders.get (sName);
+  }
+
   @Override
   public String toString ()
   {
     return new ToStringGenerator (this).append ("StatusCode", m_nStatusCode)
                                        .append ("ContentType", m_aContentType)
+                                       .append ("Headers", m_aHeaders)
                                        .append ("Body", getBodyAsString ())
                                        .getToString ();
   }

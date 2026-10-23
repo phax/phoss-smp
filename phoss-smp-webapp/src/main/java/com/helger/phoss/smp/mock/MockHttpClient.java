@@ -19,6 +19,8 @@ package com.helger.phoss.smp.mock;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -26,6 +28,7 @@ import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -60,7 +63,10 @@ public class MockHttpClient implements AutoCloseable
       final HttpEntity aEntity = aResponse.getEntity ();
       final ContentType aContentType = HttpClientHelper.getContentType (aEntity);
       final byte [] aBody = aEntity == null ? null : EntityUtils.toByteArray (aEntity);
-      return new MockHttpResponse (aResponse.getCode (), aContentType, aBody);
+      final Map <String, String> aHeaders = new TreeMap <> (String.CASE_INSENSITIVE_ORDER);
+      for (final Header aHeader : aResponse.getHeaders ())
+        aHeaders.putIfAbsent (aHeader.getName (), aHeader.getValue ());
+      return new MockHttpResponse (aResponse.getCode (), aContentType, aBody, aHeaders);
     }
   }
 
@@ -129,6 +135,17 @@ public class MockHttpClient implements AutoCloseable
   public MockHttpResponse get (@Nullable final String sPath, @Nullable final String sAuthorization)
   {
     return _execute (new HttpGet (_getURL (sPath)), sAuthorization);
+  }
+
+  @NonNull
+  public MockHttpResponse get (@Nullable final String sPath, @NonNull final Map <String, String> aRequestHeaders)
+  {
+    ValueEnforcer.notNull (aRequestHeaders, "RequestHeaders");
+
+    final HttpGet aRequest = new HttpGet (_getURL (sPath));
+    for (final Map.Entry <String, String> aEntry : aRequestHeaders.entrySet ())
+      aRequest.addHeader (aEntry.getKey (), aEntry.getValue ());
+    return _execute (aRequest, null);
   }
 
   @NonNull
