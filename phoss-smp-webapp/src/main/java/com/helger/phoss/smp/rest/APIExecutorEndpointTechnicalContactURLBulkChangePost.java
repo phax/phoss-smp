@@ -50,7 +50,6 @@ import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
 import com.helger.photon.security.user.IUser;
 import com.helger.text.ReadOnlyMultilingualText;
-import com.helger.url.validate.URLValidator;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
 import com.helger.web.scope.mgr.WebScoped;
 
@@ -174,12 +173,8 @@ public final class APIExecutorEndpointTechnicalContactURLBulkChangePost extends 
 
     if (StringHelper.isEmpty (sOldURL))
       throw new SMPBadRequestException ("Field '" + JSON_OLD_URL + "' is required", aDataProvider.getCurrentURI ());
-    if (!URLValidator.isValid (sOldURL))
-      throw new SMPBadRequestException ("The old technical contact URL is invalid", aDataProvider.getCurrentURI ());
     if (StringHelper.isEmpty (sNewURL))
       throw new SMPBadRequestException ("Field '" + JSON_NEW_URL + "' is required", aDataProvider.getCurrentURI ());
-    if (!URLValidator.isValid (sNewURL))
-      throw new SMPBadRequestException ("The new technical contact URL is invalid", aDataProvider.getCurrentURI ());
     if (sNewURL.equals (sOldURL))
       throw new SMPBadRequestException ("The new technical contact URL is identical to the old technical contact URL", aDataProvider.getCurrentURI ());
 

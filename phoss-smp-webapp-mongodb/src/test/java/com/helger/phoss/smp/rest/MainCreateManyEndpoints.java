@@ -35,7 +35,6 @@ import com.helger.peppolid.peppol.doctype.PeppolDocumentTypeIdentifier;
 import com.helger.peppolid.peppol.participant.PeppolParticipantIdentifier;
 import com.helger.peppolid.peppol.process.EPredefinedProcessIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
-import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.mock.MockHttpClient;
 import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.servlet.mock.MockHttpServletRequest;
@@ -97,13 +96,11 @@ public final class MainCreateManyEndpoints extends AbstractCreateMany
       {
         final PeppolDocumentTypeIdentifier aDT = aEDT.getAsDocumentTypeIdentifier ();
         final String sDT = aDT.getURIPercentEncoded ();
-        final ProcessIdentifierType aProcID;
-        if (true)
-          aProcID = EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
-        else
-          aProcID = new SimpleProcessIdentifier ("",
-                                                 EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ()
-                                                                                          .getValue ());
+        final ProcessIdentifierType aProcID = switch (aEDT)
+        {
+          case urn_un_unece_uncefact_data_standard_CrossIndustryInvoice_100__CrossIndustryInvoice__urn_cen_eu_en16931_2017__D16B -> EPredefinedProcessIdentifier.urn_fdc_peppol_eu_poacc_en16931_any.getAsProcessIdentifier ();
+          default -> EPredefinedProcessIdentifier.BIS3_BILLING.getAsProcessIdentifier ();
+        };
 
         for (int i = START_INDEX; i < START_INDEX + PARTICIPANT_COUNT; ++i)
         {

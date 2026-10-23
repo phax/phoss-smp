@@ -44,8 +44,8 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
-import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
 import com.helger.phoss.smp.rest.SMPBulkChangeLocks;
+import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -68,7 +68,6 @@ import com.helger.photon.uictrls.datatables.column.DTCol;
 import com.helger.photon.uictrls.datatables.column.EDTColType;
 import com.helger.text.ReadOnlyMultilingualText;
 import com.helger.url.ISimpleURL;
-import com.helger.url.validate.URLValidator;
 import com.helger.web.scope.mgr.WebScoped;
 
 import jakarta.annotation.Nullable;
@@ -80,16 +79,17 @@ public final class PageSecureEndpointChangeTechnicalContactURL extends AbstractS
    *
    * @author Philip Helger
    */
-  private static final class BulkChangeEndpointTechnicalContactURL extends AbstractLongRunningJobRunnable implements IHCBootstrap5Trait
+  private static final class BulkChangeEndpointTechnicalContactURL extends AbstractLongRunningJobRunnable implements
+                                                                   IHCBootstrap5Trait
   {
     private final IParticipantIdentifier m_aServiceGroupPID;
     private final String m_sOldURL;
     private final String m_sNewURL;
 
     public BulkChangeEndpointTechnicalContactURL (@Nullable final IParticipantIdentifier aServiceGroupPID,
-                                  @NonNull @Nonempty final String sOldURL,
-                                  @NonNull @Nonempty final String sNewURL,
-                                  @Nullable final String sUserID)
+                                                  @NonNull @Nonempty final String sOldURL,
+                                                  @NonNull @Nonempty final String sNewURL,
+                                                  @Nullable final String sUserID)
     {
       super ("BulkChangeEndpointTechnicalContactURL",
              new ReadOnlyMultilingualText (CSMPServer.DEFAULT_LOCALE, "Bulk change endpoint technical contact URL"),
@@ -104,10 +104,13 @@ public final class PageSecureEndpointChangeTechnicalContactURL extends AbstractS
     {
       final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
 
-      final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointTechnicalContactUrls (m_aServiceGroupPID, m_sOldURL, m_sNewURL);
+      final long nEndpointsChanged = aServiceInfoMgr.updateAllEndpointTechnicalContactUrls (m_aServiceGroupPID,
+                                                                                            m_sOldURL,
+                                                                                            m_sNewURL);
       if (nEndpointsChanged > 0)
       {
-        // The bulk update does not trigger the callbacks and affects an unknown number of participants
+        // The bulk update does not trigger the callbacks and affects an unknown number of
+        // participants
         SMPRestResponseCache.invalidateAll ();
       }
 
@@ -150,7 +153,7 @@ public final class PageSecureEndpointChangeTechnicalContactURL extends AbstractS
 
   public PageSecureEndpointChangeTechnicalContactURL (@NonNull @Nonempty final String sID)
   {
-    super (sID, "Bulk change technical contact URL");
+    super (sID, "Bulk change Technical Contact");
   }
 
   @Override
@@ -216,18 +219,13 @@ public final class PageSecureEndpointChangeTechnicalContactURL extends AbstractS
 
         if (StringHelper.isEmpty (sOldURL))
           aFormErrors.addFieldInfo (FIELD_OLD_URL, "An old technical contact URL must be provided");
-        else
-          if (!URLValidator.isValid (sOldURL))
-            aFormErrors.addFieldInfo (FIELD_OLD_URL, "The old technical contact URL is invalid");
 
         if (StringHelper.isEmpty (sNewURL))
           aFormErrors.addFieldInfo (FIELD_NEW_URL, "A new technical contact URL must be provided");
         else
-          if (!URLValidator.isValid (sNewURL))
-            aFormErrors.addFieldInfo (FIELD_NEW_URL, "The new technical contact URL is invalid");
-          else
-            if (sNewURL.equals (sOldURL))
-              aFormErrors.addFieldInfo (FIELD_NEW_URL, "The new technical contact URL is identical to the old technical contact URL");
+          if (sNewURL.equals (sOldURL))
+            aFormErrors.addFieldInfo (FIELD_NEW_URL,
+                                      "The new technical contact URL is identical to the old technical contact URL");
 
         // Validate parameters
         if (aFormErrors.isEmpty ())
@@ -244,10 +242,10 @@ public final class PageSecureEndpointChangeTechnicalContactURL extends AbstractS
               PhotonWorkerPool.getInstance ()
                               .run ("BulkChangeEndpointTechnicalContactURL",
                                     new BulkChangeEndpointTechnicalContactURL (aSelectedServiceGroup == null ? null
-                                                                                             : aSelectedServiceGroup.getParticipantIdentifier (),
-                                                               sOldURL,
-                                                               sNewURL,
-                                                               aWPEC.getLoggedInUserID ()));
+                                                                                                             : aSelectedServiceGroup.getParticipantIdentifier (),
+                                                                               sOldURL,
+                                                                               sNewURL,
+                                                                               aWPEC.getLoggedInUserID ()));
             }
             catch (final RuntimeException ex)
             {
