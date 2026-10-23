@@ -70,6 +70,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   public static final String PATH_BUSINESSCARD = "/businesscard/";
   public static final String PATH_COMPLETE = "/complete";
   public static final String PATH_CUSTOM_PROPERTIES = "/customproperties";
+  public static final String PATH_ENDPOINTS = "/endpoints";
   public static final String PATH_LIST = "/list";
   public static final String PATH_SERVICE_GROUP_IDS = "/servicegroupids";
   public static final String PATH_SERVICES = "/services";
@@ -263,6 +264,24 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                              new APIExecutorServiceMetadataProcessDelete ());
       aDeleteServiceMetadataProcess.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteServiceMetadataProcess);
+    }
+
+    // Bulk change of endpoints since 8.6.3
+    {
+      final APIDescriptor aBulkChangeEndpointURL = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
+                                                                                    "/url/bulk-change"),
+                                                                      new APIExecutorEndpointURLBulkChangePost ());
+      aBulkChangeEndpointURL.allowedMimeTypes ().add (CMimeType.APPLICATION_JSON.getAsString ());
+      aBulkChangeEndpointURL.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aBulkChangeEndpointURL);
+    }
+    {
+      final APIDescriptor aBulkChangeEndpointCertificate = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
+                                                                                            "/certificate/bulk-change"),
+                                                                              new APIExecutorEndpointCertificateBulkChangePost ());
+      aBulkChangeEndpointCertificate.allowedMimeTypes ().add (CMimeType.APPLICATION_JSON.getAsString ());
+      aBulkChangeEndpointCertificate.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aBulkChangeEndpointCertificate);
     }
 
     // Custom Properties API since 8.1.0
@@ -472,7 +491,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
   @Override
   @NonNull
   protected EContinue onFilterBefore (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
-                                      @NonNull final UnifiedResponse aUnifiedResponse) throws IOException, ServletException
+                                      @NonNull final UnifiedResponse aUnifiedResponse) throws IOException,
+                                                                                       ServletException
   {
     if (LOGGER.isDebugEnabled ())
     {

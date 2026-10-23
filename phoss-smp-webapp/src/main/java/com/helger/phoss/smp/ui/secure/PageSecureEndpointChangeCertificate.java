@@ -48,6 +48,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
+import com.helger.phoss.smp.rest.SMPBulkChangeLocks;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
@@ -62,7 +63,6 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
-import com.helger.photon.security.lock.SingleRunLock;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -86,9 +86,6 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
    */
   private static final class BulkChangeCertificate extends AbstractLongRunningJobRunnable implements IHCBootstrap5Trait
   {
-    /** The process wide lock ensuring, that only a single bulk change runs at a time */
-    public static final SingleRunLock LOCK = new SingleRunLock ("Bulk change of the endpoint certificate");
-
     private final Locale m_aDisplayLocale;
     private final String m_sOldUnifiedCert;
     private final String m_sNewCert;
@@ -142,7 +139,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       finally
       {
         // Always release, even if the job failed
-        LOCK.release ();
+        SMPBulkChangeLocks.ENDPOINT_CERTIFICATE.release ();
       }
     }
   }
@@ -227,7 +224,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aNodeList.addChild (aToolbar);
 
-      if (BulkChangeCertificate.LOCK.isRunning ())
+      if (SMPBulkChangeLocks.ENDPOINT_CERTIFICATE.isRunning ())
         aNodeList.addChild (warn ("A bulk change is currently running in the background"));
     }
 
@@ -270,7 +267,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
         if (aFormErrors.containsNoError ())
         {
           // Only a single bulk change may run at a time
-          if (!BulkChangeCertificate.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+          if (!SMPBulkChangeLocks.ENDPOINT_CERTIFICATE.tryAcquire (aWPEC.getLoggedInUserID ()))
           {
             aWPEC.postRedirectGetInternal (warn ("Another bulk change is already running in the background. Please wait until it is finished."));
           }
@@ -288,7 +285,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
             catch (final RuntimeException ex)
             {
               // The job was never started, so it can never release the lock
-              BulkChangeCertificate.LOCK.release ();
+              SMPBulkChangeLocks.ENDPOINT_CERTIFICATE.release ();
               throw ex;
             }
 

@@ -45,6 +45,7 @@ import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
+import com.helger.phoss.smp.rest.SMPBulkChangeLocks;
 import com.helger.phoss.smp.ui.AbstractSMPWebPage;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -58,7 +59,6 @@ import com.helger.photon.core.form.RequestField;
 import com.helger.photon.io.PhotonWorkerPool;
 import com.helger.photon.mgrs.longrun.AbstractLongRunningJobRunnable;
 import com.helger.photon.mgrs.longrun.LongRunningJobResult;
-import com.helger.photon.security.lock.SingleRunLock;
 import com.helger.photon.uicore.css.CPageParam;
 import com.helger.photon.uicore.icon.EDefaultIcon;
 import com.helger.photon.uicore.page.AbstractWebPageForm;
@@ -82,9 +82,6 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
    */
   private static final class BulkChangeEndpointURL extends AbstractLongRunningJobRunnable implements IHCBootstrap5Trait
   {
-    /** The process wide lock ensuring, that only a single bulk change runs at a time */
-    public static final SingleRunLock LOCK = new SingleRunLock ("Bulk change of the endpoint URL");
-
     private final IParticipantIdentifier m_aServiceGroupPID;
     private final String m_sOldURL;
     private final String m_sNewURL;
@@ -141,7 +138,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       finally
       {
         // Always release, even if the job failed
-        LOCK.release ();
+        SMPBulkChangeLocks.ENDPOINT_URL.release ();
       }
     }
   }
@@ -192,7 +189,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
       aToolbar.addButton ("Refresh", aWPEC.getSelfHref (), EDefaultIcon.REFRESH);
       aNodeList.addChild (aToolbar);
 
-      if (BulkChangeEndpointURL.LOCK.isRunning ())
+      if (SMPBulkChangeLocks.ENDPOINT_URL.isRunning ())
         aNodeList.addChild (warn ("A bulk change is currently running in the background"));
     }
 
@@ -236,7 +233,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
         if (aFormErrors.isEmpty ())
         {
           // Only a single bulk change may run at a time
-          if (!BulkChangeEndpointURL.LOCK.tryAcquire (aWPEC.getLoggedInUserID ()))
+          if (!SMPBulkChangeLocks.ENDPOINT_URL.tryAcquire (aWPEC.getLoggedInUserID ()))
           {
             aWPEC.postRedirectGetInternal (warn ("Another bulk change is already running in the background. Please wait until it is finished."));
           }
@@ -255,7 +252,7 @@ public final class PageSecureEndpointChangeURL extends AbstractSMPWebPage
             catch (final RuntimeException ex)
             {
               // The job was never started, so it can never release the lock
-              BulkChangeEndpointURL.LOCK.release ();
+              SMPBulkChangeLocks.ENDPOINT_URL.release ();
               throw ex;
             }
 
