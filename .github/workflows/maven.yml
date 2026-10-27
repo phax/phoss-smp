@@ -26,7 +26,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Needed for MongoDB - https://github.com/supercharge/mongodb-github-action/issues/81
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         java: [ 17, 21, 25, 27 ]
