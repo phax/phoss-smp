@@ -26,8 +26,7 @@ permissions:
 
 jobs:
   build:
-    # Needed for MongoDB - https://github.com/supercharge/mongodb-github-action/issues/81
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         java: [ 17, 21, 25, 27 ]
@@ -68,9 +67,10 @@ jobs:
       id: postgres
 
     - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.12.1
+      uses: supercharge/mongodb-github-action@main
       with:
         mongodb-version: '8.0'
+        mongodb-extra-env: GLIBC_TUNABLES=glibc.pthread.rseq=1
                 
     - name: Build and deploy with Maven
       run: mvn --batch-mode --update-snapshots -P release-snapshot deploy
