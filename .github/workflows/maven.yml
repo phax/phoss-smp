@@ -26,10 +26,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 17, 21, 25, 26 ]
+        java: [ 17, 21, 25, 27 ]
     name: Java ${{ matrix.java }} build
 
     steps:
@@ -57,7 +57,7 @@ jobs:
           ${{ runner.os }}-maven-
  
     - name: Start PostgreSQL
-      uses: ikalnytskyi/action-setup-postgres@v8
+      uses: ikalnytskyi/action-setup-postgres@v9
       with:
         username: peppol
         password: peppol
