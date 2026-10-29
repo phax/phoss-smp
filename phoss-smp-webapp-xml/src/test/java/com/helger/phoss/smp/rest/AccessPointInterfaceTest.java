@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
+import org.apache.hc.core5.http.HttpEntity;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.After;
@@ -40,7 +41,6 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.xml.XMLOffsetDateTime;
-import com.helger.http.CHttpHeader;
 import com.helger.http.basicauth.BasicAuthClientCredentials;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -59,6 +59,8 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
 import com.helger.phoss.smp.domain.serviceinfo.SMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.SMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.SMPServiceInformation;
+import com.helger.phoss.smp.mock.MockHttpClient;
+import com.helger.phoss.smp.mock.MockHttpResponse;
 import com.helger.phoss.smp.mock.SMPServerRESTTestRule;
 import com.helger.phoss.smp.restapi.SMPAccessPointRESTHelper;
 import com.helger.photon.security.CSecurity;
@@ -70,11 +72,6 @@ import com.helger.xml.microdom.MicroDocument;
 import com.helger.xml.microdom.serialize.MicroReader;
 import com.helger.xml.microdom.serialize.MicroWriter;
 
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.Invocation.Builder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Test class for the Access Point management REST API - see
@@ -102,6 +99,7 @@ public final class AccessPointInterfaceTest
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
+  private MockHttpClient m_aClient;
   private IIdentifierFactory m_aIF;
   private ISMPAccessPointManager m_aAPMgr;
   private ISMPServiceGroupManager m_aSGMgr;
@@ -113,6 +111,7 @@ public final class AccessPointInterfaceTest
   @Before
   public void before ()
   {
+    m_aClient = new MockHttpClient (m_aRule.getFullURL ());
     m_aIF = SMPMetaManager.getIdentifierFactory ();
     m_aAPMgr = SMPMetaManager.getAccessPointMgr ();
     m_aSGMgr = SMPMetaManager.getServiceGroupMgr ();
@@ -129,6 +128,7 @@ public final class AccessPointInterfaceTest
   @After
   public void after ()
   {
+    m_aClient.close ();
     _cleanup ();
   }
 
@@ -141,9 +141,9 @@ public final class AccessPointInterfaceTest
   }
 
   @NonNull
-  private static Builder _addCredentials (@NonNull final Builder aBuilder)
+  private static HttpEntity _xml (@NonNull final String sXML)
   {
-    return aBuilder.header (CHttpHeader.AUTHORIZATION, CREDENTIALS.getRequestValue ());
+    return MockHttpClient.createXMLEntity (sXML);
   }
 
   @NonNull
@@ -159,16 +159,16 @@ public final class AccessPointInterfaceTest
   }
 
   @NonNull
-  private static String _testResponse (@NonNull final Response aResponseMsg, @Nonempty final int... aStatusCodes)
+  private static String _testResponse (@NonNull final MockHttpResponse aResponseMsg, @Nonempty final int... aStatusCodes)
   {
     ValueEnforcer.notNull (aResponseMsg, "ResponseMsg");
     ValueEnforcer.notEmpty (aStatusCodes, "StatusCodes");
 
-    final String sResponse = aResponseMsg.readEntity (String.class);
+    final String sResponse = aResponseMsg.getBodyAsString ();
     if (StringHelper.isNotEmpty (sResponse))
       LOGGER.info ("HTTP Response: " + sResponse);
-    assertTrue (aResponseMsg.getStatus () + " is not in " + Arrays.toString (aStatusCodes),
-                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatus ()));
+    assertTrue (aResponseMsg.getStatusCode () + " is not in " + Arrays.toString (aStatusCodes),
+                ArrayHelper.contains (aStatusCodes, aResponseMsg.getStatusCode ()));
     return sResponse;
   }
 
@@ -185,15 +185,11 @@ public final class AccessPointInterfaceTest
   @Test
   public void testCreateReadUpdateDelete ()
   {
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-
     // Not existing - but needs authentication first
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME).request ()).get (), 404);
+    _testResponse (m_aClient.get (PATH_NAME + AP_NAME, CREDENTIALS), 404);
 
     // Create
-    String sResponse = _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME)
-                                                              .request ()).put (Entity.xml (_getAccessPointXML (URL1,
-                                                                                                                CERT1))),
+    String sResponse = _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS, _xml (_getAccessPointXML (URL1, CERT1))),
                                       200);
     IMicroElement eRoot = _parse (sResponse);
     assertEquals (SMPAccessPointRESTHelper.ELEMENT_ACCESS_POINT, eRoot.getTagName ());
@@ -207,19 +203,18 @@ public final class AccessPointInterfaceTest
     assertEquals (CERT1, aAP.getCertificate ());
 
     // Read
-    sResponse = _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME).request ()).get (), 200);
+    sResponse = _testResponse (m_aClient.get (PATH_NAME + AP_NAME, CREDENTIALS), 200);
     eRoot = _parse (sResponse);
     assertEquals (CERT1, eRoot.getFirstChildElement (SMPAccessPointRESTHelper.ELEMENT_CERTIFICATE).getTextContent ());
 
     // List
-    sResponse = _testResponse (_addCredentials (aTarget.path (PATH_LIST).request ()).get (), 200);
+    sResponse = _testResponse (m_aClient.get (PATH_LIST, CREDENTIALS), 200);
     eRoot = _parse (sResponse);
     assertEquals (SMPAccessPointRESTHelper.ELEMENT_ACCESS_POINT_LIST, eRoot.getTagName ());
     assertEquals (1, eRoot.getAllChildElements (SMPAccessPointRESTHelper.ELEMENT_ACCESS_POINT).size ());
 
     // Update the existing one
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME)
-                                           .request ()).put (Entity.xml (_getAccessPointXML (URL2, CERT2))), 200);
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS, _xml (_getAccessPointXML (URL2, CERT2))), 200);
     aAP = m_aAPMgr.getAccessPointOfName (AP_NAME);
     assertNotNull (aAP);
     assertEquals (URL2, aAP.getEndpointReference ());
@@ -228,30 +223,25 @@ public final class AccessPointInterfaceTest
     assertEquals (1, m_aAPMgr.getAccessPointCount ());
 
     // Delete
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME).request ()).delete (), 200);
+    _testResponse (m_aClient.delete (PATH_NAME + AP_NAME, CREDENTIALS), 200);
     assertNull (m_aAPMgr.getAccessPointOfName (AP_NAME));
 
     // Delete again - not found
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME).request ()).delete (), 404);
+    _testResponse (m_aClient.delete (PATH_NAME + AP_NAME, CREDENTIALS), 404);
   }
 
   @Test
   public void testAuthenticationRequired ()
   {
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-
     // No credentials at all
-    _testResponse (aTarget.path (PATH_LIST).request ().get (), 403);
-    _testResponse (aTarget.path (PATH_NAME + AP_NAME).request ().get (), 403);
-    _testResponse (aTarget.path (PATH_NAME + AP_NAME).request ().put (Entity.xml (_getAccessPointXML (URL1, CERT1))),
-                   403);
-    _testResponse (aTarget.path (PATH_NAME + AP_NAME).request ().delete (), 403);
+    _testResponse (m_aClient.get (PATH_LIST), 403);
+    _testResponse (m_aClient.get (PATH_NAME + AP_NAME), 403);
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, (String) null, _xml (_getAccessPointXML (URL1, CERT1))), 403);
+    _testResponse (m_aClient.delete (PATH_NAME + AP_NAME, (String) null), 403);
 
     // Invalid credentials
-    _testResponse (aTarget.path (PATH_NAME + AP_NAME)
-                          .request ()
-                          .header (CHttpHeader.AUTHORIZATION, CREDENTIALS_INVALID.getRequestValue ())
-                          .put (Entity.xml (_getAccessPointXML (URL1, CERT1))), 403);
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS_INVALID, _xml (_getAccessPointXML (URL1, CERT1))),
+                   403);
 
     // Nothing was created
     assertEquals (0, m_aAPMgr.getAccessPointCount ());
@@ -260,16 +250,12 @@ public final class AccessPointInterfaceTest
   @Test
   public void testCreateInvalidData ()
   {
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-
     // No endpoint reference
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME)
-                                           .request ()).put (Entity.xml (_getAccessPointXML (null, CERT1))), 400);
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS, _xml (_getAccessPointXML (null, CERT1))), 400);
     // No certificate
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME)
-                                           .request ()).put (Entity.xml (_getAccessPointXML (URL1, null))), 400);
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS, _xml (_getAccessPointXML (URL1, null))), 400);
     // Not XML at all
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME).request ()).put (Entity.xml ("this is no XML")),
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS, _xml ("this is no XML")),
                    400);
 
     assertEquals (0, m_aAPMgr.getAccessPointCount ());
@@ -303,20 +289,14 @@ public final class AccessPointInterfaceTest
                                                                                 null)).isSuccess ());
     assertNull (_getEndpoint ().getAccessPointID ());
 
-    final WebTarget aTarget = ClientBuilder.newClient ().target (m_aRule.getFullURL ());
-
     // Create the matching Access Point
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME)
-                                           .request ()).put (Entity.xml (_getAccessPointXML (URL1, CERT1))), 200);
+    _testResponse (m_aClient.put (PATH_NAME + AP_NAME, CREDENTIALS, _xml (_getAccessPointXML (URL1, CERT1))), 200);
 
     // Not authenticated
-    _testResponse (aTarget.path (PATH_NAME + AP_NAME + "/use-for-matching-endpoints").request ().post (null), 403);
+    _testResponse (m_aClient.post (PATH_NAME + AP_NAME + "/use-for-matching-endpoints", (String) null), 403);
 
     // Let all matching endpoints use the Access Point
-    final String sResponse = _testResponse (_addCredentials (aTarget.path (PATH_NAME +
-                                                                           AP_NAME +
-                                                                           "/use-for-matching-endpoints")
-                                                                    .request ()).post (null), 200);
+    final String sResponse = _testResponse (m_aClient.post (PATH_NAME + AP_NAME + "/use-for-matching-endpoints", CREDENTIALS), 200);
     final IMicroElement eRoot = _parse (sResponse);
     assertEquals ("1", eRoot.getAttributeValue ("changedendpoints"));
 
@@ -327,14 +307,11 @@ public final class AccessPointInterfaceTest
     assertEquals (aAP.getID (), aChangedEP.getAccessPointID ());
 
     // A referenced Access Point may not be deleted
-    _testResponse (_addCredentials (aTarget.path (PATH_NAME + AP_NAME).request ()).delete (), 412);
+    _testResponse (m_aClient.delete (PATH_NAME + AP_NAME, CREDENTIALS), 412);
     assertNotNull (m_aAPMgr.getAccessPointOfName (AP_NAME));
 
     // Second invocation changes nothing
-    final String sResponse2 = _testResponse (_addCredentials (aTarget.path (PATH_NAME +
-                                                                            AP_NAME +
-                                                                            "/use-for-matching-endpoints")
-                                                                     .request ()).post (null), 200);
+    final String sResponse2 = _testResponse (m_aClient.post (PATH_NAME + AP_NAME + "/use-for-matching-endpoints", CREDENTIALS), 200);
     assertEquals ("0", _parse (sResponse2).getAttributeValue ("changedendpoints"));
   }
 

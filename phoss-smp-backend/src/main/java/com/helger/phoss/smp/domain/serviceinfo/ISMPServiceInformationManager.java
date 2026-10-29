@@ -384,6 +384,8 @@ public interface ISMPServiceInformationManager
                                          @Nullable XMLOffsetDateTime aNewActivation,
                                          boolean bChangeExpiration,
                                          @Nullable XMLOffsetDateTime aNewExpiration);
+
+  /**
    * Count the endpoints that currently reference the Access Point with the provided ID.
    *
    * @param sAccessPointID
