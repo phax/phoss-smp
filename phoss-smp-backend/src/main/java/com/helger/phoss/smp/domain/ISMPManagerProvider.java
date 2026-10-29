@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.base.state.ETriState;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -91,12 +92,23 @@ public interface ISMPManagerProvider
   ISMPRedirectManager createRedirectMgr (@NonNull IIdentifierFactory aIdentifierFactory);
 
   /**
+   * @return A new SMP Access Point manager. May not be <code>null</code>.
+   * @since 8.4.4
+   */
+  @NonNull
+  ISMPAccessPointManager createAccessPointMgr ();
+
+  /**
    * @param aIdentifierFactory
    *        The identifier factory to be used. May not be <code>null</code>.
+   * @param aAccessPointMgr
+   *        The Access Point manager to be used for resolving and de-duplicating the endpoint
+   *        reference URLs and certificates. May not be <code>null</code>.
    * @return A new SMP service information manager. May not be <code>null</code>.
    */
   @NonNull
-  ISMPServiceInformationManager createServiceInformationMgr (@NonNull IIdentifierFactory aIdentifierFactory);
+  ISMPServiceInformationManager createServiceInformationMgr (@NonNull IIdentifierFactory aIdentifierFactory,
+                                                             @NonNull ISMPAccessPointManager aAccessPointMgr);
 
   /**
    * @return A new SMP participant migration manager. May not be <code>null</code>.

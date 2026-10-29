@@ -13,6 +13,8 @@ package com.helger.phoss.smp.config;
 import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.style.IsSPIImplementation;
+import com.helger.phoss.smp.domain.accesspoint.SMPAccessPoint;
+import com.helger.phoss.smp.domain.accesspoint.SMPAccessPointMicroTypeConverter;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCard;
 import com.helger.phoss.smp.domain.businesscard.SMPBusinessCardMicroTypeConverter;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigration;
@@ -47,6 +49,7 @@ public final class MicroTypeConverterRegistrarSMPServer implements IMicroTypeCon
   public void registerMicroTypeConverter (@NonNull final IMicroTypeConverterRegistry aRegistry)
   {
     aRegistry.registerMicroElementTypeConverter (SMPBusinessCard.class, new SMPBusinessCardMicroTypeConverter ());
+    aRegistry.registerMicroElementTypeConverter (SMPAccessPoint.class, new SMPAccessPointMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPEndpoint.class, new SMPEndpointMicroTypeConverter ());
     aRegistry.registerMicroElementTypeConverter (SMPParticipantMigration.class,
                                                  new SMPParticipantMigrationMicroTypeConverter ());

@@ -57,6 +57,12 @@ public final class SMPCommonUI
                                                                                      .addItem (100)
                                                                                      .addItemAll ();
 
+  /**
+   * The maximum number of records that are loaded in a single chunk from the server. This applies
+   * to all server side paginated tables as well as to the Ajax based selects.
+   */
+  public static final int PAGE_SIZE = 25;
+
   private SMPCommonUI ()
   {}
 
