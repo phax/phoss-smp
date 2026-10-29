@@ -35,3 +35,26 @@ ALTER TABLE `smp_endpoint`
 
 -- No need for the additional index, as this is already covered in the FK constraint
 -- ALTER TABLE `smp_endpoint` ADD INDEX `IX_smp_endpoint_process` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`);
+
+--
+-- Alternative solution which is supposed to be quicker
+--
+
+---- Step 1: Add the new id column and populate it
+--ALTER TABLE `smp_endpoint` ADD COLUMN `id` varchar(45) NOT NULL DEFAULT '' FIRST;
+--UPDATE `smp_endpoint` SET `id` = UUID();
+--
+---- Step 2: Drop the FK constraint that is blocking the PRIMARY KEY drop
+--ALTER TABLE `smp_endpoint` DROP FOREIGN KEY `FK_smp_endpoint_documentIdentifierScheme`;
+--
+---- Step 3: Swap the PRIMARY KEY in a single statement (one in-place rebuild instead of two, the first being a copy)
+--ALTER TABLE `smp_endpoint` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`);
+--
+---- Step 4: Recreate the FK constraint without revalidating rows: the data is unchanged and was covered by the same FK before
+--SET foreign_key_checks = 0;
+--ALTER TABLE `smp_endpoint`
+--  ADD CONSTRAINT `FK_smp_endpoint_documentIdentifierScheme`
+--  FOREIGN KEY (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) 
+--  REFERENCES `smp_process` (`businessIdentifierScheme`, `businessIdentifier`, `documentIdentifierScheme`, `documentIdentifier`, `processIdentifierType`, `processIdentifier`) 
+--  ON DELETE CASCADE ON UPDATE CASCADE;
+--SET foreign_key_checks = 1;
