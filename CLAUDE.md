@@ -153,6 +153,7 @@ UI page classes extend `AbstractSMPWebPageForm` or `AbstractSMPWebPageSimpleForm
 
 Connection pool properties (v8.0.11+):
 ```properties
+jdbc.pooling.min-connections = 4
 jdbc.pooling.max-connections = 8
 jdbc.pooling.max-wait.millis = 10000
 jdbc.pooling.between-evictions-runs.millis = 300000

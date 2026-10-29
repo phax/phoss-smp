@@ -48,6 +48,8 @@ public class SMPSQLStatusProviderExtensionSPI implements ISMPStatusProviderExten
       // Since 5.3.0-RC5
       ret.put ("smp.sql.target-database", aJdbcConfig.getJdbcDatabaseType ());
 
+      // since 8.7.1
+      ret.put ("smp.sql.pooling.min-connections", Integer.valueOf (aJdbcConfig.getJdbcPoolingMinConnections ()));
       // All smp.sql.pooling since 8.0.11
       ret.put ("smp.sql.pooling.max-connections", Integer.valueOf (aJdbcConfig.getJdbcPoolingMaxConnections ()));
       ret.put ("smp.sql.pooling.max-wait.duration", aJdbcConfig.getJdbcPoolingMaxWait ().toString ());
