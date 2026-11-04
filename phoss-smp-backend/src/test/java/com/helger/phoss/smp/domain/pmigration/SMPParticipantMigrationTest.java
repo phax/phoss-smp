@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.UUID;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -50,6 +52,34 @@ public final class SMPParticipantMigrationTest
     assertTrue (PDTFactory.getCurrentLocalDateTime ().compareTo (pm.getInitiationDateTime ()) >= 0);
     assertTrue (StringHelper.isNotEmpty (pm.getMigrationKey ()));
     XMLTestHelper.testMicroTypeConversion (pm);
+  }
+
+  @Test
+  public void testReplaceOutboundInProgress () throws Exception
+  {
+    final ISMPParticipantMigrationManager aMgr = new SMPParticipantMigrationManagerXML ("test-migrations-" +
+                                                                                        UUID.randomUUID () +
+                                                                                        ".xml");
+    final IParticipantIdentifier aPI = SimpleIdentifierFactory.INSTANCE.createParticipantIdentifier ("foo", "replace");
+    final ISMPParticipantMigration aFirst = aMgr.createOutboundParticipantMigration (aPI, "key1");
+    assertNotNull (aFirst);
+    assertTrue (aMgr.containsOutboundMigrationInProgress (aPI));
+
+    // Replace the key, like a second prepareToMigrate call does
+    assertTrue (aMgr.deleteParticipantMigrationOfID (aFirst.getID ()).isChanged ());
+    final ISMPParticipantMigration aSecond = aMgr.createOutboundParticipantMigration (aPI, "key2");
+    assertNotNull (aSecond);
+
+    assertTrue (aMgr.containsOutboundMigrationInProgress (aPI));
+    final ISMPParticipantMigration aCurrent = aMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
+                                                                                           EParticipantMigrationState.IN_PROGRESS,
+                                                                                           aPI);
+    assertNotNull (aCurrent);
+    assertEquals ("key2", aCurrent.getMigrationKey ());
+    assertEquals (1, aMgr.getAllOutboundParticipantMigrations (EParticipantMigrationState.IN_PROGRESS)
+                         .getCount (x -> x.getParticipantIdentifier ().hasSameContent (aPI)));
+
+    aMgr.deleteParticipantMigrationOfID (aSecond.getID ());
   }
 
   @Test

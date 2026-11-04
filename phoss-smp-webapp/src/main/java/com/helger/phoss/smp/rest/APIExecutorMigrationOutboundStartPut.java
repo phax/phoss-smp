@@ -34,6 +34,8 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
+import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigration;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -64,6 +66,8 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
 {
   public static final String XML_ELEMENT_PARTICIPANT_ID = "participantID";
   public static final String XML_ELEMENT_MIGRATION_KEY = "migrationKey";
+  /** Query parameter to explicitly replace the migration key of a migration in progress */
+  public static final String PARAM_RENEW = "renew";
   private static final Logger LOGGER = LoggerFactory.getLogger (APIExecutorMigrationOutboundStartPut.class);
 
   @Override
@@ -121,12 +125,18 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                                         aDataProvider.getCurrentURI ());
     }
 
-    // Ensure no existing migration is in process
-    if (aParticipantMigrationMgr.containsOutboundMigrationInProgress (aServiceGroupID))
+    // Ensure no existing migration is in process, except a new key was explicitly requested
+    final boolean bRenew = aRequestScope.params ().getAsBoolean (PARAM_RENEW, false);
+    final ISMPParticipantMigration aExistingMigration = aParticipantMigrationMgr.getParticipantMigrationOfParticipantID (EParticipantMigrationDirection.OUTBOUND,
+                                                                                                                         EParticipantMigrationState.IN_PROGRESS,
+                                                                                                                         aServiceGroupID);
+    if (aExistingMigration != null && !bRenew)
     {
       throw new SMPBadRequestException ("The outbound Participant Migration of the Service Group '" +
                                         sPathServiceGroupID +
-                                        "' is already in progress",
+                                        "' is already in progress. Use the query parameter '" +
+                                        PARAM_RENEW +
+                                        "=true' to create a new migration key and invalidate the existing one.",
                                         aDataProvider.getCurrentURI ());
     }
 
@@ -149,6 +159,16 @@ public final class APIExecutorMigrationOutboundStartPut extends AbstractSMPAPIEx
                                  sPathServiceGroupID +
                                  "'",
                                  ex);
+    }
+
+    // The SML replaced the old key, so the old record is obsolete
+    if (aExistingMigration != null)
+    {
+      aParticipantMigrationMgr.deleteParticipantMigrationOfID (aExistingMigration.getID ());
+      LOGGER.info (sLogPrefix +
+                   "Replaced the migration key of the outbound Participant Migration with ID '" +
+                   aExistingMigration.getID () +
+                   "'");
     }
 
     // Remember internally

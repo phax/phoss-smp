@@ -92,6 +92,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
   private static final String FIELD_PARTICIPANT_ID = "pid";
   private static final String ACTION_CANCEL_MIGRATION = "cancelmig";
   private static final String ACTION_FINALIZE_MIGRATION = "finishmig";
+  private static final String ACTION_RENEW_KEY = "renewkey";
 
   public PageSecureServiceGroupMigrationOutbound (@NonNull @Nonempty final String sID)
   {
@@ -154,6 +155,71 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                   aSelectedObject.getParticipantIdentifier ()
                                                                                  .getURIEncoded () +
                                                                   "'!"));
+                          }
+                        }
+                      });
+    addCustomHandler (ACTION_RENEW_KEY,
+                      new AbstractBootstrapWebPageActionHandlerWithQuery <ISMPParticipantMigration, WebPageExecutionContext> (true,
+                                                                                                                              ACTION_RENEW_KEY,
+                                                                                                                              "renewkey")
+                      {
+                        @Override
+                        protected void showQuery (@NonNull final WebPageExecutionContext aWPEC,
+                                                  @NonNull final BootstrapForm aForm,
+                                                  @Nullable final ISMPParticipantMigration aSelectedObject)
+                        {
+                          aForm.addChild (question ("Are you sure you want to generate a new migration key for the outbound Participant Migration of '" +
+                                                    aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
+                                                    "'? The existing migration key will become invalid - also if it was already handed over to the target SMP."));
+                        }
+
+                        @Override
+                        protected void performAction (@NonNull final WebPageExecutionContext aWPEC,
+                                                      @Nullable final ISMPParticipantMigration aSelectedObject)
+                        {
+                          final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
+                          final String sParticipantID = aParticipantID.getURIEncoded ();
+
+                          String sMigrationKey;
+                          try
+                          {
+                            final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (SMPMetaManager.getSettings ()
+                                                                                                                                   .getSMLInfo ());
+
+                            // The SML replaces the pending migration key
+                            sMigrationKey = aCaller.prepareToMigrate (aParticipantID,
+                                                                      SMPServerConfiguration.getSMLSMPID ());
+                            LOGGER.info ("Successfully called prepareToMigrate on SML again. Created migration key is '" +
+                                         sMigrationKey +
+                                         "'");
+                          }
+                          catch (final Exception ex)
+                          {
+                            LOGGER.error ("Error invoking prepareToMigrate on SML", ex);
+                            aWPEC.postRedirectGetInternal (error ("Failed to create a new migration key for participant '" +
+                                                                  sParticipantID +
+                                                                  "' in SML.").addChild (SMPCommonUI.getTechnicalDetailsUI (ex)));
+                            return;
+                          }
+
+                          // Replace the old record
+                          aParticipantMigrationMgr.deleteParticipantMigrationOfID (aSelectedObject.getID ());
+                          if (aParticipantMigrationMgr.createOutboundParticipantMigration (aParticipantID,
+                                                                                           sMigrationKey) != null)
+                          {
+                            aWPEC.postRedirectGetInternal (success ().addChild (div ("The migration key for '" +
+                                                                                     sParticipantID +
+                                                                                     "' was successfully replaced."))
+                                                                     .addChild (div ("The new migration key is ").addChild (code (sMigrationKey))));
+                          }
+                          else
+                          {
+                            aWPEC.postRedirectGetInternal (error ().addChild (div ("Failed to store the participant migration for '" +
+                                                                                   sParticipantID +
+                                                                                   "'."))
+                                                                   .addChild (div ("The created migration key is ").addChild (code (sMigrationKey)))
+                                                                   .addChild (". Please note it down manually!"));
                           }
                         }
                       });
@@ -491,6 +557,15 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                                                                                                   sParticipantID +
                                                                                                                                   "'")
                                                                                                                        .addChild (EDefaultIcon.YES.getAsNode ())
+                                                   : createEmptyAction ());
+      aActionCell.addChild (" ");
+      aActionCell.addChild (eState.isInProgress () ? new HCA (aWPEC.getSelfHref ()
+                                                                   .add (CPageParam.PARAM_ACTION, ACTION_RENEW_KEY)
+                                                                   .add (CPageParam.PARAM_OBJECT, aCurObject.getID ()))
+                                                                                                                       .setTitle ("Generate a new migration key for the Participant Migration of '" +
+                                                                                                                                  sParticipantID +
+                                                                                                                                  "'")
+                                                                                                                       .addChild (EDefaultIcon.REFRESH.getAsNode ())
                                                    : createEmptyAction ());
       aActionCell.addChild (" ");
       aActionCell.addChild (eState.isInProgress () ? new HCA (aWPEC.getSelfHref ()
