@@ -224,7 +224,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     if (!aSettings.isDirectoryIntegrationEnabled () || !aSettings.isDirectoryIntegrationAutoUpdate ())
       return null;
 
-    final PDClient ret = PDClientProvider.getInstance ().getPDClient ();
+    final PDClient ret = PDClientProvider.getInstance ().getPDClientOrNull ();
     if (ret == null)
       LOGGER.warn ("Failed to create the " +
                    SMPWebAppConfiguration.getDirectoryName () +

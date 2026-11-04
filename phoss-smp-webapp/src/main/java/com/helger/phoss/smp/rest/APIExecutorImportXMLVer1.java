@@ -92,7 +92,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
   public static final String PARAM_DRY_RUN = "dry-run";
 
   public static final IPeppolDirectoryPushCallback PD_PUSH = (@NonNull final IParticipantIdentifier aParticipantID) -> {
-    final PDClient aPDClient = PDClientProvider.getInstance ().getPDClient ();
+    final PDClient aPDClient = PDClientProvider.getInstance ().getPDClientOrNull ();
     if (aPDClient != null)
       return aPDClient.addServiceGroupToIndex (aParticipantID);
     return ESuccess.SUCCESS;

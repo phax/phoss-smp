@@ -18,6 +18,8 @@ package com.helger.phoss.smp.app;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.annotation.style.UsedViaReflection;
@@ -37,6 +39,8 @@ import com.helger.web.scope.singleton.AbstractGlobalWebSingleton;
 @ThreadSafe
 public final class PDClientProvider extends AbstractGlobalWebSingleton
 {
+  private static final Logger LOGGER = LoggerFactory.getLogger (PDClientProvider.class);
+
   private PDClient m_aPDClient;
 
   /**
@@ -77,9 +81,13 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
   /**
    * @return The {@link PDClient} to be used with the current settings. May be <code>null</code> if
    *         no Directory hostname is configured.
+   * @throws PDClientCreationException
+   *         If the client cannot be created, e.g. because the PD client configuration is incomplete
+   *         or invalid. The cause is the original exception.
+   * @see #getPDClientOrNull()
    */
   @Nullable
-  public PDClient getPDClient ()
+  public PDClient getPDClient () throws PDClientCreationException
   {
     PDClient ret = m_aRWLock.readLockedGet (() -> m_aPDClient);
     if (ret == null)
@@ -95,8 +103,17 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
           if (ret == null)
           {
             // Create a new one
-            ret = m_aPDClient = new PDClient (sPDHostName);
-            // Note: by default a logging exception handler is installed
+            try
+            {
+              ret = m_aPDClient = new PDClient (sPDHostName);
+              // Note: by default a logging exception handler is installed
+            }
+            catch (final RuntimeException ex)
+            {
+              // E.g. NullPointerException for a missing key store type
+              throw new PDClientCreationException ("Failed to create the PDClient. Please check the PD client configuration.",
+                                                   ex);
+            }
           }
         }
         finally
@@ -106,5 +123,27 @@ public final class PDClientProvider extends AbstractGlobalWebSingleton
       }
     }
     return ret;
+  }
+
+  /**
+   * Same as {@link #getPDClient()} but never throws an exception. Use this variant if the caller
+   * cannot do anything useful with a failure, e.g. when running in the background.
+   *
+   * @return The {@link PDClient} to be used with the current settings. May be <code>null</code> if
+   *         no Directory hostname is configured or if the client could not be created. In the
+   *         latter case the problem is logged.
+   */
+  @Nullable
+  public PDClient getPDClientOrNull ()
+  {
+    try
+    {
+      return getPDClient ();
+    }
+    catch (final PDClientCreationException ex)
+    {
+      LOGGER.error ("Failed to get the PDClient", ex);
+      return null;
+    }
   }
 }

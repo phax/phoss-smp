@@ -61,6 +61,7 @@ import com.helger.pd.client.PDClient;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.app.PDClientCreationException;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -326,10 +327,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
           final ISMPSettings aSettings = SMPMetaManager.getSettings ();
           aWPEC.postRedirectGetInternal (success ("The selected Business Card was successfully deleted!" +
                                                   (aSettings.isDirectoryIntegrationEnabled () &&
-                                                   aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
-                                                                                                   SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                   " server is updated in the background."
-                                                                                                 : "")));
+                                                    aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
+                                                                                                    SMPWebAppConfiguration.getDirectoryName () +
+                                                                                                    " server is updated in the background."
+                                                                                                  : "")));
         }
         else
           aWPEC.postRedirectGetInternal (error ("Failed to delete the selected Business Card!"));
@@ -345,15 +346,17 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
                           PDClient aPDClient = null;
-                          Exception aCaughtEx = null;
+                          Throwable aCaughtEx = null;
                           try
                           {
                             aPDClient = PDClientProvider.getInstance ().getPDClient ();
                           }
-                          catch (final IllegalStateException ex)
+                          catch (final PDClientCreationException ex)
                           {
-                            aCaughtEx = ex;
+                            // Get the underlying RuntimeException
+                            aCaughtEx = ex.getCause ();
                           }
+
                           if (aPDClient == null)
                           {
                             aWPEC.postRedirectGetInternal (error ("Failed to create the " +
@@ -400,14 +403,15 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                         {
                           final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
                           PDClient aPDClient = null;
-                          Exception aCaughtEx = null;
+                          Throwable aCaughtEx = null;
                           try
                           {
                             aPDClient = PDClientProvider.getInstance ().getPDClient ();
                           }
-                          catch (final IllegalStateException ex)
+                          catch (final PDClientCreationException ex)
                           {
-                            aCaughtEx = ex;
+                            // Get the underlying RuntimeException
+                            aCaughtEx = ex.getCause ();
                           }
                           if (aPDClient == null)
                           {
@@ -731,9 +735,9 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                 aFormErrors.addFieldError (sFieldEmail, "The provided email address is invalid!");
 
             final boolean bIsAnySet = StringHelper.isNotEmpty (sType) ||
-                                      StringHelper.isNotEmpty (sName) ||
-                                      StringHelper.isNotEmpty (sPhoneNumber) ||
-                                      StringHelper.isNotEmpty (sEmail);
+              StringHelper.isNotEmpty (sName) ||
+              StringHelper.isNotEmpty (sPhoneNumber) ||
+              StringHelper.isNotEmpty (sEmail);
 
             if (aFormErrors.size () == nErrors2 && bIsAnySet)
             {
@@ -810,10 +814,10 @@ public final class PageSecureBusinessCard extends AbstractSMPWebPageForm <ISMPBu
                                                 aServiceGroup.getID () +
                                                 "' was successfully saved." +
                                                 (aSettings.isDirectoryIntegrationEnabled () &&
-                                                 aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
-                                                                                                 SMPWebAppConfiguration.getDirectoryName () +
-                                                                                                 " server is updated in the background."
-                                                                                               : "")));
+                                                  aSettings.isDirectoryIntegrationAutoUpdate () ? " " +
+                                                                                                  SMPWebAppConfiguration.getDirectoryName () +
+                                                                                                  " server is updated in the background."
+                                                                                                : "")));
       }
       else
         aWPEC.postRedirectGetInternal (error ("Error creating the Business Card for Service Group '" +

@@ -22,6 +22,7 @@ import org.jspecify.annotations.NonNull;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
+import com.helger.pd.client.PDClient;
 import com.helger.phoss.smp.app.PDClientProvider;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
@@ -57,12 +58,20 @@ public final class APIExecutorBusinessCardPush extends AbstractSMPAPIExecutor
     // Check if credentials are present
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
 
+    final PDClient aPDClient = PDClientProvider.getInstance ().getPDClientOrNull ();
+    if (aPDClient == null)
+    {
+      throw new SMPPreconditionFailedException ("Failed to create the " +
+                                                SMPWebAppConfiguration.getDirectoryName () +
+                                                " client component. Please check the configuration. pushBusinessCard will not be executed",
+                                                aDataProvider.getCurrentURI ());
+    }
+
     // Do main push
     // The PDClient stuff must be here, because the backend project is missing the dependency
     new BusinessCardServerAPI (aDataProvider).pushBusinessCard (sPathServiceGroupID,
                                                                 aCredentials,
-                                                                PDClientProvider.getInstance ()
-                                                                                .getPDClient ()::addServiceGroupToIndex);
+                                                                aPDClient::addServiceGroupToIndex);
     aUnifiedResponse.createOk ();
   }
 }
