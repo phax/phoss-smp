@@ -22,9 +22,11 @@ import com.helger.base.callback.CallbackList;
 import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.datetime.xml.XMLOffsetDateTime;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
@@ -170,6 +172,11 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
     return 0;
   }
 
+  public long getEndpointCountUsingAccessPoint (@Nullable final String sAccessPointID)
+  {
+    return 0;
+  }
+
   @NonNull
   @ReturnsMutableCopy
   public ICommonsMap <String, IEndpointUsageInfo> getEndpointDocumentTypeUsageMap ()
@@ -184,6 +191,12 @@ final class MockSMPServiceInformationManager implements ISMPServiceInformationMa
                                                 @Nullable final XMLOffsetDateTime aNewActivation,
                                                 final boolean bChangeExpiration,
                                                 @Nullable final XMLOffsetDateTime aNewExpiration)
+  {
+    return 0;
+  }
+
+  public long useAccessPointForMatchingEndpoints (@NonNull final String sAccessPointID,
+                                                  final boolean bRequireSameEndpointReference)
   {
     return 0;
   }

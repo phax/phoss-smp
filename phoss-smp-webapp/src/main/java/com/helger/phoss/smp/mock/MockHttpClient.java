@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -172,6 +173,18 @@ public class MockHttpClient implements AutoCloseable
                                @NonNull final HttpEntity aEntity)
   {
     return put (sPath, aCredentials.getRequestValue (), aEntity);
+  }
+
+  @NonNull
+  public MockHttpResponse post (@Nullable final String sPath, @Nullable final String sAuthorization)
+  {
+    return _execute (new HttpPost (_getURL (sPath)), sAuthorization);
+  }
+
+  @NonNull
+  public MockHttpResponse post (@Nullable final String sPath, @NonNull final BasicAuthClientCredentials aCredentials)
+  {
+    return post (sPath, aCredentials.getRequestValue ());
   }
 
   @NonNull

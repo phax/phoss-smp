@@ -35,6 +35,7 @@ import com.helger.phoss.smp.backend.sql.SMPJdbcConfiguration;
 import com.helger.phoss.smp.config.SMPConfigProvider;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.accesspoint.ISMPAccessPointManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -140,9 +141,18 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
   }
 
   @NonNull
-  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory)
+  public ISMPAccessPointManager createAccessPointMgr ()
   {
-    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
+    return new SMPAccessPointManagerJDBC (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_PREFIX);
+  }
+
+  @NonNull
+  public ISMPServiceInformationManager createServiceInformationMgr (@NonNull final IIdentifierFactory aIdentifierFactory,
+                                                                    @NonNull final ISMPAccessPointManager aAccessPointMgr)
+  {
+    return new SMPServiceInformationManagerJDBC (SMPDBExecutor::new,
+                                                 SMPDBExecutor.TABLE_NAME_PREFIX,
+                                                 aAccessPointMgr);
   }
 
   @NonNull
