@@ -61,6 +61,7 @@ import com.helger.phoss.smp.domain.serviceinfo.ISMPEndpoint;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPProcess;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
+import com.helger.phoss.smp.domain.transportprofile.ISMPTransportProfileManager;
 import com.helger.phoss.smp.security.SMPCertificateHelper;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.phoss.smp.security.SMPTrustManager;
@@ -532,6 +533,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final ISMPServiceGroupManager aServiceGroupMgr = SMPMetaManager.getServiceGroupMgr ();
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
+    final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
     final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
     final OffsetDateTime aNowPlusDT = aNowDT.plusMonths (3);
@@ -612,11 +614,12 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
                 {
                   final HCUL aULPerEndpoint = new HCUL ();
 
-                  final ESMPTransportProfile eTransportProfile = ESMPTransportProfile.getFromIDOrNull (aEndpoint.getTransportProfile ());
-                  if (eTransportProfile == null)
-                    aULPerEndpoint.addItem (_createWarning ("The endpoint uses the non-standard transport profile '" +
-                                                            aEndpoint.getTransportProfile () +
-                                                            "'."));
+                  final String sTransportProfileID = aEndpoint.getTransportProfile ();
+                  if (ESMPTransportProfile.getFromIDOrNull (sTransportProfileID) == null &&
+                      !aTransportProfileMgr.containsSMPTransportProfileWithID (sTransportProfileID))
+                    aULPerEndpoint.addItem (_createWarning ("The endpoint uses the transport profile '" +
+                                                            sTransportProfileID +
+                                                            "' which is neither a standard transport profile nor configured in the transport profile administration."));
 
                   if (aEndpoint.getServiceActivationDateTime () != null)
                   {
