@@ -24,7 +24,7 @@ import com.helger.photon.core.execcontext.ILayoutExecutionContext;
 
 /**
  * Sticky button toolbar
- * 
+ *
  * @author Philip Helger
  */
 public class HCButtonToolbarSticky extends BootstrapButtonToolbar
@@ -33,5 +33,8 @@ public class HCButtonToolbarSticky extends BootstrapButtonToolbar
   {
     super (aLEC);
     addClasses (CBootstrapCSS.STICKY_BOTTOM, CBootstrapCSS.BG_LIGHT, CBootstrapCSS.BORDER_TOP, CBootstrapCSS.P_3);
+    // To take the full width
+    removeClass (CBootstrapCSS.D_INLINE_FLEX);
+    addClass (CBootstrapCSS.D_FLEX);
   }
 }
