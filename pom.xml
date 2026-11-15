@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.helger</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
   <version>8.7.2-SNAPSHOT</version>
@@ -67,20 +67,27 @@
   </developers>
 
   <properties>
-    <flyway.version>13.12.1</flyway.version>
+    <flyway.version>13.12.2</flyway.version>
     <log4j.version>2.26.1</log4j.version>
     <mongodb.version>5.14.0</mongodb.version>
     <protobuf.version>4.36.2</protobuf.version>
     
-    <ph-db.version>8.5.1</ph-db.version>
+    <ph-db.version>8.5.2</ph-db.version>
   </properties>
   
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.helger.commons</groupId>
-        <artifactId>ph-commons-parent-pom</artifactId>
-        <version>12.6.0</version>
+        <artifactId>ph-commons-bom</artifactId>
+        <version>12.7.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-totp-bom</artifactId>
+        <version>2.1.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -91,80 +98,88 @@
       </dependency>
       <dependency>
         <groupId>com.helger.schedule</groupId>
-        <artifactId>ph-schedule-parent-pom</artifactId>
-        <version>6.2.1</version>
+        <artifactId>ph-schedule-bom</artifactId>
+        <version>6.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.masterdata</groupId>
-        <artifactId>ph-masterdata-parent-pom</artifactId>
-        <version>8.2.1</version>
+        <artifactId>ph-masterdata-bom</artifactId>
+        <version>8.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger</groupId>
         <artifactId>ph-css-parent-pom</artifactId>
-        <version>8.4.0</version>
+        <version>8.4.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.web</groupId>
-        <artifactId>ph-web-parent-pom</artifactId>
-        <version>11.5.0</version>
+        <artifactId>ph-web-bom</artifactId>
+        <version>11.5.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.photon</groupId>
-        <artifactId>ph-oton-parent-pom</artifactId>
-        <version>10.8.0</version>
+        <artifactId>ph-oton-bom</artifactId>
+        <version>10.8.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>com.helger.photon</groupId>
-        <artifactId>ph-oton-bootstrap5-parent-pom</artifactId>
+        <groupId>com.helger.photon.icon</groupId>
+        <artifactId>ph-oton-icon-bom</artifactId>
         <version>1.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>com.helger.photon</groupId>
+        <artifactId>ph-oton-bootstrap5-bom</artifactId>
+        <version>1.0.3</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>com.helger.peppol</groupId>
-        <artifactId>peppol-commons-parent-pom</artifactId>
-        <version>13.2.2</version>
+        <artifactId>peppol-commons-bom</artifactId>
+        <version>13.2.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol.ui</groupId>
-        <artifactId>peppol-shared-ui-parent-pom</artifactId>
-        <version>0.11.3</version>
+        <artifactId>peppol-shared-ui-bom</artifactId>
+        <version>0.11.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.helger.peppol.directory</groupId>
-        <artifactId>peppol-directory-client-parent-pom</artifactId>
-        <version>1.0.1</version>
+        <artifactId>peppol-directory-client-bom</artifactId>
+        <version>1.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       
       <dependency>
-        <groupId>com.helger</groupId>
-        <artifactId>ph-totp-parent-pom</artifactId>
-        <version>2.1.1</version>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-bom</artifactId>
+        <version>4.0.9</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.ws</groupId>
+        <artifactId>jaxws-ri-bom</artifactId>
+        <version>4.0.5</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      
-      <dependency>
-        <groupId>com.fasterxml.woodstox</groupId>
-        <artifactId>woodstox-core</artifactId>
-        <version>7.1.1</version>
       </dependency>
       <!-- Used by Flyway -->
       <dependency>
@@ -174,26 +189,28 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
+        <artifactId>log4j-bom</artifactId>
         <version>${log4j.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.woodstox</groupId>
+        <artifactId>woodstox-core</artifactId>
+        <version>7.1.1</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>${log4j.version}</version>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit4.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-slf4j2-impl</artifactId>
-        <version>${log4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-web</artifactId>
-        <version>${log4j.version}</version>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${jakarta.servlet-api.version}</version>
       </dependency>
 
       <dependency>
@@ -242,6 +259,7 @@
   </dependencies>
   
   <modules>
+    <module>phoss-smp-bom</module>
     <module>phoss-smp-backend</module>
     <module>phoss-smp-backend-sql</module>
     <module>phoss-smp-backend-xml</module>
@@ -274,7 +292,7 @@
         <plugin>
           <groupId>com.helger.maven</groupId>
           <artifactId>ph-csscompress-maven-plugin</artifactId>
-          <version>8.4.0</version><!--$NO-MVN-MAN-VER$-->
+          <version>8.4.1</version><!--$NO-MVN-MAN-VER$-->
           <executions>
             <execution>
               <goals>
