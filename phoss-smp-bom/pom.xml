@@ -44,12 +44,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <scm>
-    <connection>scm:git:https://github.com/phax/phoss-smp.git</connection>
-    <developerConnection>scm:git:https://github.com/phax/phoss-smp.git</developerConnection>
-    <url>https://github.com/phax/phoss-smp</url>
-    <tag>HEAD</tag>
-  </scm>
   <organization>
     <name>Philip Helger</name>
     <url>https://www.helger.com</url>
