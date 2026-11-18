@@ -36,6 +36,7 @@ public final class CMenuSecure
   public static final String MENU_SERVICE_GROUPS_IMPORT = "service_groups_import";
   public static final String MENU_SERVICE_GROUPS_MIGRATE_OUTBOUND = "service_groups_migrate_outbound";
   public static final String MENU_SERVICE_GROUPS_MIGRATE_INBOUND = "service_groups_migrate_inbound";
+  public static final String MENU_SERVICE_GROUPS_CHANGE_OWNER = "service_groups_change_owner";
 
   public static final String MENU_ENDPOINTS = "endpoints";
   public static final String MENU_ENDPOINT_LIST = "endpoint_list";

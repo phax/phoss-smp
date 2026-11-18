@@ -39,6 +39,7 @@ import com.helger.photon.core.menu.IMenuObject;
 import com.helger.photon.core.menu.IMenuObjectFilter;
 import com.helger.photon.core.menu.IMenuTree;
 import com.helger.photon.core.menu.filter.MenuObjectFilterUserAssignedToUserGroup;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.util.SecurityHelper;
 import com.helger.photon.uicore.page.system.BasePageShowChildren;
 import com.helger.web.scope.singleton.AbstractRequestWebSingleton;
@@ -96,7 +97,9 @@ public final class MenuSecure
     final IMenuObjectFilter aFilterPeppolDirectory = x -> SMPMetaManager.getSettings ()
                                                                         .isDirectoryIntegrationEnabled () &&
                                                           SMPMetaManager.hasBusinessCardMgr ();
-    final IMenuObjectFilter aFilterSMLConnectionActive = x -> SMPMetaManager.getSettings ().isSMLEnabled ();
+    final IMenuObjectFilter aFilterMultipleActiveUsers = x -> PhotonSecurityManager.getUserMgr ()
+                                                                                    .getActiveUserCount () > 1;
+    final IMenuObjectFilter aFilterSMLConnectionActive =x -> SMPMetaManager.getSettings ().isSMLEnabled ();
     final IMenuObjectFilter aFilterSMLConnectionActiveOrNeeded = x -> {
       final ISMPSettings aSettings = SMPMetaManager.getSettings ();
       return aSettings.isSMLEnabled () || aSettings.isSMLRequired ();
@@ -114,6 +117,9 @@ public final class MenuSecure
                             new PageSecureServiceGroupMigrationOutbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_OUTBOUND));
       aMenuTree.createItem (aServiceGroups,
                             new PageSecureServiceGroupMigrationInbound (CMenuSecure.MENU_SERVICE_GROUPS_MIGRATE_INBOUND));
+      aMenuTree.createItem (aServiceGroups,
+                            new PageSecureServiceGroupChangeOwner (CMenuSecure.MENU_SERVICE_GROUPS_CHANGE_OWNER))
+               .setDisplayFilter (aFilterMultipleActiveUsers);
     }
     {
       final IMenuItemPage aEndpoints = aMenuTree.createRootItem (new BasePageShowChildren <> (CMenuSecure.MENU_ENDPOINTS,
