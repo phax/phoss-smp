@@ -53,6 +53,7 @@ import com.helger.phoss.smp.ui.AbstractSMPWebPageForm;
 import com.helger.phoss.smp.ui.SMPCommonUI;
 import com.helger.phoss.smp.ui.secure.hc.HCServiceGroupSelect;
 import com.helger.phoss.smp.ui.secure.hc.IHCServiceGroupSelect;
+import com.helger.photon.bootstrap5.alert.BootstrapErrorBox;
 import com.helger.photon.bootstrap5.alert.BootstrapWarnBox;
 import com.helger.photon.bootstrap5.button.BootstrapButton;
 import com.helger.photon.bootstrap5.buttongroup.BootstrapButtonToolbar;
@@ -132,7 +133,7 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                         {
                           aForm.addChild (question ("Are you sure you want to cancel the outbound Participant Migration for '" +
                                                     aSelectedObject.getParticipantIdentifier ().getURIEncoded () +
-                                                    "'? This action will keep the Service Group in this SMP and not migrate it away."));
+                                                    "'? This action will keep the Service Group in this SMP and not migrate it away. The migration key will be removed from the SML and become invalid."));
                         }
 
                         @Override
@@ -140,20 +141,56 @@ public final class PageSecureServiceGroupMigrationOutbound extends AbstractSMPWe
                                                       @Nullable final ISMPParticipantMigration aSelectedObject)
                         {
                           final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
+                          final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+                          final IParticipantIdentifier aParticipantID = aSelectedObject.getParticipantIdentifier ();
+                          final String sParticipantID = aParticipantID.getURIEncoded ();
+
+                          if (!aSettings.hasSMLInfo () || !aSettings.isSMLEnabled ())
+                          {
+                            aWPEC.postRedirectGetInternal (error ("No SML Configuration is selected or the SML Connection is not enabled hence the Participant Migration of '" +
+                                                                  sParticipantID +
+                                                                  "' cannot be cancelled."));
+                            return;
+                          }
+
+                          try
+                          {
+                            final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSettings.getSMLInfo ());
+
+                            // Remove the prepared migration from the SML, so that the migration key becomes invalid
+                            aCaller.cancelMigration (aParticipantID, SMPServerConfiguration.getSMLSMPID ());
+                            LOGGER.info ("Successfully called cancelMigration on SML for participant '" +
+                                         sParticipantID +
+                                         "'");
+                          }
+                          catch (final Exception ex)
+                          {
+                            LOGGER.error ("Error invoking cancelMigration on SML", ex);
+                            final BootstrapErrorBox aErrorBox = error (div ("Failed to cancel the migration of participant '" +
+                                                                            sParticipantID +
+                                                                            "' in SML."));
+                            if (SmpSmlHelper.isCancelMigrationUnsupported (ex))
+                            {
+                              aErrorBox.addChild (div (SmpSmlHelper.CANCEL_MIGRATION_UNSUPPORTED_MSG));
+                              aErrorBox.addChild (div ("The Participant Migration stays in progress. To invalidate the migration key handed over to the target SMP, generate a new migration key instead."));
+                            }
+                            aErrorBox.addChild (SMPCommonUI.getTechnicalDetailsUI (ex));
+                            aWPEC.postRedirectGetInternal (aErrorBox);
+                            return;
+                          }
+
                           if (aParticipantMigrationMgr.setParticipantMigrationState (aSelectedObject.getID (),
                                                                                      EParticipantMigrationState.CANCELLED)
                                                       .isChanged ())
                           {
                             aWPEC.postRedirectGetInternal (success ("The outbound Participant Migration for '" +
-                                                                    aSelectedObject.getParticipantIdentifier ()
-                                                                                   .getURIEncoded () +
+                                                                    sParticipantID +
                                                                     "' was successfully cancelled!"));
                           }
                           else
                           {
                             aWPEC.postRedirectGetInternal (error ("Failed to cancel outbound Participant Migration for '" +
-                                                                  aSelectedObject.getParticipantIdentifier ()
-                                                                                 .getURIEncoded () +
+                                                                  sParticipantID +
                                                                   "'!"));
                           }
                         }

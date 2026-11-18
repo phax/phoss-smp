@@ -24,8 +24,15 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
+import com.helger.peppol.sml.ISMLInfo;
+import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
+import com.helger.peppol.smlclient.participant.BadRequestFault;
+import com.helger.peppol.smlclient.participant.InternalErrorFault;
+import com.helger.peppol.smlclient.participant.NotFoundFault;
+import com.helger.peppol.smlclient.participant.UnauthorizedFault;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
@@ -34,11 +41,15 @@ import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.user.SMPUserManagerPhoton;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPPreconditionFailedException;
+import com.helger.phoss.smp.exception.SMPSMLException;
 import com.helger.phoss.smp.restapi.ISMPServerAPIDataProvider;
 import com.helger.phoss.smp.restapi.SMPAPICredentials;
+import com.helger.phoss.smp.settings.ISMPSettings;
+import com.helger.phoss.smp.smlhook.SmpSmlHelper;
 import com.helger.photon.api.IAPIDescriptor;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.web.scope.IRequestWebScopeWithoutResponse;
+import com.sun.xml.ws.client.ClientTransportException;
 
 /**
  * REST API to cancel an outbound migration for a participant
@@ -78,8 +89,21 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
     final SMPAPICredentials aCredentials = getMandatoryAuth (aRequestScope.headers ());
     SMPUserManagerPhoton.validateUserCredentials (aCredentials);
 
+    final ISMPSettings aSettings = SMPMetaManager.getSettings ();
+    final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
     final ISMPParticipantMigrationManager aParticipantMigrationMgr = SMPMetaManager.getParticipantMigrationMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+
+    if (aSMLInfo == null)
+    {
+      throw new SMPPreconditionFailedException ("Currently no SML is available. Please select it in the UI at the 'SMP Settings' page",
+                                                aDataProvider.getCurrentURI ());
+    }
+    if (!aSettings.isSMLEnabled ())
+    {
+      throw new SMPPreconditionFailedException ("SML Connection is not enabled hence no participant migration can be cancelled",
+                                                aDataProvider.getCurrentURI ());
+    }
 
     final IParticipantIdentifier aServiceGroupID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
     if (aServiceGroupID == null)
@@ -109,6 +133,24 @@ public final class APIExecutorMigrationOutboundCancelPut extends AbstractSMPAPIE
                  " for the Service Group ID '" +
                  sPathServiceGroupID +
                  "'");
+
+    // Remove the prepared migration from the SML, so that the migration key becomes invalid
+    try
+    {
+      final ManageParticipantIdentifierServiceCaller aCaller = SmpSmlHelper.createSMLCallerPI (aSMLInfo);
+      aCaller.cancelMigration (aServiceGroupID, SMPServerConfiguration.getSMLSMPID ());
+      LOGGER.info (sLogPrefix + "Successfully called cancelMigration on SML");
+    }
+    catch (final BadRequestFault | InternalErrorFault | NotFoundFault | UnauthorizedFault | ClientTransportException ex)
+    {
+      throw new SMPSMLException ("Failed to call cancelMigration on SML for Service Group '" +
+                                 sPathServiceGroupID +
+                                 "'" +
+                                 (SmpSmlHelper.isCancelMigrationUnsupported (ex) ? ". " +
+                                                                                   SmpSmlHelper.CANCEL_MIGRATION_UNSUPPORTED_MSG
+                                                                                 : ""),
+                                 ex);
+    }
 
     // Change migration state
     if (aParticipantMigrationMgr.setParticipantMigrationState (sMigrationID, EParticipantMigrationState.CANCELLED)

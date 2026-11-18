@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import org.apache.hc.core5.util.Timeout;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.BDMSLClient;
 import com.helger.peppol.smlclient.ManageParticipantIdentifierServiceCaller;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
+import com.helger.peppol.smlclient.participant.BadRequestFault;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.security.SMPKeyManager;
 import com.helger.wsclient.WSClientConfig;
@@ -39,6 +41,15 @@ import com.helger.wsclient.WSClientConfig;
 @Immutable
 public final class SmpSmlHelper
 {
+  /**
+   * The error message of BDMSL versions before 5.1, that do not support cancelling a prepared
+   * migration via an empty migration key.
+   */
+  private static final String BDMSL_EMPTY_MIGRATION_KEY_ERROR = "The migration code can not be null or empty";
+
+  /** The user readable message if the SML does not support cancelling a prepared migration */
+  public static final String CANCEL_MIGRATION_UNSUPPORTED_MSG = "The SML does not support cancelling a prepared participant migration. This requires DomiSML 5.1 or later.";
+
   private static final Logger LOGGER = LoggerFactory.getLogger (SmpSmlHelper.class);
 
   private SmpSmlHelper ()
@@ -131,5 +142,23 @@ public final class SmpSmlHelper
     // and customize
     _customizeSmlCaller (aSMLEndpointURL, ret);
     return ret;
+  }
+
+  /**
+   * Check if the provided exception, thrown by
+   * {@link ManageParticipantIdentifierServiceCaller#cancelMigration(com.helger.peppolid.IParticipantIdentifier, String)},
+   * indicates that the SML does not support cancelling a prepared migration. BDMSL versions before
+   * 5.1 reject the empty migration key used for cancelling.
+   *
+   * @param aException
+   *        The exception to check. May be <code>null</code>.
+   * @return <code>true</code> if the SML does not support cancelling a migration.
+   * @since 8.8.0
+   */
+  public static boolean isCancelMigrationUnsupported (@Nullable final Exception aException)
+  {
+    return aException instanceof final BadRequestFault aFault &&
+           aFault.getMessage () != null &&
+           aFault.getMessage ().contains (BDMSL_EMPTY_MIGRATION_KEY_ERROR);
   }
 }
