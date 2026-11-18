@@ -80,10 +80,11 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     {
       // Don't write audit items into the database
       SMPReadOnlyPhotonSecurityManagerFactory.install (new PhotonSecurityManagerFactoryJDBC (SMPDBExecutor::new,
-                                                                                            SMPDBExecutor.TABLE_NAME_CUSTOMIZER));
+                                                                                             m_eDBType,
+                                                                                             SMPDBExecutor.TABLE_NAME_CUSTOMIZER));
     }
     else
-      PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
+      PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, m_eDBType, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Build Flyway configuration with fallback to main JDBC settings
     final IJdbcConfiguration aJdbcConfig = SMPDataSourceSingleton.getJdbcConfiguration ();
