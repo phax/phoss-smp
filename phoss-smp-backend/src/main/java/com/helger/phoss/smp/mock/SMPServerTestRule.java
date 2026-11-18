@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.helger.annotation.OverridingMethodsMustInvokeSuper;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.app.mock.PhotonAppWebTestRule;
 import com.helger.photon.security.CSecurity;
@@ -39,8 +40,11 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
     SMPMetaManager.initBackendFromConfiguration ();
 
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
-    // The backend must not be modified in read-only mode
-    if (!SMPMetaManager.isReadOnly () && !aUserMgr.containsWithID (CSecurity.USER_ADMINISTRATOR_ID))
+    // The backend must not be modified in read-only mode, and externally managed users are not
+    // created
+    if (!SMPMetaManager.isReadOnly () &&
+        SMPServerConfiguration.isSecurityPredefinedCreate () &&
+        !aUserMgr.containsWithID (CSecurity.USER_ADMINISTRATOR_ID))
       aUserMgr.createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
                                      CSecurity.USER_ADMINISTRATOR_EMAIL,
                                      CSecurity.USER_ADMINISTRATOR_EMAIL,

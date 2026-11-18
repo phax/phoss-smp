@@ -91,6 +91,8 @@ public final class SMPServerConfiguration
 
   public static final String KEY_SMP_READONLY = "smp.readonly";
 
+  public static final String KEY_SMP_SECURITY_PREDEFINED_CREATE = "smp.security.predefined.create";
+
   public static final String KEY_SML_SMPID = "sml.smpid";
   public static final String KEY_SML_SMP_IP = "sml.smp.ip";
   public static final String KEY_SML_SMP_HOSTNAME = "sml.smp.hostname";
@@ -164,6 +166,8 @@ public final class SMPServerConfiguration
   public static final boolean DEFAULT_SMP_TOTP_ENABLED = false;
   /** The read-only mode is opt-in and therefore disabled by default */
   public static final boolean DEFAULT_SMP_READONLY = false;
+  /** The predefined users, user groups and roles are created by default */
+  public static final boolean DEFAULT_SMP_SECURITY_PREDEFINED_CREATE = true;
   public static final boolean DEFAULT_SMP_STATUS_SHOW_CERTIFICATE_DATES = false;
 
   public static final String DEFAULT_SMP_BDXR2_CERTIFICATE_MIME_CODE = EMimeContentType.APPLICATION.buildMimeType ("base64")
@@ -624,6 +628,18 @@ public final class SMPServerConfiguration
   public static boolean isReadOnly ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_READONLY, DEFAULT_SMP_READONLY);
+  }
+
+  /**
+   * @return <code>true</code> if the predefined users, user groups and roles should be created on
+   *         startup if they are not present, <code>false</code> if they are managed externally.
+   *         Property <code>smp.security.predefined.create</code>. Defaults to <code>true</code>.
+   *         This is only evaluated on startup - changing this value requires a restart.
+   * @since 8.8.0
+   */
+  public static boolean isSecurityPredefinedCreate ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_SECURITY_PREDEFINED_CREATE, DEFAULT_SMP_SECURITY_PREDEFINED_CREATE);
   }
 
   /**

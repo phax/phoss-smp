@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.exception.InitializationException;
+import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
@@ -129,7 +130,15 @@ public final class SMPSecurity
       LOGGER.info ("Not creating the predefined users, roles and user groups, because the SMP runs in read-only mode");
     }
     else
-      _createPredefinedSecurityObjects ();
+      if (!SMPServerConfiguration.isSecurityPredefinedCreate ())
+      {
+        // The predefined users, roles and user groups are managed externally
+        LOGGER.info ("Not creating the predefined users, roles and user groups, because this is disabled via the configuration property '" +
+                     SMPServerConfiguration.KEY_SMP_SECURITY_PREDEFINED_CREATE +
+                     "'");
+      }
+      else
+        _createPredefinedSecurityObjects ();
 
     // New login logs out old user
     LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);
