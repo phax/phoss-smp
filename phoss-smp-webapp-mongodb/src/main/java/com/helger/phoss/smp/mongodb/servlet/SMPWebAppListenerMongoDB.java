@@ -29,6 +29,7 @@ import com.helger.base.id.factory.MemoryLongIDFactory;
 import com.helger.base.string.StringParser;
 import com.helger.io.file.SimpleFileIO;
 import com.helger.phoss.smp.backend.mongodb.audit.IDFactoryMongoDB;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.io.WebFileIO;
 
@@ -46,6 +47,13 @@ public class SMPWebAppListenerMongoDB extends SMPWebAppListener
   @Override
   protected void initGlobalIDFactory ()
   {
+    if (SMPMetaManager.isReadOnly ())
+    {
+      // Never reserve IDs in the database in read-only mode
+      super.initGlobalIDFactory ();
+      return;
+    }
+
     // Check if an old value is present
     final long nInitialCount;
     final File aOldFile = WebFileIO.getDataIO ().getFile (ID_FILENAME);

@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.base.state.EContinue;
 import com.helger.cache.regex.RegExHelper;
+import com.helger.http.CHttp;
 import com.helger.http.EHttpMethod;
 import com.helger.http.EHttpVersion;
 import com.helger.mime.CMimeType;
@@ -89,12 +90,24 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
 
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRestFilter.class);
 
+  /** Application internal paths, that are not served in read-only mode */
+  private static final String REGEX_READ_ONLY_BLOCKED_INTERNAL_PATHS = "^/(ajax|logout|secure)(/.*)?$";
+  /** Generic ph-oton servlet paths, that are not served in read-only mode, if no API matches */
+  private static final String REGEX_READ_ONLY_BLOCKED_SERVLET_PATHS = "^/(api|go|user|userupload)(/.*)?$";
+
+  private final boolean m_bReadOnly;
+
   public SMPRestFilter ()
   {
     final IAPIExceptionMapper aExceptionMapper = new SMPRestExceptionMapper ();
     final IAPIRegistry aAPIRegistry = GlobalAPIInvoker.getInstance ().getRegistry ();
 
     final String sQueryPathPrefix = SMPServerConfiguration.getRESTType ().getQueryPathPrefix ();
+
+    // In read-only mode only the public read APIs are registered. The configuration is used directly,
+    // so that this also works if the filter is instantiated before the context listener ran.
+    m_bReadOnly = SMPServerConfiguration.isReadOnly ();
+    final boolean bWritable = !m_bReadOnly;
 
     // BusinessCard
     {
@@ -105,6 +118,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aGetBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetBusinessCard);
     }
+    if (bWritable)
     {
       final APIDescriptor aPutBusinessCard = new APIDescriptor (APIPath.put (PATH_BUSINESSCARD +
                                                                              "{" +
@@ -115,6 +129,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aPutBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutBusinessCard);
     }
+    if (bWritable)
     {
       final APIDescriptor aDeleteBusinessCard = new APIDescriptor (APIPath.delete (PATH_BUSINESSCARD +
                                                                                    "{" +
@@ -124,6 +139,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aDeleteBusinessCard.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteBusinessCard);
     }
+    if (bWritable)
     {
       final APIDescriptor aPushBusinessCard = new APIDescriptor (APIPath.post (PATH_BUSINESSCARD +
                                                                                "{" +
@@ -146,6 +162,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     // List
+    if (bWritable)
     {
       final APIDescriptor aGetList = new APIDescriptor (APIPath.get (PATH_LIST + "/{" + PARAM_USER_ID + "}"),
                                                         new APIExecutorUserListGet ());
@@ -154,6 +171,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     // Service Group IDs
+    if (bWritable)
     {
       final APIDescriptor aGetServiceGroupIDs = new APIDescriptor (APIPath.get (PATH_SERVICE_GROUP_IDS + "/all"),
                                                                    new APIExecutorServiceGroupIDsGet ());
@@ -170,6 +188,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aGetServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetServiceGroup);
     }
+    if (bWritable)
     {
       final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                 new APIExecutorServiceGroupPut ());
@@ -178,6 +197,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aPutServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutServiceGroup);
     }
+    if (bWritable)
     {
       final APIDescriptor aDeleteServiceGroup = new APIDescriptor (APIPath.delete ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
                                                                    new APIExecutorServiceGroupDelete ());
@@ -198,6 +218,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aGetServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetServiceMetadata);
     }
+    if (bWritable)
     {
       final APIDescriptor aPutServiceMetadata = new APIDescriptor (APIPath.put ("/{" +
                                                                                 PARAM_SERVICE_GROUP_ID +
@@ -212,6 +233,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aPutServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutServiceMetadata);
     }
+    if (bWritable)
     {
       final APIDescriptor aDeleteServiceMetadata = new APIDescriptor (APIPath.delete ("/{" +
                                                                                       PARAM_SERVICE_GROUP_ID +
@@ -224,6 +246,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aDeleteServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteServiceMetadata);
     }
+    if (bWritable)
     {
       final APIDescriptor aDeleteAllServiceMetadata = new APIDescriptor (APIPath.delete ("/{" +
                                                                                          PARAM_SERVICE_GROUP_ID +
@@ -234,6 +257,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aDeleteAllServiceMetadata);
     }
     // Add a single Endpoint to a ServiceMetadata since 8.5.0
+    if (bWritable)
     {
       final APIDescriptor aPutServiceMetadataEndpoint = new APIDescriptor (APIPath.put ("/{" +
                                                                                         PARAM_SERVICE_GROUP_ID +
@@ -251,6 +275,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aPutServiceMetadataEndpoint);
     }
     // Delete a single process of a ServiceMetadata since 8.1.8
+    if (bWritable)
     {
       final APIDescriptor aDeleteServiceMetadataProcess = new APIDescriptor (APIPath.delete ("/{" +
                                                                                              PARAM_SERVICE_GROUP_ID +
@@ -267,6 +292,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     // Bulk change of endpoints since 8.7.0
+    if (bWritable)
     {
       final APIDescriptor aBulkChangeEndpointURL = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
                                                                                     "/url/bulk-change"),
@@ -275,6 +301,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aBulkChangeEndpointURL.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aBulkChangeEndpointURL);
     }
+    if (bWritable)
     {
       final APIDescriptor aBulkChangeEndpointTechnicalContactURL = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
                                                                                                     "/technicalcontacturl/bulk-change"),
@@ -283,6 +310,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aBulkChangeEndpointTechnicalContactURL.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aBulkChangeEndpointTechnicalContactURL);
     }
+    if (bWritable)
     {
       final APIDescriptor aBulkChangeEndpointServiceValidity = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
                                                                                                 "/servicevalidity/bulk-change"),
@@ -291,6 +319,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aBulkChangeEndpointServiceValidity.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aBulkChangeEndpointServiceValidity);
     }
+    if (bWritable)
     {
       final APIDescriptor aBulkChangeEndpointCertificate = new APIDescriptor (APIPath.post (PATH_ENDPOINTS +
                                                                                             "/certificate/bulk-change"),
@@ -322,6 +351,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aGetCustomProperties.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetCustomProperties);
     }
+    if (bWritable)
     {
       final APIDescriptor aPutCustomProperties = new APIDescriptor (APIPath.put ("/{" +
                                                                                  PARAM_SERVICE_GROUP_ID +
@@ -331,6 +361,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aPutCustomProperties.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutCustomProperties);
     }
+    if (bWritable)
     {
       final APIDescriptor aPutCustomProperty = new APIDescriptor (APIPath.put ("/{" +
                                                                                PARAM_SERVICE_GROUP_ID +
@@ -345,6 +376,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aPutCustomProperty.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aPutCustomProperty);
     }
+    if (bWritable)
     {
       final APIDescriptor aDeleteCustomProperty = new APIDescriptor (APIPath.delete ("/{" +
                                                                                      PARAM_SERVICE_GROUP_ID +
@@ -354,6 +386,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aDeleteCustomProperty.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aDeleteCustomProperty);
     }
+    if (bWritable)
     {
       final APIDescriptor aDeleteCustomProperty = new APIDescriptor (APIPath.delete ("/{" +
                                                                                      PARAM_SERVICE_GROUP_ID +
@@ -397,6 +430,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     // Exchange API since 5.6.0
+    if (bWritable)
     {
       final APIDescriptor aSMPExportAll = new APIDescriptor (APIPath.get ("/exchange/export/all/xml/v1"),
                                                              new APIExecutorExportAllXMLVer1 ());
@@ -404,6 +438,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aSMPExportAll);
     }
 
+    if (bWritable)
     {
       final APIDescriptor aSMPExportByOwner = new APIDescriptor (APIPath.get ("/exchange/export/byowner/{" +
                                                                               PARAM_USER_ID +
@@ -413,6 +448,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aSMPExportByOwner);
     }
 
+    if (bWritable)
     {
       final APIDescriptor aSMPExportByOwner = new APIDescriptor (APIPath.get ("/exchange/export/specific/{" +
                                                                               PARAM_SERVICE_GROUP_ID +
@@ -422,6 +458,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aSMPExportByOwner);
     }
 
+    if (bWritable)
     {
       final APIDescriptor aSMPExportOMIP = new APIDescriptor (APIPath.get ("/exchange/export/outboundmigip/xml/v1"),
                                                               new APIExecutorExportOutboundMigrationInProcessXMLVer ());
@@ -429,6 +466,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aAPIRegistry.registerAPI (aSMPExportOMIP);
     }
 
+    if (bWritable)
     {
       final APIDescriptor aSMPImportAll = new APIDescriptor (APIPath.put ("/exchange/import/xml/v1/{" +
                                                                           PARAM_USER_ID +
@@ -438,12 +476,14 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     // Migration list API since 8.6.2
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateOutboundList = new APIDescriptor (APIPath.get ("/migration/outbound"),
                                                                        new APIExecutorMigrationListGet (EParticipantMigrationDirection.OUTBOUND));
       aSMPMigrateOutboundList.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundList);
     }
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateInboundList = new APIDescriptor (APIPath.get ("/migration/inbound"),
                                                                       new APIExecutorMigrationListGet (EParticipantMigrationDirection.INBOUND));
@@ -452,6 +492,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     }
 
     // Migration API since 5.6.0
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateOutboundStart = new APIDescriptor (APIPath.put ("/migration/outbound/start/{" +
                                                                                      PARAM_SERVICE_GROUP_ID +
@@ -460,6 +501,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aSMPMigrateOutboundStart.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundStart);
     }
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateOutboundCancel = new APIDescriptor (APIPath.put ("/migration/outbound/cancel/{" +
                                                                                       PARAM_SERVICE_GROUP_ID +
@@ -468,6 +510,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aSMPMigrateOutboundCancel.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundCancel);
     }
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateOutboundFinalize = new APIDescriptor (APIPath.put ("/migration/outbound/finalize/{" +
                                                                                         PARAM_SERVICE_GROUP_ID +
@@ -476,6 +519,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aSMPMigrateOutboundFinalize.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateOutboundFinalize);
     }
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateInbound = new APIDescriptor (APIPath.put ("/migration/inbound/{" +
                                                                                PARAM_SERVICE_GROUP_ID +
@@ -486,6 +530,7 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aSMPMigrateInbound.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aSMPMigrateInbound);
     }
+    if (bWritable)
     {
       final APIDescriptor aSMPMigrateInbound = new APIDescriptor (APIPath.put ("/migration/inbound"),
                                                                   new APIExecutorMigrationInboundFromXMLPut ());
@@ -526,6 +571,15 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     if (RegExHelper.stringMatchesPattern ("^/(ajax|error|favicon.ico|logout|ping|public|resbundle|robots.txt|secure|smp-cspreporting|smp-ready|smp-status|stream)(/.*)?$",
                                           aAPIPath.getPath ()))
     {
+      if (m_bReadOnly && RegExHelper.stringMatchesPattern (REGEX_READ_ONLY_BLOCKED_INTERNAL_PATHS, aAPIPath.getPath ()))
+      {
+        // No management GUI in read-only mode
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug (LOG_PREFIX + "Blocking '" + aAPIPath.getPath () + "' because the SMP runs in read-only mode");
+        aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+        return EContinue.BREAK;
+      }
+
       // Explicitly other servlet
       if (LOGGER.isDebugEnabled ())
         LOGGER.debug (LOG_PREFIX +
@@ -539,6 +593,15 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     final InvokableAPIDescriptor aInvokableDescriptor = aAPI.getRegistry ().getAPIByPath (aAPIPath);
     if (aInvokableDescriptor == null)
     {
+      if (m_bReadOnly && RegExHelper.stringMatchesPattern (REGEX_READ_ONLY_BLOCKED_SERVLET_PATHS, aAPIPath.getPath ()))
+      {
+        // The generic ph-oton servlets are not needed in read-only mode
+        if (LOGGER.isDebugEnabled ())
+          LOGGER.debug (LOG_PREFIX + "Blocking '" + aAPIPath.getPath () + "' because the SMP runs in read-only mode");
+        aUnifiedResponse.setStatus (CHttp.HTTP_NOT_FOUND);
+        return EContinue.BREAK;
+      }
+
       // No API match
       return EContinue.CONTINUE;
     }

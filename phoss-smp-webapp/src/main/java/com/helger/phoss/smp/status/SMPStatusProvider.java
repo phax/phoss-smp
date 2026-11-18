@@ -106,7 +106,10 @@ public final class SMPStatusProvider
     aStatusData.add ("smp.resttype", SMPServerConfiguration.getRESTType ().getID ());
     aStatusData.add ("smp.identifiertype", SMPServerConfiguration.getIdentifierType ().getID ());
     aStatusData.add ("smp.id", SMPServerConfiguration.getSMLSMPID ());
-    aStatusData.add ("smp.writable-rest-api.enabled", !aSettings.isRESTWritableAPIDisabled ());
+    aStatusData.add ("smp.writable-rest-api.enabled",
+                     !SMPMetaManager.isReadOnly () && !aSettings.isRESTWritableAPIDisabled ());
+    // New in 8.8.0
+    aStatusData.add ("smp.read-only", SMPMetaManager.isReadOnly ());
     // New in 8.0.6
     aStatusData.add ("smp.rest-remote-query-api.enabled", !SMPServerConfiguration.isRestRemoteQueryAPIDisabled ());
     // New in 5.1.0

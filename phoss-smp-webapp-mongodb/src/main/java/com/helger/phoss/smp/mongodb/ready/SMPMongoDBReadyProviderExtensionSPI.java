@@ -18,6 +18,7 @@ package com.helger.phoss.smp.mongodb.ready;
 
 import com.helger.annotation.style.IsSPIImplementation;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.ready.ISMPReadyProviderExtensionSPI;
 
 /**
@@ -31,6 +32,9 @@ public class SMPMongoDBReadyProviderExtensionSPI implements ISMPReadyProviderExt
 {
   public boolean isReady ()
   {
+    // A read-only SMP only needs to read from the database
+    if (SMPMetaManager.isReadOnly ())
+      return MongoClientSingleton.isDBReadable ();
     return MongoClientSingleton.isDBWritable ();
   }
 }
