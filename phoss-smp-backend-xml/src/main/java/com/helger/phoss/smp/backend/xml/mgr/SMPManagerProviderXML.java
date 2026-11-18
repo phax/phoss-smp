@@ -25,6 +25,7 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.pmigration.SMPParticipantMigrationManagerXML;
@@ -59,6 +60,15 @@ public final class SMPManagerProviderXML implements ISMPManagerProvider
 
   public SMPManagerProviderXML ()
   {}
+
+  @Override
+  public void beforeInitManagers ()
+  {
+    // The XML backend keeps all data in memory and writes files, so a read-only instance would
+    // never see changes of another instance
+    if (SMPMetaManager.isReadOnly ())
+      throw new InitializationException ("The read-only mode is not supported for the XML backend");
+  }
 
   @NonNull
   public ETriState getBackendConnectionEstablishedDefaultState ()
