@@ -85,6 +85,17 @@ To implement a **custom backend**, follow the pattern of `phoss-smp-backend-xml`
 1. Create a backend sub-project implementing `ISMPManagerProvider` and `ISMPBackendRegistrarSPI`
 2. Create a webapp sub-project that references your backend
 
+### Read-only mode (8.8.0+, work in progress, issue #592)
+
+`SMPMetaManager.setReadOnly (boolean)` must be called before `SMPMetaManager.initBackendFromConfiguration ()`; `SMPMetaManager.isReadOnly ()` is queried by the backends. The web layer does not set it yet (pending decision between separate read-only WARs and a configuration flag). In read-only mode the backend is never modified:
+- `SMPMetaManager` validates the system migration `ensure-transport-profiles-128` instead of executing it.
+- SQL and MongoDB install `SMPReadOnlyPhotonSecurityManagerFactory`, which wraps the backend factory but uses `SMPReadOnlyAuditManager` (audit items are only logged).
+- SQL never runs Flyway (regardless of `smp.flyway.enabled`); `FlywayMigrator.checkNoPendingMigrations` fails start-up if `info ().pending ()` is not empty. Checksums are not validated, because released scripts were edited later.
+- MongoDB skips the XML migrations and validates them instead; all index creation goes through `AbstractManagerMongoDB.createIndexUnlessReadOnly`. `MongoClientProvider.isDBReadable ()` reflects the read preference of the connection string.
+- `SMPServerTestRule` does not create the administrator user in read-only mode.
+
+Any new code that writes to the backend at start-up must respect `SMPMetaManager.isReadOnly ()`.
+
 ## Key Domain Concepts
 
 - **ServiceGroup**: A participant (identified by participant ID). The top-level entity.
