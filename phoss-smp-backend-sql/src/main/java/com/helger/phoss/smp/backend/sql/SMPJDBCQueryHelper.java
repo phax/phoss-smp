@@ -54,8 +54,8 @@ public final class SMPJDBCQueryHelper
 
   /**
    * The number of leading characters of a LOB column that are used for sorting on databases that
-   * cannot sort by a LOB column. Oracle limits a <code>VARCHAR2</code> in SQL to 4000 bytes, so this
-   * fits even with 4 bytes per character.
+   * cannot sort by a LOB column. Oracle limits a <code>VARCHAR2</code> in SQL to 4000 bytes, so
+   * this fits even with 4 bytes per character.
    *
    * @since 8.8.0
    */
@@ -87,8 +87,8 @@ public final class SMPJDBCQueryHelper
   }
 
   /**
-   * Create the database specific SQL expression to sort by a LOB column. Oracle and DB2 cannot use a
-   * LOB column in an <code>ORDER BY</code> clause, so only the first {@link #LOB_SORT_LENGTH}
+   * Create the database specific SQL expression to sort by a LOB column. Oracle and DB2 cannot use
+   * a LOB column in an <code>ORDER BY</code> clause, so only the first {@link #LOB_SORT_LENGTH}
    * characters are used there. All other databases sort by the column itself.
    *
    * @param eDBType
@@ -115,8 +115,8 @@ public final class SMPJDBCQueryHelper
 
   /**
    * Create the resolver from the logical field name of a sort field to the SQL column expressions.
-   * Only sortable columns are resolved, everything else is rejected, so that a forged field name can
-   * never reach the SQL statement. The provided LOB columns are resolved to a database specific
+   * Only sortable columns are resolved, everything else is rejected, so that a forged field name
+   * can never reach the SQL statement. The provided LOB columns are resolved to a database specific
    * expression that can be sorted by.
    *
    * @param eDBType
@@ -219,8 +219,8 @@ public final class SMPJDBCQueryHelper
   /**
    * Create the combined <code>ORDER BY</code> and paging clause for the provided paging
    * specification, for a table that contains LOB columns. See
-   * {@link #getOrderByAndPagingClause(EDatabaseSystemType, ISMPTableColumn[], IPagingSpec)} for
-   * the details.
+   * {@link #getOrderByAndPagingClause(EDatabaseSystemType, ISMPTableColumn[], IPagingSpec)} for the
+   * details.
    *
    * @param eDBType
    *        The database system to create the clause for. May not be <code>null</code>.

@@ -161,11 +161,10 @@ final class FlywayMigrator
   }
 
   /**
-   * Check that the database schema contains all migrations known to this version, without
-   * modifying the database. This is used in read-only mode instead of {@link #runFlyway}. The
-   * Flyway configuration is built like in <code>FlywayMigrationRunner</code> of ph-db-flyway, but
-   * only the read-only <code>info</code> operation is invoked. Checksums are deliberately not
-   * validated.
+   * Check that the database schema contains all migrations known to this version, without modifying
+   * the database. This is used in read-only mode instead of {@link #runFlyway}. The Flyway
+   * configuration is built like in <code>FlywayMigrationRunner</code> of ph-db-flyway, but only the
+   * read-only <code>info</code> operation is invoked. Checksums are deliberately not validated.
    *
    * @param eDBType
    *        Database type. May not be <code>null</code>.
