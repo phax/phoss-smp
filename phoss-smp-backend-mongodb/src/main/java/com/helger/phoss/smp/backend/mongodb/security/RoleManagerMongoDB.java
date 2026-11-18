@@ -52,7 +52,7 @@ public class RoleManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IR
   public RoleManagerMongoDB ()
   {
     super (ROLE_COLLECTION_NAME);
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
   }
 
   @NonNull

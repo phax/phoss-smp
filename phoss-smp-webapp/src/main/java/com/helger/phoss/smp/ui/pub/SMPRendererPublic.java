@@ -48,6 +48,7 @@ import com.helger.html.hc.impl.HCNodeList;
 import com.helger.phoss.smp.app.CSMP;
 import com.helger.phoss.smp.app.SMPWebAppConfiguration;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.servlet.SMPLogoutServlet;
 import com.helger.photon.app.url.LinkHelper;
 import com.helger.photon.bootstrap5.CBootstrapCSS;
@@ -109,7 +110,8 @@ public final class SMPRendererPublic
     final IUser aUser = aLEC.getLoggedInUser ();
 
     final BootstrapNavbarToggleable aToggleable = aNavbar.addAndReturnToggleable ();
-    if (aUser != null)
+    // There is no management GUI in read-only mode
+    if (aUser != null && !SMPMetaManager.isReadOnly ())
     {
       final Locale aDisplayLocale = aLEC.getDisplayLocale ();
       aToggleable.addChild (new BootstrapButton ().addClass (CBootstrapCSS.MS_AUTO)

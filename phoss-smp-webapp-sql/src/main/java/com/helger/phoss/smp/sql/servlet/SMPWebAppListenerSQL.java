@@ -26,6 +26,7 @@ import com.helger.base.id.factory.GlobalIDFactory;
 import com.helger.base.string.StringParser;
 import com.helger.io.file.SimpleFileIO;
 import com.helger.phoss.smp.backend.sql.mgr.SMPIDFactoryJDBC;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.servlet.SMPWebAppListener;
 import com.helger.photon.io.WebFileIO;
 
@@ -41,6 +42,13 @@ public class SMPWebAppListenerSQL extends SMPWebAppListener
   @Override
   protected void initGlobalIDFactory ()
   {
+    if (SMPMetaManager.isReadOnly ())
+    {
+      // Never reserve IDs in the database in read-only mode
+      super.initGlobalIDFactory ();
+      return;
+    }
+
     // Check if an old value is present
     final long nInitialCount;
     final File aOldFile = WebFileIO.getDataIO ().getFile (ID_FILENAME);

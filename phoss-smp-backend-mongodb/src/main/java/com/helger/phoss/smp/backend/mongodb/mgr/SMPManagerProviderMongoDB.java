@@ -23,11 +23,14 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.helger.base.exception.InitializationException;
 import com.helger.base.state.ETriState;
 import com.helger.base.tostring.ToStringGenerator;
+import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.backend.SMPReadOnlyPhotonSecurityManagerFactory;
 import com.helger.phoss.smp.backend.mongodb.PhotonBasicManagerFactoryMongoDB;
 import com.helger.phoss.smp.backend.mongodb.PhotonSecurityManagerFactoryMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.RoleManagerMongoDB;
@@ -35,6 +38,7 @@ import com.helger.phoss.smp.backend.mongodb.security.UserGroupManagerMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.UserManagerMongoDB;
 import com.helger.phoss.smp.backend.mongodb.security.UserTokenManagerMongoDB;
 import com.helger.phoss.smp.domain.ISMPManagerProvider;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.businesscard.ISMPBusinessCardManager;
 import com.helger.phoss.smp.domain.pmigration.ISMPParticipantMigrationManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
@@ -73,6 +77,12 @@ import com.helger.web.scope.mgr.WebScoped;
 public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPManagerProviderMongoDB.class);
+  private static final String MIGRATION_ID_ROLES = "mongodb-security-migrate-roles-from-xml";
+  private static final String MIGRATION_ID_USERS = "mongodb-security-migrate-users-from-xml";
+  private static final String MIGRATION_ID_USER_GROUPS = "mongodb-security-migrate-usergroups-from-xml";
+  private static final String MIGRATION_ID_USER_TOKENS = "mongodb-security-migrate-usertokens-from-xml";
+  private static final String MIGRATION_ID_SYSTEM_MESSAGE = "mongodb-basic-migrate-sysmessage-from-xml";
+  private static final String MIGRATION_ID_LONG_RUNNING_JOBS = "mongodb-basic-migrate-longruningjobs-from-xml";
 
   /**
    * Bootstrap the MongoDB system migration history from the XML file. This must run before
@@ -120,7 +130,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
       // See issue #358, #359, #360 and #361
       final ISystemMigrationManager aSysMigMgr = PhotonBasicManager.getSystemMigrationMgr ();
 
-      aSysMigMgr.performMigrationIfNecessary ("mongodb-security-migrate-roles-from-xml", () -> {
+      aSysMigMgr.performMigrationIfNecessary (MIGRATION_ID_ROLES, () -> {
         LOGGER.info ("Migrating all roles from XML to MongoDB");
         try
         {
@@ -159,7 +169,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
         }
       });
 
-      aSysMigMgr.performMigrationIfNecessary ("mongodb-security-migrate-users-from-xml", () -> {
+      aSysMigMgr.performMigrationIfNecessary (MIGRATION_ID_USERS, () -> {
         LOGGER.info ("Migrating all users from XML to MongoDB");
         try
         {
@@ -197,10 +207,10 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
         }
       });
 
-      aSysMigMgr.performMigrationIfNecessary ("mongodb-security-migrate-usergroups-from-xml", () -> {
-        if (!aSysMigMgr.wasMigrationExecutedSuccessfully ("mongodb-security-migrate-roles-from-xml"))
+      aSysMigMgr.performMigrationIfNecessary (MIGRATION_ID_USER_GROUPS, () -> {
+        if (!aSysMigMgr.wasMigrationExecutedSuccessfully (MIGRATION_ID_ROLES))
           throw new IllegalStateException ("User groups can only be migrated, after roles were migrated");
-        if (!aSysMigMgr.wasMigrationExecutedSuccessfully ("mongodb-security-migrate-users-from-xml"))
+        if (!aSysMigMgr.wasMigrationExecutedSuccessfully (MIGRATION_ID_USERS))
           throw new IllegalStateException ("User groups can only be migrated, after users were migrated");
 
         LOGGER.info ("Migrating all user groups from XML to MongoDB");
@@ -243,7 +253,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
         }
       });
 
-      aSysMigMgr.performMigrationIfNecessary ("mongodb-security-migrate-usertokens-from-xml", () -> {
+      aSysMigMgr.performMigrationIfNecessary (MIGRATION_ID_USER_TOKENS, () -> {
         LOGGER.info ("Migrating all user tokens from XML to MongoDB");
         try
         {
@@ -282,7 +292,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
         }
       });
 
-      aSysMigMgr.performMigrationIfNecessary ("mongodb-basic-migrate-sysmessage-from-xml", () -> {
+      aSysMigMgr.performMigrationIfNecessary (MIGRATION_ID_SYSTEM_MESSAGE, () -> {
         LOGGER.info ("Migrating system message to MongoDB");
         try
         {
@@ -311,7 +321,7 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
         }
       });
 
-      aSysMigMgr.performMigrationIfNecessary ("mongodb-basic-migrate-longruningjobs-from-xml", () -> {
+      aSysMigMgr.performMigrationIfNecessary (MIGRATION_ID_LONG_RUNNING_JOBS, () -> {
         LOGGER.info ("Migrating all long running job results to MongoDB");
         try
         {
@@ -343,6 +353,27 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
     }
   }
 
+  private static void _validateMigrationsReadOnly ()
+  {
+    try (final WebScoped aWS = new WebScoped ())
+    {
+      final ISystemMigrationManager aSysMigMgr = PhotonBasicManager.getSystemMigrationMgr ();
+      final ICommonsList <String> aMissing = new CommonsArrayList <> ();
+      for (final String sMigrationID : new String [] { MIGRATION_ID_ROLES,
+                                                       MIGRATION_ID_USERS,
+                                                       MIGRATION_ID_USER_GROUPS,
+                                                       MIGRATION_ID_USER_TOKENS,
+                                                       MIGRATION_ID_SYSTEM_MESSAGE,
+                                                       MIGRATION_ID_LONG_RUNNING_JOBS })
+        if (!aSysMigMgr.wasMigrationExecutedSuccessfully (sMigrationID))
+          aMissing.add (sMigrationID);
+      if (aMissing.isNotEmpty ())
+        throw new InitializationException ("The SMP runs in read-only mode, but the following MongoDB migrations were not yet executed successfully: " +
+                                           aMissing +
+                                           ". Start a writable SMP instance on the same database first.");
+    }
+  }
+
   @Override
   public void beforeInitManagers ()
   {
@@ -350,14 +381,25 @@ public final class SMPManagerProviderMongoDB implements ISMPManagerProvider
     // Must be before PhotonSecurityManager is instantiated
     PhotonBasicManagerFactoryMongoDB.install ();
 
-    // Set the special PhotonSecurityManager factory
-    PhotonSecurityManagerFactoryMongoDB.install ();
+    if (SMPMetaManager.isReadOnly ())
+    {
+      // Don't write audit items into the database
+      SMPReadOnlyPhotonSecurityManagerFactory.install (new PhotonSecurityManagerFactoryMongoDB ());
 
-    // Bootstrap migration history from XML before any migration checks run
-    _migrateSystemMigrationsFromXML ();
+      // The database is never modified in read-only mode
+      _validateMigrationsReadOnly ();
+    }
+    else
+    {
+      // Set the special PhotonSecurityManager factory
+      PhotonSecurityManagerFactoryMongoDB.install ();
 
-    // Migrate the rest
-    _performMigrations ();
+      // Bootstrap migration history from XML before any migration checks run
+      _migrateSystemMigrationsFromXML ();
+
+      // Migrate the rest
+      _performMigrations ();
+    }
   }
 
   @NonNull

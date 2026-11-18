@@ -79,10 +79,10 @@ public class UserTokenManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     super (TOKEN_COLLECTION_NAME);
     ValueEnforcer.notNull (aUserMgr, "UserMgr");
     m_aUserMgr = aUserMgr;
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
     // Needed for the resolution of a Bearer token to its User Token, which happens on every
     // token authenticated REST request
-    getCollection ().createIndex (Indexes.ascending (BSON_USER_TOKEN_TOKENS + "." + BSON_USER_TOKEN_TOKEN_STRING));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_USER_TOKEN_TOKENS + "." + BSON_USER_TOKEN_TOKEN_STRING));
   }
 
   @NonNull

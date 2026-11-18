@@ -38,6 +38,7 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.phoss.smp.backend.mongodb.MongoClientProvider;
 import com.helger.phoss.smp.backend.mongodb.MongoClientSingleton;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.audit.AuditItem;
 import com.helger.photon.audit.EAuditActionType;
 import com.helger.photon.audit.IAuditActionStringProvider;
@@ -96,7 +97,9 @@ public class AuditorMongoDB implements IAuditor
     m_aCollection = MongoClientSingleton.getInstance ().getCollection (sCollectionName);
     // The audit collection grows unbounded and is only ever read sorted by date, so without this
     // index every read is a collection scan with an in-memory sort
-    m_aCollection.createIndex (Indexes.ascending (BSON_DT));
+    // The database is never modified in read-only mode
+    if (!SMPMetaManager.isReadOnly ())
+      m_aCollection.createIndex (Indexes.ascending (BSON_DT));
     m_aCurrentUserIDProvider = ValueEnforcer.notNull (aCurrentUserIDProvider, "UserIDProvider");
   }
 

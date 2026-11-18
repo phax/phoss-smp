@@ -56,7 +56,7 @@ public class SystemMigrationManagerMongoDB extends AbstractManagerMongoDB implem
   public SystemMigrationManagerMongoDB ()
   {
     super ("smp-sys-migration");
-    getCollection ().createIndex (Indexes.ascending (BSON_MIGRATION_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_MIGRATION_ID));
   }
 
   @NonNull

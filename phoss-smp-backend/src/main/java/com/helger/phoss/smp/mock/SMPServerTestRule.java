@@ -39,7 +39,8 @@ public class SMPServerTestRule extends PhotonAppWebTestRule
     SMPMetaManager.initBackendFromConfiguration ();
 
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
-    if (!aUserMgr.containsWithID (CSecurity.USER_ADMINISTRATOR_ID))
+    // The backend must not be modified in read-only mode
+    if (!SMPMetaManager.isReadOnly () && !aUserMgr.containsWithID (CSecurity.USER_ADMINISTRATOR_ID))
       aUserMgr.createPredefinedUser (CSecurity.USER_ADMINISTRATOR_ID,
                                      CSecurity.USER_ADMINISTRATOR_EMAIL,
                                      CSecurity.USER_ADMINISTRATOR_EMAIL,

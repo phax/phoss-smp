@@ -84,12 +84,12 @@ public final class SMPParticipantMigrationManagerMongoDB extends AbstractManager
   public SMPParticipantMigrationManagerMongoDB ()
   {
     super (COLLECTION_NAME);
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
     // Needed for the $lookup of ESMPServiceGroupFilter.NO_BLOCKING_MIGRATION, and for the deletion
     // of all migrations of a participant
-    getCollection ().createIndex (Indexes.ascending (BSON_PARTICIPANT_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_PARTICIPANT_ID));
     // Needed for the listing by direction and state
-    getCollection ().createIndex (Indexes.ascending (BSON_DIRECTION, BSON_STATE));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_DIRECTION, BSON_STATE));
   }
 
   @NonNull

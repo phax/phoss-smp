@@ -29,6 +29,8 @@ import com.helger.annotation.OverridingMethodsMustInvokeSuper;
 import com.helger.base.array.ArrayHelper;
 import com.helger.base.debug.GlobalDebug;
 import com.helger.base.exception.InitializationException;
+import com.helger.base.id.factory.GlobalIDFactory;
+import com.helger.base.id.factory.MemoryLongIDFactory;
 import com.helger.base.state.ETriState;
 import com.helger.base.string.StringHelper;
 import com.helger.base.url.URLHelper;
@@ -306,11 +308,32 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   }
 
   @Override
+  protected void initGlobalIDFactory ()
+  {
+    if (SMPMetaManager.isReadOnly ())
+    {
+      // No persistent IDs are needed in read-only mode, and nothing must be written
+      GlobalIDFactory.setPersistentLongIDFactory (new MemoryLongIDFactory ());
+      GlobalIDFactory.setPersistentIntIDFactory (() -> (int) GlobalIDFactory.getNewPersistentLongID ());
+    }
+    else
+      super.initGlobalIDFactory ();
+  }
+
+  @Override
   protected void onTheVeryBeginning (final ServletContext aSC)
   {
     super.onTheVeryBeginning (aSC);
 
     _initTimeZone ();
+
+    // Must be before the global ID factory and the backend are initialized
+    final boolean bReadOnly = SMPServerConfiguration.isReadOnly ();
+    SMPMetaManager.setReadOnly (bReadOnly);
+    if (bReadOnly)
+      LOGGER.warn ("This SMP runs in READ-ONLY mode (configuration property '" +
+                   SMPServerConfiguration.KEY_SMP_READONLY +
+                   "'). The management GUI and all writing REST APIs are disabled, and the backend is never modified.");
   }
 
   /**
@@ -533,7 +556,8 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
     ServletSettings.setEncodeURLs (false);
 
     // Avoid writing unnecessary stuff
-    setHandleStatisticsOnEnd (SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
+    // Never write statistics in read-only mode
+    setHandleStatisticsOnEnd (!SMPMetaManager.isReadOnly () && SMPWebAppConfiguration.isPersistStatisticsOnEnd ());
 
     // Check SMP ID
     {
@@ -619,9 +643,17 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
       PhotonGlobalState.state (CApplicationID.APP_ID_PUBLIC).setMenuTree (aMenuTree);
     }
     {
-      LOGGER.info ("Initializing secure menu");
       final MenuTree aMenuTree = new MenuTree ();
-      MenuSecure.init (aMenuTree);
+      if (SMPMetaManager.isReadOnly ())
+      {
+        // No management GUI in read-only mode - the secure menu stays empty
+        LOGGER.info ("Not initializing the secure menu, because the SMP runs in read-only mode");
+      }
+      else
+      {
+        LOGGER.info ("Initializing secure menu");
+        MenuSecure.init (aMenuTree);
+      }
       PhotonGlobalState.state (CApplicationID.APP_ID_SECURE).setMenuTree (aMenuTree);
     }
   }
@@ -629,7 +661,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initAjax (@NonNull final IAjaxRegistry aAjaxRegistry)
   {
-    CAjax.init (aAjaxRegistry);
+    // All Ajax functions are only used by the management GUI
+    if (!SMPMetaManager.isReadOnly ())
+      CAjax.init (aAjaxRegistry);
   }
 
   @Override
@@ -642,8 +676,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initUI ()
   {
-    // UI stuff
-    SMPCommonUI.init ();
+    // UI stuff of the management GUI
+    if (!SMPMetaManager.isReadOnly ())
+      SMPCommonUI.init ();
   }
 
   @Override
@@ -660,7 +695,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
 
     NiceNameHandler.reloadNames ();
 
+    if (!SMPMetaManager.isReadOnly ())
     {
+      // In read-only mode nothing changes, so no Directory update is needed
       LOGGER.info ("Init of Directory client stuff");
 
       // If the SMP settings change, the PD client must be re-created
@@ -723,7 +760,9 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   protected void initJobs ()
   {
     // Delete the outdated Service Group export files once a day
-    m_aExportPurgeJobTrigger = ServiceGroupExportPurgeJob.schedule ();
+    // No exports can be created in read-only mode
+    if (!SMPMetaManager.isReadOnly ())
+      m_aExportPurgeJobTrigger = ServiceGroupExportPurgeJob.schedule ();
   }
 
   @Override

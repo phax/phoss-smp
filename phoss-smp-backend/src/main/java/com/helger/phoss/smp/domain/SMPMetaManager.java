@@ -64,8 +64,10 @@ import com.helger.web.scope.mgr.WebScoped;
 public final class SMPMetaManager extends AbstractGlobalSingleton
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPMetaManager.class);
+  private static final String MIGRATION_ID_ENSURE_TRANSPORT_PROFILES = "ensure-transport-profiles-128";
 
   private static ISMPManagerProvider s_aManagerProvider = null;
+  private static volatile boolean s_bReadOnly = false;
 
   private IIdentifierFactory m_aIdentifierFactory;
   private ISMPURLProvider m_aSMPURLProvider;
@@ -116,6 +118,36 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   }
 
   /**
+   * Define whether the SMP runs in read-only mode. In read-only mode the backend is never modified:
+   * no schema migrations, no data migrations, no index creation and no persistent audit entries.
+   * Instead the backend is validated on startup. This must be called before {@link #getInstance()}
+   * is called, so before {@link #initBackendFromConfiguration()}.
+   *
+   * @param bReadOnly
+   *        <code>true</code> to enable read-only mode, <code>false</code> to disable it.
+   * @since 8.8.0
+   */
+  public static void setReadOnly (final boolean bReadOnly)
+  {
+    if (isGlobalSingletonInstantiated (SMPMetaManager.class))
+      LOGGER.warn ("Changing the read-only mode after singleton instantiation may not have the desired effect.");
+
+    s_bReadOnly = bReadOnly;
+    LOGGER.info ("The SMP read-only mode is " + (bReadOnly ? "enabled" : "disabled"));
+  }
+
+  /**
+   * @return <code>true</code> if the SMP runs in read-only mode, <code>false</code> if not. The
+   *         default is <code>false</code>.
+   * @see #setReadOnly(boolean)
+   * @since 8.8.0
+   */
+  public static boolean isReadOnly ()
+  {
+    return s_bReadOnly;
+  }
+
+  /**
    * @deprecated Only called via reflection
    */
   @Deprecated (forRemoval = false)
@@ -153,13 +185,26 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
     }
   }
 
+  private static void _validateMigrationsReadOnly ()
+  {
+    // Required for SQL version
+    try (final WebScoped aWS = new WebScoped ())
+    {
+      if (!PhotonBasicManager.getSystemMigrationMgr ()
+                             .wasMigrationExecutedSuccessfully (MIGRATION_ID_ENSURE_TRANSPORT_PROFILES))
+        throw new InitializationException ("The SMP runs in read-only mode, but the backend migration '" +
+                                           MIGRATION_ID_ENSURE_TRANSPORT_PROFILES +
+                                           "' was not yet executed successfully. Start a writable SMP instance on the same backend first.");
+    }
+  }
+
   private void _performMigrations ()
   {
     // Required for SQL version
     try (final WebScoped aWS = new WebScoped ())
     {
       // See issue #128
-      PhotonBasicManager.getSystemMigrationMgr ().performMigrationIfNecessary ("ensure-transport-profiles-128", () -> {
+      PhotonBasicManager.getSystemMigrationMgr ().performMigrationIfNecessary (MIGRATION_ID_ENSURE_TRANSPORT_PROFILES, () -> {
         LOGGER.info ("Started running migration to ensure all used transport profiles are automatically created");
         for (final ISMPServiceInformation aSI : m_aServiceInformationMgr.getAllSMPServiceInformation ())
           for (final ISMPProcess aProc : aSI.getAllProcesses ())
@@ -265,7 +310,10 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       // Instantiate eagerly, so that an invalid configuration is detected on startup
       SMPRestResponseCache.getInstance ();
 
-      _performMigrations ();
+      if (s_bReadOnly)
+        _validateMigrationsReadOnly ();
+      else
+        _performMigrations ();
 
       // After all
       s_aManagerProvider.afterInitManagers ();

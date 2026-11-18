@@ -28,6 +28,7 @@ import com.helger.db.api.config.IJdbcConfiguration;
 import com.helger.db.flyway.FlywayConfiguration;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.peppolid.factory.IIdentifierFactory;
+import com.helger.phoss.smp.backend.SMPReadOnlyPhotonSecurityManagerFactory;
 import com.helger.phoss.smp.backend.sql.SMPDBExecutor;
 import com.helger.phoss.smp.backend.sql.SMPDataSourceSingleton;
 import com.helger.phoss.smp.backend.sql.SMPFlywayConfigurationBuilder;
@@ -71,9 +72,18 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
     // Must be before Flyway and before PhotonSecurityManager is instantiated
     PhotonBasicManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
+    final boolean bReadOnly = SMPMetaManager.isReadOnly ();
+
     // Set the special PhotonSecurityManager factory
     // Must be before Flyway, so that auditing of Flyway actions (may) work
-    PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
+    if (bReadOnly)
+    {
+      // Don't write audit items into the database
+      SMPReadOnlyPhotonSecurityManagerFactory.install (new PhotonSecurityManagerFactoryJDBC (SMPDBExecutor::new,
+                                                                                            SMPDBExecutor.TABLE_NAME_CUSTOMIZER));
+    }
+    else
+      PhotonSecurityManagerFactoryJDBC.install (SMPDBExecutor::new, SMPDBExecutor.TABLE_NAME_CUSTOMIZER);
 
     // Build Flyway configuration with fallback to main JDBC settings
     final IJdbcConfiguration aJdbcConfig = SMPDataSourceSingleton.getJdbcConfiguration ();
@@ -83,7 +93,13 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
 
     // Flyway migration is enabled by default
     if (aFlywayConfig.isFlywayEnabled ())
-      FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType, aJdbcConfig, aFlywayConfig);
+    {
+      // The database schema is never modified in read-only mode - it is only checked
+      if (bReadOnly)
+        FlywayMigrator.Singleton.INSTANCE.checkNoPendingMigrations (m_eDBType, aJdbcConfig, aFlywayConfig);
+      else
+        FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType, aJdbcConfig, aFlywayConfig);
+    }
     else
       LOGGER.warn ("Flyway Migration is disabled according to the configuration key '" +
                    aFlywayBuilder.getConfigKeyEnabled () +

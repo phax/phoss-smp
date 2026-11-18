@@ -59,8 +59,8 @@ public class LongRunningJobResultManagerMongoDB extends AbstractManagerMongoDB i
   public LongRunningJobResultManagerMongoDB ()
   {
     super ("smp-long-running-job");
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
-    getCollection ().createIndex (Indexes.ascending (BSON_JOB_TYPE));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_JOB_TYPE));
   }
 
   @NonNull

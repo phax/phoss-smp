@@ -107,9 +107,9 @@ public final class SMPBusinessCardManagerMongoDB extends AbstractManagerMongoDB 
   {
     super (COLLECTION_NAME);
     m_aIdentifierFactory = aIdentifierFactory;
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
     // Needed for the $lookup of ESMPServiceGroupFilter.NO_BUSINESS_CARD
-    getCollection ().createIndex (Indexes.ascending (BSON_SERVICE_GROUP_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_SERVICE_GROUP_ID));
   }
 
   @NonNull

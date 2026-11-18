@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.exception.InitializationException;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.security.login.LoggedInUserManager;
 import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.photon.security.role.IRoleManager;
@@ -40,10 +41,8 @@ public final class SMPSecurity
   private SMPSecurity ()
   {}
 
-  public static void init ()
+  private static void _createPredefinedSecurityObjects ()
   {
-    LOGGER.info ("Starting to initialize SMP security");
-
     final IUserManager aUserMgr = PhotonSecurityManager.getUserMgr ();
     final IUserGroupManager aUserGroupMgr = PhotonSecurityManager.getUserGroupMgr ();
     final IRoleManager aRoleMgr = PhotonSecurityManager.getRoleMgr ();
@@ -118,6 +117,19 @@ public final class SMPSecurity
 
     if (nErrorCount > 0)
       throw new InitializationException ("Failed to init SMP Security with " + nErrorCount + " errors");
+  }
+
+  public static void init ()
+  {
+    LOGGER.info ("Starting to initialize SMP security");
+
+    if (SMPMetaManager.isReadOnly ())
+    {
+      // The predefined users, roles and user groups are created by a writable SMP instance
+      LOGGER.info ("Not creating the predefined users, roles and user groups, because the SMP runs in read-only mode");
+    }
+    else
+      _createPredefinedSecurityObjects ();
 
     // New login logs out old user
     LoggedInUserManager.getInstance ().setLogoutAlreadyLoggedInUser (true);

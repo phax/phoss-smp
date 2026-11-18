@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -81,6 +82,22 @@ public abstract class AbstractManagerMongoDB
   public final MongoCollection <Document> getCollection ()
   {
     return m_aCollection;
+  }
+
+  /**
+   * Create an index on the collection of this manager, unless the SMP runs in read-only mode. In
+   * read-only mode the backend must not be modified, so the indexes are expected to be created by a
+   * writable SMP instance on the same database.
+   *
+   * @param aKeys
+   *        The index keys. May not be <code>null</code>.
+   * @see SMPMetaManager#isReadOnly()
+   * @since 8.8.0
+   */
+  protected final void createIndexUnlessReadOnly (@NonNull final Bson aKeys)
+  {
+    if (!SMPMetaManager.isReadOnly ())
+      m_aCollection.createIndex (aKeys);
   }
 
   @NonNull

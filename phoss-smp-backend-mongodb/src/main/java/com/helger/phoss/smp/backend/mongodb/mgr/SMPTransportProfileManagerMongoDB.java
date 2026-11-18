@@ -53,7 +53,7 @@ public final class SMPTransportProfileManagerMongoDB extends AbstractManagerMong
   public SMPTransportProfileManagerMongoDB ()
   {
     super ("smp-transportprofile");
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
   }
 
   @NonNull
