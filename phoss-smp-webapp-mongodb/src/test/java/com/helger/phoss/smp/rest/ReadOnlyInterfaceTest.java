@@ -16,7 +16,6 @@
  */
 package com.helger.phoss.smp.rest;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -44,8 +43,8 @@ import com.helger.xsds.peppol.smp1.ServiceGroupType;
 import com.helger.xsds.peppol.smp1.ServiceMetadataReferenceCollectionType;
 
 /**
- * Test the read-only mode (configuration property <code>smp.readonly</code>) with the MongoDB backend.
- * A writable instance creates the test data first, and removes it afterwards.
+ * Test the read-only mode (configuration property <code>smp.readonly</code>) with the MongoDB
+ * backend. A writable instance creates the test data first, and removes it afterwards.
  *
  * @author Philip Helger
  */
