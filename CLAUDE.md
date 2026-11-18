@@ -85,14 +85,23 @@ To implement a **custom backend**, follow the pattern of `phoss-smp-backend-xml`
 1. Create a backend sub-project implementing `ISMPManagerProvider` and `ISMPBackendRegistrarSPI`
 2. Create a webapp sub-project that references your backend
 
-### Read-only mode (8.8.0+, work in progress, issue #592)
+### Read-only mode (8.8.0+, issue #592)
 
-`SMPMetaManager.setReadOnly (boolean)` must be called before `SMPMetaManager.initBackendFromConfiguration ()`; `SMPMetaManager.isReadOnly ()` is queried by the backends. The web layer does not set it yet (pending decision between separate read-only WARs and a configuration flag). In read-only mode the backend is never modified:
+Enabled with the configuration property `smp.readonly` (`SMPServerConfiguration.isReadOnly ()`, startup only). `SMPWebAppListener.onTheVeryBeginning` copies it into `SMPMetaManager.setReadOnly (boolean)`, which must happen before `SMPMetaManager.initBackendFromConfiguration ()`; at runtime always query `SMPMetaManager.isReadOnly ()`. `SMPRestFilter` reads the configuration directly in its constructor, so that it never registers writable APIs, even if the filter is created before the listener ran.
+
+Web layer in read-only mode:
+- `SMPRestFilter` registers only the public read APIs and the two custom property GETs (which keep their optional authentication). It answers 404 for `/secure`, `/logout`, `/ajax`, and for `/api`, `/go`, `/user`, `/userupload` if no REST API matches.
+- `SMPWebAppListener`: empty secure menu, no `CAjax`, no `SMPCommonUI`, no Directory callbacks, no export purge job, no statistics on shutdown, in-memory persistent ID factory (also in the SQL and MongoDB listener subclasses). `SMPSecurity.init` does not create the predefined users, roles and user groups.
+- `SMPRendererPublic` shows no administration/logout buttons; `SMPStatusProvider` emits `smp.read-only`; `SMPMongoDBReadyProviderExtensionSPI` checks readability instead of writability.
+- `SMPServerRESTTestRule` does not update the SMP settings.
+
+Backend in read-only mode (never modified):
 - `SMPMetaManager` validates the system migration `ensure-transport-profiles-128` instead of executing it.
 - SQL and MongoDB install `SMPReadOnlyPhotonSecurityManagerFactory`, which wraps the backend factory but uses `SMPReadOnlyAuditManager` (audit items are only logged).
 - SQL never runs Flyway (regardless of `smp.flyway.enabled`); `FlywayMigrator.checkNoPendingMigrations` fails start-up if `info ().pending ()` is not empty. Checksums are not validated, because released scripts were edited later.
 - MongoDB skips the XML migrations and validates them instead; all index creation goes through `AbstractManagerMongoDB.createIndexUnlessReadOnly`. `MongoClientProvider.isDBReadable ()` reflects the read preference of the connection string.
 - `SMPServerTestRule` does not create the administrator user in read-only mode.
+- The XML backend rejects the read-only mode on startup (`SMPManagerProviderXML.beforeInitManagers`).
 
 Any new code that writes to the backend at start-up must respect `SMPMetaManager.isReadOnly ()`.
 
@@ -216,6 +225,7 @@ smp.status.enabled = false     # /smp-status/ endpoint; off by default
 smp.ready.timeout = 2s         # time limit for the /smp-ready backend checks
 smp.totp.enabled = false       # two-factor auth (TOTP) for the management GUI; opt-in, restart required
 smp.totp.issuer = ...          # issuer shown in the authenticator app; defaults to the application title
+smp.readonly = false           # read-only mode: no GUI, no writing REST APIs, backend never modified; restart required
 
 # Reverse proxy support
 smp.forceroot = false          # Set true when behind a reverse proxy stripping context path
