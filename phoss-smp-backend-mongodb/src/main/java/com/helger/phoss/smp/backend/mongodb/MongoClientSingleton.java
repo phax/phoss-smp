@@ -96,6 +96,24 @@ public class MongoClientSingleton extends AbstractGlobalWebSingleton
     }
   }
 
+  /**
+   * @return <code>true</code> if the database can be read from, <code>false</code> if not.
+   * @see MongoClientProvider#isDBReadable()
+   * @since 8.8.0
+   */
+  public static boolean isDBReadable ()
+  {
+    try
+    {
+      return getClientProvider ().isDBReadable ();
+    }
+    catch (final IllegalStateException ex)
+    {
+      // On shutdown
+      return false;
+    }
+  }
+
   @NonNull
   public final MongoCollection <Document> getCollection (@NonNull @Nonempty final String sCollectionName)
   {

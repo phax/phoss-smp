@@ -59,7 +59,7 @@ public class SMPUserTotpManagerMongoDB extends AbstractManagerMongoDB implements
   public SMPUserTotpManagerMongoDB ()
   {
     super ("smp-user-totp");
-    getCollection ().createIndex (Indexes.ascending (BSON_USER_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_USER_ID));
   }
 
   @NonNull

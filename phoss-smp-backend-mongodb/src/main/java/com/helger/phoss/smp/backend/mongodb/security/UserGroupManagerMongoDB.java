@@ -66,7 +66,7 @@ public class UserGroupManagerMongoDB extends AbstractBusinessObjectManagerMongoD
     ValueEnforcer.notNull (aRoleMgr, "RoleMgr");
     m_aUserMgr = aUserMgr;
     m_aRoleMgr = aRoleMgr;
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
   }
 
   @Override

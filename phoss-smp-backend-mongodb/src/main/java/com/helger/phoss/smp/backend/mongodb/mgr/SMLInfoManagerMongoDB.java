@@ -53,7 +53,7 @@ public class SMLInfoManagerMongoDB extends AbstractManagerMongoDB implements ISM
   public SMLInfoManagerMongoDB ()
   {
     super ("smp-smlinfo");
-    getCollection ().createIndex (Indexes.ascending (BSON_ID));
+    createIndexUnlessReadOnly (Indexes.ascending (BSON_ID));
   }
 
   @NonNull

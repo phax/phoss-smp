@@ -36,8 +36,10 @@ import com.helger.base.log.ConditionalLogger;
 import com.helger.base.numeric.mutable.MutableInt;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.ReadPreference;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -83,10 +85,30 @@ public class MongoClientProvider implements AutoCloseable
   {
     private final AtomicBoolean m_aIsWritable = new AtomicBoolean (false);
     private final CountDownLatch m_aReadyLatch = new CountDownLatch (1);
+    private final ReadPreference m_aReadPreference;
+    private final AtomicBoolean m_aIsReadable = new AtomicBoolean (false);
+    private final CountDownLatch m_aReadableLatch = new CountDownLatch (1);
+
+    IsWriteable (@NonNull final ReadPreference aReadPreference)
+    {
+      m_aReadPreference = aReadPreference;
+    }
 
     @Override
     public void clusterDescriptionChanged (final ClusterDescriptionChangedEvent aEvent)
     {
+      final boolean bReadable = aEvent.getNewDescription ().hasReadableServer (m_aReadPreference);
+      if (m_aIsReadable.getAndSet (bReadable) != bReadable)
+      {
+        if (bReadable)
+        {
+          m_aReadableLatch.countDown ();
+          LOGGER.info ("Able to read from server");
+        }
+        else
+          LOGGER.error ("Unable to read from server");
+      }
+
       if (!m_aIsWritable.get ())
       {
         if (aEvent.getNewDescription ().hasWritableServer ())
@@ -116,13 +138,31 @@ public class MongoClientProvider implements AutoCloseable
       m_aIsWritable.set (bWritable);
     }
 
+    boolean isReadable ()
+    {
+      return m_aIsReadable.get ();
+    }
+
+    void setReadable (final boolean bReadable)
+    {
+      m_aIsReadable.set (bReadable);
+    }
+
     boolean awaitReady (final long nTimeoutMillis) throws InterruptedException
     {
       return m_aReadyLatch.await (nTimeoutMillis, TimeUnit.MILLISECONDS);
     }
+
+    boolean awaitReadable (final long nTimeoutMillis) throws InterruptedException
+    {
+      return m_aReadableLatch.await (nTimeoutMillis, TimeUnit.MILLISECONDS);
+    }
   }
 
-  /** Default timeout for waiting until the MongoDB server is writable (in milliseconds). */
+  /**
+   * Default timeout for waiting until the MongoDB server is writable (or readable in read-only mode)
+   * (in milliseconds).
+   */
   public static final long DEFAULT_READY_TIMEOUT_MILLIS = Duration.ofSeconds (10).toMillis ();
 
   public static final Integer SORT_ASCENDING = Integer.valueOf (1);
@@ -132,7 +172,7 @@ public class MongoClientProvider implements AutoCloseable
 
   private final MongoClient m_aMongoClient;
   private final MongoDatabase m_aDatabase;
-  private final IsWriteable m_aClusterListener = new IsWriteable ();
+  private final IsWriteable m_aClusterListener;
 
   public MongoClientProvider (@NonNull @Nonempty final String sConnectionString,
                               @NonNull @Nonempty final String sDBName)
@@ -147,29 +187,38 @@ public class MongoClientProvider implements AutoCloseable
     ValueEnforcer.notEmpty (sConnectionString, "ConnectionString");
     ValueEnforcer.notEmpty (sDBName, "DBName");
 
+    final ConnectionString aConnectionString = new ConnectionString (sConnectionString);
+    // The driver default is to read from the primary
+    final ReadPreference aReadPreference = aConnectionString.getReadPreference ();
+    m_aClusterListener = new IsWriteable (aReadPreference != null ? aReadPreference : ReadPreference.primary ());
+
     final MongoClientSettings aClientSettings = MongoClientSettings.builder ()
                                                                    .applicationName ("phoss SMP")
-                                                                   .applyConnectionString (new ConnectionString (sConnectionString))
+                                                                   .applyConnectionString (aConnectionString)
                                                                    .addCommandListener (new LoggingCommandListener ())
                                                                    .applyToClusterSettings (x -> x.addClusterListener (m_aClusterListener))
                                                                    .build ();
     m_aMongoClient = MongoClients.create (aClientSettings);
     m_aDatabase = m_aMongoClient.getDatabase (sDBName);
 
-    // Block until MongoDB is writable or timeout expires
+    // Block until MongoDB is writable (or readable in read-only mode) or timeout expires
     if (nReadyTimeoutMillis > 0)
     {
+      final boolean bReadOnly = SMPMetaManager.isReadOnly ();
+      final String sState = bReadOnly ? "readable" : "writable";
       try
       {
-        if (!m_aClusterListener.awaitReady (nReadyTimeoutMillis))
+        final boolean bReady = bReadOnly ? m_aClusterListener.awaitReadable (nReadyTimeoutMillis)
+                                         : m_aClusterListener.awaitReady (nReadyTimeoutMillis);
+        if (!bReady)
         {
-          LOGGER.warn ("MongoDB did not become writable within " + nReadyTimeoutMillis + " ms");
+          LOGGER.warn ("MongoDB did not become " + sState + " within " + nReadyTimeoutMillis + " ms");
         }
       }
       catch (final InterruptedException ex)
       {
         Thread.currentThread ().interrupt ();
-        LOGGER.error ("Interrupted while waiting for MongoDB to become writable");
+        LOGGER.error ("Interrupted while waiting for MongoDB to become " + sState);
       }
     }
   }
@@ -177,12 +226,23 @@ public class MongoClientProvider implements AutoCloseable
   public void close ()
   {
     m_aClusterListener.setWritable (false);
+    m_aClusterListener.setReadable (false);
     StreamHelper.close (m_aMongoClient);
   }
 
   public boolean isDBWritable ()
   {
     return m_aClusterListener.isWritable ();
+  }
+
+  /**
+   * @return <code>true</code> if a server matching the read preference of the connection string
+   *         (default: primary) is available, <code>false</code> if not.
+   * @since 8.8.0
+   */
+  public boolean isDBReadable ()
+  {
+    return m_aClusterListener.isReadable ();
   }
 
   /**
