@@ -91,21 +91,19 @@ public final class SMPManagerProviderSQL implements ISMPManagerProvider
                                                                                             aJdbcConfig);
     final FlywayConfiguration aFlywayConfig = aFlywayBuilder.build ();
 
-    if (bReadOnly)
+    // Flyway migration is enabled by default
+    if (aFlywayConfig.isFlywayEnabled ())
     {
-      // The database schema is never modified in read-only mode, independent of the configuration
-      FlywayMigrator.Singleton.INSTANCE.checkNoPendingMigrations (m_eDBType, aJdbcConfig, aFlywayConfig);
+      // The database schema is never modified in read-only mode - it is only checked
+      if (bReadOnly)
+        FlywayMigrator.Singleton.INSTANCE.checkNoPendingMigrations (m_eDBType, aJdbcConfig, aFlywayConfig);
+      else
+        FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType, aJdbcConfig, aFlywayConfig);
     }
     else
-    {
-      // Flyway migration is enabled by default
-      if (aFlywayConfig.isFlywayEnabled ())
-        FlywayMigrator.Singleton.INSTANCE.runFlyway (m_eDBType, aJdbcConfig, aFlywayConfig);
-      else
-        LOGGER.warn ("Flyway Migration is disabled according to the configuration key '" +
-                     aFlywayBuilder.getConfigKeyEnabled () +
-                     "'");
-    }
+      LOGGER.warn ("Flyway Migration is disabled according to the configuration key '" +
+                   aFlywayBuilder.getConfigKeyEnabled () +
+                   "'");
 
     // Register this here, so that the SMPMetaManager is available
     DBExecutor.setConnectionStatusChangeCallback ((eOld, eNew) ->

@@ -98,7 +98,7 @@ Web layer in read-only mode:
 Backend in read-only mode (never modified):
 - `SMPMetaManager` validates the system migration `ensure-transport-profiles-128` instead of executing it.
 - SQL and MongoDB install `SMPReadOnlyPhotonSecurityManagerFactory`, which wraps the backend factory but uses `SMPReadOnlyAuditManager` (audit items are only logged).
-- SQL never runs Flyway (regardless of `smp.flyway.enabled`); `FlywayMigrator.checkNoPendingMigrations` fails start-up if `info ().pending ()` is not empty. Checksums are not validated, because released scripts were edited later.
+- SQL never runs a Flyway migration. If Flyway is enabled (`smp.flyway.enabled`, default), `FlywayMigrator.checkNoPendingMigrations` fails start-up if `info ().pending ()` is not empty; if Flyway is disabled, nothing is checked. Checksums are not validated, because released scripts were edited later.
 - MongoDB skips the XML migrations and validates them instead; all index creation goes through `AbstractManagerMongoDB.createIndexUnlessReadOnly`. `MongoClientProvider.isDBReadable ()` reflects the read preference of the connection string.
 - `SMPServerTestRule` does not create the administrator user in read-only mode.
 - The XML backend rejects the read-only mode on startup (`SMPManagerProviderXML.beforeInitManagers`).
