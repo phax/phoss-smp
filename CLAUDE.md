@@ -170,6 +170,9 @@ UI page classes extend `AbstractSMPWebPageForm` or `AbstractSMPWebPageSimpleForm
 - **Migrations**: Flyway, scripts in `phoss-smp-backend-sql/src/main/resources/db/migrate-{mysql,postgresql,oracle,db2}/`
 - **Supported databases**: MySQL, PostgreSQL, Oracle, DB2 (set via `target-database` property)
 - Manager classes are named `SMP*ManagerJDBC` and live in `com.helger.phoss.smp.backend.sql.mgr`
+- Oracle stores an empty string as `NULL`: a column that may receive an empty string must be nullable (on Oracle at least), and mandatory values are read back with `StringHelper.getNotNull (...)` so that all databases behave the same. Since ph-db 8.5.3 a `NULL` CLOB is read as `null`, not as an empty string.
+- Oracle and DB2 cannot use a CLOB column in `DISTINCT`, `ORDER BY` or (Oracle) `=` comparisons. Compare in Java and update by primary key, and sort with `SMPJDBCQueryHelper.getLobSortExpression` (passed as LOB column names to `getOrderByAndPagingClause`).
+- A new Flyway migration needs a script for every database (`migrate-{db2,mysql,oracle,postgresql,sqlserver}`), even if only one database is affected - otherwise the versions diverge.
 
 Connection pool properties (v8.0.11+):
 ```properties

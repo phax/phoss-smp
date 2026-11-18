@@ -15,13 +15,14 @@
 -- limitations under the License.
 --
 
+-- The URL suffix columns are nullable, because Oracle stores an empty string as NULL
 CREATE TABLE smp_sml_info (
   id                varchar(45)  NOT NULL,
   displayname       varchar(256) NOT NULL,
   dnszone           varchar(256) NOT NULL,
   serviceurl        varchar(500) NOT NULL,
-  managesmp         varchar(256) NOT NULL,
-  manageparticipant varchar(256) NOT NULL,
+  managesmp         varchar(256),
+  manageparticipant varchar(256),
   clientcert        number(1)    NOT NULL,
   CONSTRAINT smp_sml_info_pk PRIMARY KEY (id) USING INDEX tablespace USERS
 );

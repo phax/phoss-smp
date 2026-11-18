@@ -24,6 +24,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.PagingSpec;
 import com.helger.collection.paging.SortField;
 import com.helger.db.api.EDatabaseSystemType;
@@ -150,6 +152,51 @@ public final class SMPJDBCQueryHelperTest
                   SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
                                                                 com.helger.phoss.smp.domain.businesscard.ESMPBusinessCardColumn.values (),
                                                                 new PagingSpec (0, 25)));
+  }
+
+  @Test
+  public void testLobSortExpression ()
+  {
+    // Oracle and DB2 cannot sort by a CLOB column
+    assertEquals ("DBMS_LOB.SUBSTR(redirectionUrl, 1000, 1)",
+                  SMPJDBCQueryHelper.getLobSortExpression (EDatabaseSystemType.ORACLE, "redirectionUrl"));
+    assertEquals ("CAST(redirectionUrl AS VARCHAR(1000))",
+                  SMPJDBCQueryHelper.getLobSortExpression (EDatabaseSystemType.DB2, "redirectionUrl"));
+    assertEquals ("redirectionUrl",
+                  SMPJDBCQueryHelper.getLobSortExpression (EDatabaseSystemType.MYSQL, "redirectionUrl"));
+    assertEquals ("redirectionUrl",
+                  SMPJDBCQueryHelper.getLobSortExpression (EDatabaseSystemType.POSTGRESQL, "redirectionUrl"));
+    assertEquals ("redirectionUrl",
+                  SMPJDBCQueryHelper.getLobSortExpression (EDatabaseSystemType.SQLSERVER, "redirectionUrl"));
+  }
+
+  @Test
+  public void testOrderByLobColumn ()
+  {
+    final ICommonsSet <String> aLobColumnNames = new CommonsHashSet <> ("redirectionUrl");
+
+    // Only the LOB column is changed
+    assertEquals (" ORDER BY DBMS_LOB.SUBSTR(redirectionUrl, 1000, 1) DESC OFFSET 0 ROWS FETCH NEXT 25 ROWS ONLY",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.ORACLE,
+                                                                ESMPRedirectColumn.values (),
+                                                                new PagingSpec (0,
+                                                                                25,
+                                                                                SortField.descending ("targeturl")),
+                                                                aLobColumnNames));
+    assertEquals (" ORDER BY documentIdentifierScheme ASC, documentIdentifier ASC OFFSET 0 ROWS FETCH NEXT 25 ROWS ONLY",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.ORACLE,
+                                                                ESMPRedirectColumn.values (),
+                                                                new PagingSpec (0,
+                                                                                25,
+                                                                                SortField.ascending ("doctypeid")),
+                                                                aLobColumnNames));
+    assertEquals (" ORDER BY redirectionUrl ASC LIMIT 25 OFFSET 0",
+                  SMPJDBCQueryHelper.getOrderByAndPagingClause (EDatabaseSystemType.MYSQL,
+                                                                ESMPRedirectColumn.values (),
+                                                                new PagingSpec (0,
+                                                                                25,
+                                                                                SortField.ascending ("targeturl")),
+                                                                aLobColumnNames));
   }
 
   @Test

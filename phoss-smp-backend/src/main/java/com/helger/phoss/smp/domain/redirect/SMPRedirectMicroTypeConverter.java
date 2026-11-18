@@ -55,7 +55,8 @@ public final class SMPRedirectMicroTypeConverter implements IMicroTypeConverter 
                                                                  sNamespaceURI,
                                                                  ELEMENT_DOCUMENT_TYPE_IDENTIFIER));
     aElement.setAttribute (ATTR_TARGET_HREF, aValue.getTargetHref ());
-    aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE_SUID).addText (aValue.getSubjectUniqueIdentifier ());
+    if (aValue.hasSubjectUniqueIdentifier ())
+      aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE_SUID).addText (aValue.getSubjectUniqueIdentifier ());
     if (aValue.hasCertificate ())
       aElement.addElementNS (sNamespaceURI, ELEMENT_CERTIFICATE)
               .addText (CertificateHelper.getPEMEncodedCertificate (aValue.getCertificate ()));

@@ -136,6 +136,20 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     m_sTableNameE = sTableNamePrefix + "smp_endpoint";
   }
 
+  /**
+   * Oracle stores an empty string as <code>NULL</code>. To get the same results on all databases,
+   * optional values are always written and read as <code>NULL</code> if they are empty.
+   *
+   * @param s
+   *        Source string. May be <code>null</code>.
+   * @return <code>null</code> if the source string is empty, the source string otherwise.
+   */
+  @Nullable
+  private static String _getNullIfEmpty (@Nullable final String s)
+  {
+    return StringHelper.isEmpty (s) ? null : s;
+  }
+
   @NonNull
   @ReturnsMutableObject
   public CallbackList <ISMPServiceInformationCallback> serviceInformationCallbacks ()
@@ -199,15 +213,15 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                        aDocTypeID.getValue (),
                                                                                        aProcessID.getScheme (),
                                                                                        aProcessID.getValue (),
-                                                                                       aEndpoint.getCertificate (),
-                                                                                       aEndpoint.getEndpointReference (),
-                                                                                       aEndpoint.getMinimumAuthenticationLevel (),
+                                                                                       StringHelper.getNotNull (aEndpoint.getCertificate ()),
+                                                                                       StringHelper.getNotNull (aEndpoint.getEndpointReference ()),
+                                                                                       _getNullIfEmpty (aEndpoint.getMinimumAuthenticationLevel ()),
                                                                                        Boolean.valueOf (aEndpoint.isRequireBusinessLevelSignature ()),
                                                                                        DBValueHelper.toTimestamp (aEndpoint.getServiceActivationDateTime ()),
-                                                                                       aEndpoint.getServiceDescription (),
+                                                                                       StringHelper.getNotNull (aEndpoint.getServiceDescription ()),
                                                                                        DBValueHelper.toTimestamp (aEndpoint.getServiceExpirationDateTime ()),
-                                                                                       aEndpoint.getTechnicalContactUrl (),
-                                                                                       aEndpoint.getTechnicalInformationUrl (),
+                                                                                       StringHelper.getNotNull (aEndpoint.getTechnicalContactUrl ()),
+                                                                                       _getNullIfEmpty (aEndpoint.getTechnicalInformationUrl ()),
                                                                                        aEndpoint.getTransportProfile (),
                                                                                        aEndpoint.getExtensions ()
                                                                                                 .getExtensionsAsJsonString ()));
@@ -518,16 +532,16 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
         // SMPProcess.equals/hashcode
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (8),
                                                        aDBRow.getAsString (9),
-                                                       aDBRow.getAsString (10),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (10)),
                                                        aDBRow.getAsBoolean (11,
                                                                             SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                       aDBRow.getAsString (12),
+                                                       _getNullIfEmpty (aDBRow.getAsString (12)),
                                                        aDBRow.getAsXMLOffsetDateTime (13),
                                                        aDBRow.getAsXMLOffsetDateTime (14),
-                                                       aDBRow.getAsString (15),
-                                                       aDBRow.getAsString (16),
-                                                       aDBRow.getAsString (17),
-                                                       aDBRow.getAsString (18),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (15)),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (16)),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (17)),
+                                                       _getNullIfEmpty (aDBRow.getAsString (18)),
                                                        aDBRow.getAsString (19));
         aGrouping.computeIfAbsent (aParticipantID, k -> new CommonsHashMap <> ())
                  .computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
@@ -614,16 +628,16 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
           // SMPProcess.equals/hashcode
           final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (6),
                                                          aDBRow.getAsString (7),
-                                                         aDBRow.getAsString (8),
+                                                         StringHelper.getNotNull (aDBRow.getAsString (8)),
                                                          aDBRow.getAsBoolean (9,
                                                                               SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                         aDBRow.getAsString (10),
+                                                         _getNullIfEmpty (aDBRow.getAsString (10)),
                                                          aDBRow.getAsXMLOffsetDateTime (11),
                                                          aDBRow.getAsXMLOffsetDateTime (12),
-                                                         aDBRow.getAsString (13),
-                                                         aDBRow.getAsString (14),
-                                                         aDBRow.getAsString (15),
-                                                         aDBRow.getAsString (16),
+                                                         StringHelper.getNotNull (aDBRow.getAsString (13)),
+                                                         StringHelper.getNotNull (aDBRow.getAsString (14)),
+                                                         StringHelper.getNotNull (aDBRow.getAsString (15)),
+                                                         _getNullIfEmpty (aDBRow.getAsString (16)),
                                                          aDBRow.getAsString (17));
           aGrouping.computeIfAbsent (new DocTypeAndExtension (aDocTypeID, sServiceInformationExtension),
                                      k -> new CommonsHashMap <> ())
@@ -725,16 +739,16 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                     aDBRow.getAsString (3));
         final SMPEndpoint aEndpoint = new SMPEndpoint (aDBRow.getAsString (4),
                                                        aDBRow.getAsString (5),
-                                                       aDBRow.getAsString (6),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (6)),
                                                        aDBRow.getAsBoolean (7,
                                                                             SMPEndpoint.DEFAULT_REQUIRES_BUSINESS_LEVEL_SIGNATURE),
-                                                       aDBRow.getAsString (8),
+                                                       _getNullIfEmpty (aDBRow.getAsString (8)),
                                                        aDBRow.getAsXMLOffsetDateTime (9),
                                                        aDBRow.getAsXMLOffsetDateTime (10),
-                                                       aDBRow.getAsString (11),
-                                                       aDBRow.getAsString (12),
-                                                       aDBRow.getAsString (13),
-                                                       aDBRow.getAsString (14),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (11)),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (12)),
+                                                       StringHelper.getNotNull (aDBRow.getAsString (13)),
+                                                       _getNullIfEmpty (aDBRow.getAsString (14)),
                                                        aDBRow.getAsString (15));
         aEndpoints.computeIfAbsent (aProcess, k -> new CommonsArrayList <> ()).add (aEndpoint);
       }
@@ -844,8 +858,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    // Get all distinct certificate values
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT DISTINCT certificate FROM " +
+    // Get all certificate values. The comparison is done here and each endpoint is updated by ID,
+    // because Oracle and DB2 cannot use a CLOB column in DISTINCT or in a "=" comparison
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, certificate FROM " +
                                                                           m_sTableNameE +
                                                                           " WHERE certificate IS NOT NULL");
     long nEndpointsChanged = 0;
@@ -853,7 +868,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     {
       for (final DBResultRow aRow : aDBResult)
       {
-        final String sStoredCert = aRow.getAsString (0);
+        final String sStoredCert = aRow.getAsString (1);
         if (StringHelper.isNotEmpty (sStoredCert))
         {
           final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
@@ -861,9 +876,9 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
           {
             nEndpointsChanged += newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
                                                                         m_sTableNameE +
-                                                                        " SET certificate=? WHERE certificate=?",
+                                                                        " SET certificate=? WHERE id=?",
                                                                         new ConstantPreparedStatementDataProvider (sNewCert,
-                                                                                                                   sStoredCert));
+                                                                                                                   aRow.getAsString (0)));
           }
         }
       }

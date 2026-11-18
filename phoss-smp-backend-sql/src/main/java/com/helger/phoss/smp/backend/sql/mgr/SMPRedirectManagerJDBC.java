@@ -35,7 +35,9 @@ import com.helger.base.state.EChange;
 import com.helger.base.state.ESuccess;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
+import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
@@ -66,6 +68,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 {
   private static final Logger LOGGER = LoggerFactory.getLogger (SMPRedirectManagerJDBC.class);
   private static final ESMPRedirectColumn [] COLUMNS = ESMPRedirectColumn.values ();
+  // Oracle and DB2 store the redirection URL as CLOB
+  private static final ICommonsSet <String> LOB_COLUMN_NAMES = new CommonsHashSet <> ("redirectionUrl");
 
   private final String m_sTableName;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
@@ -97,7 +101,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   public ISMPRedirect createOrUpdateSMPRedirect (@NonNull final IParticipantIdentifier aParticipantIdentifier,
                                                  @NonNull final IDocumentTypeIdentifier aDocTypeID,
                                                  @NonNull @Nonempty final String sRedirectUrl,
-                                                 @NonNull @Nonempty final String sSubjectUniqueIdentifier,
+                                                 @Nullable final String sSubjectUniqueIdentifier,
                                                  @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {
@@ -287,7 +291,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final SearchCondition aSearch = SMPJDBCQueryHelper.createSearchCondition (COLUMNS, sSearchText);
     return _getAllSMPRedirects ((aSearch.isEmpty () ? "" : " WHERE " + aSearch.getSQL ()) +
-                                SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec),
+                                SMPJDBCQueryHelper.getOrderByAndPagingClause (COLUMNS, aPagingSpec, LOB_COLUMN_NAMES),
                                 aSearch.getAllParams ());
   }
 

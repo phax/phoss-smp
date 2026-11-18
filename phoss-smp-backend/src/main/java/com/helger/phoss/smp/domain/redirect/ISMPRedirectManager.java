@@ -67,7 +67,8 @@ public interface ISMPRedirectManager
    *        Target URL of the new SMP. May neither be <code>null</code> nor empty.
    * @param sSubjectUniqueIdentifier
    *        The subject unique identifier of the target SMPs certificate used to sign its resources.
-   *        May neither be <code>null</code> nor empty.
+   *        Required for Peppol SMP and OASIS BDXR SMP v1. May be <code>null</code> for OASIS BDXR
+   *        SMP v2, which has no such element.
    * @param aCertificate
    *        The certificate of the target SMP. Required for OASIS BDXR SMP v2 May be
    *        <code>null</code>.
@@ -80,7 +81,7 @@ public interface ISMPRedirectManager
   ISMPRedirect createOrUpdateSMPRedirect (@NonNull IParticipantIdentifier aParticipantID,
                                           @NonNull IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                           @NonNull @Nonempty String sTargetHref,
-                                          @NonNull @Nonempty String sSubjectUniqueIdentifier,
+                                          @Nullable String sSubjectUniqueIdentifier,
                                           @Nullable X509Certificate aCertificate,
                                           @Nullable String sExtension);
 

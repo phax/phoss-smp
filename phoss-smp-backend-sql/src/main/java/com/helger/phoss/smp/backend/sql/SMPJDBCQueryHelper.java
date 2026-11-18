@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql;
 
 import java.util.Locale;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -51,6 +52,15 @@ public final class SMPJDBCQueryHelper
    */
   public static final char LIKE_ESCAPE_CHAR = '!';
 
+  /**
+   * The number of leading characters of a LOB column that are used for sorting on databases that
+   * cannot sort by a LOB column. Oracle limits a <code>VARCHAR2</code> in SQL to 4000 bytes, so this
+   * fits even with 4 bytes per character.
+   *
+   * @since 8.8.0
+   */
+  public static final int LOB_SORT_LENGTH = 1000;
+
   private SMPJDBCQueryHelper ()
   {}
 
@@ -73,6 +83,69 @@ public final class SMPJDBCQueryHelper
         if (aColumn.isSortable () && aColumn.getID ().equals (sFieldName))
           return aColumn.getAllSQLColumnNames ();
       return null;
+    };
+  }
+
+  /**
+   * Create the database specific SQL expression to sort by a LOB column. Oracle and DB2 cannot use a
+   * LOB column in an <code>ORDER BY</code> clause, so only the first {@link #LOB_SORT_LENGTH}
+   * characters are used there. All other databases sort by the column itself.
+   *
+   * @param eDBType
+   *        The database system to create the expression for. May not be <code>null</code>.
+   * @param sColumnName
+   *        The name of the LOB column. May neither be <code>null</code> nor empty.
+   * @return The SQL expression. Never <code>null</code>.
+   * @since 8.8.0
+   */
+  @NonNull
+  public static String getLobSortExpression (@NonNull final EDatabaseSystemType eDBType,
+                                             @NonNull @Nonempty final String sColumnName)
+  {
+    ValueEnforcer.notNull (eDBType, "DBType");
+    ValueEnforcer.notEmpty (sColumnName, "ColumnName");
+
+    return switch (eDBType)
+    {
+      case ORACLE -> "DBMS_LOB.SUBSTR(" + sColumnName + ", " + LOB_SORT_LENGTH + ", 1)";
+      case DB2 -> "CAST(" + sColumnName + " AS VARCHAR(" + LOB_SORT_LENGTH + "))";
+      default -> sColumnName;
+    };
+  }
+
+  /**
+   * Create the resolver from the logical field name of a sort field to the SQL column expressions.
+   * Only sortable columns are resolved, everything else is rejected, so that a forged field name can
+   * never reach the SQL statement. The provided LOB columns are resolved to a database specific
+   * expression that can be sorted by.
+   *
+   * @param eDBType
+   *        The database system to create the resolver for. May not be <code>null</code>.
+   * @param aColumns
+   *        All available columns. May not be <code>null</code>.
+   * @param aLobColumnNames
+   *        The SQL names of all columns that are LOB columns in at least one database system. May
+   *        be <code>null</code>.
+   * @return Never <code>null</code>.
+   * @see #getLobSortExpression(EDatabaseSystemType, String)
+   * @since 8.8.0
+   */
+  @NonNull
+  public static IDBColumnNameResolver createColumnNameResolver (@NonNull final EDatabaseSystemType eDBType,
+                                                                @NonNull final ISMPTableColumn <?> [] aColumns,
+                                                                @Nullable final Set <String> aLobColumnNames)
+  {
+    ValueEnforcer.notNull (eDBType, "DBType");
+
+    final IDBColumnNameResolver aResolver = createColumnNameResolver (aColumns);
+    if (aLobColumnNames == null || aLobColumnNames.isEmpty ())
+      return aResolver;
+
+    return sFieldName -> {
+      final ICommonsList <String> ret = aResolver.getAllSQLColumnNames (sFieldName);
+      if (ret != null)
+        ret.replaceAll (x -> aLobColumnNames.contains (x) ? getLobSortExpression (eDBType, x) : x);
+      return ret;
     };
   }
 
@@ -115,11 +188,63 @@ public final class SMPJDBCQueryHelper
                                                   @NonNull final ISMPTableColumn <?> [] aColumns,
                                                   @NonNull final IPagingSpec aPagingSpec)
   {
+    return getOrderByAndPagingClause (eDBType, aColumns, aPagingSpec, null);
+  }
+
+  /**
+   * Create the combined <code>ORDER BY</code> and paging clause for the provided paging
+   * specification, for a table that contains LOB columns.
+   *
+   * @param aColumns
+   *        All available columns. May not be <code>null</code>.
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param aLobColumnNames
+   *        The SQL names of all columns that are LOB columns in at least one database system. May
+   *        be <code>null</code>.
+   * @return The SQL clause, starting with a blank. Never <code>null</code> but maybe empty.
+   * @since 8.8.0
+   */
+  @NonNull
+  public static String getOrderByAndPagingClause (@NonNull final ISMPTableColumn <?> [] aColumns,
+                                                  @NonNull final IPagingSpec aPagingSpec,
+                                                  @Nullable final Set <String> aLobColumnNames)
+  {
+    return getOrderByAndPagingClause (SMPDataSourceSingleton.getDatabaseType (),
+                                      aColumns,
+                                      aPagingSpec,
+                                      aLobColumnNames);
+  }
+
+  /**
+   * Create the combined <code>ORDER BY</code> and paging clause for the provided paging
+   * specification, for a table that contains LOB columns. See
+   * {@link #getOrderByAndPagingClause(EDatabaseSystemType, ISMPTableColumn[], IPagingSpec)} for
+   * the details.
+   *
+   * @param eDBType
+   *        The database system to create the clause for. May not be <code>null</code>.
+   * @param aColumns
+   *        All available columns. May not be <code>null</code>.
+   * @param aPagingSpec
+   *        The paging specification to be applied. May not be <code>null</code>.
+   * @param aLobColumnNames
+   *        The SQL names of all columns that are LOB columns in at least one database system. May
+   *        be <code>null</code>.
+   * @return The SQL clause, starting with a blank. Never <code>null</code> but maybe empty.
+   * @since 8.8.0
+   */
+  @NonNull
+  public static String getOrderByAndPagingClause (@NonNull final EDatabaseSystemType eDBType,
+                                                  @NonNull final ISMPTableColumn <?> [] aColumns,
+                                                  @NonNull final IPagingSpec aPagingSpec,
+                                                  @Nullable final Set <String> aLobColumnNames)
+  {
     ValueEnforcer.notNull (aColumns, "Columns");
 
     return DBPagingHelper.getOrderByAndPagingClause (eDBType,
                                                      aPagingSpec,
-                                                     createColumnNameResolver (aColumns),
+                                                     createColumnNameResolver (eDBType, aColumns, aLobColumnNames),
                                                      TableColumnHelper.getAllDefaultSortFields (aColumns));
   }
 

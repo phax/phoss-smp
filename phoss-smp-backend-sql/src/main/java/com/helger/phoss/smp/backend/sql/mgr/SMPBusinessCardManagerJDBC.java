@@ -444,7 +444,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
         // Single name or multiple names?
         final String sName = aRow.getAsString (2);
         final String sNames = aRow.getAsString (3);
-        _addNames (aEntity, sName, sNames);
+        if (_addNames (aEntity, sName, sNames).isBreak ())
+          continue;
         aEntity.setCountryCode (aRow.getAsString (4));
         aEntity.setGeographicalInformation (aRow.getAsString (5));
         aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (6)));
@@ -510,7 +511,8 @@ public final class SMPBusinessCardManagerJDBC extends AbstractJDBCEnabledManager
       final SMPBusinessCardEntity aEntity = new SMPBusinessCardEntity (aRow.getAsString (0));
       final String sName = aRow.getAsString (1);
       final String sNames = aRow.getAsString (2);
-      _addNames (aEntity, sName, sNames);
+      if (_addNames (aEntity, sName, sNames).isBreak ())
+        continue;
       aEntity.setCountryCode (aRow.getAsString (3));
       aEntity.setGeographicalInformation (aRow.getAsString (4));
       aEntity.identifiers ().setAll (getJsonAsBCI (aRow.getAsString (5)));

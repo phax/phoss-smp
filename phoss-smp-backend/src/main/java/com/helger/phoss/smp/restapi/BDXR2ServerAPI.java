@@ -53,6 +53,7 @@ import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.phoss.smp.exception.SMPServerException;
 import com.helger.photon.security.user.IUser;
+import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.smpclient.extension.SMPExtensionList;
 import com.helger.statistics.api.IMutableStatisticsHandlerKeyedCounter;
 import com.helger.statistics.api.IStatisticsHandlerKeyedCounter;
@@ -473,7 +474,18 @@ public final class BDXR2ServerAPI
           final ISMPRedirectManager aRedirectMgr = SMPMetaManager.getRedirectMgr ();
           // Certificate UID not available in OASIS BDXR SMP v2 mode
           final String sCertificateUID = null;
-          final X509Certificate aCertificate = null;
+          // TODO BDXR2 use first cert only
+          X509Certificate aCertificate = null;
+          if (aPM.getRedirect ().hasCertificateEntries ())
+          {
+            aCertificate = new CertificateDecodeHelper ().source (aPM.getRedirect ()
+                                                                     .getCertificateAtIndex (0)
+                                                                     .getContentBinaryObjectValue ())
+                                                         .getDecodedOrNull ();
+            if (aCertificate == null)
+              throw new SMPBadRequestException ("Save Service Metadata was called with a Redirect that contains an invalid Certificate",
+                                                m_aAPIDataProvider.getCurrentURI ());
+          }
           if (aRedirectMgr.createOrUpdateSMPRedirect (aPathServiceGroupID,
                                                       aPathDocTypeID,
                                                       aPM.getRedirect ().getPublisherURI ().getValue (),

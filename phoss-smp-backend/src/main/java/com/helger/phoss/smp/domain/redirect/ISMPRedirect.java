@@ -18,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 import com.helger.annotation.Nonempty;
 import com.helger.base.compare.IComparator;
 import com.helger.base.id.IHasID;
+import com.helger.base.string.StringHelper;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
@@ -67,11 +68,19 @@ public interface ISMPRedirect extends IHasID <String>, ISMPHasExtension
 
   /**
    * @return The subject unique identifier of the target SMPs certificate used to sign its
-   *         resources.
+   *         resources. May be <code>null</code> for OASIS BDXR SMP v2, which has no such element.
    */
-  @NonNull
-  @Nonempty
+  @Nullable
   String getSubjectUniqueIdentifier ();
+
+  /**
+   * @return <code>true</code> if a subject unique identifier is present, <code>false</code> if not.
+   * @since 8.8.0
+   */
+  default boolean hasSubjectUniqueIdentifier ()
+  {
+    return StringHelper.isNotEmpty (getSubjectUniqueIdentifier ());
+  }
 
   /**
    * @return The X509 public certificate of the new SMP where the redirect points to. This is needed

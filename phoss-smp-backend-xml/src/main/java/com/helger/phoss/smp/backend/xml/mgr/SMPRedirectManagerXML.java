@@ -112,7 +112,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   public ISMPRedirect createOrUpdateSMPRedirect (@NonNull final IParticipantIdentifier aParticipantID,
                                                  @NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                                                  @NonNull @Nonempty final String sTargetHref,
-                                                 @NonNull @Nonempty final String sSubjectUniqueIdentifier,
+                                                 @Nullable final String sSubjectUniqueIdentifier,
                                                  @Nullable final X509Certificate aCertificate,
                                                  @Nullable final String sExtension)
   {

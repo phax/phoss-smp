@@ -89,7 +89,7 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
   public SMPRedirect (@NonNull final IParticipantIdentifier aParticipantID,
                       @NonNull final IDocumentTypeIdentifier aDocumentTypeIdentifier,
                       @NonNull @Nonempty final String sTargetHref,
-                      @NonNull @Nonempty final String sSubjectUniqueIdentifier,
+                      @Nullable final String sSubjectUniqueIdentifier,
                       @Nullable final X509Certificate aCertificate,
                       @Nullable final String sExtension)
   {
@@ -148,16 +148,14 @@ public class SMPRedirect extends AbstractSMPHasExtension implements ISMPRedirect
     m_sTargetHref = sTargetHref;
   }
 
-  @NonNull
-  @Nonempty
+  @Nullable
   public final String getSubjectUniqueIdentifier ()
   {
     return m_sSubjectUniqueIdentifier;
   }
 
-  public final void setSubjectUniqueIdentifier (@NonNull @Nonempty final String sSubjectUniqueIdentifier)
+  public final void setSubjectUniqueIdentifier (@Nullable final String sSubjectUniqueIdentifier)
   {
-    ValueEnforcer.notEmpty (sSubjectUniqueIdentifier, "SubjectUniqueIdentifier");
     m_sSubjectUniqueIdentifier = sSubjectUniqueIdentifier;
   }
 

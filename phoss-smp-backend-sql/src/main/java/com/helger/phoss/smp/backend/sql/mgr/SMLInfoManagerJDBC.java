@@ -230,8 +230,8 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                         .displayName (aRow.getAsString (1))
                         .dnsZone (aRow.getAsString (2))
                         .managementServiceURL (aRow.getAsString (3))
-                        .urlSuffixManageSMP (aRow.getAsString (4))
-                        .urlSuffixManageParticipant (aRow.getAsString (5))
+                        .urlSuffixManageSMP (StringHelper.getNotNull (aRow.getAsString (4)))
+                        .urlSuffixManageParticipant (StringHelper.getNotNull (aRow.getAsString (5)))
                         .clientCertificateRequired (aRow.getAsBoolean (6, DEFAULT_CLIENT_CERTIFICATE_REQUIRED))
                         .build ());
     return ret;
@@ -259,8 +259,8 @@ public final class SMLInfoManagerJDBC extends AbstractJDBCEnabledManager impleme
                   .displayName (aRow.getAsString (0))
                   .dnsZone (aRow.getAsString (1))
                   .managementServiceURL (aRow.getAsString (2))
-                  .urlSuffixManageSMP (aRow.getAsString (3))
-                  .urlSuffixManageParticipant (aRow.getAsString (4))
+                  .urlSuffixManageSMP (StringHelper.getNotNull (aRow.getAsString (3)))
+                  .urlSuffixManageParticipant (StringHelper.getNotNull (aRow.getAsString (4)))
                   .clientCertificateRequired (aRow.getAsBoolean (5, DEFAULT_CLIENT_CERTIFICATE_REQUIRED))
                   .build ();
   }
