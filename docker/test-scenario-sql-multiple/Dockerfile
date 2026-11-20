@@ -16,11 +16,20 @@
 #
 
 # Use an official Tomcat runtime as a base image
-FROM tomcat:9-jdk11
+FROM tomcat:10.1-jre25
+
+# Use non-blocking random
+ENV CATALINA_OPTS="--enable-native-access=ALL-UNNAMED -Djava.security.egd=file:/dev/urandom"
 
 # Special encoded slash handling for SMP
-# Use non-blocking random
-ENV CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djava.security.egd=file:/dev/urandom"
+#   Tomcat 10 removed: org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+#   See: https://tomcat.apache.org/migration-10.html#encoded_slash
+# Second sed command adds a Valve to the Host element to suppress server info and error report
+RUN  sed -i 's/<Connector port="8080" protocol="HTTP\/1.1"/<Connector port="8080" protocol="HTTP\/1.1" encodedSolidusHandling="passthrough"/' ${CATALINA_HOME}/conf/server.xml \
+  && sed -i 's/^.*<\/Host>/<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" \/>\n&/' ${CATALINA_HOME}/conf/server.xml  
+
+# Disable the HotSpot Base64 intrinsic as mitigation for CVE-2026-114938 ("Java2Shell")
+ENV CATALINA_OPTS="$CATALINA_OPTS -XX:-UseBASE64Intrinsics"
 
 ARG SMP_VERSION
 ENV SMP_VERSION=$SMP_VERSION

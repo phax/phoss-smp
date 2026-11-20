@@ -53,6 +53,9 @@ ENV CATALINA_OPTS="--enable-native-access=ALL-UNNAMED -Djava.security.egd=file:/
 # See: https://medium.com/pernod-ricard-tech/how-to-control-java-memory-in-tomcat-running-on-docker-cec267f858d4
 ENV CATALINA_OPTS="$CATALINA_OPTS -XX:InitialRAMPercentage=10 -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80"
 
+# Disable the HotSpot Base64 intrinsic as mitigation for CVE-2026-114938 ("Java2Shell")
+ENV CATALINA_OPTS="$CATALINA_OPTS -XX:-UseBASE64Intrinsics"
+
 LABEL vendor="Philip Helger"
 LABEL version="HEAD"
 
