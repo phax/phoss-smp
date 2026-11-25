@@ -290,6 +290,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final Wrapper <EChange> aWrappedChange = new Wrapper <> (EChange.UNCHANGED);
     final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
+    // Compare against the current state of the DB and not against a cached
+    // version that may be outdated
+    if (m_aCache != null)
+      m_aCache.removeFromCache (aParticipantID.getURIEncoded ());
+
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Check if the passed service group ID is already in use
@@ -349,6 +354,10 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
         aWrappedChange.set (EChange.CHANGED);
       }
     }, aCaughtException::set);
+
+    // The read inside the transaction put the old version into the cache
+    if (m_aCache != null)
+      m_aCache.removeFromCache (aParticipantID.getURIEncoded ());
 
     if (eSuccess.isFailure () || aCaughtException.isSet ())
     {
