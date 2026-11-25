@@ -131,19 +131,18 @@ public final class EmptyValuesSQLTest extends AbstractSMPWebAppSQLTest
                                                     new CommonsArrayList <> (aEPEmpty, aEPNull, aEPCert),
                                                     null);
         assertTrue (aServiceInfoMgr.mergeSMPServiceInformation (new SMPServiceInformation (aPI,
-                                                                                          aDocTypeID,
-                                                                                          new CommonsArrayList <> (aProcess),
-                                                                                          null))
-                                   .isSuccess ());
+                                                                                           aDocTypeID,
+                                                                                           new CommonsArrayList <> (aProcess),
+                                                                                           null)).isSuccess ());
 
         ISMPServiceInformation aSI = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI,
-                                                                                                           aDocTypeID);
+                                                                                                            aDocTypeID);
         assertNotNull (aSI);
         ISMPProcess aReadProcess = aSI.getAllProcesses ().getFirstOrNull ();
         assertNotNull (aReadProcess);
         for (final String sTP : new String [] { "tp-empty", "tp-null" })
         {
-          final ISMPEndpoint aEP = aReadProcess.getEndpointOfTransportProfile (sTP);
+          final ISMPEndpoint aEP = aReadProcess.getAllEndpointsOfTransportProfile (sTP).getFirstOrNull ();
           assertNotNull (sTP, aEP);
           // Mandatory elements are read as empty strings
           assertEquals (sTP, "", aEP.getEndpointReference ());
@@ -159,8 +158,10 @@ public final class EmptyValuesSQLTest extends AbstractSMPWebAppSQLTest
         assertEquals (1, aServiceInfoMgr.updateAllEndpointCertificates (sOldCert, sNewCert));
         aSI = aServiceInfoMgr.getSMPServiceInformationOfServiceGroupAndDocumentType (aPI, aDocTypeID);
         aReadProcess = aSI.getAllProcesses ().getFirstOrNull ();
-        assertEquals (sNewCert, aReadProcess.getEndpointOfTransportProfile ("tp-cert").getCertificate ());
-        assertEquals ("", aReadProcess.getEndpointOfTransportProfile ("tp-empty").getCertificate ());
+        assertEquals (sNewCert,
+                      aReadProcess.getAllEndpointsOfTransportProfile ("tp-cert").getFirstOrNull ().getCertificate ());
+        assertEquals ("",
+                      aReadProcess.getAllEndpointsOfTransportProfile ("tp-empty").getFirstOrNull ().getCertificate ());
       }
       finally
       {
