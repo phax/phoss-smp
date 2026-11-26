@@ -23,7 +23,6 @@ import com.helger.annotation.concurrent.GuardedBy;
 import com.helger.annotation.concurrent.ThreadSafe;
 import com.helger.base.concurrent.SimpleReadWriteLock;
 import com.helger.base.string.StringHelper;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppol.sml.ISMLInfo;
 import com.helger.peppol.smlclient.ManageServiceMetadataServiceCaller;
 import com.helger.peppol.smlclient.SMLExceptionHelper;
@@ -156,7 +155,7 @@ public final class SMLRegistrationCache
       return null;
 
     final String sCacheKey = _getCacheKey (aSmlInfo, sSmpID);
-    final LocalDateTime aNotBefore = PDTFactory.getCurrentLocalDateTime ().minus (CACHE_DURATION);
+    final LocalDateTime aNotBefore = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ().minus (CACHE_DURATION);
 
     final SMLRegistrationCheckResult aCached = RW_LOCK.readLockedGet (() -> {
       if (s_aResult != null && sCacheKey.equals (s_sCacheKey) && s_aResult.getCheckDateTime ().isAfter (aNotBefore))

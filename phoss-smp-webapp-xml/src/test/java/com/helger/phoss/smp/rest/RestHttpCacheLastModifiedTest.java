@@ -24,6 +24,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.apache.hc.core5.http.HttpEntity;
@@ -147,6 +150,9 @@ public final class RestHttpCacheLastModifiedTest
     final String sLastModified = aResponse.getFirstHeaderValue (LAST_MODIFIED);
     assertNotNull (sLastModified);
     assertTrue (sLastModified, sLastModified.endsWith (" GMT"));
+    // The configured time zone is not UTC, but the HTTP date must be the real UTC time
+    final Instant aLastModified = ZonedDateTime.parse (sLastModified, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant ();
+    assertTrue (sLastModified, Math.abs (Duration.between (aLastModified, Instant.now ()).toSeconds ()) < 60);
     return sLastModified;
   }
 

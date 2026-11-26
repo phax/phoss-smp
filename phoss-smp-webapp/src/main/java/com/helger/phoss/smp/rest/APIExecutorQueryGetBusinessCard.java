@@ -29,7 +29,6 @@ import com.helger.base.CGlobal;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
 import com.helger.base.wrapper.Wrapper;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.edelivery.smp.ESMPAPIType;
 import com.helger.json.IJsonObject;
 import com.helger.peppol.api.rest.PeppolAPIHelper;
@@ -102,7 +101,7 @@ public final class APIExecutorQueryGetBusinessCard extends AbstractSMPAPIExecuto
       return;
     }
 
-    final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
+    final ZonedDateTime aQueryDT = SMPMetaManager.getTimestampMgr ().getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
     // Main querying

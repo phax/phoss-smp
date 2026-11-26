@@ -27,7 +27,7 @@ import com.helger.base.tostring.ToStringGenerator;
 import com.helger.base.type.ObjectType;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.datetime.helper.PDTFactory;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
  * Default implementation of {@link ISMPUserTotp}.
@@ -204,6 +204,6 @@ public class SMPUserTotp implements ISMPUserTotp
   public static SMPUserTotp createPending (@NonNull @Nonempty final String sUserID,
                                            @NonNull @Nonempty final String sSecret)
   {
-    return new SMPUserTotp (sUserID, sSecret, false, PDTFactory.getCurrentLocalDateTime (), null, null);
+    return new SMPUserTotp (sUserID, sSecret, false, SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime (), null, null);
   }
 }

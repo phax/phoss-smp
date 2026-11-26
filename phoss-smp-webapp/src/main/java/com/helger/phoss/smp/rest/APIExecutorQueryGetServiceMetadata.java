@@ -30,7 +30,6 @@ import com.helger.base.CGlobal;
 import com.helger.base.codec.base64.Base64;
 import com.helger.base.string.StringHelper;
 import com.helger.base.timing.StopWatch;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.rt.OffsetDate;
 import com.helger.datetime.xml.XMLOffsetDate;
 import com.helger.edelivery.smp.ESMPAPIType;
@@ -161,7 +160,7 @@ public final class APIExecutorQueryGetServiceMetadata extends AbstractSMPAPIExec
     final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean ("xmlSchemaValidation", true);
     final boolean bVerifySignature = aRequestScope.params ().getAsBoolean ("verifySignature", true);
 
-    final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
+    final ZonedDateTime aQueryDT = SMPMetaManager.getTimestampMgr ().getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
     LOGGER.info (sLogPrefix +

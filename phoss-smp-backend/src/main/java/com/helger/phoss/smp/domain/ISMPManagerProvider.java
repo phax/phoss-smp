@@ -59,6 +59,18 @@ public interface ISMPManagerProvider
   ETriState getBackendConnectionEstablishedDefaultState ();
 
   /**
+   * @return A new timestamp manager, that is the single source of the current date and time. May
+   *         not be <code>null</code>. By default
+   *         {@link ISMPTimestampManager#createDefaultInstance()} is used.
+   * @since 8.9.0
+   */
+  @NonNull
+  default ISMPTimestampManager createTimestampMgr ()
+  {
+    return ISMPTimestampManager.createDefaultInstance ();
+  }
+
+  /**
    * @return A new SML information manager. May not be <code>null</code>.
    */
   @NonNull

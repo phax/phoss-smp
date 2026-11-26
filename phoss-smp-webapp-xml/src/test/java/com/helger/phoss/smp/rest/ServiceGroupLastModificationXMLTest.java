@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.Rule;
@@ -31,7 +31,6 @@ import org.junit.Test;
 
 import com.helger.base.concurrent.ThreadHelper;
 import com.helger.collection.commons.CommonsArrayList;
-import com.helger.datetime.domain.IHasLastModificationDateTime;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.io.resource.FileSystemResource;
 import com.helger.peppolid.IDocumentTypeIdentifier;
@@ -41,6 +40,7 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -68,18 +68,18 @@ public final class ServiceGroupLastModificationXMLTest
   @Rule
   public final SMPServerRESTTestRule m_aRule = new SMPServerRESTTestRule (new FileSystemResource ("src/test/resources/test-smp-server-xml-peppol.properties"));
 
-  private static LocalDateTime _getLastModDT (@NonNull final IParticipantIdentifier aPI)
+  private static OffsetDateTime _getLastModDT (@NonNull final IParticipantIdentifier aPI)
   {
-    final IHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
+    final ISMPHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
                                                                 .getSMPServiceGroupLastModification (aPI);
     return aLastMod == null ? null : aLastMod.getLastModificationDateTime ();
   }
 
   @NonNull
-  private static LocalDateTime _assertModified (@NonNull final IParticipantIdentifier aPI,
-                                                @NonNull final LocalDateTime aPrevLastModDT)
+  private static OffsetDateTime _assertModified (@NonNull final IParticipantIdentifier aPI,
+                                                @NonNull final OffsetDateTime aPrevLastModDT)
   {
-    final LocalDateTime ret = _getLastModDT (aPI);
+    final OffsetDateTime ret = _getLastModDT (aPI);
     assertNotNull (ret);
     assertTrue (ret + " is not after " + aPrevLastModDT, ret.isAfter (aPrevLastModDT));
     // The last modification has millisecond precision
@@ -108,11 +108,11 @@ public final class ServiceGroupLastModificationXMLTest
       aServiceGroupMgr.deleteSMPServiceGroupNoEx (aPI, false);
       assertNull (aServiceGroupMgr.getSMPServiceGroupLastModification (aPI));
 
-      final LocalDateTime aStart = LocalDateTime.MIN;
+      final OffsetDateTime aStart = OffsetDateTime.MIN;
       assertNotNull (aServiceGroupMgr.createSMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null, null, false));
       try
       {
-        LocalDateTime aLastModDT = _assertModified (aPI, aStart);
+        OffsetDateTime aLastModDT = _assertModified (aPI, aStart);
         // The object read from the backend contains it as well
         assertEquals (aLastModDT, aServiceGroupMgr.getSMPServiceGroupOfID (aPI).getLastModificationDateTime ());
 

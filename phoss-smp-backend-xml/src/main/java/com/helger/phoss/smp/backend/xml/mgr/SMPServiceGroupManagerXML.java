@@ -110,7 +110,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                                                                   aParticipantID,
                                                                   sExtension,
                                                                   aCustomProperties);
-    aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
+    aSMPServiceGroup.setLastModificationDateTime (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -206,7 +206,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
           LOGGER.debug ("updateSMPServiceGroup - unchanged");
         return EChange.UNCHANGED;
       }
-      aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
+      aSMPServiceGroup.setLastModificationDateTime (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
       internalUpdateItem (aSMPServiceGroup);
     }
     finally
@@ -237,7 +237,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
       if (aSMPServiceGroup == null)
         return EChange.UNCHANGED;
 
-      aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
+      aSMPServiceGroup.setLastModificationDateTime (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
       internalUpdateItem (aSMPServiceGroup);
     }
     finally

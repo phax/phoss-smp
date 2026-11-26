@@ -49,12 +49,12 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.redirect.SMPRedirect;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.security.certificate.CertificateDecodeHelper;
 import com.helger.security.certificate.CertificateHelper;
@@ -100,7 +100,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                        m_sTableNameSG,
                                                        aParticipantID.getScheme (),
                                                        aParticipantID.getValue (),
-                                                       SMPServiceGroup.getCurrentLastModificationDateTime ());
+                                                       SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
   }
 
   @NonNull

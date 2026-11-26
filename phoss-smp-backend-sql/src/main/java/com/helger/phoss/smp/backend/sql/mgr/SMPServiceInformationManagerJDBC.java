@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -60,7 +60,7 @@ import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
@@ -163,7 +163,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                        m_sTableNameSG,
                                                        aParticipantID.getScheme (),
                                                        aParticipantID.getValue (),
-                                                       SMPServiceGroup.getCurrentLastModificationDateTime ());
+                                                       SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
   }
 
   /**
@@ -203,7 +203,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                               new ConstantPreparedStatementDataProvider (aParams));
         if (nCount > 0)
         {
-          final LocalDateTime aLastModDT = SMPServiceGroup.getCurrentLastModificationDateTime ();
+          final OffsetDateTime aLastModDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ();
           for (final DBResultRow aRow : aDBResult)
             SMPServiceGroupManagerJDBC.updateLastModification (aExecutor,
                                                                m_sTableNameSG,
@@ -987,7 +987,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                      m_sTableNameSG,
                                                                      aRow.getAsString (2),
                                                                      aRow.getAsString (3),
-                                                                     SMPServiceGroup.getCurrentLastModificationDateTime ());
+                                                                     SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
               }
             }
           }

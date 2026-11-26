@@ -420,7 +420,7 @@ public abstract class AbstractPageSecureEndpoint extends AbstractSMPWebPageForm 
     final IDocumentTypeIdentifier aDocumentTypeID = aSelectedObject.getDocumentTypeIdentifier ();
     final ISMPProcess aSelectedProcess = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_PROCESS);
     final ISMPEndpoint aSelectedEndpoint = aWPEC.getRequestScope ().attrs ().getCastedValue (REQUEST_ATTR_ENDPOINT);
-    final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
+    final OffsetDateTime aNowDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTime ();
 
     aNodeList.addChild (getUIHandler ().createActionHeader ("Show details of Endpoint"));
 

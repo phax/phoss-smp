@@ -10,7 +10,7 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
@@ -89,7 +89,7 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     final SGCustomPropertyList aCustomProperties = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_CUSTOM_PROPERTIES),
                                                                                        SGCustomPropertyList.class);
 
-    final LocalDateTime aLastModDT = aElement.getAttributeValueWithConversion (ATTR_LAST_MOD_DT, LocalDateTime.class);
+    final OffsetDateTime aLastModDT = aElement.getAttributeValueWithConversion (ATTR_LAST_MOD_DT, OffsetDateTime.class);
 
     // Use the new ID in case the ID was changed!
     final SMPServiceGroup ret = new SMPServiceGroup (aOwner.getID (),

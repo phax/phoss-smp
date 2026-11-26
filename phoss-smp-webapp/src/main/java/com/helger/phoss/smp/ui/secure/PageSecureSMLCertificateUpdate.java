@@ -95,7 +95,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final LocalDate aNow = PDTFactory.getCurrentLocalDate ();
+    final LocalDate aNow = SMPMetaManager.getTimestampMgr ().getCurrentDate ();
     final String sMigrationDate = aWPEC.params ().getAsStringTrimmed (FIELD_PM_MIGRATION_DATE);
     final LocalDate aMigrationDate = PDTFromString.getLocalDateFromString (sMigrationDate, aDisplayLocale);
     final String sMigrationPublicCert = aWPEC.params ().getAsStringTrimmed (FIELD_PM_PUBLIC_CERT);
@@ -200,7 +200,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
         final BDMSLClient aCaller = SmpSmlHelper.createSMLCallerBDMSL (aSMLInfo);
         aCaller.prepareChangeCertificate (sMigrationPublicCert, aMigrationDate);
 
-        final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
+        final OffsetDateTime aNowDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTime ();
         final OffsetDateTime aNotBefore = PDTFactory.createOffsetDateTime (aMigrationPublicCert.getNotBefore ());
 
         final LocalDate aEffectiveMigrationDate = aMigrationDate != null ? aMigrationDate : aNotBefore.toLocalDate ();
@@ -304,7 +304,7 @@ public class PageSecureSMLCertificateUpdate extends AbstractSMPWebPage
       final BootstrapDateTimePicker aDTP = BootstrapDateTimePicker.create (FIELD_PM_MIGRATION_DATE,
                                                                            (LocalDate) null,
                                                                            aDisplayLocale);
-      aDTP.setMinDate (PDTFactory.getCurrentLocalDate ().plusDays (1));
+      aDTP.setMinDate (SMPMetaManager.getTimestampMgr ().getCurrentDate ().plusDays (1));
       aForm.addFormGroup (new BootstrapFormGroup ().setLabel ("Certificate migration date")
                                                    .setCtrl (aDTP)
                                                    .setHelpText ("The SML will replace the certificate at this date at 02:00am Brussels Time." +

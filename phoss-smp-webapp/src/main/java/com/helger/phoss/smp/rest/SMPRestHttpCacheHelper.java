@@ -16,8 +16,10 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 import org.jspecify.annotations.NonNull;
@@ -25,8 +27,6 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
-import com.helger.datetime.domain.IHasLastModificationDateTime;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.web.PDTWebDateHelper;
 import com.helger.http.CHttpHeader;
 import com.helger.http.cache.CacheControlBuilder;
@@ -34,6 +34,7 @@ import com.helger.mime.CMimeType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.restapi.SMPRestLastModification;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.security.messagedigest.EMessageDigestAlgorithm;
@@ -101,16 +102,25 @@ public final class SMPRestHttpCacheHelper
    * @return <code>true</code> if the header value is a valid HTTP date and the resource was not
    *         modified since then, <code>false</code> otherwise.
    */
-  static boolean isNotModifiedSince (@Nullable final String sIfModifiedSince, @NonNull final LocalDateTime aLastModDT)
+  static boolean isNotModifiedSince (@Nullable final String sIfModifiedSince, @NonNull final OffsetDateTime aLastModDT)
   {
-    // An invalid date is ignored (RFC 9110 section 13.1.3)
-    final ZonedDateTime aIfModifiedSince = PDTWebDateHelper.getDateTimeFromRFC822 (sIfModifiedSince);
-    if (aIfModifiedSince == null)
+    final String sRealValue = StringHelper.trim (sIfModifiedSince);
+    if (StringHelper.isEmpty (sRealValue))
       return false;
 
-    // Same conversion as in UnifiedResponse.setLastModified
-    final ZonedDateTime aLastMod = PDTFactory.createZonedDateTime (aLastModDT);
-    return !aLastMod.toInstant ().isAfter (aIfModifiedSince.toInstant ());
+    final ZonedDateTime aIfModifiedSince;
+    try
+    {
+      // Strictly the IMF-fixdate of RFC 9110 section 5.6.7
+      aIfModifiedSince = ZonedDateTime.parse (sRealValue, DateTimeFormatter.RFC_1123_DATE_TIME);
+    }
+    catch (final DateTimeParseException ex)
+    {
+      // An invalid date is ignored (RFC 9110 section 13.1.3)
+      return false;
+    }
+
+    return !aLastModDT.toInstant ().isAfter (aIfModifiedSince.toInstant ());
   }
 
   /**
@@ -125,11 +135,11 @@ public final class SMPRestHttpCacheHelper
    *         modified since the backend maintains the last modification.
    */
   @Nullable
-  public static LocalDateTime getParticipantLastModificationDateTime (@Nullable final IParticipantIdentifier aParticipantID)
+  public static OffsetDateTime getParticipantLastModificationDateTime (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (aParticipantID == null || !SMPServerConfiguration.isRestCacheHttpLastModifiedEnabled ())
       return null;
-    final IHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
+    final ISMPHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
                                                                 .getSMPServiceGroupLastModification (aParticipantID);
     return aLastMod == null ? null : aLastMod.getLastModificationDateTime ();
   }
@@ -148,10 +158,10 @@ public final class SMPRestHttpCacheHelper
    *         same second could otherwise never be detected by a client.
    */
   @Nullable
-  static LocalDateTime getLastModifiedHeaderValue (@Nullable final LocalDateTime aParticipantLastModDT,
-                                                   @NonNull final LocalDateTime aNow)
+  static OffsetDateTime getLastModifiedHeaderValue (@Nullable final OffsetDateTime aParticipantLastModDT,
+                                                   @NonNull final OffsetDateTime aNow)
   {
-    final LocalDateTime ret = SMPRestLastModification.getEffectiveLastModificationDateTime (aParticipantLastModDT)
+    final OffsetDateTime ret = SMPRestLastModification.getEffectiveLastModificationDateTime (aParticipantLastModDT)
                                                      .truncatedTo (ChronoUnit.SECONDS);
     return ret.isBefore (aNow.truncatedTo (ChronoUnit.SECONDS)) ? ret : null;
   }
@@ -190,7 +200,7 @@ public final class SMPRestHttpCacheHelper
                                                @NonNull final PhotonUnifiedResponse aUnifiedResponse,
                                                final byte @Nullable [] aBytes,
                                                @Nullable final SMPRestDataProvider aVaryDataProvider,
-                                               @Nullable final LocalDateTime aParticipantLastModDT)
+                                               @Nullable final OffsetDateTime aParticipantLastModDT)
   {
     final long nMaxAgeSecs = SMPServerConfiguration.getRestCacheHttpMaxAge ().toSeconds ();
     final boolean bETag = SMPServerConfiguration.isRestCacheHttpETagEnabled ();
@@ -246,8 +256,8 @@ public final class SMPRestHttpCacheHelper
 
     if (bLastModified)
     {
-      final LocalDateTime aLastModDT = getLastModifiedHeaderValue (aParticipantLastModDT,
-                                                                   PDTFactory.getCurrentLocalDateTime ());
+      final OffsetDateTime aLastModDT = getLastModifiedHeaderValue (aParticipantLastModDT,
+                                                                   SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
       if (aLastModDT != null)
       {
         // Must be called after removeCaching, because that removes the Last-Modified as well
@@ -292,7 +302,7 @@ public final class SMPRestHttpCacheHelper
                                     @NonNull final PhotonUnifiedResponse aUnifiedResponse,
                                     final byte @NonNull [] aBytes,
                                     @Nullable final SMPRestDataProvider aVaryDataProvider,
-                                    @Nullable final LocalDateTime aParticipantLastModDT)
+                                    @Nullable final OffsetDateTime aParticipantLastModDT)
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
     ValueEnforcer.notNull (aUnifiedResponse, "UnifiedResponse");
@@ -327,7 +337,7 @@ public final class SMPRestHttpCacheHelper
   public static void applyHeadResponse (@NonNull final IRequestWebScopeWithoutResponse aRequestScope,
                                         @NonNull final PhotonUnifiedResponse aUnifiedResponse,
                                         @Nullable final SMPRestDataProvider aVaryDataProvider,
-                                        @Nullable final LocalDateTime aParticipantLastModDT)
+                                        @Nullable final OffsetDateTime aParticipantLastModDT)
   {
     ValueEnforcer.notNull (aRequestScope, "RequestScope");
     ValueEnforcer.notNull (aUnifiedResponse, "UnifiedResponse");

@@ -193,7 +193,7 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
       return 0;
     }
 
-    final LocalDateTime aMaxDT = PDTFactory.getCurrentLocalDateTime ().minusDays (nRetentionDays);
+    final LocalDateTime aMaxDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ().minusDays (nRetentionDays);
     final ICommonsSet <String> aDeletedFilenames = new CommonsHashSet <> ();
 
     for (final File aFile : FileHelper.getDirectoryContent (aSyncDir))
@@ -341,7 +341,7 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
     final File aOrphanCandidateFile = new File (aSyncDir, aZipFile.getName () + ".candidates.tmp");
     final File aOrphanVerifiedFile = new File (aSyncDir, aZipFile.getName () + ".orphans.tmp");
 
-    final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
+    final LocalDateTime aStartDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
     try
     {
       final ICommonsSet <String> aLocalIDs = aServiceGroupMgr.getAllSMPServiceGroupIDs ();
@@ -383,7 +383,7 @@ public class SMLSyncJob extends AbstractLongRunningJobRunnable
       final int nOrphans = _verifyOrphans (aOrphanCandidateFile, aLocalIDsNow, aOrphanVerifiedFile);
 
       final SMLSyncResult aResult = new SMLSyncResult (aStartDT,
-                                                       PDTFactory.getCurrentLocalDateTime (),
+                                                       SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime (),
                                                        aSMLInfo.getID (),
                                                        sSMPID,
                                                        nPageCount,

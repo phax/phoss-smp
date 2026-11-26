@@ -25,7 +25,7 @@
     <version>3.2.0</version>
   </parent>
   <artifactId>phoss-smp-parent-pom</artifactId>
-  <version>8.8.1-SNAPSHOT</version>
+  <version>8.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>phoss-smp-parent-pom</name>
   <description>Base POM to build the phoss SMP projects</description>
@@ -72,7 +72,7 @@
     <mongodb.version>5.15.0</mongodb.version>
     <protobuf.version>4.36.2</protobuf.version>
     
-    <ph-db.version>8.5.3</ph-db.version>
+    <ph-db.version>8.5.4-SNAPSHOT</ph-db.version>
   </properties>
   
   <dependencyManagement>
@@ -80,7 +80,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-bom</artifactId>
-        <version>12.8.0</version>
+        <version>12.8.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -120,7 +120,7 @@
       <dependency>
         <groupId>com.helger.web</groupId>
         <artifactId>ph-web-bom</artifactId>
-        <version>11.5.1</version>
+        <version>11.5.2-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

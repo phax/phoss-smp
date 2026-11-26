@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 import org.bson.Document;
@@ -117,7 +117,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   }
 
   @Nullable
-  private static Date _toDate (@Nullable final LocalDateTime aLDT)
+  private static Date _toDate (@Nullable final OffsetDateTime aLDT)
   {
     // Must be a Date to make sure the same timezone is used everywhere
     return TypeConverter.convert (aLDT, Date.class);
@@ -156,7 +156,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
         aCustomProperties = SGCustomPropertyList.fromJson (aJson);
     }
     final SMPServiceGroup ret = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension, aCustomProperties);
-    ret.setLastModificationDateTime (TypeConverter.convert (aDoc.getDate (BSON_LAST_MOD_DT), LocalDateTime.class));
+    ret.setLastModificationDateTime (TypeConverter.convert (aDoc.getDate (BSON_LAST_MOD_DT), OffsetDateTime.class));
     return ret;
   }
 
@@ -184,7 +184,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                   aParticipantID,
                                                                   sExtension,
                                                                   aCustomProperties);
-    aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
+    aSMPServiceGroup.setLastModificationDateTime (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -262,7 +262,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                                  Updates.set (BSON_CUSTOM_PROPERTIES,
                                                                                               sCustomPropsJson),
                                                                                  Updates.set (BSON_LAST_MOD_DT,
-                                                                                              _toDate (SMPServiceGroup.getCurrentLastModificationDateTime ()))));
+                                                                                              _toDate (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ()))));
     if (aOldDoc == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", sServiceGroupID, "no-such-id");
@@ -286,7 +286,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
     final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sServiceGroupID),
                                                                 Updates.set (BSON_LAST_MOD_DT,
-                                                                             _toDate (SMPServiceGroup.getCurrentLastModificationDateTime ())));
+                                                                             _toDate (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ())));
     return EChange.valueOf (aOldDoc != null);
   }
 

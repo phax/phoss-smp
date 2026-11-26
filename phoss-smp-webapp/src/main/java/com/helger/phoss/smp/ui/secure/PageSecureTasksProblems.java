@@ -535,7 +535,7 @@ public class PageSecureTasksProblems extends AbstractSMPWebPage
     final ISMPServiceInformationManager aServiceInfoMgr = SMPMetaManager.getServiceInformationMgr ();
     final ISMPTransportProfileManager aTransportProfileMgr = SMPMetaManager.getTransportProfileMgr ();
     final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-    final OffsetDateTime aNowDT = PDTFactory.getCurrentOffsetDateTime ();
+    final OffsetDateTime aNowDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTime ();
     final OffsetDateTime aNowPlusDT = aNowDT.plusMonths (3);
     final XMLOffsetDateTime aNowXMLDT = XMLOffsetDateTime.of (aNowDT);
     final XMLOffsetDateTime aNowPlusXMLDT = XMLOffsetDateTime.of (aNowPlusDT);

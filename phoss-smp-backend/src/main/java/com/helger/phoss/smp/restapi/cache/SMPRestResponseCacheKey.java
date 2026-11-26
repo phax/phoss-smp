@@ -10,7 +10,8 @@
  */
 package com.helger.phoss.smp.restapi.cache;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -48,12 +49,12 @@ public final class SMPRestResponseCacheKey
   private final String m_sParticipantID;
   private final EResponseType m_eResponseType;
   private final String m_sDetail;
-  private final LocalDateTime m_aLastModDT;
+  private final OffsetDateTime m_aLastModDT;
 
   private SMPRestResponseCacheKey (@NonNull @Nonempty final String sParticipantID,
                                    @NonNull final EResponseType eResponseType,
                                    @NonNull @Nonempty final String sDetail,
-                                   @Nullable final LocalDateTime aLastModDT)
+                                   @Nullable final OffsetDateTime aLastModDT)
   {
     ValueEnforcer.notEmpty (sParticipantID, "ParticipantID");
     ValueEnforcer.notNull (eResponseType, "ResponseType");
@@ -61,7 +62,8 @@ public final class SMPRestResponseCacheKey
     m_sParticipantID = sParticipantID;
     m_eResponseType = eResponseType;
     m_sDetail = sDetail;
-    m_aLastModDT = aLastModDT;
+    // Normalise, so that the same instant is always equal
+    m_aLastModDT = aLastModDT == null ? null : aLastModDT.withOffsetSameInstant (ZoneOffset.UTC);
   }
 
   /**
@@ -105,7 +107,7 @@ public final class SMPRestResponseCacheKey
    * @since 8.9.0
    */
   @Nullable
-  public LocalDateTime getLastModificationDateTime ()
+  public OffsetDateTime getLastModificationDateTime ()
   {
     return m_aLastModDT;
   }
@@ -180,7 +182,7 @@ public final class SMPRestResponseCacheKey
   @NonNull
   public static SMPRestResponseCacheKey forServiceGroup (@NonNull final IParticipantIdentifier aParticipantID,
                                                          @NonNull @Nonempty final String sServiceGroupHref,
-                                                         @Nullable final LocalDateTime aLastModDT)
+                                                         @Nullable final OffsetDateTime aLastModDT)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     return new SMPRestResponseCacheKey (aParticipantID.getURIEncoded (),
@@ -223,7 +225,7 @@ public final class SMPRestResponseCacheKey
   @NonNull
   public static SMPRestResponseCacheKey forServiceMetadata (@NonNull final IParticipantIdentifier aParticipantID,
                                                             @NonNull final IDocumentTypeIdentifier aDocTypeID,
-                                                            @Nullable final LocalDateTime aLastModDT)
+                                                            @Nullable final OffsetDateTime aLastModDT)
   {
     ValueEnforcer.notNull (aParticipantID, "ParticipantID");
     ValueEnforcer.notNull (aDocTypeID, "DocTypeID");

@@ -24,11 +24,11 @@ import org.slf4j.LoggerFactory;
 
 import com.helger.annotation.Nonempty;
 import com.helger.base.string.StringHelper;
-import com.helger.datetime.domain.IHasLastModificationDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
+import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.exception.SMPBadRequestException;
 import com.helger.phoss.smp.exception.SMPNotFoundException;
 import com.helger.photon.api.IAPIDescriptor;
@@ -66,7 +66,7 @@ public final class APIExecutorServiceMetadataHead extends AbstractSMPAPIExecutor
     if (aParticipantID == null)
       throw SMPBadRequestException.failedToParseSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());
 
-    final IHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
+    final ISMPHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
                                                                 .getSMPServiceGroupLastModification (aParticipantID);
     if (aLastMod == null)
       throw SMPNotFoundException.unknownSG (sPathServiceGroupID, aDataProvider.getCurrentURI ());

@@ -28,7 +28,6 @@ import com.helger.base.state.EValidity;
 import com.helger.base.state.IValidityIndicator;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.forms.HCHiddenField;
 import com.helger.html.hc.html.forms.HCTextArea;
@@ -206,7 +205,7 @@ public final class PageSecureEndpointChangeCertificate extends AbstractSMPWebPag
       return ret;
     }
 
-    final OffsetDateTime aNowODT = PDTFactory.getCurrentOffsetDateTime ();
+    final OffsetDateTime aNowODT = SMPMetaManager.getTimestampMgr ().getCurrentDateTime ();
     return CertificateUI.createCertificateDetailsTable (null, aEndpointCert, aNowODT, aDisplayLocale);
   }
 

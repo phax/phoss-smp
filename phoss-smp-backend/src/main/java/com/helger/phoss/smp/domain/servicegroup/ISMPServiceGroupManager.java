@@ -24,7 +24,6 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
-import com.helger.datetime.domain.IHasLastModificationDateTime;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -143,7 +142,7 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
    * @since 8.9.0
    */
   @Nullable
-  default IHasLastModificationDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  default ISMPHasLastModificationDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantIdentifier)
   {
     return getSMPServiceGroupOfID (aParticipantIdentifier);
   }

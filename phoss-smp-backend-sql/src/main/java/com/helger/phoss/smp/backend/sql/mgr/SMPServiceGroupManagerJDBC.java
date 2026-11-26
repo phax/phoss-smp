@@ -17,7 +17,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.function.Supplier;
 
@@ -46,11 +46,10 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.collection.paging.PagingSpec;
-import com.helger.datetime.domain.IHasLastModificationDateTime;
-import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
+import com.helger.db.jdbc.executor.DBTimestampUTC;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.json.IJsonArray;
 import com.helger.json.serialize.JsonReader;
@@ -59,10 +58,12 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
+import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -163,7 +164,8 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   /**
    * Set the last modification date time of a single service group. This is meant to be called
    * inside an existing transaction of the provided executor, so that the change of the
-   * participant and the update of the last modification are atomic.
+   * participant and the update of the last modification are atomic. The value is stored as UTC
+   * with {@link DBTimestampUTC}, so that it is independent of the time zone of the JVM.
    *
    * @param aExecutor
    *        The DB executor to use. May not be <code>null</code>.
@@ -181,12 +183,12 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                       @NonNull final String sTableNameSG,
                                       @NonNull final String sParticipantIDScheme,
                                       @NonNull final String sParticipantIDValue,
-                                      @NonNull final LocalDateTime aLastModDT)
+                                      @NonNull final OffsetDateTime aLastModDT)
   {
     return aExecutor.insertOrUpdateOrDelete ("UPDATE " +
                                              sTableNameSG +
                                              " SET lastmoddt=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                             new ConstantPreparedStatementDataProvider (DBValueHelper.toTimestamp (aLastModDT),
+                                             new ConstantPreparedStatementDataProvider (DBTimestampUTC.of (aLastModDT),
                                                                                         sParticipantIDScheme,
                                                                                         sParticipantIDValue));
   }
@@ -196,7 +198,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                                       @NonNull final IParticipantIdentifier aParticipantID,
                                                       @Nullable final String sExtension,
                                                       @Nullable final String sCustomPropsJson,
-                                                      @Nullable final LocalDateTime aLastModDT)
+                                                      @Nullable final OffsetDateTime aLastModDT)
   {
     final SMPServiceGroup ret = new SMPServiceGroup (sOwnerID,
                                                      aParticipantID,
@@ -231,7 +233,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
-    final LocalDateTime aLastModDT = SMPServiceGroup.getCurrentLastModificationDateTime ();
+    final OffsetDateTime aLastModDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ();
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Check if the passed service group ID is already in use
@@ -258,7 +260,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                                                                        aParticipantID.getValue (),
                                                                                        sExtension,
                                                                                        sCustomPropsJson,
-                                                                                       DBValueHelper.toTimestamp (aLastModDT))) > 0)
+                                                                                       DBTimestampUTC.of (aLastModDT))) > 0)
       {
         aCreatedSGDB.set (true);
         aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
@@ -411,7 +413,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                 m_sTableNameSG,
                                 aParticipantID.getScheme (),
                                 aParticipantID.getValue (),
-                                SMPServiceGroup.getCurrentLastModificationDateTime ());
+                                SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
     }, aCaughtException::set);
 
     // The read inside the transaction put the old version into the cache
@@ -737,7 +739,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2),
                                       aRow.getAsString (4),
-                                      aRow.getAsLocalDateTime (5)));
+                                      aRow.getAsOffsetDateTimeUTC (5)));
     return ret;
   }
 
@@ -784,7 +786,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2),
                                       aRow.getAsString (3),
-                                      aRow.getAsLocalDateTime (4)));
+                                      aRow.getAsOffsetDateTimeUTC (4)));
     return ret;
   }
 
@@ -842,7 +844,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                aParticipantID,
                                aResult.get ().getAsString (0),
                                aResult.get ().getAsString (2),
-                               aResult.get ().getAsLocalDateTime (3));
+                               aResult.get ().getAsOffsetDateTimeUTC (3));
     if (m_aCache != null)
       m_aCache.putInCache (aParticipantID.getURIEncoded (), ret);
     return ret;
@@ -865,7 +867,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                                 m_sTableNameSG,
                                                 aParticipantID.getScheme (),
                                                 aParticipantID.getValue (),
-                                                SMPServiceGroup.getCurrentLastModificationDateTime ());
+                                                SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
     if (m_aCache != null)
       m_aCache.removeFromCache (aParticipantID.getURIEncoded ());
     return EChange.valueOf (nCount > 0);
@@ -878,7 +880,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
    */
   @Override
   @Nullable
-  public IHasLastModificationDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantID)
+  public ISMPHasLastModificationDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupLastModification(" +
@@ -898,7 +900,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (aResult.isNotSet ())
       return null;
 
-    final LocalDateTime aLastModDT = aResult.get ().getAsLocalDateTime (0);
+    final OffsetDateTime aLastModDT = aResult.get ().getAsOffsetDateTimeUTC (0);
     return () -> aLastModDT;
   }
 

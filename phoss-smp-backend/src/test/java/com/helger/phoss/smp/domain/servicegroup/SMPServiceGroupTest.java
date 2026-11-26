@@ -15,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -116,7 +116,7 @@ public final class SMPServiceGroupTest
     assertNull (aSG2.getLastModificationDateTime ());
 
     // With last modification
-    final LocalDateTime aLastModDT = SMPServiceGroup.getCurrentLastModificationDateTime ();
+    final OffsetDateTime aLastModDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ();
     aSG.setLastModificationDateTime (aLastModDT);
     aElement = MicroTypeConverter.convertToMicroElement (aSG, "sg");
     aSG2 = SMPServiceGroupMicroTypeConverter.convertToNative (aElement, PhotonSecurityManager.getUserMgr ()::getUserOfID);

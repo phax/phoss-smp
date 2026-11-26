@@ -16,7 +16,7 @@
  */
 package com.helger.phoss.smp.rest;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
@@ -93,7 +93,7 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
                                                                 .parseParticipantIdentifier (sPathServiceGroupID);
 
     // Must be read before the response is created
-    final LocalDateTime aLastModDT = SMPRestHttpCacheHelper.getParticipantLastModificationDateTime (aParticipantID);
+    final OffsetDateTime aLastModDT = SMPRestHttpCacheHelper.getParticipantLastModificationDateTime (aParticipantID);
 
     SMPRestResponseCacheKey aCacheKey = null;
     if (SMPRestResponseCache.isEnabled () && aParticipantID != null)

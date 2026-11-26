@@ -21,13 +21,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 import org.junit.Test;
 
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.phoss.smp.restapi.SMPRestLastModification;
 
 /**
@@ -53,10 +52,7 @@ public final class SMPRestHttpCacheHelperTest
   public void testIsNotModifiedSince ()
   {
     // The example of OASIS SMP 2.0, section 5.2.2
-    final LocalDateTime aLastModUTC = LocalDateTime.of (2018, 12, 1, 19, 14, 44);
-    // Last modification in the default time zone, as used by the SMP
-    final LocalDateTime aLastMod = PDTFactory.createZonedDateTime (aLastModUTC.atOffset (ZoneOffset.UTC))
-                                             .toLocalDateTime ();
+    final OffsetDateTime aLastMod = OffsetDateTime.of (2018, 12, 1, 19, 14, 44, 0, ZoneOffset.UTC);
 
     assertTrue (SMPRestHttpCacheHelper.isNotModifiedSince ("Sat, 01 Dec 2018 19:14:44 GMT", aLastMod));
     assertTrue (SMPRestHttpCacheHelper.isNotModifiedSince ("Sat, 01 Dec 2018 19:14:45 GMT", aLastMod));
@@ -64,6 +60,11 @@ public final class SMPRestHttpCacheHelperTest
     assertFalse (SMPRestHttpCacheHelper.isNotModifiedSince ("Sat, 01 Dec 2018 19:14:43 GMT", aLastMod));
     assertFalse (SMPRestHttpCacheHelper.isNotModifiedSince ("Sat, 01 Dec 2018 19:14:44 GMT",
                                                             aLastMod.plusSeconds (1)));
+
+    // The same instant with another offset
+    final OffsetDateTime aLastModCET = aLastMod.withOffsetSameInstant (ZoneOffset.ofHours (1));
+    assertTrue (SMPRestHttpCacheHelper.isNotModifiedSince ("Sat, 01 Dec 2018 19:14:44 GMT", aLastModCET));
+    assertFalse (SMPRestHttpCacheHelper.isNotModifiedSince ("Sat, 01 Dec 2018 19:14:43 GMT", aLastModCET));
 
     // Invalid values are ignored
     assertFalse (SMPRestHttpCacheHelper.isNotModifiedSince (null, aLastMod));
@@ -74,8 +75,8 @@ public final class SMPRestHttpCacheHelperTest
   @Test
   public void testGetLastModifiedHeaderValue ()
   {
-    final LocalDateTime aGlobal = SMPRestLastModification.getGlobalLastModificationDateTime ();
-    final LocalDateTime aNow = aGlobal.plusHours (1);
+    final OffsetDateTime aGlobal = SMPRestLastModification.getGlobalLastModificationDateTime ();
+    final OffsetDateTime aNow = aGlobal.plusHours (1);
 
     // Unknown participant last modification - use the global one
     assertEquals (aGlobal.truncatedTo (ChronoUnit.SECONDS),
@@ -85,7 +86,7 @@ public final class SMPRestHttpCacheHelperTest
                   SMPRestHttpCacheHelper.getLastModifiedHeaderValue (aGlobal.minusDays (1), aNow));
 
     // Newer participant last modification
-    final LocalDateTime aParticipant = aGlobal.plusMinutes (5).withNano (123_000_000);
+    final OffsetDateTime aParticipant = aGlobal.plusMinutes (5).withNano (123_000_000);
     assertEquals (aParticipant.truncatedTo (ChronoUnit.SECONDS),
                   SMPRestHttpCacheHelper.getLastModifiedHeaderValue (aParticipant, aNow));
 

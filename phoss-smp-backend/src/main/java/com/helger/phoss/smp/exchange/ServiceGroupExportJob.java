@@ -196,7 +196,7 @@ public class ServiceGroupExportJob extends AbstractLongRunningJobRunnable
       return 0;
     }
 
-    final LocalDateTime aMaxDT = PDTFactory.getCurrentLocalDateTime ().minusDays (nRetentionDays);
+    final LocalDateTime aMaxDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ().minusDays (nRetentionDays);
     final ICommonsSet <String> aDeletedFilenames = new CommonsHashSet <> ();
 
     for (final File aFile : FileHelper.getDirectoryContent (aExportDir))

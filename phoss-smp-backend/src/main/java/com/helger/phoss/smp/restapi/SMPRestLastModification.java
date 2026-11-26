@@ -10,14 +10,14 @@
  */
 package com.helger.phoss.smp.restapi;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import com.helger.annotation.concurrent.ThreadSafe;
-import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
  * Determine the last modification of a REST API response, as used for the HTTP header
@@ -34,7 +34,7 @@ import com.helger.phoss.smp.domain.servicegroup.SMPServiceGroup;
 @ThreadSafe
 public final class SMPRestLastModification
 {
-  private static final AtomicReference <LocalDateTime> GLOBAL_LAST_MOD_DT = new AtomicReference <> (SMPServiceGroup.getCurrentLastModificationDateTime ());
+  private static final AtomicReference <OffsetDateTime> GLOBAL_LAST_MOD_DT = new AtomicReference <> (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
 
   private SMPRestLastModification ()
   {}
@@ -43,7 +43,7 @@ public final class SMPRestLastModification
    * @return The global last modification date time of this SMP instance. Never <code>null</code>.
    */
   @NonNull
-  public static LocalDateTime getGlobalLastModificationDateTime ()
+  public static OffsetDateTime getGlobalLastModificationDateTime ()
   {
     return GLOBAL_LAST_MOD_DT.get ();
   }
@@ -54,7 +54,7 @@ public final class SMPRestLastModification
    */
   public static void updateGlobalLastModificationDateTime ()
   {
-    GLOBAL_LAST_MOD_DT.set (SMPServiceGroup.getCurrentLastModificationDateTime ());
+    GLOBAL_LAST_MOD_DT.set (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
   }
 
   /**
@@ -67,9 +67,9 @@ public final class SMPRestLastModification
    *         Never <code>null</code>.
    */
   @NonNull
-  public static LocalDateTime getEffectiveLastModificationDateTime (@Nullable final LocalDateTime aParticipantLastModDT)
+  public static OffsetDateTime getEffectiveLastModificationDateTime (@Nullable final OffsetDateTime aParticipantLastModDT)
   {
-    final LocalDateTime aGlobalLastModDT = getGlobalLastModificationDateTime ();
+    final OffsetDateTime aGlobalLastModDT = getGlobalLastModificationDateTime ();
     if (aParticipantLastModDT == null || aParticipantLastModDT.isBefore (aGlobalLastModDT))
       return aGlobalLastModDT;
     return aParticipantLastModDT;

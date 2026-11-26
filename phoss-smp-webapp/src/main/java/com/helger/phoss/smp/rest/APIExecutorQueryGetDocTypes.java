@@ -32,7 +32,6 @@ import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsTreeMap;
 import com.helger.collection.commons.ICommonsOrderedMap;
 import com.helger.collection.commons.ICommonsSortedMap;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.edelivery.smp.ESMPAPIType;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
@@ -114,7 +113,7 @@ public final class APIExecutorQueryGetDocTypes extends AbstractSMPAPIExecutorQue
     final boolean bXMLSchemaValidation = aRequestScope.params ().getAsBoolean (PARAM_XML_SCHEMA_VALIDATION, true);
     final boolean bVerifySignature = true;
 
-    final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
+    final ZonedDateTime aQueryDT = SMPMetaManager.getTimestampMgr ().getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
     final ISMPClientCreationCallback aSmpCcc = new ISMPClientCreationCallback ()
