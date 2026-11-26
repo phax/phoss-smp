@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.rest;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.jspecify.annotations.NonNull;
@@ -88,25 +89,26 @@ public final class APIExecutorServiceGroupGet extends AbstractSMPAPIExecutor
   {
     final String sPathServiceGroupID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_SERVICE_GROUP_ID));
     final SMPRestDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
+    final IParticipantIdentifier aParticipantID = SMPMetaManager.getIdentifierFactory ()
+                                                                .parseParticipantIdentifier (sPathServiceGroupID);
+
+    // Must be read before the response is created
+    final LocalDateTime aLastModDT = SMPRestHttpCacheHelper.getParticipantLastModificationDateTime (aParticipantID);
 
     SMPRestResponseCacheKey aCacheKey = null;
-    if (SMPRestResponseCache.isEnabled ())
+    if (SMPRestResponseCache.isEnabled () && aParticipantID != null)
     {
-      final IParticipantIdentifier aParticipantID = SMPMetaManager.getIdentifierFactory ()
-                                                                  .parseParticipantIdentifier (sPathServiceGroupID);
-      if (aParticipantID != null)
-      {
-        // The HREF is part of the key, because the response contains absolute URLs based on the
-        // public URL of this SMP
-        aCacheKey = SMPRestResponseCacheKey.forServiceGroup (aParticipantID,
-                                                             aDataProvider.getServiceGroupHref (aParticipantID));
-      }
+      // The HREF is part of the key, because the response contains absolute URLs based on the
+      // public URL of this SMP
+      aCacheKey = SMPRestResponseCacheKey.forServiceGroup (aParticipantID,
+                                                           aDataProvider.getServiceGroupHref (aParticipantID),
+                                                           aLastModDT);
     }
 
     final byte [] aBytes = SMPRestResponseCache.getOrCreate (aCacheKey,
                                                              () -> _createResponse (sPathServiceGroupID,
                                                                                     aDataProvider));
 
-    SMPRestHttpCacheHelper.applyResponse (aRequestScope, aUnifiedResponse, aBytes, aDataProvider);
+    SMPRestHttpCacheHelper.applyResponse (aRequestScope, aUnifiedResponse, aBytes, aDataProvider, aLastModDT);
   }
 }

@@ -141,6 +141,8 @@ Three API variants are implemented in `phoss-smp-backend/src/main/java/com/helge
 | GET | `/smp-status/` | No | Health/status JSON (disabled by default) |
 | GET | `/smp-ready` | No | Backend-aware readiness: HTTP 200 `{"ready":true}` / HTTP 503 `{"ready":false}` |
 
+`HEAD /{ServiceGroupId}` and `HEAD /{ServiceGroupId}/services/{DocumentTypeId}` (8.9.0+) are only registered in `SMPRestFilter` if an HTTP caching header is enabled (`SMPRestHttpCacheHelper.isAnyHttpCachingEnabled`). The HEAD executors only use `getSMPServiceGroupLastModification`, `containsSMPRedirect` and `containsSMPServiceInformationWithEndpoint`, never build or sign the response, and send no `ETag`.
+
 ### Authentication
 
 - **Bearer Token** (preferred, v6.0.7+): `Authorization: Bearer <token>` — tokens created in Administration > Security > User Tokens
@@ -172,6 +174,7 @@ UI page classes extend `AbstractSMPWebPageForm` or `AbstractSMPWebPageSimpleForm
 - Manager classes are named `SMP*ManagerJDBC` and live in `com.helger.phoss.smp.backend.sql.mgr`
 - Oracle stores an empty string as `NULL`: a column that may receive an empty string must be nullable (on Oracle at least), and mandatory values are read back with `StringHelper.getNotNull (...)` so that all databases behave the same. Since ph-db 8.5.3 a `NULL` CLOB is read as `null`, not as an empty string.
 - Oracle and DB2 cannot use a CLOB column in `DISTINCT`, `ORDER BY` or (Oracle) `=` comparisons. Compare in Java and update by primary key, and sort with `SMPJDBCQueryHelper.getLobSortExpression` (passed as LOB column names to `getOrderByAndPagingClause`).
+- `smp_service_group.lastmoddt` (V40) is the last modification of the whole participant (Service Group, Service Information, Endpoints, Redirects), used for the HTTP `Last-Modified` header (#597). Every write path must update it - in the SQL backend inside the same transaction via `SMPServiceGroupManagerJDBC.updateLastModification`, in the XML and MongoDB backends via `ISMPServiceGroupManager.updateSMPServiceGroupLastModification`. Read it with `ISMPServiceGroupManager.getSMPServiceGroupLastModification` (`null` if the Service Group doesn't exist), which bypasses the Service Group cache.
 - A new Flyway migration needs a script for every database (`migrate-{db2,mysql,oracle,postgresql,sqlserver}`), even if only one database is affected - otherwise the versions diverge.
 
 Connection pool properties (v8.0.11+):
@@ -224,6 +227,7 @@ global.production = true
 webapp.security.login.errordetails = false
 csp.enabled = true
 smp.rest.remote.queryapi.disabled = true
+smp.rest.cache.http.lastmodified = false  # Last-Modified / If-Modified-Since for GET SG and SM (OASIS SMP 2.0 section 5.2.2); opt-in
 smp.status.enabled = false     # /smp-status/ endpoint; off by default
 smp.ready.timeout = 2s         # time limit for the /smp-ready backend checks
 smp.totp.enabled = false       # two-factor auth (TOTP) for the management GUI; opt-in, restart required

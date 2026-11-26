@@ -73,6 +73,7 @@ public final class SMPServerConfiguration
   public static final String KEY_SMP_REST_CACHE_MAX_ITEMS = "smp.rest.cache.maxitems";
   public static final String KEY_SMP_REST_CACHE_HTTP_MAXAGE = "smp.rest.cache.http.maxage";
   public static final String KEY_SMP_REST_CACHE_HTTP_ETAG = "smp.rest.cache.http.etag";
+  public static final String KEY_SMP_REST_CACHE_HTTP_LASTMODIFIED = "smp.rest.cache.http.lastmodified";
 
   public static final String KEY_SMP_STATUS_ENABLED = "smp.status.enabled";
   public static final String KEY_SMP_STATUS_SHOW_CERTIFICATE_DATES = "smp.status.show.certificate.dates";
@@ -136,6 +137,7 @@ public final class SMPServerConfiguration
   public static final int DEFAULT_SMP_REST_CACHE_MAX_ITEMS = 10_000;
   /** The ETag of the REST API responses is opt-in and therefore disabled by default */
   public static final boolean DEFAULT_SMP_REST_CACHE_HTTP_ETAG = false;
+  public static final boolean DEFAULT_SMP_REST_CACHE_HTTP_LASTMODIFIED = false;
 
   /** The default number of days an exported file is kept - roughly one month */
   public static final int DEFAULT_SMP_EXPORT_RETENTION_DAYS = 30;
@@ -583,6 +585,21 @@ public final class SMPServerConfiguration
   public static boolean isRestCacheHttpETagEnabled ()
   {
     return _getConfig ().getAsBoolean (KEY_SMP_REST_CACHE_HTTP_ETAG, DEFAULT_SMP_REST_CACHE_HTTP_ETAG);
+  }
+
+  /**
+   * @return <code>true</code> if the REST API endpoints <code>GET /{ServiceGroupId}</code> and
+   *         <code>GET /{ServiceGroupId}/services/{DocumentTypeId}</code> should send a
+   *         <code>Last-Modified</code> header (the last modification of the participant) and answer
+   *         conditional requests with <code>If-Modified-Since</code> with <code>304 Not
+   *         Modified</code>, <code>false</code> if not. This is the caching defined in OASIS SMP
+   *         2.0, section 5.2.2. By default this is disabled.
+   * @since 8.9.0
+   */
+  public static boolean isRestCacheHttpLastModifiedEnabled ()
+  {
+    return _getConfig ().getAsBoolean (KEY_SMP_REST_CACHE_HTTP_LASTMODIFIED,
+                                       DEFAULT_SMP_REST_CACHE_HTTP_LASTMODIFIED);
   }
 
   /**

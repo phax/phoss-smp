@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.rest;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import javax.xml.transform.Transformer;
@@ -197,14 +198,18 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
     final String sPathDocumentTypeID = StringHelper.trim (aPathVariables.get (SMPRestFilter.PARAM_DOCUMENT_TYPE_ID));
     final ISMPServerAPIDataProvider aDataProvider = new SMPRestDataProvider (aRequestScope);
 
+    final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
+    final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
+
+    // Must be read before the response is created
+    final LocalDateTime aLastModDT = SMPRestHttpCacheHelper.getParticipantLastModificationDateTime (aParticipantID);
+
     SMPRestResponseCacheKey aCacheKey = null;
-    if (SMPRestResponseCache.isEnabled ())
+    if (SMPRestResponseCache.isEnabled () && aParticipantID != null)
     {
-      final IIdentifierFactory aIdentifierFactory = SMPMetaManager.getIdentifierFactory ();
-      final IParticipantIdentifier aParticipantID = aIdentifierFactory.parseParticipantIdentifier (sPathServiceGroupID);
       final IDocumentTypeIdentifier aDocTypeID = aIdentifierFactory.parseDocumentTypeIdentifier (sPathDocumentTypeID);
-      if (aParticipantID != null && aDocTypeID != null)
-        aCacheKey = SMPRestResponseCacheKey.forServiceMetadata (aParticipantID, aDocTypeID);
+      if (aDocTypeID != null)
+        aCacheKey = SMPRestResponseCacheKey.forServiceMetadata (aParticipantID, aDocTypeID, aLastModDT);
     }
 
     final byte [] aBytes = SMPRestResponseCache.getOrCreate (aCacheKey,
@@ -212,6 +217,6 @@ public final class APIExecutorServiceMetadataGet extends AbstractSMPAPIExecutor
                                                                                           sPathDocumentTypeID,
                                                                                           aDataProvider));
 
-    SMPRestHttpCacheHelper.applyResponse (aRequestScope, aUnifiedResponse, aBytes, null);
+    SMPRestHttpCacheHelper.applyResponse (aRequestScope, aUnifiedResponse, aBytes, null, aLastModDT);
   }
 }

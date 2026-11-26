@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import java.time.LocalDateTime;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import com.helger.base.hashcode.HashCodeGenerator;
 import com.helger.base.state.EChange;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.base.type.ObjectType;
+import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp1.participant.BDXR1ParticipantIdentifier;
 import com.helger.peppolid.bdxr.smp2.participant.BDXR2ParticipantIdentifier;
@@ -48,6 +51,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   private final String m_sID;
   private String m_sOwnerID;
   private SGCustomPropertyList m_aCustomProperties;
+  private LocalDateTime m_aLastModDT;
 
   // Status member
   private final IParticipantIdentifier m_aParticipantIdentifier;
@@ -86,6 +90,18 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     // Old sins ;-)
     LOGGER.warn ("Failed to unify participant ID '" + aParticipantIdentifier + "' - get rid of it.");
     return aParticipantIdentifier.getURIEncoded ();
+  }
+
+  /**
+   * @return The date time to be used as the last modification date time of a service group that is
+   *         modified now. It has millisecond precision, so that all backends store the same value.
+   *         Never <code>null</code>.
+   * @since 8.9.0
+   */
+  @NonNull
+  public static LocalDateTime getCurrentLastModificationDateTime ()
+  {
+    return PDTFactory.getCurrentLocalDateTimeMillisOnly ();
   }
 
   public SMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
@@ -150,6 +166,30 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     if (EqualsHelper.equals (aCustomProperties, m_aCustomProperties))
       return EChange.UNCHANGED;
     m_aCustomProperties = aCustomProperties;
+    return EChange.CHANGED;
+  }
+
+  @Nullable
+  public LocalDateTime getLastModificationDateTime ()
+  {
+    return m_aLastModDT;
+  }
+
+  /**
+   * Set the last modification date time of this service group. It covers the service group itself
+   * and all service information, endpoints and redirects of it.
+   *
+   * @param aLastModDT
+   *        The new last modification date time. May be <code>null</code>.
+   * @return {@link EChange}
+   * @since 8.9.0
+   */
+  @NonNull
+  public final EChange setLastModificationDateTime (@Nullable final LocalDateTime aLastModDT)
+  {
+    if (EqualsHelper.equals (aLastModDT, m_aLastModDT))
+      return EChange.UNCHANGED;
+    m_aLastModDT = aLastModDT;
     return EChange.CHANGED;
   }
 
@@ -221,6 +261,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
                             .append ("ID", m_sID)
                             .append ("OwnerID", m_sOwnerID)
                             .append ("ParticipantIdentifier", m_aParticipantIdentifier)
+                            .append ("LastModDT", m_aLastModDT)
                             .getToString ();
   }
 }

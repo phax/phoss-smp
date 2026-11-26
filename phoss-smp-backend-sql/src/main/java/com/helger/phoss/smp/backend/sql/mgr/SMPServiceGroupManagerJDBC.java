@@ -17,6 +17,7 @@
 package com.helger.phoss.smp.backend.sql.mgr;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.function.Supplier;
 
@@ -45,6 +46,8 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.collection.paging.PagingSpec;
+import com.helger.datetime.domain.IHasLastModificationDateTime;
+import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
@@ -157,6 +160,52 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     return SGCustomPropertyList.fromJson (aJson);
   }
 
+  /**
+   * Set the last modification date time of a single service group. This is meant to be called
+   * inside an existing transaction of the provided executor, so that the change of the
+   * participant and the update of the last modification are atomic.
+   *
+   * @param aExecutor
+   *        The DB executor to use. May not be <code>null</code>.
+   * @param sTableNameSG
+   *        The full table name of the service group table. May not be <code>null</code>.
+   * @param sParticipantIDScheme
+   *        The participant identifier scheme. May not be <code>null</code>.
+   * @param sParticipantIDValue
+   *        The participant identifier value. May not be <code>null</code>.
+   * @param aLastModDT
+   *        The new last modification date time. May not be <code>null</code>.
+   * @return The number of modified rows. 0 if the service group does not exist.
+   */
+  static long updateLastModification (@NonNull final DBExecutor aExecutor,
+                                      @NonNull final String sTableNameSG,
+                                      @NonNull final String sParticipantIDScheme,
+                                      @NonNull final String sParticipantIDValue,
+                                      @NonNull final LocalDateTime aLastModDT)
+  {
+    return aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                             sTableNameSG +
+                                             " SET lastmoddt=? WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                             new ConstantPreparedStatementDataProvider (DBValueHelper.toTimestamp (aLastModDT),
+                                                                                        sParticipantIDScheme,
+                                                                                        sParticipantIDValue));
+  }
+
+  @NonNull
+  private static SMPServiceGroup _createServiceGroup (@NonNull final String sOwnerID,
+                                                      @NonNull final IParticipantIdentifier aParticipantID,
+                                                      @Nullable final String sExtension,
+                                                      @Nullable final String sCustomPropsJson,
+                                                      @Nullable final LocalDateTime aLastModDT)
+  {
+    final SMPServiceGroup ret = new SMPServiceGroup (sOwnerID,
+                                                     aParticipantID,
+                                                     sExtension,
+                                                     _getCustomPropertiesFromJsonString (sCustomPropsJson));
+    ret.setLastModificationDateTime (aLastModDT);
+    return ret;
+  }
+
   @NonNull
   public SMPServiceGroup createSMPServiceGroup (@NonNull @Nonempty final String sOwnerID,
                                                 @NonNull final IParticipantIdentifier aParticipantID,
@@ -182,6 +231,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
     final Wrapper <Exception> aCaughtException = new Wrapper <> ();
 
+    final LocalDateTime aLastModDT = SMPServiceGroup.getCurrentLastModificationDateTime ();
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
       // Check if the passed service group ID is already in use
@@ -203,11 +253,12 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
       final String sCustomPropsJson = _getCustomPropertiesAsJsonString (aCustomProperties);
       if (aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
                                             m_sTableNameSG +
-                                            " (businessIdentifierScheme, businessIdentifier, extension, customproperties) VALUES (?, ?, ?, ?)",
+                                            " (businessIdentifierScheme, businessIdentifier, extension, customproperties, lastmoddt) VALUES (?, ?, ?, ?, ?)",
                                             new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                        aParticipantID.getValue (),
                                                                                        sExtension,
-                                                                                       sCustomPropsJson)) > 0)
+                                                                                       sCustomPropsJson,
+                                                                                       DBValueHelper.toTimestamp (aLastModDT))) > 0)
       {
         aCreatedSGDB.set (true);
         aExecutor.insertOrUpdateOrDelete ("INSERT INTO " +
@@ -263,6 +314,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
                                       Boolean.valueOf (bCreateInSML));
 
     final SMPServiceGroup aServiceGroup = new SMPServiceGroup (sOwnerID, aParticipantID, sExtension, aCustomProperties);
+    aServiceGroup.setLastModificationDateTime (aLastModDT);
     if (m_aCache != null)
       m_aCache.putInCache (aParticipantID.getURIEncoded (), aServiceGroup);
 
@@ -353,6 +405,13 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
           throw new IllegalStateException ("Failed to update the service_group customproperties");
         aWrappedChange.set (EChange.CHANGED);
       }
+
+      if (aWrappedChange.get ().isChanged ())
+        updateLastModification (aExecutor,
+                                m_sTableNameSG,
+                                aParticipantID.getScheme (),
+                                aParticipantID.getValue (),
+                                SMPServiceGroup.getCurrentLastModificationDateTime ());
     }, aCaughtException::set);
 
     // The read inside the transaction put the old version into the cache
@@ -659,7 +718,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   private ICommonsList <ISMPServiceGroup> _getAllSMPServiceGroups (@Nullable final String sSuffix,
                                                                    @Nullable final ICommonsList <Object> aParams)
   {
-    final String sSQL = "SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username, sg.customproperties" +
+    final String sSQL = "SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, so.username, sg.customproperties, sg.lastmoddt" +
                         " FROM " +
                         m_sTableNameSG +
                         " sg, " +
@@ -674,10 +733,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
-        ret.add (new SMPServiceGroup (aRow.getAsString (3),
+        ret.add (_createServiceGroup (aRow.getAsString (3),
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2),
-                                      _getCustomPropertiesFromJsonString (aRow.getAsString (4))));
+                                      aRow.getAsString (4),
+                                      aRow.getAsLocalDateTime (5)));
     return ret;
   }
 
@@ -707,7 +767,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getAllSMPServiceGroupsOfOwner(" + sOwnerID + ")");
 
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, sg.customproperties" +
+    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT sg.businessIdentifierScheme, sg.businessIdentifier, sg.extension, sg.customproperties, sg.lastmoddt" +
                                                                           " FROM " +
                                                                           m_sTableNameSG +
                                                                           " sg, " +
@@ -720,10 +780,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     final ICommonsList <ISMPServiceGroup> ret = new CommonsArrayList <> ();
     if (aDBResult != null)
       for (final DBResultRow aRow : aDBResult)
-        ret.add (new SMPServiceGroup (sOwnerID,
+        ret.add (_createServiceGroup (sOwnerID,
                                       new SimpleParticipantIdentifier (aRow.getAsString (0), aRow.getAsString (1)),
                                       aRow.getAsString (2),
-                                      _getCustomPropertiesFromJsonString (aRow.getAsString (3))));
+                                      aRow.getAsString (3),
+                                      aRow.getAsLocalDateTime (4)));
     return ret;
   }
 
@@ -763,7 +824,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
 
     // Not in cache
     final Wrapper <DBResultRow> aResult = new Wrapper <> ();
-    aDBExecutor.querySingle ("SELECT sg.extension, so.username, sg.customproperties" +
+    aDBExecutor.querySingle ("SELECT sg.extension, so.username, sg.customproperties, sg.lastmoddt" +
                              " FROM " +
                              m_sTableNameSG +
                              " sg, " +
@@ -777,10 +838,11 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
     if (aResult.isNotSet ())
       return null;
 
-    ret = new SMPServiceGroup (aResult.get ().getAsString (1),
+    ret = _createServiceGroup (aResult.get ().getAsString (1),
                                aParticipantID,
                                aResult.get ().getAsString (0),
-                               _getCustomPropertiesFromJsonString (aResult.get ().getAsString (2)));
+                               aResult.get ().getAsString (2),
+                               aResult.get ().getAsLocalDateTime (3));
     if (m_aCache != null)
       m_aCache.putInCache (aParticipantID.getURIEncoded (), ret);
     return ret;
@@ -790,6 +852,54 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
   public SMPServiceGroup getSMPServiceGroupOfID (@Nullable final IParticipantIdentifier aParticipantID)
   {
     return _getSMPServiceGroupOfID (newExecutor (), aParticipantID);
+  }
+
+  @NonNull
+  public EChange updateSMPServiceGroupLastModification (@NonNull final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("updateSMPServiceGroupLastModification (" + aParticipantID.getURIEncoded () + ")");
+
+    final long nCount = updateLastModification (newExecutor (),
+                                                m_sTableNameSG,
+                                                aParticipantID.getScheme (),
+                                                aParticipantID.getValue (),
+                                                SMPServiceGroup.getCurrentLastModificationDateTime ());
+    if (m_aCache != null)
+      m_aCache.removeFromCache (aParticipantID.getURIEncoded ());
+    return EChange.valueOf (nCount > 0);
+  }
+
+  /**
+   * {@inheritDoc}<br>
+   * This implementation always queries the database, because the cached service groups are not
+   * updated if a service information or a redirect of them changes.
+   */
+  @Override
+  @Nullable
+  public IHasLastModificationDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantID)
+  {
+    if (LOGGER.isDebugEnabled ())
+      LOGGER.debug ("getSMPServiceGroupLastModification(" +
+                    (aParticipantID == null ? "null" : aParticipantID.getURIEncoded ()) +
+                    ")");
+
+    if (aParticipantID == null)
+      return null;
+
+    final Wrapper <DBResultRow> aResult = new Wrapper <> ();
+    newExecutor ().querySingle ("SELECT lastmoddt FROM " +
+                                m_sTableNameSG +
+                                " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                           aParticipantID.getValue ()),
+                                aResult::set);
+    if (aResult.isNotSet ())
+      return null;
+
+    final LocalDateTime aLastModDT = aResult.get ().getAsLocalDateTime (0);
+    return () -> aLastModDT;
   }
 
   public boolean containsSMPServiceGroupWithID (@Nullable final IParticipantIdentifier aParticipantID)

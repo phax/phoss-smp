@@ -189,4 +189,21 @@ public interface ISMPRedirectManager
   @Nullable
   ISMPRedirect getSMPRedirectOfServiceGroupAndDocumentType (@Nullable IParticipantIdentifier aParticipantID,
                                                             @Nullable IDocumentTypeIdentifier aDocTypeID);
+
+  /**
+   * Check if a redirect for the passed tuple of service group and document type exists, without
+   * reading the redirect. This is used for <code>HEAD</code> requests.
+   *
+   * @param aParticipantID
+   *        The service group ID to query. May be <code>null</code>.
+   * @param aDocTypeID
+   *        The document type to query. May be <code>null</code>.
+   * @return <code>true</code> if such a redirect exists, <code>false</code> if not.
+   * @since 8.9.0
+   */
+  default boolean containsSMPRedirect (@Nullable final IParticipantIdentifier aParticipantID,
+                                       @Nullable final IDocumentTypeIdentifier aDocTypeID)
+  {
+    return getSMPRedirectOfServiceGroupAndDocumentType (aParticipantID, aDocTypeID) != null;
+  }
 }

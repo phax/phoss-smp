@@ -110,6 +110,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
                                                                   aParticipantID,
                                                                   sExtension,
                                                                   aCustomProperties);
+    aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -205,6 +206,7 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
           LOGGER.debug ("updateSMPServiceGroup - unchanged");
         return EChange.UNCHANGED;
       }
+      aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
       internalUpdateItem (aSMPServiceGroup);
     }
     finally
@@ -219,6 +221,29 @@ public final class SMPServiceGroupManagerXML extends AbstractPhotonMapBasedWALDA
 
     m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (aParticipantID));
 
+    return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange updateSMPServiceGroupLastModification (@NonNull final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+
+    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    m_aRWLock.writeLock ().lock ();
+    try
+    {
+      final SMPServiceGroup aSMPServiceGroup = internalGetOfID (sServiceGroupID);
+      if (aSMPServiceGroup == null)
+        return EChange.UNCHANGED;
+
+      aSMPServiceGroup.setLastModificationDateTime (SMPServiceGroup.getCurrentLastModificationDateTime ());
+      internalUpdateItem (aSMPServiceGroup);
+    }
+    finally
+    {
+      m_aRWLock.writeLock ().unlock ();
+    }
     return EChange.CHANGED;
   }
 

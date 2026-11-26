@@ -48,6 +48,7 @@ import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
 import com.helger.peppolid.factory.IIdentifierFactory;
 import com.helger.phoss.smp.backend.mongodb.SMPMongoQueryHelper;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
@@ -120,6 +121,18 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     createIndexUnlessReadOnly (Indexes.ascending (BSON_SERVICE_GROUP_ID, BSON_DOCTYPE_ID));
     createIndexUnlessReadOnly (Indexes.ascending (BSON_ENDPOINT_REFERENCE_PATH));
     createIndexUnlessReadOnly (Indexes.ascending (BSON_TRANSPORT_PROFILE_PATH));
+  }
+
+  private static void _updateLastModification (@NonNull final IParticipantIdentifier aParticipantID)
+  {
+    SMPMetaManager.getServiceGroupMgr ().updateSMPServiceGroupLastModification (aParticipantID);
+  }
+
+  private void _updateLastModification (@NonNull final Document aDoc)
+  {
+    final IParticipantIdentifier aParticipantID = m_aIdentifierFactory.parseParticipantIdentifier (aDoc.getString (BSON_SERVICE_GROUP_ID));
+    if (aParticipantID != null)
+      _updateLastModification (aParticipantID);
   }
 
   @NonNull
@@ -313,6 +326,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       if (!getCollection ().replaceOne (new Document (BSON_ID, aOldInformation.getID ()),
                                         toBson (aSMPServiceInformation)).wasAcknowledged ())
         throw new IllegalStateException ("Failed to replace in MongoDB Collection");
+      _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
@@ -332,6 +346,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
       // Create the new one
       if (!getCollection ().insertOne (toBson (aSMPServiceInformation)).wasAcknowledged ())
         throw new IllegalStateException ("Failed to insert into MongoDB Collection");
+      _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
       AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
                                         aSMPServiceInformation.getID (),
@@ -368,6 +383,8 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
         LOGGER.debug ("deleteSMPServiceInformation - failure");
       return EChange.UNCHANGED;
     }
+
+    _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
     if (LOGGER.isDebugEnabled ())
@@ -430,6 +447,7 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
     if (!getCollection ().replaceOne (new Document (BSON_ID, aSMPServiceInformation.getID ()),
                                       toBson (aRealServiceInformation)).wasAcknowledged ())
       throw new IllegalStateException ("Failed to replace in MongoDB Collection");
+    _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
@@ -666,7 +684,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
               }
         }
       if (bDocChanged)
+      {
         getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+        _updateLastModification (aDoc);
+      }
     }
     return nEndpointsChanged;
   }
@@ -706,7 +727,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
             }
         }
       if (bDocChanged)
+      {
         getCollection ().replaceOne (Filters.eq (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+        _updateLastModification (aDoc);
+      }
     }
     return nEndpointsChanged;
   }
@@ -768,7 +792,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
               }
         }
       if (bDocChanged)
+      {
         getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+        _updateLastModification (aDoc);
+      }
     }
     return nEndpointsChanged;
   }
@@ -854,7 +881,10 @@ public final class SMPServiceInformationManagerMongoDB extends AbstractManagerMo
             }
         }
       if (bDocChanged)
+      {
         getCollection ().replaceOne (new Document (BSON_ID, aDoc.getString (BSON_ID)), aDoc);
+        _updateLastModification (aDoc);
+      }
     }
     return nEndpointsChanged;
   }

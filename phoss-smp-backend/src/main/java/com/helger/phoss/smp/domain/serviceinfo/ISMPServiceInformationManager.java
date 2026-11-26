@@ -242,6 +242,27 @@ public interface ISMPServiceInformationManager
                                                                                 @Nullable IDocumentTypeIdentifier aDocumentTypeIdentifier);
 
   /**
+   * Check if a service information with at least one endpoint exists for the passed tuple of
+   * service group and document type identifier, without reading the service information. A
+   * service information without endpoints is never returned by the REST API. This is used for
+   * <code>HEAD</code> requests.
+   *
+   * @param aParticipantIdentifier
+   *        The service group ID of interest. May be <code>null</code>.
+   * @param aDocumentTypeIdentifier
+   *        The document type identifier to search. May be <code>null</code>.
+   * @return <code>true</code> if such a service information exists, <code>false</code> if not.
+   * @since 8.9.0
+   */
+  default boolean containsSMPServiceInformationWithEndpoint (@Nullable final IParticipantIdentifier aParticipantIdentifier,
+                                                             @Nullable final IDocumentTypeIdentifier aDocumentTypeIdentifier)
+  {
+    final ISMPServiceInformation aServiceInfo = getSMPServiceInformationOfServiceGroupAndDocumentType (aParticipantIdentifier,
+                                                                                                       aDocumentTypeIdentifier);
+    return aServiceInfo != null && aServiceInfo.getTotalEndpointCount () > 0;
+  }
+
+  /**
    * Check if the passed transport profile is used or not.
    *
    * @param sTransportProfileID

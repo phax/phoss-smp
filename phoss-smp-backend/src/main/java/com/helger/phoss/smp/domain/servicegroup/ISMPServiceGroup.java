@@ -19,17 +19,22 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.base.id.IHasID;
+import com.helger.datetime.domain.IHasLastModificationDateTime;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
 
 /**
- * Base interface for a single SMP service group.
+ * Base interface for a single SMP service group.<br>
+ * Since 8.9.0 it has a last modification date time, which covers the service group itself and all
+ * service information, endpoints and redirects of it. It is used for HTTP caching with
+ * <code>Last-Modified</code> and <code>If-Modified-Since</code>. It may be <code>null</code> for
+ * service groups that were not modified since the backend supports it.
  *
  * @author Philip Helger
  */
 @MustImplementEqualsAndHashcode
-public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension
+public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension, IHasLastModificationDateTime
 {
   /**
    * @return the URI encoded participant identifier is the ID.
