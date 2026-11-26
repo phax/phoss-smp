@@ -22,6 +22,10 @@ Docker containers can be found, depending on the backend you want to use:
 * https://hub.docker.com/r/phelger/phoss-smp-sql/tags
 * https://hub.docker.com/r/phelger/phoss-smp-mongodb/tags
 
+---
+
+This project is neither sponsored nor endorsed by OpenPeppol AISBL.
+
 ## Documentation
 
 Please read the **[Wiki](https://github.com/phax/phoss-smp/wiki)** for a detailed description, configuration reference and setup hints. It contains an introduction with screenshots, configuration, building and running instructions:
