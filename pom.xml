@@ -80,7 +80,7 @@
       <dependency>
         <groupId>com.helger.commons</groupId>
         <artifactId>ph-commons-bom</artifactId>
-        <version>12.8.1-SNAPSHOT</version>
+        <version>12.9.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

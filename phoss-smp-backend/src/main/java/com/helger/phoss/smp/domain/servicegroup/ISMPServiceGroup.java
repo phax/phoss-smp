@@ -19,6 +19,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.Nonnegative;
 import com.helger.annotation.style.MustImplementEqualsAndHashcode;
 import com.helger.base.id.IHasID;
+import com.helger.datetime.domain.IHasLastModificationOffsetDateTime;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.extension.ISMPHasExtension;
 import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
@@ -33,7 +34,7 @@ import com.helger.phoss.smp.domain.sgprops.SGCustomPropertyList;
  * @author Philip Helger
  */
 @MustImplementEqualsAndHashcode
-public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension, ISMPHasLastModificationDateTime
+public interface ISMPServiceGroup extends IHasID <String>, ISMPHasExtension, IHasLastModificationOffsetDateTime
 {
   /**
    * @return the URI encoded participant identifier is the ID.

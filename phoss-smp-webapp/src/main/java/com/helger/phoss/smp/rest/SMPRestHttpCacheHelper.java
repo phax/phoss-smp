@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.string.StringHelper;
+import com.helger.datetime.domain.IHasLastModificationOffsetDateTime;
 import com.helger.datetime.web.PDTWebDateHelper;
 import com.helger.http.CHttpHeader;
 import com.helger.http.cache.CacheControlBuilder;
@@ -34,7 +35,6 @@ import com.helger.mime.CMimeType;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
 import com.helger.phoss.smp.domain.SMPMetaManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.restapi.SMPRestLastModification;
 import com.helger.photon.app.PhotonUnifiedResponse;
 import com.helger.security.messagedigest.EMessageDigestAlgorithm;
@@ -139,7 +139,7 @@ public final class SMPRestHttpCacheHelper
   {
     if (aParticipantID == null || !SMPServerConfiguration.isRestCacheHttpLastModifiedEnabled ())
       return null;
-    final ISMPHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
+    final IHasLastModificationOffsetDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
                                                                 .getSMPServiceGroupLastModification (aParticipantID);
     return aLastMod == null ? null : aLastMod.getLastModificationDateTime ();
   }

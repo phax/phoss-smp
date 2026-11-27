@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import com.helger.base.concurrent.ThreadHelper;
 import com.helger.collection.commons.CommonsArrayList;
+import com.helger.datetime.domain.IHasLastModificationOffsetDateTime;
 import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
@@ -39,7 +40,6 @@ import com.helger.peppolid.factory.PeppolIdentifierFactory;
 import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
-import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformation;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -69,7 +69,7 @@ public final class ServiceGroupLastModificationSQLTest extends AbstractSMPWebApp
 
   private static OffsetDateTime _getLastModDT (@NonNull final IParticipantIdentifier aPI)
   {
-    final ISMPHasLastModificationDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
+    final IHasLastModificationOffsetDateTime aLastMod = SMPMetaManager.getServiceGroupMgr ()
                                                                 .getSMPServiceGroupLastModification (aPI);
     return aLastMod == null ? null : aLastMod.getLastModificationDateTime ();
   }

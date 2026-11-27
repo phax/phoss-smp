@@ -46,6 +46,7 @@ import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.collection.paging.PagingSpec;
+import com.helger.datetime.domain.IHasLastModificationOffsetDateTime;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
@@ -63,7 +64,6 @@ import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationDirection;
 import com.helger.phoss.smp.domain.pmigration.EParticipantMigrationState;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupColumn;
 import com.helger.phoss.smp.domain.servicegroup.ESMPServiceGroupFilter;
-import com.helger.phoss.smp.domain.servicegroup.ISMPHasLastModificationDateTime;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroup;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupCallback;
 import com.helger.phoss.smp.domain.servicegroup.ISMPServiceGroupManager;
@@ -880,7 +880,7 @@ public final class SMPServiceGroupManagerJDBC extends AbstractJDBCEnabledManager
    */
   @Override
   @Nullable
-  public ISMPHasLastModificationDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantID)
+  public IHasLastModificationOffsetDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantID)
   {
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug ("getSMPServiceGroupLastModification(" +
