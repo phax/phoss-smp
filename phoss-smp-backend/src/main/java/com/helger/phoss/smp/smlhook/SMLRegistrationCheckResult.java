@@ -19,7 +19,7 @@ import com.helger.annotation.Nonempty;
 import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.tostring.ToStringGenerator;
-import com.helger.datetime.helper.PDTFactory;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
  * The immutable result of reading this SMPs own registration from the SML, as defined in chapter
@@ -47,7 +47,7 @@ public final class SMLRegistrationCheckResult
     ValueEnforcer.notNull (eState, "State");
     ValueEnforcer.notEmpty (sSMPID, "SMPID");
 
-    m_aCheckDT = PDTFactory.getCurrentLocalDateTime ();
+    m_aCheckDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
     m_eState = eState;
     m_sSMPID = sSMPID;
     m_sLogicalAddress = sLogicalAddress;

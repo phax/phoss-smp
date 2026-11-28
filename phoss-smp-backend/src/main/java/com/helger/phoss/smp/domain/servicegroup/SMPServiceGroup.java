@@ -10,6 +10,8 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import java.time.OffsetDateTime;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -48,6 +50,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
   private final String m_sID;
   private String m_sOwnerID;
   private SGCustomPropertyList m_aCustomProperties;
+  private OffsetDateTime m_aLastModDT;
 
   // Status member
   private final IParticipantIdentifier m_aParticipantIdentifier;
@@ -153,6 +156,30 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
     return EChange.CHANGED;
   }
 
+  @Nullable
+  public OffsetDateTime getLastModificationDateTime ()
+  {
+    return m_aLastModDT;
+  }
+
+  /**
+   * Set the last modification date time of this service group. It covers the service group itself
+   * and all service information, endpoints and redirects of it.
+   *
+   * @param aLastModDT
+   *        The new last modification date time. May be <code>null</code>.
+   * @return {@link EChange}
+   * @since 8.9.0
+   */
+  @NonNull
+  public final EChange setLastModificationDateTime (@Nullable final OffsetDateTime aLastModDT)
+  {
+    if (EqualsHelper.equals (aLastModDT, m_aLastModDT))
+      return EChange.UNCHANGED;
+    m_aLastModDT = aLastModDT;
+    return EChange.CHANGED;
+  }
+
   public com.helger.xsds.peppol.smp1.@NonNull ServiceGroupType getAsJAXBObjectPeppol ()
   {
     final com.helger.xsds.peppol.smp1.ServiceGroupType ret = new com.helger.xsds.peppol.smp1.ServiceGroupType ();
@@ -221,6 +248,7 @@ public class SMPServiceGroup extends AbstractSMPHasExtension implements ISMPServ
                             .append ("ID", m_sID)
                             .append ("OwnerID", m_sOwnerID)
                             .append ("ParticipantIdentifier", m_aParticipantIdentifier)
+                            .append ("LastModDT", m_aLastModDT)
                             .getToString ();
   }
 }

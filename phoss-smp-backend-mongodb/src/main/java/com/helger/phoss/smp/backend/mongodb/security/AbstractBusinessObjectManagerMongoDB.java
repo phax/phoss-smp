@@ -35,8 +35,8 @@ import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.phoss.smp.backend.mongodb.mgr.AbstractManagerMongoDB;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.io.mgr.IPhotonManager;
 import com.helger.photon.security.object.BusinessObjectHelper;
 import com.helger.photon.security.object.StubObject;
@@ -93,7 +93,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
   protected final Bson addLastModToUpdate (@NonNull final Bson aBson)
   {
     return Updates.combine (aBson,
-                            Updates.set (BSON_LAST_MOD_TIME, asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
+                            Updates.set (BSON_LAST_MOD_TIME, asBsonDate (SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ())),
                             Updates.set (BSON_LAST_MOD_USER_ID, BusinessObjectHelper.getUserIDOrFallback ()));
   }
 
@@ -135,7 +135,7 @@ public abstract class AbstractBusinessObjectManagerMongoDB <TINT extends IHasID 
     return genericUpdateOne (sID,
                              Filters.eq (BSON_DELETED_TIME, null),
                              Updates.combine (Updates.set (BSON_DELETED_TIME,
-                                                           asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
+                                                           asBsonDate (SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ())),
                                               Updates.set (BSON_DELETED_USER_ID,
                                                            BusinessObjectHelper.getUserIDOrFallback ())));
   }

@@ -32,13 +32,13 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
 import com.helger.db.jdbc.executor.DBExecutor;
 import com.helger.db.jdbc.executor.DBResultRow;
 import com.helger.db.jdbc.mgr.AbstractJDBCEnabledManager;
 import com.helger.phoss.smp.CSMPServer;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotp;
 import com.helger.phoss.smp.domain.totp.ISMPUserTotpManager;
 import com.helger.phoss.smp.domain.totp.SMPUserTotp;
@@ -87,7 +87,7 @@ public class SMPUserTotpManagerJDBC extends AbstractJDBCEnabledManager implement
                                           ISMPUserTotp.SECRET_MAX_LENGTH +
                                           " chars is supported");
 
-    final LocalDateTime aRegistrationDT = PDTFactory.getCurrentLocalDateTime ();
+    final LocalDateTime aRegistrationDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
 
     final DBExecutor aExecutor = newExecutor ();
     final ESuccess eSuccess = aExecutor.performInTransaction (() -> {

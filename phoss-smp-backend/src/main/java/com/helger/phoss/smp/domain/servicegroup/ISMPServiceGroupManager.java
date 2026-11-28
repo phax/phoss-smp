@@ -24,6 +24,7 @@ import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
 import com.helger.collection.paging.IPagingSpec;
+import com.helger.datetime.domain.IHasLastModificationOffsetDateTime;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectManager;
 import com.helger.phoss.smp.domain.serviceinfo.ISMPServiceInformationManager;
@@ -109,6 +110,42 @@ public interface ISMPServiceGroupManager extends ISMPServiceGroupProvider
     {
       return EChange.UNCHANGED;
     }
+  }
+
+  /**
+   * Set the last modification date time of an existing service group to the current date time. This
+   * must be called by the implementations for every change of the service group itself and for
+   * every change of a service information, an endpoint or a redirect of the service group, because
+   * the last modification date time is used for HTTP caching with <code>Last-Modified</code> and
+   * <code>If-Modified-Since</code>.
+   *
+   * @param aParticipantIdentifier
+   *        The participant identifier of the service group to modify. May not be
+   *        <code>null</code>.
+   * @return {@link EChange#CHANGED} if the service group exists and was modified,
+   *         {@link EChange#UNCHANGED} otherwise.
+   * @since 8.9.0
+   */
+  @NonNull
+  EChange updateSMPServiceGroupLastModification (@NonNull IParticipantIdentifier aParticipantIdentifier);
+
+  /**
+   * Get the last modification of a service group, without reading the whole service group. Other
+   * than {@link #getSMPServiceGroupOfID(IParticipantIdentifier)} this must not use a cache that may
+   * be outdated. This is used for HTTP caching with <code>Last-Modified</code> and for
+   * <code>HEAD</code> requests.
+   *
+   * @param aParticipantIdentifier
+   *        The participant identifier of the service group. May be <code>null</code>.
+   * @return <code>null</code> if no such service group exists. Otherwise an object whose last
+   *         modification date time may be <code>null</code>, if the service group was not modified
+   *         since the last modification date time is maintained.
+   * @since 8.9.0
+   */
+  @Nullable
+  default IHasLastModificationOffsetDateTime getSMPServiceGroupLastModification (@Nullable final IParticipantIdentifier aParticipantIdentifier)
+  {
+    return getSMPServiceGroupOfID (aParticipantIdentifier);
   }
 
   /**

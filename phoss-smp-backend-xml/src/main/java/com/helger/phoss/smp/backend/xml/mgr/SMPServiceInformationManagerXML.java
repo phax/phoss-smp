@@ -44,6 +44,7 @@ import com.helger.datetime.xml.XMLOffsetDateTime;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.peppolid.IProcessIdentifier;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
@@ -78,6 +79,11 @@ public final class SMPServiceInformationManagerXML extends
   public SMPServiceInformationManagerXML (@NonNull @Nonempty final String sFilename) throws DAOException
   {
     super (SMPServiceInformation.class, sFilename);
+  }
+
+  private static void _updateLastModification (@NonNull final IParticipantIdentifier aParticipantID)
+  {
+    SMPMetaManager.getServiceGroupMgr ().updateSMPServiceGroupLastModification (aParticipantID);
   }
 
   @NonNull
@@ -125,6 +131,7 @@ public final class SMPServiceInformationManagerXML extends
       // Replace existing. In particular, REST API calls pass a newly created
       // object rather than the stored instance.
       m_aRWLock.writeLocked (() -> { internalUpdateItem (aSMPServiceInformation); });
+      _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
       AuditHelper.onAuditModifySuccess (SMPServiceInformation.OT,
                                         "set-all",
@@ -143,6 +150,7 @@ public final class SMPServiceInformationManagerXML extends
     {
       // Create the new one
       m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPServiceInformation); });
+      _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
       AuditHelper.onAuditCreateSuccess (SMPServiceInformation.OT,
                                         aSMPServiceInformation.getID (),
@@ -187,6 +195,8 @@ public final class SMPServiceInformationManagerXML extends
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
+    _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
 
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT, aSMPServiceInformation.getID ());
 
@@ -253,6 +263,8 @@ public final class SMPServiceInformationManagerXML extends
     {
       m_aRWLock.writeLock ().unlock ();
     }
+    _updateLastModification (aSMPServiceInformation.getServiceGroupParticipantIdentifier ());
+
     AuditHelper.onAuditDeleteSuccess (SMPServiceInformation.OT,
                                       aSMPServiceInformation.getID (),
                                       aProcess.getProcessIdentifier ().getURIEncoded ());
@@ -421,7 +433,10 @@ public final class SMPServiceInformationManagerXML extends
               aEndpointsChanged.inc ();
             }
         if (bSIChanged)
+        {
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+          _updateLastModification (aSI.getServiceGroupParticipantIdentifier ());
+        }
       }
     });
     return aEndpointsChanged.longValue ();
@@ -457,7 +472,10 @@ public final class SMPServiceInformationManagerXML extends
             }
           }
         if (bSIChanged)
+        {
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+          _updateLastModification (aSI.getServiceGroupParticipantIdentifier ());
+        }
       }
     });
     return aEndpointsChanged.longValue ();
@@ -507,7 +525,10 @@ public final class SMPServiceInformationManagerXML extends
               aEndpointsChanged.inc ();
             }
         if (bSIChanged)
+        {
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+          _updateLastModification (aSI.getServiceGroupParticipantIdentifier ());
+        }
       }
     });
     return aEndpointsChanged.longValue ();
@@ -560,7 +581,10 @@ public final class SMPServiceInformationManagerXML extends
             aEndpointsChanged.inc ();
           }
         if (bSIChanged)
+        {
           m_aRWLock.writeLocked (() -> { internalUpdateItem ((SMPServiceInformation) aSI); });
+          _updateLastModification (aSI.getServiceGroupParticipantIdentifier ());
+        }
       }
     });
     return aEndpointsChanged.longValue ();

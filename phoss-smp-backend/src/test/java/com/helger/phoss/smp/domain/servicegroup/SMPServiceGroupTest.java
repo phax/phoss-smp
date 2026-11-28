@@ -12,7 +12,10 @@ package com.helger.phoss.smp.domain.servicegroup;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.time.OffsetDateTime;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,8 +30,11 @@ import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.mock.SMPServerTestRule;
 import com.helger.phoss.smp.restapi.BDXR1ServerAPI;
 import com.helger.photon.security.CSecurity;
+import com.helger.photon.security.mgr.PhotonSecurityManager;
 import com.helger.smpclient.bdxr1.marshal.BDXR1MarshallerServiceGroupType;
 import com.helger.smpclient.peppol.marshal.SMPMarshallerServiceGroupType;
+import com.helger.xml.microdom.IMicroElement;
+import com.helger.xml.microdom.convert.MicroTypeConverter;
 import com.helger.xml.serialize.read.DOMReader;
 import com.helger.xsds.bdxr.smp1.ExtensionType;
 
@@ -92,5 +98,28 @@ public final class SMPServiceGroupTest
 
     final Document aDoc = new BDXR1MarshallerServiceGroupType ().getAsDocument (aSGBDXR);
     assertNotNull (aDoc);
+  }
+
+  @Test
+  public void testLastModificationMicroTypeConverter ()
+  {
+    final IParticipantIdentifier aPI = SMPMetaManager.getIdentifierFactory ()
+                                                     .createParticipantIdentifier (PeppolIdentifierHelper.DEFAULT_PARTICIPANT_SCHEME,
+                                                                                   "0088:dummy");
+    final SMPServiceGroup aSG = new SMPServiceGroup (CSecurity.USER_ADMINISTRATOR_ID, aPI, null);
+    assertNull (aSG.getLastModificationDateTime ());
+
+    // Without last modification
+    IMicroElement aElement = MicroTypeConverter.convertToMicroElement (aSG, "sg");
+    SMPServiceGroup aSG2 = SMPServiceGroupMicroTypeConverter.convertToNative (aElement,
+                                                                             PhotonSecurityManager.getUserMgr ()::getUserOfID);
+    assertNull (aSG2.getLastModificationDateTime ());
+
+    // With last modification
+    final OffsetDateTime aLastModDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ();
+    aSG.setLastModificationDateTime (aLastModDT);
+    aElement = MicroTypeConverter.convertToMicroElement (aSG, "sg");
+    aSG2 = SMPServiceGroupMicroTypeConverter.convertToNative (aElement, PhotonSecurityManager.getUserMgr ()::getUserOfID);
+    assertEquals (aLastModDT, aSG2.getLastModificationDateTime ());
   }
 }

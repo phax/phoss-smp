@@ -108,6 +108,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     // so that this also works if the filter is instantiated before the context listener ran.
     m_bReadOnly = SMPServerConfiguration.isReadOnly ();
     final boolean bWritable = !m_bReadOnly;
+    // HEAD is only answered, if HTTP caching headers are enabled (since 8.9.0)
+    final boolean bHttpCaching = SMPRestHttpCacheHelper.isAnyHttpCachingEnabled ();
 
     // BusinessCard
     {
@@ -188,6 +190,17 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
       aGetServiceGroup.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetServiceGroup);
     }
+    if (bHttpCaching)
+    {
+      final APIDescriptor aHeadServiceGroup = new APIDescriptor (new APIPath (EHttpMethod.HEAD,
+                                                                              sQueryPathPrefix +
+                                                                                                "/{" +
+                                                                                                PARAM_SERVICE_GROUP_ID +
+                                                                                                "}"),
+                                                                 new APIExecutorServiceGroupHead ());
+      aHeadServiceGroup.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aHeadServiceGroup);
+    }
     if (bWritable)
     {
       final APIDescriptor aPutServiceGroup = new APIDescriptor (APIPath.put ("/{" + PARAM_SERVICE_GROUP_ID + "}"),
@@ -217,6 +230,21 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
                                                                    new APIExecutorServiceMetadataGet ());
       aGetServiceMetadata.setExceptionMapper (aExceptionMapper);
       aAPIRegistry.registerAPI (aGetServiceMetadata);
+    }
+    if (bHttpCaching)
+    {
+      final APIDescriptor aHeadServiceMetadata = new APIDescriptor (new APIPath (EHttpMethod.HEAD,
+                                                                                 sQueryPathPrefix +
+                                                                                                   "/{" +
+                                                                                                   PARAM_SERVICE_GROUP_ID +
+                                                                                                   "}" +
+                                                                                                   PATH_SERVICES +
+                                                                                                   "/{" +
+                                                                                                   PARAM_DOCUMENT_TYPE_ID +
+                                                                                                   "}"),
+                                                                    new APIExecutorServiceMetadataHead ());
+      aHeadServiceMetadata.setExceptionMapper (aExceptionMapper);
+      aAPIRegistry.registerAPI (aHeadServiceMetadata);
     }
     if (bWritable)
     {
@@ -609,8 +637,8 @@ public class SMPRestFilter extends AbstractXFilterUnifiedResponse
     if (LOGGER.isDebugEnabled ())
       LOGGER.debug (LOG_PREFIX + "Found API match for '" + aAPIPath.getPath () + "': " + aInvokableDescriptor);
 
-    // Always disable caching for GET requests
-    if (aRequestScope.getHttpMethod () == EHttpMethod.GET)
+    // Always disable caching for GET and HEAD requests
+    if (aRequestScope.getHttpMethod () == EHttpMethod.GET || aRequestScope.getHttpMethod () == EHttpMethod.HEAD)
       aUnifiedResponse.disableCaching ();
     else
     {

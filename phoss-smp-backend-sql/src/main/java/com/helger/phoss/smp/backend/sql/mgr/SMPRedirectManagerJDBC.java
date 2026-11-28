@@ -49,6 +49,7 @@ import com.helger.peppolid.simple.doctype.SimpleDocumentTypeIdentifier;
 import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
@@ -71,6 +72,7 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   // Oracle and DB2 store the redirection URL as CLOB
   private static final ICommonsSet <String> LOB_COLUMN_NAMES = new CommonsHashSet <> ("redirectionUrl");
 
+  private final String m_sTableNameSG;
   private final String m_sTableName;
   private final CallbackList <ISMPRedirectCallback> m_aCallbacks = new CallbackList <> ();
 
@@ -87,7 +89,18 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
   {
     super (aDBExecSupplier);
     ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableNameSG = sTableNamePrefix + "smp_service_group";
     m_sTableName = sTableNamePrefix + "smp_service_metadata_red";
+  }
+
+  private void _updateLastModification (@NonNull final DBExecutor aExecutor,
+                                        @NonNull final IParticipantIdentifier aParticipantID)
+  {
+    SMPServiceGroupManagerJDBC.updateLastModification (aExecutor,
+                                                       m_sTableNameSG,
+                                                       aParticipantID.getScheme (),
+                                                       aParticipantID.getValue (),
+                                                       SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
   }
 
   @NonNull
@@ -156,6 +169,8 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
           throw new IllegalStateException ("Failed to update existing DB entry (" + nUpdated + ")");
         aCreatedNew.set (false);
       }
+
+      _updateLastModification (aExecutor, aParticipantIdentifier);
     });
 
     if (eSuccess.isFailure ())
@@ -208,14 +223,22 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
 
     final IParticipantIdentifier aParticipantID = aSMPRedirect.getServiceGroupParticipantIdentifier ();
     final IDocumentTypeIdentifier aDocTypeID = aSMPRedirect.getDocumentTypeIdentifier ();
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " +
-                                                                 m_sTableName +
-                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
-                                                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                            aParticipantID.getValue (),
-                                                                                                            aDocTypeID.getScheme (),
-                                                                                                            aDocTypeID.getValue ()));
-    if (nDeleted == 0)
+    final Wrapper <Long> aDeleted = new Wrapper <> (Long.valueOf (0));
+    final DBExecutor aExecutor = newExecutor ();
+    aExecutor.performInTransaction (() -> {
+      final long nCount = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                            m_sTableName +
+                                                            " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? and documentIdentifier=?",
+                                                            new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                       aParticipantID.getValue (),
+                                                                                                       aDocTypeID.getScheme (),
+                                                                                                       aDocTypeID.getValue ()));
+      if (nCount > 0)
+        _updateLastModification (aExecutor, aParticipantID);
+      aDeleted.set (Long.valueOf (nCount));
+    });
+    final long nDeleted = aDeleted.get ().longValue ();
+    if (nDeleted <= 0)
     {
       AuditHelper.onAuditDeleteFailure (SMPRedirect.OT, aSMPRedirect.getID (), "no-such-id");
       return EChange.UNCHANGED;
@@ -239,12 +262,20 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
     final ICommonsList <ISMPRedirect> aDeletedRedirects = getAllSMPRedirectsOfServiceGroup (aParticipantID);
 
     // Now delete
-    final long nDeleted = newExecutor ().insertOrUpdateOrDelete ("DELETE FROM " +
-                                                                 m_sTableName +
-                                                                 " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
-                                                                 new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
-                                                                                                            aParticipantID.getValue ()));
-    if (nDeleted == 0)
+    final Wrapper <Long> aDeleted = new Wrapper <> (Long.valueOf (0));
+    final DBExecutor aExecutor = newExecutor ();
+    aExecutor.performInTransaction (() -> {
+      final long nCount = aExecutor.insertOrUpdateOrDelete ("DELETE FROM " +
+                                                            m_sTableName +
+                                                            " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
+                                                            new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                                       aParticipantID.getValue ()));
+      if (nCount > 0)
+        _updateLastModification (aExecutor, aParticipantID);
+      aDeleted.set (Long.valueOf (nCount));
+    });
+    final long nDeleted = aDeleted.get ().longValue ();
+    if (nDeleted <= 0)
     {
       return EChange.UNCHANGED;
     }
@@ -420,5 +451,21 @@ public final class SMPRedirectManagerJDBC extends AbstractJDBCEnabledManager imp
                                                                    @Nullable final IDocumentTypeIdentifier aDocTypeID)
   {
     return _getSMPRedirectOfServiceGroupAndDocumentType (newExecutor (), aParticipantID, aDocTypeID);
+  }
+
+  @Override
+  public boolean containsSMPRedirect (@Nullable final IParticipantIdentifier aParticipantID,
+                                      @Nullable final IDocumentTypeIdentifier aDocTypeID)
+  {
+    if (aParticipantID == null || aDocTypeID == null)
+      return false;
+
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
+                                      m_sTableName +
+                                      " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
+                                      new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                 aParticipantID.getValue (),
+                                                                                 aDocTypeID.getScheme (),
+                                                                                 aDocTypeID.getValue ())) > 0;
   }
 }

@@ -27,9 +27,9 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.tostring.ToStringGenerator;
 import com.helger.base.type.ObjectType;
 import com.helger.cache.regex.RegExHelper;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppol.sml.CSMLDefault;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
  * Default implementation of {@link ISMPParticipantMigration}
@@ -174,7 +174,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
                                         EParticipantMigrationDirection.OUTBOUND,
                                         EParticipantMigrationState.IN_PROGRESS,
                                         aParticipantID,
-                                        PDTFactory.getCurrentLocalDateTime (),
+                                        SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime (),
                                         sMigrationKey);
   }
 
@@ -187,7 +187,7 @@ public class SMPParticipantMigration implements ISMPParticipantMigration
                                         EParticipantMigrationDirection.INBOUND,
                                         EParticipantMigrationState.MIGRATED,
                                         aParticipantID,
-                                        PDTFactory.getCurrentLocalDateTime (),
+                                        SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime (),
                                         sMigrationKey);
   }
 }

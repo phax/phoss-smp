@@ -31,7 +31,6 @@ import com.helger.config.source.resource.IConfigurationSourceResource;
 import com.helger.config.value.IConfigurationValueProvider;
 import com.helger.config.value.IConfigurationValueProviderWithPriorityCallback;
 import com.helger.datetime.format.PDTToString;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.html.hc.html.grouping.HCLI;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.textlevel.HCCode;
@@ -147,7 +146,7 @@ public final class PageSecureSMPConfiguration extends AbstractSMPWebPage
 
     if (bReloadConfig)
     {
-      m_aLastReload = PDTFactory.getCurrentLocalDateTime ();
+      m_aLastReload = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
       aNodeList.addChild (warn ("Please note that some configuration properties have been read prior to rendering this part of the page." +
                                 " This means that some configuration changes only take effect when you switch to another page inside the SMP."));
     }

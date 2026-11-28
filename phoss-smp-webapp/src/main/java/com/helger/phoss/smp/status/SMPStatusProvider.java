@@ -83,7 +83,7 @@ public final class SMPStatusProvider
 
     final StopWatch aSW = StopWatch.createdStarted ();
     final ISMPSettings aSettings = SMPMetaManager.getSettings ();
-    final OffsetDateTime aNow = PDTFactory.getCurrentOffsetDateTime ();
+    final OffsetDateTime aNow = SMPMetaManager.getTimestampMgr ().getCurrentDateTime ();
     final ISMLInfo aSMLInfo = aSettings.getSMLInfo ();
 
     final IJsonObject aStatusData = new JsonObject ();
@@ -94,7 +94,7 @@ public final class SMPStatusProvider
                               PDTWebDateHelper.getAsStringXSD (SMPWebAppListener.getStartupDateTime ()));
     aStatusData.add ("status.datetime", PDTWebDateHelper.getAsStringXSD (aNow));
     aStatusData.add ("status.datetime.utc",
-                     PDTWebDateHelper.getAsStringXSD (PDTFactory.getCurrentOffsetDateTimeUTC ()));
+                     PDTWebDateHelper.getAsStringXSD (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ()));
     aStatusData.add ("version.smp", CSMP.getApplicationVersion ());
     aStatusData.add ("version.java", SystemProperties.getJavaVersion ());
     aStatusData.add ("global.debug", GlobalDebug.isDebugMode ());

@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.helger.datetime.helper.PDTFactory;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.quartz.DisallowConcurrentExecution;
 import com.helger.quartz.IJobExecutionContext;
 import com.helger.quartz.ITrigger.EMisfireInstruction;
@@ -60,7 +60,7 @@ public final class ServiceGroupExportPurgeJob extends AbstractScopeAwareJob
     return GlobalQuartzScheduler.getInstance ()
                                 .scheduleJob (ServiceGroupExportPurgeJob.class.getName (),
                                               JDK8TriggerBuilder.newTrigger ()
-                                                                .startAt (PDTFactory.getCurrentLocalDateTime ()
+                                                                .startAt (SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ()
                                                                                     .withHour (SCHEDULE_HOUR_OF_DAY)
                                                                                     .withMinute (0)
                                                                                     .withSecond (0)

@@ -24,7 +24,7 @@ import com.helger.base.concurrent.SimpleReadWriteLock;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.collection.commons.CommonsHashMap;
 import com.helger.collection.commons.ICommonsMap;
-import com.helger.datetime.helper.PDTFactory;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 
 /**
  * Remembers which repair was already performed from which reconciliation report.<br>
@@ -55,7 +55,7 @@ public final class SMLRepairHistory
 
     private Entry (final int nSucceeded, final int nAlreadyDone, final int nFailed)
     {
-      m_aDT = PDTFactory.getCurrentLocalDateTime ();
+      m_aDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
       m_nSucceeded = nSucceeded;
       m_nAlreadyDone = nAlreadyDone;
       m_nFailed = nFailed;

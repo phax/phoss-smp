@@ -17,7 +17,6 @@
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.function.Supplier;
 
@@ -32,6 +31,7 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsSet;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.mgrs.sysmigration.ISystemMigrationManager;
 import com.helger.photon.mgrs.sysmigration.SystemMigrationHelper;
@@ -75,7 +75,7 @@ public class SystemMigrationManagerMongoDB extends AbstractManagerMongoDB implem
     final String sMigrationID = aDoc.getString (BSON_MIGRATION_ID);
     final Date aDate = aDoc.getDate (BSON_EXECUTION_DT);
     final LocalDateTime aExecutionDT = aDate != null ? TypeConverter.convert (aDate, LocalDateTime.class)
-                                                     : LocalDateTime.now (ZoneOffset.UTC);
+                                                     : SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
     final boolean bSuccess = aDoc.getBoolean (BSON_SUCCESS, false);
     final String sErrorMsg = aDoc.getString (BSON_ERROR_MSG);
     return new SystemMigrationResult (sMigrationID, aExecutionDT, bSuccess, sErrorMsg);

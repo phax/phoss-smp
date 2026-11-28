@@ -34,7 +34,6 @@ import com.helger.annotation.Nonnegative;
 import com.helger.base.lang.clazz.ClassHelper;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.CommonsArrayList;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.html.hc.IHCNode;
 import com.helger.html.hc.html.grouping.HCOL;
 import com.helger.html.hc.html.textlevel.HCSpan;
@@ -210,7 +209,7 @@ public final class PageSecureCertificateInformation extends AbstractSMPWebPage
   {
     final HCNodeList aNodeList = aWPEC.getNodeList ();
     final Locale aDisplayLocale = aWPEC.getDisplayLocale ();
-    final ZonedDateTime aNowZDT = PDTFactory.getCurrentZonedDateTime ();
+    final ZonedDateTime aNowZDT = SMPMetaManager.getTimestampMgr ().getCurrentZonedDateTime ();
     final OffsetDateTime aNowDT = aNowZDT.toOffsetDateTime ();
     final String sDirectoryName = SMPWebAppConfiguration.getDirectoryName ();
 

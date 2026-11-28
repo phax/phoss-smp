@@ -81,6 +81,8 @@ Backends are registered via Java `ServiceLoader` SPI. Each backend module contai
 
 The active backend is selected via `smp.backend` in `application.properties`. All backend-specific manager classes implement interfaces defined in `phoss-smp-backend`.
 
+`ISMPTimestampManager` (8.9.0+, modelled after phase4 `IAS4TimestampManager`) is the single source of the current date and time with millisecond precision: `SMPMetaManager.getTimestampMgr ()`. It is static, so it is also available before `SMPMetaManager` is initialised, and a provider may replace it via `ISMPManagerProvider.createTimestampMgr ()`. All production code uses it instead of `PDTFactory.getCurrent...` (test code may still use `PDTFactory`); new code must do the same.
+
 To implement a **custom backend**, follow the pattern of `phoss-smp-backend-xml`:
 1. Create a backend sub-project implementing `ISMPManagerProvider` and `ISMPBackendRegistrarSPI`
 2. Create a webapp sub-project that references your backend
@@ -141,6 +143,8 @@ Three API variants are implemented in `phoss-smp-backend/src/main/java/com/helge
 | GET | `/smp-status/` | No | Health/status JSON (disabled by default) |
 | GET | `/smp-ready` | No | Backend-aware readiness: HTTP 200 `{"ready":true}` / HTTP 503 `{"ready":false}` |
 
+`HEAD /{ServiceGroupId}` and `HEAD /{ServiceGroupId}/services/{DocumentTypeId}` (8.9.0+) are only registered in `SMPRestFilter` if an HTTP caching header is enabled (`SMPRestHttpCacheHelper.isAnyHttpCachingEnabled`). The HEAD executors only use `getSMPServiceGroupLastModification`, `containsSMPRedirect` and `containsSMPServiceInformationWithEndpoint`, never build or sign the response, and send no `ETag`.
+
 ### Authentication
 
 - **Bearer Token** (preferred, v6.0.7+): `Authorization: Bearer <token>` — tokens created in Administration > Security > User Tokens
@@ -172,6 +176,7 @@ UI page classes extend `AbstractSMPWebPageForm` or `AbstractSMPWebPageSimpleForm
 - Manager classes are named `SMP*ManagerJDBC` and live in `com.helger.phoss.smp.backend.sql.mgr`
 - Oracle stores an empty string as `NULL`: a column that may receive an empty string must be nullable (on Oracle at least), and mandatory values are read back with `StringHelper.getNotNull (...)` so that all databases behave the same. Since ph-db 8.5.3 a `NULL` CLOB is read as `null`, not as an empty string.
 - Oracle and DB2 cannot use a CLOB column in `DISTINCT`, `ORDER BY` or (Oracle) `=` comparisons. Compare in Java and update by primary key, and sort with `SMPJDBCQueryHelper.getLobSortExpression` (passed as LOB column names to `getOrderByAndPagingClause`).
+- `smp_service_group.lastmoddt` (V40) is the last modification of the whole participant (Service Group, Service Information, Endpoints, Redirects), used for the HTTP `Last-Modified` header (#597). Every write path must update it - in the SQL backend inside the same transaction via `SMPServiceGroupManagerJDBC.updateLastModification`, in the XML and MongoDB backends via `ISMPServiceGroupManager.updateSMPServiceGroupLastModification`. The value is an `OffsetDateTime` in UTC (ph-commons `IHasLastModificationOffsetDateTime`, 12.9.0+), always from `SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ()`; SQL stores it as UTC in a plain `TIMESTAMP` column via ph-db `DBTimestampUTC` (8.5.4+) and reads it with `DBResultRow.getAsOffsetDateTimeUTC`, so it is independent of the JVM time zone and of daylight saving time changes (verified on all 5 databases). The endpoint activation and expiration dates still use `DBValueHelper.toTimestamp`, which the drivers convert with the JVM time zone - only correct if all instances use the same `smp.timezone` (default `UTC`). `Last-Modified` is set with ph-web's `UnifiedResponse.setLastModified (OffsetDateTime)` (11.5.2+), and `If-Modified-Since` is parsed strictly as IMF-fixdate with `DateTimeFormatter.RFC_1123_DATE_TIME`. ph-commons before 12.9.0 formatted and parsed RFC 822 dates in the default time zone - phoss-smp requires 12.9.0+. Tests must not rely on `smp.timezone = UTC` (the default) - `RestHttpCacheLastModifiedTest` runs with `Europe/Vienna`. Read it with `ISMPServiceGroupManager.getSMPServiceGroupLastModification` (`null` if the Service Group doesn't exist), which bypasses the Service Group cache.
 - A new Flyway migration needs a script for every database (`migrate-{db2,mysql,oracle,postgresql,sqlserver}`), even if only one database is affected - otherwise the versions diverge.
 
 Connection pool properties (v8.0.11+):
@@ -224,6 +229,7 @@ global.production = true
 webapp.security.login.errordetails = false
 csp.enabled = true
 smp.rest.remote.queryapi.disabled = true
+smp.rest.cache.http.lastmodified = false  # Last-Modified / If-Modified-Since for GET SG and SM (OASIS SMP 2.0 section 5.2.2); opt-in
 smp.status.enabled = false     # /smp-status/ endpoint; off by default
 smp.ready.timeout = 2s         # time limit for the /smp-ready backend checks
 smp.totp.enabled = false       # two-factor auth (TOTP) for the management GUI; opt-in, restart required

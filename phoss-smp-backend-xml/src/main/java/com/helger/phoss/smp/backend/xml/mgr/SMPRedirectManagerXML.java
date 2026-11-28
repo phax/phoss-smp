@@ -40,6 +40,7 @@ import com.helger.collection.paging.IPagingSpec;
 import com.helger.dao.DAOException;
 import com.helger.peppolid.IDocumentTypeIdentifier;
 import com.helger.peppolid.IParticipantIdentifier;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.redirect.ESMPRedirectColumn;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirect;
 import com.helger.phoss.smp.domain.redirect.ISMPRedirectCallback;
@@ -75,11 +76,17 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     return m_aCallbacks;
   }
 
+  private static void _updateLastModification (@NonNull final IParticipantIdentifier aParticipantID)
+  {
+    SMPMetaManager.getServiceGroupMgr ().updateSMPServiceGroupLastModification (aParticipantID);
+  }
+
   @NonNull
   @IsLocked (ELockType.WRITE)
   private ISMPRedirect _createSMPRedirect (@NonNull final SMPRedirect aSMPRedirect)
   {
     m_aRWLock.writeLocked (() -> { internalCreateItem (aSMPRedirect); });
+    _updateLastModification (aSMPRedirect.getServiceGroupParticipantIdentifier ());
     AuditHelper.onAuditCreateSuccess (SMPRedirect.OT,
                                       aSMPRedirect.getID (),
                                       aSMPRedirect.getServiceGroupID (),
@@ -96,6 +103,7 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
   private ISMPRedirect _updateSMPRedirect (@NonNull final SMPRedirect aSMPRedirect)
   {
     m_aRWLock.writeLocked (() -> { internalUpdateItem (aSMPRedirect); });
+    _updateLastModification (aSMPRedirect.getServiceGroupParticipantIdentifier ());
     AuditHelper.onAuditModifySuccess (SMPRedirect.OT,
                                       "set-all",
                                       aSMPRedirect.getID (),
@@ -199,6 +207,8 @@ public final class SMPRedirectManagerXML extends AbstractPhotonMapBasedWALDAO <I
     {
       m_aRWLock.writeLock ().unlock ();
     }
+
+    _updateLastModification (aSMPRedirect.getServiceGroupParticipantIdentifier ());
 
     m_aCallbacks.forEach (x -> x.onSMPRedirectDeleted (aSMPRedirect));
 

@@ -10,6 +10,7 @@
  */
 package com.helger.phoss.smp.domain.servicegroup;
 
+import java.time.OffsetDateTime;
 import java.util.function.Function;
 
 import org.jspecify.annotations.NonNull;
@@ -35,6 +36,7 @@ import com.helger.xml.microdom.util.MicroHelper;
 public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConverter <SMPServiceGroup>
 {
   private static final MicroQName ATTR_OWNER_ID = new MicroQName ("ownerid");
+  private static final MicroQName ATTR_LAST_MOD_DT = new MicroQName ("lastmoddt");
   private static final String ELEMENT_PARTICIPANT_ID = "participant";
   private static final String ELEMENT_EXTENSION = "extension";
   public static final String ELEMENT_CUSTOM_PROPERTIES = "customproperties";
@@ -46,6 +48,8 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
   {
     final IMicroElement aElement = new MicroElement (sNamespaceURI, sTagName);
     aElement.setAttribute (ATTR_OWNER_ID, aValue.getOwnerID ());
+    if (aValue.hasLastModificationDateTime ())
+      aElement.setAttributeWithConversion (ATTR_LAST_MOD_DT, aValue.getLastModificationDateTime ());
     aElement.addChild (MicroTypeConverter.convertToMicroElement (aValue.getParticipantIdentifier (),
                                                                  sNamespaceURI,
                                                                  ELEMENT_PARTICIPANT_ID));
@@ -85,8 +89,15 @@ public final class SMPServiceGroupMicroTypeConverter implements IMicroTypeConver
     final SGCustomPropertyList aCustomProperties = MicroTypeConverter.convertToNative (aElement.getFirstChildElement (ELEMENT_CUSTOM_PROPERTIES),
                                                                                        SGCustomPropertyList.class);
 
+    final OffsetDateTime aLastModDT = aElement.getAttributeValueWithConversion (ATTR_LAST_MOD_DT, OffsetDateTime.class);
+
     // Use the new ID in case the ID was changed!
-    return new SMPServiceGroup (aOwner.getID (), aParticipantIdentifier, sExtension, aCustomProperties);
+    final SMPServiceGroup ret = new SMPServiceGroup (aOwner.getID (),
+                                                     aParticipantIdentifier,
+                                                     sExtension,
+                                                     aCustomProperties);
+    ret.setLastModificationDateTime (aLastModDT);
+    return ret;
   }
 
   @NonNull

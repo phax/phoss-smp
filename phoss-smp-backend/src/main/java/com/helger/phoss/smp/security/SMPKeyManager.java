@@ -55,6 +55,7 @@ import com.helger.collection.commons.CommonsArrayList;
 import com.helger.http.security.TrustManagerTrustAll;
 import com.helger.phoss.smp.ESMPRESTType;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.restapi.SMPRestLastModification;
 import com.helger.phoss.smp.restapi.cache.SMPRestResponseCache;
 import com.helger.scope.singleton.AbstractGlobalSingleton;
 import com.helger.security.keystore.EKeyStoreLoadError;
@@ -381,6 +382,8 @@ public final class SMPKeyManager extends AbstractGlobalSingleton
 
       // Cached responses were signed with the previous key
       SMPRestResponseCache.invalidateAll ();
+      // All responses changed, so the HTTP "Last-Modified" must change as well
+      SMPRestLastModification.updateGlobalLastModificationDateTime ();
     }
     catch (final Exception ex)
     {

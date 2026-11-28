@@ -20,6 +20,8 @@ import static org.junit.Assert.fail;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
@@ -76,6 +78,22 @@ public final class SMPRestResponseCacheHandlerTest
     assertNotEquals (SMPRestResponseCacheKey.forServiceGroup (PID1, "http://a/x"),
                      SMPRestResponseCacheKey.forServiceGroup (PID1, "http://b/x"));
     assertEquals (PID1.getURIEncoded (), aKey1.getParticipantID ());
+
+    // The last modification is part of the key
+    final OffsetDateTime aLastModDT = OffsetDateTime.of (2026, 11, 26, 12, 0, 0, 0, ZoneOffset.UTC);
+    final SMPRestResponseCacheKey aKey2 = SMPRestResponseCacheKey.forServiceMetadata (PID1, DT1, aLastModDT);
+    assertEquals (aKey2, SMPRestResponseCacheKey.forServiceMetadata (PID1, DT1, aLastModDT));
+    assertEquals (aKey2.hashCode (), SMPRestResponseCacheKey.forServiceMetadata (PID1, DT1, aLastModDT).hashCode ());
+    assertEquals (aLastModDT, aKey2.getLastModificationDateTime ());
+    assertNotEquals (aKey1, aKey2);
+    // The same instant with another offset
+    assertEquals (aKey2,
+                  SMPRestResponseCacheKey.forServiceMetadata (PID1,
+                                                              DT1,
+                                                              aLastModDT.withOffsetSameInstant (ZoneOffset.ofHours (1))));
+    assertNotEquals (aKey2, SMPRestResponseCacheKey.forServiceMetadata (PID1, DT1, aLastModDT.plusSeconds (1)));
+    assertNotEquals (SMPRestResponseCacheKey.forServiceGroup (PID1, "http://a/x", aLastModDT),
+                     SMPRestResponseCacheKey.forServiceGroup (PID1, "http://a/x", aLastModDT.plusSeconds (1)));
   }
 
   @Test

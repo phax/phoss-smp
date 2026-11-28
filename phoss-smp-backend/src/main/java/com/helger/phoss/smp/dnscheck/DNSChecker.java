@@ -26,9 +26,9 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.peppolid.IParticipantIdentifier;
 import com.helger.phoss.smp.config.SMPServerConfiguration;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.smpclient.url.SMPDNSResolutionException;
 import com.helger.smpclient.url.dns.IBDXLURLProvider;
 
@@ -116,11 +116,11 @@ public final class DNSChecker
     ValueEnforcer.notNull (aURLProvider, "URLProvider");
     ValueEnforcer.notNull (aParticipantIDs, "ParticipantIDs");
 
-    final LocalDateTime aStartDT = PDTFactory.getCurrentLocalDateTime ();
+    final LocalDateTime aStartDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
     final ICommonsList <DNSCheckEntry> aEntries = new CommonsArrayList <> ();
 
     if (aParticipantIDs.isEmpty ())
-      return new DNSCheckResult (aStartDT, PDTFactory.getCurrentLocalDateTime (), aEntries);
+      return new DNSCheckResult (aStartDT, SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime (), aEntries);
 
     final int nThreads = Math.min (SMPServerConfiguration.getDNSCheckThreadCount (), aParticipantIDs.size ());
     LOGGER.info ("Checking the DNS state of " +
@@ -166,7 +166,7 @@ public final class DNSChecker
       }
     }
 
-    final DNSCheckResult ret = new DNSCheckResult (aStartDT, PDTFactory.getCurrentLocalDateTime (), aEntries);
+    final DNSCheckResult ret = new DNSCheckResult (aStartDT, SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime (), aEntries);
     LOGGER.info ("Finished the DNS check of " +
                  ret.getEntryCount () +
                  " participant(s) in " +

@@ -16,6 +16,9 @@
  */
 package com.helger.phoss.smp.backend.mongodb.mgr;
 
+import java.time.OffsetDateTime;
+import java.util.Date;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.jspecify.annotations.NonNull;
@@ -59,6 +62,7 @@ import com.helger.phoss.smp.smlhook.IRegistrationHook;
 import com.helger.phoss.smp.smlhook.RegistrationHookException;
 import com.helger.phoss.smp.smlhook.RegistrationHookFactory;
 import com.helger.photon.audit.AuditHelper;
+import com.helger.typeconvert.impl.TypeConverter;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
@@ -81,6 +85,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
   private static final String BSON_PARTICIPANT_ID = "participantid";
   private static final String BSON_EXTENSION = "extension";
   private static final String BSON_CUSTOM_PROPERTIES = "customproperties";
+  private static final String BSON_LAST_MOD_DT = "lastmoddt";
 
   /** The temporary field name used for the <code>$lookup</code> results of the filtered queries */
   private static final String BSON_JOINED = "__joined";
@@ -111,6 +116,13 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                                            .getAsJsonString () : null;
   }
 
+  @Nullable
+  private static Date _toDate (@Nullable final OffsetDateTime aLDT)
+  {
+    // Must be a Date to make sure the same timezone is used everywhere
+    return TypeConverter.convert (aLDT, Date.class);
+  }
+
   @NonNull
   @ReturnsMutableCopy
   public static Document toBson (@NonNull final ISMPServiceGroup aValue)
@@ -121,6 +133,8 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     if (aValue.getExtensions ().extensions ().isNotEmpty ())
       ret.append (BSON_EXTENSION, aValue.getExtensions ().getExtensionsAsJsonString ());
     ret.append (BSON_CUSTOM_PROPERTIES, _toString (aValue.getCustomProperties ()));
+    if (aValue.hasLastModificationDateTime ())
+      ret.append (BSON_LAST_MOD_DT, _toDate (aValue.getLastModificationDateTime ()));
     return ret;
   }
 
@@ -141,7 +155,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
       if (aJson != null)
         aCustomProperties = SGCustomPropertyList.fromJson (aJson);
     }
-    return new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension, aCustomProperties);
+    final SMPServiceGroup ret = new SMPServiceGroup (sOwnerID, aParticipantIdentifier, sExtension, aCustomProperties);
+    ret.setLastModificationDateTime (TypeConverter.convert (aDoc.getDate (BSON_LAST_MOD_DT), OffsetDateTime.class));
+    return ret;
   }
 
   @NonNull
@@ -168,6 +184,7 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                   aParticipantID,
                                                                   sExtension,
                                                                   aCustomProperties);
+    aSMPServiceGroup.setLastModificationDateTime (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
 
     // It's a new service group - throws exception in case of an error
     final IRegistrationHook aHook = RegistrationHookFactory.getInstance ();
@@ -243,7 +260,9 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
                                                                                  Updates.set (BSON_EXTENSION,
                                                                                               sExtension),
                                                                                  Updates.set (BSON_CUSTOM_PROPERTIES,
-                                                                                              sCustomPropsJson)));
+                                                                                              sCustomPropsJson),
+                                                                                 Updates.set (BSON_LAST_MOD_DT,
+                                                                                              _toDate (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ()))));
     if (aOldDoc == null)
     {
       AuditHelper.onAuditModifyFailure (SMPServiceGroup.OT, "set-all", sServiceGroupID, "no-such-id");
@@ -257,6 +276,18 @@ public final class SMPServiceGroupManagerMongoDB extends AbstractManagerMongoDB 
     m_aCBs.forEach (x -> x.onSMPServiceGroupUpdated (aParticipantID));
 
     return EChange.CHANGED;
+  }
+
+  @NonNull
+  public EChange updateSMPServiceGroupLastModification (@NonNull final IParticipantIdentifier aParticipantID)
+  {
+    ValueEnforcer.notNull (aParticipantID, "ParticipantID");
+
+    final String sServiceGroupID = SMPServiceGroup.createSMPServiceGroupID (aParticipantID);
+    final Document aOldDoc = getCollection ().findOneAndUpdate (new Document (BSON_ID, sServiceGroupID),
+                                                                Updates.set (BSON_LAST_MOD_DT,
+                                                                             _toDate (SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ())));
+    return EChange.valueOf (aOldDoc != null);
   }
 
   @NonNull

@@ -67,6 +67,8 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   private static final String MIGRATION_ID_ENSURE_TRANSPORT_PROFILES = "ensure-transport-profiles-128";
 
   private static ISMPManagerProvider s_aManagerProvider = null;
+  // Static, so that it is also available before the initialization (as in phase4 MetaAS4Manager)
+  private static ISMPTimestampManager s_aTimestampMgr = ISMPTimestampManager.createDefaultInstance ();
   private static volatile boolean s_bReadOnly = false;
 
   private IIdentifierFactory m_aIdentifierFactory;
@@ -266,6 +268,12 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
       if (m_aSMPURLProvider == null)
         throw new IllegalStateException ("Failed to create SMP URL Provider!");
 
+      // Before all other managers, because they may use it
+      final ISMPTimestampManager aTimestampMgr = s_aManagerProvider.createTimestampMgr ();
+      if (aTimestampMgr == null)
+        throw new IllegalStateException ("Failed to create Timestamp manager!");
+      s_aTimestampMgr = aTimestampMgr;
+
       m_aSMLInfoMgr = s_aManagerProvider.createSMLInfoMgr ();
       if (m_aSMLInfoMgr == null)
         throw new IllegalStateException ("Failed to create SML Info manager!");
@@ -342,6 +350,17 @@ public final class SMPMetaManager extends AbstractGlobalSingleton
   public static ISMPURLProvider getSMPURLProvider ()
   {
     return getInstance ().m_aSMPURLProvider;
+  }
+
+  /**
+   * @return The timestamp manager, that is the single source of the current date and time. Before
+   *         the initialization the default instance is returned. Never <code>null</code>.
+   * @since 8.9.0
+   */
+  @NonNull
+  public static ISMPTimestampManager getTimestampMgr ()
+  {
+    return s_aTimestampMgr;
   }
 
   @NonNull

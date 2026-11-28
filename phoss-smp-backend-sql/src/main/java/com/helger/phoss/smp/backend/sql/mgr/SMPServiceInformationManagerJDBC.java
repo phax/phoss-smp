@@ -16,6 +16,7 @@
  */
 package com.helger.phoss.smp.backend.sql.mgr;
 
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -39,8 +40,10 @@ import com.helger.base.string.StringHelper;
 import com.helger.base.wrapper.Wrapper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.CommonsHashMap;
+import com.helger.collection.commons.CommonsLinkedHashSet;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
+import com.helger.collection.commons.ICommonsOrderedSet;
 import com.helger.collection.paging.IPagingSpec;
 import com.helger.db.api.helper.DBValueHelper;
 import com.helger.db.jdbc.callback.ConstantPreparedStatementDataProvider;
@@ -57,6 +60,7 @@ import com.helger.peppolid.simple.participant.SimpleParticipantIdentifier;
 import com.helger.peppolid.simple.process.SimpleProcessIdentifier;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper;
 import com.helger.phoss.smp.backend.sql.SMPJDBCQueryHelper.SearchCondition;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.phoss.smp.domain.serviceinfo.ESMPServiceInformationColumn;
 import com.helger.phoss.smp.domain.serviceinfo.EndpointUsageInfo;
 import com.helger.phoss.smp.domain.serviceinfo.IEndpointUsageInfo;
@@ -113,6 +117,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     }
   }
 
+  private final String m_sTableNameSG;
   private final String m_sTableNameSM;
   private final String m_sTableNameP;
   private final String m_sTableNameE;
@@ -131,6 +136,7 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   {
     super (aDBExecSupplier);
     ValueEnforcer.notNull (sTableNamePrefix, "TableNamePrefix");
+    m_sTableNameSG = sTableNamePrefix + "smp_service_group";
     m_sTableNameSM = sTableNamePrefix + "smp_service_metadata";
     m_sTableNameP = sTableNamePrefix + "smp_process";
     m_sTableNameE = sTableNamePrefix + "smp_endpoint";
@@ -148,6 +154,69 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
   private static String _getNullIfEmpty (@Nullable final String s)
   {
     return StringHelper.isEmpty (s) ? null : s;
+  }
+
+  private void _updateLastModification (@NonNull final DBExecutor aExecutor,
+                                        @NonNull final IParticipantIdentifier aParticipantID)
+  {
+    SMPServiceGroupManagerJDBC.updateLastModification (aExecutor,
+                                                       m_sTableNameSG,
+                                                       aParticipantID.getScheme (),
+                                                       aParticipantID.getValue (),
+                                                       SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
+  }
+
+  /**
+   * Perform a bulk update of the endpoint table and update the last modification of all affected
+   * service groups in the same transaction.
+   *
+   * @param sSet
+   *        The SQL SET clause without the "SET" keyword. May not be <code>null</code>.
+   * @param aSetParams
+   *        The parameters of the SET clause. May not be <code>null</code>.
+   * @param sWhere
+   *        The SQL WHERE clause without the "WHERE" keyword. May not be <code>null</code>.
+   * @param aWhereParams
+   *        The parameters of the WHERE clause. May not be <code>null</code>.
+   * @return The number of modified endpoints. Always &ge; 0.
+   */
+  @Nonnegative
+  private long _updateEndpointsAndLastModification (@NonNull final String sSet,
+                                                    @NonNull final ICommonsList <Object> aSetParams,
+                                                    @NonNull final String sWhere,
+                                                    @NonNull final ICommonsList <Object> aWhereParams)
+  {
+    final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
+    final DBExecutor aExecutor = newExecutor ();
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
+      // Find all affected participants before the update changes the matching values
+      final ICommonsList <DBResultRow> aDBResult = aExecutor.queryAll ("SELECT DISTINCT businessIdentifierScheme, businessIdentifier FROM " +
+                                                                       m_sTableNameE +
+                                                                       " WHERE " +
+                                                                       sWhere,
+                                                                       new ConstantPreparedStatementDataProvider (aWhereParams));
+      if (aDBResult != null && aDBResult.isNotEmpty ())
+      {
+        final ICommonsList <Object> aParams = new CommonsArrayList <> (aSetParams);
+        aParams.addAll (aWhereParams);
+        final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE " + m_sTableNameE + " SET " + sSet + " WHERE " + sWhere,
+                                                              new ConstantPreparedStatementDataProvider (aParams));
+        if (nCount > 0)
+        {
+          final OffsetDateTime aLastModDT = SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ();
+          for (final DBResultRow aRow : aDBResult)
+            SMPServiceGroupManagerJDBC.updateLastModification (aExecutor,
+                                                               m_sTableNameSG,
+                                                               aRow.getAsString (0),
+                                                               aRow.getAsString (1),
+                                                               aLastModDT);
+          ret.set (Long.valueOf (nCount));
+        }
+      }
+    });
+    if (eSuccess.isFailure ())
+      return 0;
+    return ret.get ().longValue ();
   }
 
   @NonNull
@@ -227,6 +296,8 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                 .getExtensionsAsJsonString ()));
         }
       }
+
+      _updateLastModification (aExecutor, aPID);
     });
     if (eSuccess.isFailure ())
       return ESuccess.FAILURE;
@@ -308,7 +379,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                          aPID.getValue (),
                                                                                                          aDocTypeID.getScheme (),
                                                                                                          aDocTypeID.getValue ()));
-      ret.set (Long.valueOf (nCountEP + nCountProc + nCountSM));
+      final long nCount = nCountEP + nCountProc + nCountSM;
+      if (nCount > 0)
+        _updateLastModification (aExecutor, aPID);
+      ret.set (Long.valueOf (nCount));
     });
     if (eSuccess.isFailure ())
       return EChange.UNCHANGED;
@@ -364,7 +438,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                               " WHERE businessIdentifierScheme=? AND businessIdentifier=?",
                                                               new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
                                                                                                          aParticipantID.getValue ()));
-      ret.set (Long.valueOf (nCountEP + nCountProc + nCountSM));
+      final long nCount = nCountEP + nCountProc + nCountSM;
+      if (nCount > 0)
+        _updateLastModification (aExecutor, aParticipantID);
+      ret.set (Long.valueOf (nCount));
     });
     if (eSuccess.isFailure () || ret.get ().longValue () <= 0)
     {
@@ -414,7 +491,10 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
                                                                                                            aDocTypeID.getValue (),
                                                                                                            aProcessID.getScheme (),
                                                                                                            aProcessID.getValue ()));
-      ret.set (Long.valueOf (nCountEP + nCountProc));
+      final long nCount = nCountEP + nCountProc;
+      if (nCount > 0)
+        _updateLastModification (aExecutor, aPID);
+      ret.set (Long.valueOf (nCount));
     });
     if (eSuccess.isFailure ())
       return EChange.UNCHANGED;
@@ -765,6 +845,22 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     }
     return null;
   }
+  @Override
+  public boolean containsSMPServiceInformationWithEndpoint (@Nullable final IParticipantIdentifier aParticipantID,
+                                                            @Nullable final IDocumentTypeIdentifier aDocTypeID)
+  {
+    if (aParticipantID == null || aDocTypeID == null)
+      return false;
+
+    return newExecutor ().queryCount ("SELECT COUNT(*) FROM " +
+                                      m_sTableNameE +
+                                      " WHERE businessIdentifierScheme=? AND businessIdentifier=? AND documentIdentifierScheme=? AND documentIdentifier=?",
+                                      new ConstantPreparedStatementDataProvider (aParticipantID.getScheme (),
+                                                                                 aParticipantID.getValue (),
+                                                                                 aDocTypeID.getScheme (),
+                                                                                 aDocTypeID.getValue ())) > 0;
+  }
+
 
   public boolean containsAnyEndpointWithTransportProfile (@Nullable final String sTransportProfileID)
   {
@@ -836,18 +932,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     if (aServiceGroupID != null)
     {
-      return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                    m_sTableNameE +
-                                                    " SET endpointReference=? WHERE endpointReference=? AND businessIdentifierScheme=? AND businessIdentifier=?",
-                                                    new ConstantPreparedStatementDataProvider (sNewURL,
-                                                                                               sOldURL,
-                                                                                               aServiceGroupID.getScheme (),
-                                                                                               aServiceGroupID.getValue ()));
+      return _updateEndpointsAndLastModification ("endpointReference=?",
+                                                  new CommonsArrayList <> (sNewURL),
+                                                  "endpointReference=? AND businessIdentifierScheme=? AND businessIdentifier=?",
+                                                  new CommonsArrayList <> (sOldURL,
+                                                                           aServiceGroupID.getScheme (),
+                                                                           aServiceGroupID.getValue ()));
     }
-    return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                  m_sTableNameE +
-                                                  " SET endpointReference=? WHERE endpointReference=?",
-                                                  new ConstantPreparedStatementDataProvider (sNewURL, sOldURL));
+    return _updateEndpointsAndLastModification ("endpointReference=?",
+                                                new CommonsArrayList <> (sNewURL),
+                                                "endpointReference=?",
+                                                new CommonsArrayList <> (sOldURL));
   }
 
   @Nonnegative
@@ -858,32 +953,51 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     final String sOldCertNormalized = SMPCertificateHelper.getNormalizedCert (sOldCert);
 
-    // Get all certificate values. The comparison is done here and each endpoint is updated by ID,
-    // because Oracle and DB2 cannot use a CLOB column in DISTINCT or in a "=" comparison
-    final ICommonsList <DBResultRow> aDBResult = newExecutor ().queryAll ("SELECT id, certificate FROM " +
-                                                                          m_sTableNameE +
-                                                                          " WHERE certificate IS NOT NULL");
-    long nEndpointsChanged = 0;
-    if (aDBResult != null)
-    {
-      for (final DBResultRow aRow : aDBResult)
+    final Wrapper <Long> ret = new Wrapper <> (Long.valueOf (0));
+    final DBExecutor aExecutor = newExecutor ();
+    final ESuccess eSuccess = aExecutor.performInTransaction (() -> {
+      // Get all certificate values. The comparison is done here and each endpoint is updated by ID,
+      // because Oracle and DB2 cannot use a CLOB column in DISTINCT or in a "=" comparison
+      final ICommonsList <DBResultRow> aDBResult = aExecutor.queryAll ("SELECT id, certificate, businessIdentifierScheme, businessIdentifier FROM " +
+                                                                       m_sTableNameE +
+                                                                       " WHERE certificate IS NOT NULL");
+      long nEndpointsChanged = 0;
+      if (aDBResult != null)
       {
-        final String sStoredCert = aRow.getAsString (1);
-        if (StringHelper.isNotEmpty (sStoredCert))
+        // Scheme and value of all affected participants
+        final ICommonsOrderedSet <String> aChangedPIDs = new CommonsLinkedHashSet <> ();
+        for (final DBResultRow aRow : aDBResult)
         {
-          final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
-          if (sOldCertNormalized.equals (sStoredCertNormalized))
+          final String sStoredCert = aRow.getAsString (1);
+          if (StringHelper.isNotEmpty (sStoredCert))
           {
-            nEndpointsChanged += newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                                        m_sTableNameE +
-                                                                        " SET certificate=? WHERE id=?",
-                                                                        new ConstantPreparedStatementDataProvider (sNewCert,
-                                                                                                                   aRow.getAsString (0)));
+            final String sStoredCertNormalized = SMPCertificateHelper.getNormalizedCert (sStoredCert);
+            if (sOldCertNormalized.equals (sStoredCertNormalized))
+            {
+              final long nCount = aExecutor.insertOrUpdateOrDelete ("UPDATE " +
+                                                                    m_sTableNameE +
+                                                                    " SET certificate=? WHERE id=?",
+                                                                    new ConstantPreparedStatementDataProvider (sNewCert,
+                                                                                                               aRow.getAsString (0)));
+              if (nCount > 0)
+              {
+                nEndpointsChanged += nCount;
+                if (aChangedPIDs.add (CIdentifier.getURIEncoded (aRow.getAsString (2), aRow.getAsString (3))))
+                  SMPServiceGroupManagerJDBC.updateLastModification (aExecutor,
+                                                                     m_sTableNameSG,
+                                                                     aRow.getAsString (2),
+                                                                     aRow.getAsString (3),
+                                                                     SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ());
+              }
+            }
           }
         }
       }
-    }
-    return nEndpointsChanged;
+      ret.set (Long.valueOf (nEndpointsChanged));
+    });
+    if (eSuccess.isFailure ())
+      return 0;
+    return ret.get ().longValue ();
   }
 
   @NonNull
@@ -919,18 +1033,17 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
 
     if (aServiceGroupID != null)
     {
-      return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                    m_sTableNameE +
-                                                    " SET technicalContactUrl=? WHERE technicalContactUrl=? AND businessIdentifierScheme=? AND businessIdentifier=?",
-                                                    new ConstantPreparedStatementDataProvider (sNewURL,
-                                                                                               sOldURL,
-                                                                                               aServiceGroupID.getScheme (),
-                                                                                               aServiceGroupID.getValue ()));
+      return _updateEndpointsAndLastModification ("technicalContactUrl=?",
+                                                  new CommonsArrayList <> (sNewURL),
+                                                  "technicalContactUrl=? AND businessIdentifierScheme=? AND businessIdentifier=?",
+                                                  new CommonsArrayList <> (sOldURL,
+                                                                           aServiceGroupID.getScheme (),
+                                                                           aServiceGroupID.getValue ()));
     }
-    return newExecutor ().insertOrUpdateOrDelete ("UPDATE " +
-                                                  m_sTableNameE +
-                                                  " SET technicalContactUrl=? WHERE technicalContactUrl=?",
-                                                  new ConstantPreparedStatementDataProvider (sNewURL, sOldURL));
+    return _updateEndpointsAndLastModification ("technicalContactUrl=?",
+                                                new CommonsArrayList <> (sNewURL),
+                                                "technicalContactUrl=?",
+                                                new CommonsArrayList <> (sOldURL));
   }
 
   @NonNull
@@ -963,30 +1076,30 @@ public final class SMPServiceInformationManagerJDBC extends AbstractJDBCEnabledM
     ValueEnforcer.notNull (aDocTypeID, "DocTypeID");
     ValueEnforcer.isTrue (bChangeActivation || bChangeExpiration, "At least one date must be changed");
 
-    final ICommonsList <Object> aParams = new CommonsArrayList <> ();
-    final StringBuilder aSQL = new StringBuilder ("UPDATE ").append (m_sTableNameE).append (" SET ");
+    final ICommonsList <Object> aSetParams = new CommonsArrayList <> ();
+    final StringBuilder aSet = new StringBuilder ();
     if (bChangeActivation)
     {
-      aSQL.append ("serviceActivationDate=?");
-      aParams.add (DBValueHelper.toTimestamp (aNewActivation));
+      aSet.append ("serviceActivationDate=?");
+      aSetParams.add (DBValueHelper.toTimestamp (aNewActivation));
     }
     if (bChangeExpiration)
     {
       if (bChangeActivation)
-        aSQL.append (", ");
-      aSQL.append ("serviceExpirationDate=?");
-      aParams.add (DBValueHelper.toTimestamp (aNewExpiration));
+        aSet.append (", ");
+      aSet.append ("serviceExpirationDate=?");
+      aSetParams.add (DBValueHelper.toTimestamp (aNewExpiration));
     }
-    aSQL.append (" WHERE documentIdentifierScheme=? AND documentIdentifier=?");
-    aParams.add (aDocTypeID.getScheme ());
-    aParams.add (aDocTypeID.getValue ());
+    final ICommonsList <Object> aWhereParams = new CommonsArrayList <> ();
+    final StringBuilder aWhere = new StringBuilder ("documentIdentifierScheme=? AND documentIdentifier=?");
+    aWhereParams.add (aDocTypeID.getScheme ());
+    aWhereParams.add (aDocTypeID.getValue ());
     if (aServiceGroupID != null)
     {
-      aSQL.append (" AND businessIdentifierScheme=? AND businessIdentifier=?");
-      aParams.add (aServiceGroupID.getScheme ());
-      aParams.add (aServiceGroupID.getValue ());
+      aWhere.append (" AND businessIdentifierScheme=? AND businessIdentifier=?");
+      aWhereParams.add (aServiceGroupID.getScheme ());
+      aWhereParams.add (aServiceGroupID.getValue ());
     }
-    return newExecutor ().insertOrUpdateOrDelete (aSQL.toString (),
-                                                  new ConstantPreparedStatementDataProvider (aParams));
+    return _updateEndpointsAndLastModification (aSet.toString (), aSetParams, aWhere.toString (), aWhereParams);
   }
 }

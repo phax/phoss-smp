@@ -37,7 +37,6 @@ import com.helger.base.url.URLHelper;
 import com.helger.cache.regex.RegExHelper;
 import com.helger.collection.commons.CommonsArrayList;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.zone.PDTConfig;
 import com.helger.html.hc.config.HCSettings;
 import com.helger.io.resource.ClassPathResource;
@@ -493,7 +492,7 @@ public class SMPWebAppListener extends WebAppListenerBootstrap
   @Override
   protected void initGlobalSettings ()
   {
-    s_aStartupDateTime = PDTFactory.getCurrentOffsetDateTimeUTC ();
+    s_aStartupDateTime = SMPMetaManager.getTimestampMgr ().getCurrentDateTimeUTC ();
 
     showLogo ();
 

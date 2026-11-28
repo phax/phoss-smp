@@ -34,7 +34,7 @@ import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.state.EChange;
 import com.helger.base.string.StringHelper;
 import com.helger.collection.commons.ICommonsList;
-import com.helger.datetime.helper.PDTFactory;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.photon.audit.AuditHelper;
 import com.helger.photon.security.password.GlobalPasswordSettings;
 import com.helger.photon.security.user.IUser;
@@ -439,7 +439,7 @@ public class UserManagerMongoDB extends AbstractBusinessObjectManagerMongoDB <IU
 
     final EChange eChange = genericUpdateOne (sUserID,
                                               addLastModToUpdate (Updates.combine (Updates.set (BSON_USER_LAST_LOGIN,
-                                                                                                asBsonDate (PDTFactory.getCurrentLocalDateTime ())),
+                                                                                                asBsonDate (SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ())),
                                                                                    Updates.inc (BSON_USER_LOGIN_COUNT,
                                                                                                 Integer.valueOf (1)),
                                                                                    Updates.set (BSON_USER_FAILED_LOGIN_COUNT,

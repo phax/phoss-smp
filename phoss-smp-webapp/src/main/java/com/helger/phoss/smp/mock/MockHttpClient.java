@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -143,6 +144,17 @@ public class MockHttpClient implements AutoCloseable
     ValueEnforcer.notNull (aRequestHeaders, "RequestHeaders");
 
     final HttpGet aRequest = new HttpGet (_getURL (sPath));
+    for (final Map.Entry <String, String> aEntry : aRequestHeaders.entrySet ())
+      aRequest.addHeader (aEntry.getKey (), aEntry.getValue ());
+    return _execute (aRequest, null);
+  }
+
+  @NonNull
+  public MockHttpResponse head (@Nullable final String sPath, @NonNull final Map <String, String> aRequestHeaders)
+  {
+    ValueEnforcer.notNull (aRequestHeaders, "RequestHeaders");
+
+    final HttpHead aRequest = new HttpHead (_getURL (sPath));
     for (final Map.Entry <String, String> aEntry : aRequestHeaders.entrySet ())
       aRequest.addHeader (aEntry.getKey (), aEntry.getValue ());
     return _execute (aRequest, null);

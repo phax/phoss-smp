@@ -21,13 +21,13 @@ import com.helger.annotation.concurrent.Immutable;
 import com.helger.base.enforce.ValueEnforcer;
 import com.helger.base.rt.StackTraceHelper;
 import com.helger.base.string.StringHelper;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.web.PDTWebDateHelper;
 import com.helger.diagnostics.error.level.EErrorLevel;
 import com.helger.diagnostics.error.level.IErrorLevel;
 import com.helger.diagnostics.error.level.IHasErrorLevel;
 import com.helger.json.IJsonObject;
 import com.helger.json.JsonObject;
+import com.helger.phoss.smp.domain.SMPMetaManager;
 import com.helger.xml.microdom.IMicroElement;
 import com.helger.xml.microdom.MicroElement;
 
@@ -47,7 +47,7 @@ public final class ImportActionItem implements IHasErrorLevel
   {
     ValueEnforcer.notNull (eLevel, "Level");
     ValueEnforcer.notEmpty (sMsg, "Message");
-    m_aDT = PDTFactory.getCurrentLocalDateTime ();
+    m_aDT = SMPMetaManager.getTimestampMgr ().getCurrentLocalDateTime ();
     m_eLevel = eLevel;
     m_sPI = sPI;
     m_sMsg = sMsg;

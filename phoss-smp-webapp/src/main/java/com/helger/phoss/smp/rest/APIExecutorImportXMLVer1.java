@@ -36,7 +36,6 @@ import com.helger.collection.commons.CommonsTreeMap;
 import com.helger.collection.commons.ICommonsList;
 import com.helger.collection.commons.ICommonsMap;
 import com.helger.collection.commons.ICommonsSet;
-import com.helger.datetime.helper.PDTFactory;
 import com.helger.datetime.web.PDTWebDateHelper;
 import com.helger.http.CHttpHeader;
 import com.helger.http.header.specific.AcceptMimeTypeHandler;
@@ -282,7 +281,7 @@ public final class APIExecutorImportXMLVer1 extends AbstractSMPAPIExecutor
     // Version 1.0
     LOGGER.info (sLogPrefix + "The provided payload is an XML file version 1.0");
 
-    final ZonedDateTime aQueryDT = PDTFactory.getCurrentZonedDateTimeUTC ();
+    final ZonedDateTime aQueryDT = SMPMetaManager.getTimestampMgr ().getCurrentZonedDateTimeUTC ();
     final StopWatch aSW = StopWatch.createdStarted ();
 
     // Start the import
